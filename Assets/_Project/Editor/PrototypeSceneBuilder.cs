@@ -33,9 +33,9 @@ namespace HwigiTower.EditorTools
 
             var mainCamera = CreateCamera();
             var hud = CreateHud();
-            CreateRuntime(room, runtimeSettings);
+            var roomController = CreateRuntime(room, runtimeSettings);
             CreateBounds();
-            var player = CreatePlayer(movementProfile, mainCamera, hud);
+            var player = CreatePlayer(movementProfile, mainCamera, hud, roomController);
             mainCamera.GetComponent<CameraFollow2D>().SetTarget(player.transform);
             CreateNode(battle, new Vector2(-1.9f, 2.6f), new Color(0.35f, 0.32f, 0.34f, 1f));
             CreateNode(rest, new Vector2(1.9f, 2.6f), new Color(0.30f, 0.36f, 0.34f, 1f));
@@ -50,7 +50,7 @@ namespace HwigiTower.EditorTools
 
             PlayerSettings.defaultScreenWidth = 1080;
             PlayerSettings.defaultScreenHeight = 1920;
-            PlayerSettings.defaultScreenOrientation = UIOrientation.Portrait;
+            PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.allowedAutorotateToPortrait = true;
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
             PlayerSettings.allowedAutorotateToLandscapeLeft = false;
@@ -173,16 +173,17 @@ namespace HwigiTower.EditorTools
             return text;
         }
 
-        private static void CreateRuntime(PrototypeRoomDefinition room, PrototypeRuntimeSettings runtimeSettings)
+        private static PrototypeRoomController CreateRuntime(PrototypeRoomDefinition room, PrototypeRuntimeSettings runtimeSettings)
         {
             var runtime = new GameObject("Prototype Runtime");
             var bootstrap = runtime.AddComponent<PrototypeRuntimeBootstrap>();
             var roomController = runtime.AddComponent<PrototypeRoomController>();
             SetObject(bootstrap, "runtimeSettings", runtimeSettings);
             SetObject(roomController, "roomDefinition", room);
+            return roomController;
         }
 
-        private static GameObject CreatePlayer(PlayerMovementProfile movementProfile, Camera inputCamera, PrototypeHud hud)
+        private static GameObject CreatePlayer(PlayerMovementProfile movementProfile, Camera inputCamera, PrototypeHud hud, PrototypeRoomController roomController)
         {
             var player = CreateSpriteObject("Player", Vector2.zero, new Vector2(0.6f, 0.6f), new Color(0.78f, 0.82f, 0.86f, 1f));
             var body = player.AddComponent<Rigidbody2D>();
@@ -198,6 +199,7 @@ namespace HwigiTower.EditorTools
             SetObject(movement, "movementProfile", movementProfile);
             SetObject(movement, "inputCamera", inputCamera);
             SetObject(interaction, "hud", hud);
+            SetObject(interaction, "roomController", roomController);
             return player;
         }
 
