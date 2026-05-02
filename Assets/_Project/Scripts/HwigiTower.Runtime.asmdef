@@ -1,7 +1,9 @@
 {
     "name": "HwigiTower.Runtime",
     "rootNamespace": "HwigiTower",
-    "references": [],
+    "references": [
+        "Unity.InputSystem"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

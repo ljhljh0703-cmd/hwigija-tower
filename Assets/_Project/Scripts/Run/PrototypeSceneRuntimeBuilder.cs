@@ -21,11 +21,12 @@ namespace HwigiTower.Run
 
             var camera = CreateCamera();
             var hud = CreateHud();
-            CreateRoomController();
+            var roomController = CreateRoomController();
             CreateBounds();
-            var player = CreatePlayer(camera, hud);
+            var player = CreatePlayer(camera, hud, roomController);
             camera.GetComponent<CameraFollow2D>().SetTarget(player.transform);
             CreateNodes(roomDefinition == null ? null : roomDefinition.AvailableNodes);
+            roomController.BeginRun();
         }
 
         private void ApplyPortraitRuntimeSettings()
@@ -95,14 +96,15 @@ namespace HwigiTower.Run
             return text;
         }
 
-        private void CreateRoomController()
+        private PrototypeRoomController CreateRoomController()
         {
             var controllerObject = new GameObject("Prototype Room");
             var controller = controllerObject.AddComponent<PrototypeRoomController>();
             controller.Configure(roomDefinition);
+            return controller;
         }
 
-        private GameObject CreatePlayer(Camera inputCamera, PrototypeHud hud)
+        private GameObject CreatePlayer(Camera inputCamera, PrototypeHud hud, PrototypeRoomController roomController)
         {
             var player = CreateSpriteObject("Player", Vector2.zero, new Vector2(0.6f, 0.6f), new Color(0.78f, 0.82f, 0.86f, 1f));
 
@@ -118,7 +120,7 @@ namespace HwigiTower.Run
             movement.Configure(movementProfile, inputCamera);
 
             var interaction = player.AddComponent<NodeInteractionController>();
-            interaction.Configure(hud);
+            interaction.Configure(hud, roomController);
             return player;
         }
 

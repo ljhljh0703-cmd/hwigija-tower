@@ -1,0 +1,5 @@
+﻿<Solution>
+  <Project Path="HwigiTower.Runtime.csproj" />
+  <Project Path="HwigiTower.EditModeTests.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+</Solution>

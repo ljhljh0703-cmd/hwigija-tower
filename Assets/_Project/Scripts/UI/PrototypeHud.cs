@@ -39,10 +39,16 @@ namespace HwigiTower.UI
             focusText.text = node == null ? "노드 없음" : $"노드: {node.DisplayName}";
         }
 
-        public void ShowInteraction(InteractableNode node)
+        public void ShowInteraction(InteractableNode node, EncounterSelection selection)
         {
             if (interactionText == null || node == null)
             {
+                return;
+            }
+
+            if (selection.HasEncounter)
+            {
+                interactionText.text = $"조우: {selection.EncounterId}";
                 return;
             }
 

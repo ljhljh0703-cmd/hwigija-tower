@@ -1,4 +1,5 @@
 using HwigiTower.Core;
+using HwigiTower.Run;
 using HwigiTower.UI;
 using UnityEngine;
 
@@ -8,18 +9,21 @@ namespace HwigiTower.Encounters
     public sealed class NodeInteractionController : MonoBehaviour
     {
         [SerializeField] private PrototypeHud hud;
+        [SerializeField] private PrototypeRoomController roomController;
 
         private PlayerMovementController _movement;
         private InteractableNode _currentNode;
+        private readonly EncounterSelector _encounterSelector = new EncounterSelector();
 
         private void Awake()
         {
             _movement = GetComponent<PlayerMovementController>();
         }
 
-        public void Configure(PrototypeHud prototypeHud)
+        public void Configure(PrototypeHud prototypeHud, PrototypeRoomController roomController)
         {
             hud = prototypeHud;
+            this.roomController = roomController;
         }
 
         private void Update()
@@ -27,7 +31,17 @@ namespace HwigiTower.Encounters
             if (_currentNode != null && _movement.LatestInput.InteractPressed)
             {
                 _currentNode.Interact();
-                hud?.ShowInteraction(_currentNode);
+                var selection = roomController == null
+                    ? new EncounterSelection(_currentNode.Definition, null)
+                    : _encounterSelector.Select(roomController.RunContext, _currentNode.Definition);
+                var encounterId = selection.EncounterId;
+                if (roomController != null && _currentNode.Definition != null)
+                {
+                    roomController.EventBus.Raise(new GameFlowEvent(GameFlowEventType.EncounterSelected, roomController.RunContext.RunId, _currentNode.Definition.NodeId, encounterId));
+                    roomController.NotifyNodeResolved(_currentNode, encounterId);
+                }
+
+                hud?.ShowInteraction(_currentNode, selection);
             }
         }
 
@@ -53,6 +67,7 @@ namespace HwigiTower.Encounters
 
         private void SetCurrentNode(InteractableNode node)
         {
+            var previousNode = _currentNode;
             if (_currentNode != null)
             {
                 _currentNode.SetHighlighted(false);
@@ -63,6 +78,11 @@ namespace HwigiTower.Encounters
             if (_currentNode != null)
             {
                 _currentNode.SetHighlighted(true);
+                roomController?.NotifyNodeEntered(_currentNode);
+            }
+            else
+            {
+                roomController?.NotifyNodeExited(previousNode);
             }
 
             hud?.ShowFocus(_currentNode);
