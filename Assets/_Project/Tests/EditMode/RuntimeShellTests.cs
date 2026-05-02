@@ -5,6 +5,7 @@ using HwigiTower.Core;
 using HwigiTower.Encounters;
 using HwigiTower.LLM;
 using HwigiTower.NPC;
+using HwigiTower.Run;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -88,6 +89,47 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(reflection.IsValid);
             Assert.IsTrue(recall.Contains("run-001"));
+        }
+
+        [Test]
+        public void PrototypeRunState_BattleEmitsCombatAndCompletionEvents()
+        {
+            var bus = new GameFlowEventBus();
+            var events = new System.Collections.Generic.List<GameFlowEventType>();
+            using (bus.Subscribe(flowEvent => events.Add(flowEvent.Type)))
+            {
+                var state = new PrototypeRunState("run-001", bus);
+                var context = new DeterministicRunContext("run-001", 1001);
+
+                var resolution = state.ResolveBattle(context, "node.battle", "encounter.battle", null, null);
+
+                Assert.IsFalse(string.IsNullOrEmpty(resolution.Message));
+                CollectionAssert.Contains(events, GameFlowEventType.CombatStarted);
+                CollectionAssert.Contains(events, GameFlowEventType.CombatCompleted);
+                CollectionAssert.Contains(events, GameFlowEventType.EncounterCompleted);
+            }
+        }
+
+        [Test]
+        public void PrototypeRunState_RemnantCompletesRunAndSavesReflection()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+
+            var resolution = state.ResolveRemnant("node.remnant");
+
+            Assert.IsTrue(resolution.RunCompleted);
+            Assert.IsTrue(state.RunCompleted);
+            Assert.IsTrue(state.MemoryRepo.TryGetReflection("run-001", out _));
+        }
+
+        [Test]
+        public void OnDeviceLLMProvider_FallsBackWhenNativePluginIsMissing()
+        {
+            var provider = new OnDeviceLLMProvider(100, new DeterministicFakeLLMProvider());
+            var request = new LLMRequest("run-001", "prompt", "profile");
+
+            Assert.IsTrue(provider.TryComplete(request, out var response));
+            Assert.AreEqual(request.CacheKey, response.CacheKey);
         }
 
         [Test]

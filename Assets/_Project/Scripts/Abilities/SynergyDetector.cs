@@ -7,6 +7,7 @@ namespace HwigiTower.Abilities
     {
         private readonly GameFlowEventBus _eventBus;
         private readonly string _runId;
+        private readonly HashSet<string> _raisedActiveSynergies = new HashSet<string>();
 
         public SynergyDetector(GameFlowEventBus eventBus, string runId)
         {
@@ -32,7 +33,7 @@ namespace HwigiTower.Abilities
 
                 var active = CountTag(abilities, synergy.Tag) >= synergy.RequiredCount;
                 result.Add(new SynergyState(synergy, active));
-                if (active)
+                if (active && _raisedActiveSynergies.Add(synergy.Tag))
                 {
                     _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.SynergyActivated, _runId, synergy.Tag, synergy.RequiredCount.ToString()));
                 }
