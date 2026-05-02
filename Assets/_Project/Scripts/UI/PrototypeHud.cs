@@ -1,4 +1,5 @@
 using HwigiTower.Encounters;
+using HwigiTower.Run;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,10 +40,16 @@ namespace HwigiTower.UI
             focusText.text = node == null ? "노드 없음" : $"노드: {node.DisplayName}";
         }
 
-        public void ShowInteraction(InteractableNode node, EncounterSelection selection)
+        public void ShowInteraction(InteractableNode node, EncounterSelection selection, PrototypeNodeResolution resolution)
         {
             if (interactionText == null || node == null)
             {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(resolution.Message))
+            {
+                interactionText.text = resolution.Message;
                 return;
             }
 

@@ -10,6 +10,7 @@ namespace HwigiTower.Run
 
         public DeterministicRunContext RunContext { get; private set; }
         public GameFlowEventBus EventBus { get; } = new GameFlowEventBus();
+        public PrototypeRunState RunState { get; private set; }
 
         private void Awake()
         {
@@ -24,6 +25,7 @@ namespace HwigiTower.Run
 
         public void BeginRun()
         {
+            RunState = new PrototypeRunState(RunContext.RunId, EventBus);
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, RunContext.RunId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, RunContext.RunId, RunContext.RunId, string.Empty));
         }
@@ -44,6 +46,48 @@ namespace HwigiTower.Run
         {
             var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeResolved, RunContext.RunId, nodeId, payloadId));
+        }
+
+        public PrototypeNodeResolution ResolveNode(InteractableNode node, EncounterSelection selection)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (node == null || node.Definition == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "no node", false);
+            }
+
+            var definition = node.Definition;
+            var encounterId = selection.EncounterId;
+            var enemy = selection.HasEncounter && selection.Encounter.Enemy != null
+                ? selection.Encounter.Enemy
+                : definition.FallbackEnemy;
+
+            PrototypeNodeResolution resolution;
+            switch (definition.Kind)
+            {
+                case NodeKind.Battle:
+                    resolution = RunState.ResolveBattle(RunContext, definition.NodeId, encounterId, enemy, definition.TrackedSynergies);
+                    break;
+                case NodeKind.Rest:
+                    resolution = RunState.ResolveRest(definition.NodeId);
+                    break;
+                case NodeKind.Shop:
+                    resolution = RunState.ResolveShop(definition.NodeId, definition.GrantedAbility, definition.TrackedSynergies);
+                    break;
+                case NodeKind.Remnant:
+                    resolution = RunState.ResolveRemnant(definition.NodeId);
+                    break;
+                default:
+                    resolution = RunState.ResolveGeneric(definition.NodeId, encounterId, definition.PlaceholderOutcome);
+                    break;
+            }
+
+            NotifyNodeResolved(node, resolution.PayloadId);
+            return resolution;
         }
 
         private void RebuildContext()

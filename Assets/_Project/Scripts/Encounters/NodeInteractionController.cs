@@ -35,13 +35,14 @@ namespace HwigiTower.Encounters
                     ? new EncounterSelection(_currentNode.Definition, null)
                     : _encounterSelector.Select(roomController.RunContext, _currentNode.Definition);
                 var encounterId = selection.EncounterId;
+                PrototypeNodeResolution resolution = default;
                 if (roomController != null && _currentNode.Definition != null)
                 {
                     roomController.EventBus.Raise(new GameFlowEvent(GameFlowEventType.EncounterSelected, roomController.RunContext.RunId, _currentNode.Definition.NodeId, encounterId));
-                    roomController.NotifyNodeResolved(_currentNode, encounterId);
+                    resolution = roomController.ResolveNode(_currentNode, selection);
                 }
 
-                hud?.ShowInteraction(_currentNode, selection);
+                hud?.ShowInteraction(_currentNode, selection, resolution);
             }
         }
 
