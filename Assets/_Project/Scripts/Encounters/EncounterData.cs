@@ -12,6 +12,15 @@ namespace HwigiTower.Encounters
         [SerializeField, Min(0)] private int weight;
         [SerializeField] private string deterministicSeedKey = string.Empty;
         [SerializeField] private EnemyData enemy;
+        [SerializeField] private string assetPath = string.Empty;
+        [SerializeField] private string sourceHash = string.Empty;
+        [SerializeField] private string contentCategory = string.Empty;
+        [SerializeField] private string npcStage = string.Empty;
+        [SerializeField] private string bodyTextKey = string.Empty;
+        [SerializeField] private string writerStatus = string.Empty;
+        [SerializeField] private int glitchLevel;
+        [SerializeField] private int timeLimitSeconds;
+        [SerializeField] private string[] choiceStableIds = new string[0];
 
         public string Id => id;
         public EncounterType Type => type;
@@ -19,5 +28,14 @@ namespace HwigiTower.Encounters
         public int Weight => weight;
         public string DeterministicSeedKey => deterministicSeedKey;
         public EnemyData Enemy => enemy;
+        public string AssetPath => assetPath;
+        public string SourceHash => sourceHash;
+        public string ContentCategory => contentCategory;
+        public string NpcStage => npcStage;
+        public string BodyTextKey => bodyTextKey;
+        public string WriterStatus => writerStatus;
+        public int GlitchLevel => glitchLevel;
+        public int TimeLimitSeconds => timeLimitSeconds;
+        public string[] ChoiceStableIds => choiceStableIds;
     }
 }

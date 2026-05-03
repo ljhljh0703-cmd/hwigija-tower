@@ -5,6 +5,10 @@ namespace HwigiTower.Encounters
         Battle = 0,
         Rest = 1,
         Shop = 2,
-        Remnant = 3
+        Remnant = 3,
+        MoralChoice = 4,
+        MemoryFragment = 5,
+        Story = 6,
+        MetaText = 7
     }
 }
