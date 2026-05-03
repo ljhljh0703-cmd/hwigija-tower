@@ -7,10 +7,12 @@ namespace HwigiTower.Run
     public sealed class PrototypeRoomController : MonoBehaviour
     {
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
+        [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
 
         public DeterministicRunContext RunContext { get; private set; }
         public GameFlowEventBus EventBus { get; } = new GameFlowEventBus();
         public PrototypeRunState RunState { get; private set; }
+        public EncounterRuntimeCatalogData EncounterRuntimeCatalog => encounterRuntimeCatalog;
 
         private void Awake()
         {
@@ -19,13 +21,20 @@ namespace HwigiTower.Run
 
         public void Configure(PrototypeRoomDefinition definition)
         {
+            Configure(definition, encounterRuntimeCatalog);
+        }
+
+        public void Configure(PrototypeRoomDefinition definition, EncounterRuntimeCatalogData runtimeCatalog)
+        {
             roomDefinition = definition;
+            encounterRuntimeCatalog = runtimeCatalog;
             RebuildContext();
         }
 
         public void BeginRun()
         {
             RunState = new PrototypeRunState(RunContext.RunId, EventBus);
+            RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, RunContext.RunId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, RunContext.RunId, RunContext.RunId, string.Empty));
         }

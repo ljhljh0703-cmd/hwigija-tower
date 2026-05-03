@@ -32,6 +32,7 @@ namespace HwigiTower.Encounters
         public int max;
         public int minFloor;
         public int maxFloor;
+        public string memoryFragmentId = string.Empty;
     }
 
     [System.Serializable]
@@ -45,6 +46,9 @@ namespace HwigiTower.Encounters
         public int count;
         public string abilityRef = string.Empty;
         public string rewardBundleRef = string.Empty;
+        public string memoryFragmentId = string.Empty;
+        public string memoryFragmentTextKey = string.Empty;
+        public string npcStage = string.Empty;
         public string targetEncounterId = string.Empty;
         public string targetNodeId = string.Empty;
         public EncounterCombatHandoffRuntimeData combatHandoff;
@@ -61,6 +65,9 @@ namespace HwigiTower.Encounters
         public int count;
         public string abilityRef = string.Empty;
         public string rewardBundleRef = string.Empty;
+        public string memoryFragmentId = string.Empty;
+        public string memoryFragmentTextKey = string.Empty;
+        public string npcStage = string.Empty;
         public string targetEncounterId = string.Empty;
         public string targetNodeId = string.Empty;
     }
