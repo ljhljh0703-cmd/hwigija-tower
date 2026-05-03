@@ -39,6 +39,12 @@ namespace HwigiTower.Encounters
                 if (roomController != null && _currentNode.Definition != null)
                 {
                     roomController.EventBus.Raise(new GameFlowEvent(GameFlowEventType.EncounterSelected, roomController.RunContext.RunId, _currentNode.Definition.NodeId, encounterId));
+                    if (roomController.HasEncounterChoices(selection))
+                    {
+                        ShowEncounterChoices(_currentNode, selection);
+                        return;
+                    }
+
                     resolution = roomController.ResolveNode(_currentNode, selection);
                 }
 
@@ -91,6 +97,22 @@ namespace HwigiTower.Encounters
             }
 
             hud?.ShowFocus(_currentNode);
+            if (_currentNode == null)
+            {
+                hud?.ClearChoices();
+            }
+        }
+
+        private void ShowEncounterChoices(InteractableNode node, EncounterSelection selection)
+        {
+            var views = roomController.BuildEncounterChoiceViews(selection);
+            hud?.ShowChoices(selection.Encounter, views, choiceStableId =>
+            {
+                var resolution = roomController.ResolveEncounterChoice(node, selection.Encounter, choiceStableId);
+                hud?.ShowInteraction(node, selection, resolution);
+                hud?.ShowRunState(roomController.GetSnapshot());
+            });
+            hud?.ShowRunState(roomController.GetSnapshot());
         }
     }
 }

@@ -57,6 +57,38 @@ namespace HwigiTower.Run
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeResolved, RunContext.RunId, nodeId, payloadId));
         }
 
+        public bool HasEncounterChoices(EncounterSelection selection)
+        {
+            return selection.HasEncounter
+                && selection.Encounter.Choices != null
+                && selection.Encounter.Choices.Length > 0;
+        }
+
+        public PrototypeEncounterChoiceView[] BuildEncounterChoiceViews(EncounterSelection selection)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            return HasEncounterChoices(selection)
+                ? PrototypeEncounterRuntimeResolver.BuildChoiceViews(RunState, selection.Encounter)
+                : new PrototypeEncounterChoiceView[0];
+        }
+
+        public PrototypeNodeResolution ResolveEncounterChoice(InteractableNode node, EncounterData encounter, string choiceStableId)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
+            var resolution = RunState.ResolveEncounterChoice(RunContext, nodeId, encounter, choiceStableId);
+            NotifyNodeResolved(node, resolution.PayloadId);
+            return resolution;
+        }
+
         public PrototypeNodeResolution ResolveNode(InteractableNode node, EncounterSelection selection)
         {
             if (RunState == null)
@@ -76,14 +108,9 @@ namespace HwigiTower.Run
                 : definition.FallbackEnemy;
 
             PrototypeNodeResolution resolution;
-            if (selection.HasEncounter
-                && selection.Encounter.Choices != null
-                && selection.Encounter.Choices.Length > 0
-                && selection.Encounter.Type != EncounterType.Battle)
+            if (HasEncounterChoices(selection))
             {
-                resolution = RunState.ResolveEncounterChoice(RunContext, definition.NodeId, selection.Encounter, string.Empty);
-                NotifyNodeResolved(node, resolution.PayloadId);
-                return resolution;
+                return new PrototypeNodeResolution(definition.NodeId, encounterId, $"choices pending: {encounterId}", false);
             }
 
             switch (definition.Kind)
