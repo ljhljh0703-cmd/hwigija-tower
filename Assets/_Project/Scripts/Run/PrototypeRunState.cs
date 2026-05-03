@@ -13,6 +13,15 @@ namespace HwigiTower.Run
         private const int BasePlayerAttack = 5;
         private const int FallbackEnemyHp = 12;
         private const int FallbackEnemyAttack = 3;
+        private const int MinMental = -100;
+        private const int MaxMental = 100;
+        private const int MinGold = 0;
+        private const int MaxGold = 999;
+        private const int MinGlitchLevel = 0;
+        private const int MaxGlitchLevel = 100;
+        private const int MinAffinity = -100;
+        private const int MaxAffinity = 100;
+        private const int PrototypeShopAbilityCost = 10;
 
         private readonly GameFlowEventBus _eventBus;
         private readonly ReflectionPipeline _reflectionPipeline;
@@ -22,6 +31,10 @@ namespace HwigiTower.Run
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
         private int _playerAttack = BasePlayerAttack;
+        private int _mental;
+        private int _gold;
+        private int _glitchLevel;
+        private int _affinity;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
         {
@@ -45,10 +58,50 @@ namespace HwigiTower.Run
         public int PlayerHp => _playerHp;
         public int PlayerMaxHp => _playerMaxHp;
         public int PlayerAttack => _playerAttack;
+        public int Mental => _mental;
+        public int Gold => _gold;
+        public int GlitchLevel => _glitchLevel;
+        public int Affinity => _affinity;
 
         public PrototypeRunSnapshot CreateSnapshot()
         {
-            return new PrototypeRunSnapshot(RunId, _playerHp, _playerMaxHp, _playerAttack, NodesResolved, BattlesWon, Abilities.Abilities.Count, _runCompleted);
+            return new PrototypeRunSnapshot(
+                RunId,
+                _playerHp,
+                _playerMaxHp,
+                _playerAttack,
+                _mental,
+                _gold,
+                _glitchLevel,
+                _affinity,
+                NodesResolved,
+                BattlesWon,
+                Abilities.Abilities.Count,
+                _runCompleted);
+        }
+
+        public int ModifyMental(int amount)
+        {
+            _mental = Clamp(_mental + amount, MinMental, MaxMental);
+            return _mental;
+        }
+
+        public int ModifyGold(int amount)
+        {
+            _gold = Clamp(_gold + amount, MinGold, MaxGold);
+            return _gold;
+        }
+
+        public int ModifyGlitchLevel(int amount)
+        {
+            _glitchLevel = Clamp(_glitchLevel + amount, MinGlitchLevel, MaxGlitchLevel);
+            return _glitchLevel;
+        }
+
+        public int ModifyAffinity(int amount)
+        {
+            _affinity = Clamp(_affinity + amount, MinAffinity, MaxAffinity);
+            return _affinity;
         }
 
         public void AttachNpcStateMachine(NpcStateMachine stateMachine)
@@ -128,11 +181,30 @@ namespace HwigiTower.Run
             }
 
             NodesResolved++;
+            if (grantedAbility == null)
+            {
+                _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, "shop-empty"));
+                return new PrototypeNodeResolution(nodeId, string.Empty, "shop unavailable", false);
+            }
+
+            if (_gold < PrototypeShopAbilityCost)
+            {
+                _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, "shop-insufficient-gold"));
+                return new PrototypeNodeResolution(nodeId, string.Empty, $"purchase failed: gold {_gold}/{PrototypeShopAbilityCost}", false);
+            }
+
             var added = Abilities.Add(grantedAbility);
+            if (!added)
+            {
+                _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, "shop-empty"));
+                return new PrototypeNodeResolution(nodeId, string.Empty, "purchase failed: ability unavailable", false);
+            }
+
+            ModifyGold(-PrototypeShopAbilityCost);
             EvaluateSynergies(trackedSynergies);
             RecalculatePlayerStats();
-            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, added ? "ability-added" : "shop-empty"));
-            return new PrototypeNodeResolution(nodeId, added ? grantedAbility.Id : string.Empty, added ? $"ability added: {grantedAbility.Id}" : "shop placeholder", false);
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, "shop-purchase-success"));
+            return new PrototypeNodeResolution(nodeId, grantedAbility.Id, $"purchase success: {grantedAbility.Id}", false);
         }
 
         public PrototypeNodeResolution ResolveRemnant(string nodeId)
@@ -195,6 +267,11 @@ namespace HwigiTower.Run
         private void ApplyNpcTrigger(string triggerId)
         {
             NpcStateMachine?.TryApply(triggerId);
+        }
+
+        private static int Clamp(int value, int min, int max)
+        {
+            return System.Math.Max(min, System.Math.Min(value, max));
         }
 
         private static CombatantState CreateEnemyState(EnemyData enemyData)

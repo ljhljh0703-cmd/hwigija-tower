@@ -94,7 +94,7 @@ namespace HwigiTower.Run
         {
             if (RunState == null)
             {
-                return new PrototypeRunSnapshot(RunContext.RunId, 0, 0, 0, 0, 0, 0, false);
+                return new PrototypeRunSnapshot(RunContext.RunId, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false);
             }
 
             return RunState.CreateSnapshot();
