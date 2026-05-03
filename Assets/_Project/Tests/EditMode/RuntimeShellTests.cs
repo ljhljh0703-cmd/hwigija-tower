@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections.Generic;
 using HwigiTower.Abilities;
 using HwigiTower.Combat;
 using HwigiTower.Core;
@@ -222,6 +223,144 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void EncounterRuntimeResolver_AppliesChoiceEffects()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            state.ModifyGold(10);
+            var encounter = CreateRuntimeEncounter(
+                "encounter.moral",
+                CreateChoice(
+                    "choice.help",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 3) },
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", -3),
+                        CreateEffect("ModifyAffinity", 8),
+                        CreateEffect("ModifyGlitchLevel", -4),
+                        CreateFlagEffect("FLAG_HELPED", true)
+                    }));
+
+            var resolution = state.ResolveEncounterChoice("node.moral", encounter, "choice.help");
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual("choice.help", resolution.PayloadId);
+            Assert.AreEqual(7, snapshot.Gold);
+            Assert.AreEqual(8, snapshot.Affinity);
+            Assert.AreEqual(0, snapshot.GlitchLevel);
+            Assert.IsTrue(state.HasFlag("FLAG_HELPED"));
+        }
+
+        [Test]
+        public void EncounterRuntimeResolver_BlocksChoiceWhenRequirementFails()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var encounter = CreateRuntimeEncounter(
+                "encounter.shop",
+                CreateChoice(
+                    "choice.buy",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 6) },
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", -6),
+                        CreateItemEffect("ITEM_FIELD_BANDAGE", 1)
+                    }));
+
+            var resolution = state.ResolveEncounterChoice("node.shop", encounter, "choice.buy");
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual("choice.buy", resolution.PayloadId);
+            Assert.AreEqual(0, snapshot.Gold);
+            Assert.AreEqual(0, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.IsTrue(resolution.Message.Contains("requirements not met"));
+        }
+
+        [Test]
+        public void EncounterRuntimeResolver_HandlesHiddenAndDisabledVisibleChoices()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var encounter = CreateRuntimeEncounter(
+                "encounter.policy",
+                CreateChoice(
+                    "choice.hidden",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 6) },
+                    new[] { CreateEffect("ModifyMental", 1) },
+                    "Hidden"),
+                CreateChoice(
+                    "choice.disabled",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 6) },
+                    new[] { CreateEffect("ModifyMental", 2) },
+                    "DisabledVisible",
+                    "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"),
+                CreateChoice(
+                    "choice.free",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateEffect("ModifyMental", 3) }));
+
+            var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, encounter);
+            var resolution = state.ResolveEncounterChoice("node.policy", encounter, string.Empty);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.IsFalse(views[0].Visible);
+            Assert.IsTrue(views[1].Visible);
+            Assert.IsFalse(views[1].Enabled);
+            Assert.AreEqual("PLACEHOLDER_REASON_NOT_ENOUGH_GOLD", views[1].ReasonTextKey);
+            Assert.AreEqual("choice.free", resolution.PayloadId);
+            Assert.AreEqual(3, snapshot.Mental);
+        }
+
+        [Test]
+        public void EncounterRuntimeResolver_ShopSpendsGoldAndAddsItem()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            state.ModifyGold(6);
+            var encounter = CreateRuntimeEncounter(
+                "encounter.shop.runtime",
+                CreateChoice(
+                    "choice.buy.item",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 6) },
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", -6),
+                        CreateItemEffect("ITEM_FIELD_BANDAGE", 1)
+                    },
+                    "DisabledVisible",
+                    "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"));
+
+            var resolution = state.ResolveEncounterChoice("node.shop.runtime", encounter, "choice.buy.item");
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual("choice.buy.item", resolution.PayloadId);
+            Assert.AreEqual(0, snapshot.Gold);
+            Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+        }
+
+        [Test]
+        public void EncounterRuntimeResolver_StartCombatEntersCombatFlow()
+        {
+            var bus = new GameFlowEventBus();
+            var events = new List<GameFlowEventType>();
+            using (bus.Subscribe(flowEvent => events.Add(flowEvent.Type)))
+            {
+                var state = new PrototypeRunState("run-001", bus);
+                var encounter = CreateRuntimeEncounter(
+                    "encounter.combat.runtime",
+                    CreateChoice(
+                        "choice.fight",
+                        new EncounterRequirementRuntimeData[0],
+                        new[] { CreateCombatEffect("COMBAT_RUNTIME_001", "ENEMY_RUNTIME_001", new[] { CreatePostCombatEffect("ModifyGold", 8) }) }));
+
+                var resolution = state.ResolveEncounterChoice(new DeterministicRunContext("run-001", 1001), "node.combat.runtime", encounter, "choice.fight");
+                var snapshot = state.CreateSnapshot();
+
+                Assert.AreEqual("choice.fight", resolution.PayloadId);
+                Assert.AreEqual(8, snapshot.Gold);
+                Assert.AreEqual(1, snapshot.BattlesWon);
+                CollectionAssert.Contains(events, GameFlowEventType.CombatStarted);
+                CollectionAssert.Contains(events, GameFlowEventType.CombatCompleted);
+            }
+        }
+
+        [Test]
         public void OnDeviceLLMProvider_FallsBackWhenNativePluginIsMissing()
         {
             var provider = new OnDeviceLLMProvider(100, new DeterministicFakeLLMProvider());
@@ -263,6 +402,181 @@ namespace HwigiTower.Tests.EditMode
             serialized.FindProperty("weight").intValue = weight;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             return encounter;
+        }
+
+        private static EncounterData CreateRuntimeEncounter(string id, params EncounterChoiceRuntimeData[] choices)
+        {
+            var encounter = ScriptableObject.CreateInstance<EncounterData>();
+            var serialized = new SerializedObject(encounter);
+            serialized.FindProperty("id").stringValue = id;
+            var property = serialized.FindProperty("choices");
+            property.arraySize = choices.Length;
+            for (var i = 0; i < choices.Length; i++)
+            {
+                var choice = property.GetArrayElementAtIndex(i);
+                choice.FindPropertyRelative("stableId").stringValue = choices[i].stableId;
+                choice.FindPropertyRelative("textKey").stringValue = choices[i].textKey;
+                choice.FindPropertyRelative("requirementMode").stringValue = choices[i].requirementMode;
+                choice.FindPropertyRelative("unavailablePolicyMode").stringValue = choices[i].unavailablePolicyMode;
+                choice.FindPropertyRelative("unavailableReasonTextKey").stringValue = choices[i].unavailableReasonTextKey;
+                var requirements = choice.FindPropertyRelative("requirements");
+                requirements.arraySize = choices[i].requirements.Length;
+                for (var r = 0; r < choices[i].requirements.Length; r++)
+                {
+                    var source = choices[i].requirements[r];
+                    var target = requirements.GetArrayElementAtIndex(r);
+                    target.FindPropertyRelative("kind").stringValue = source.kind;
+                    target.FindPropertyRelative("stat").stringValue = source.stat;
+                    target.FindPropertyRelative("value").intValue = source.value;
+                    target.FindPropertyRelative("abilityRef").stringValue = source.abilityRef;
+                    target.FindPropertyRelative("minFloor").intValue = source.minFloor;
+                    target.FindPropertyRelative("maxFloor").intValue = source.maxFloor;
+                }
+
+                var effects = choice.FindPropertyRelative("effects");
+                effects.arraySize = choices[i].effects.Length;
+                for (var e = 0; e < choices[i].effects.Length; e++)
+                {
+                    var source = choices[i].effects[e];
+                    var target = effects.GetArrayElementAtIndex(e);
+                    target.FindPropertyRelative("kind").stringValue = source.kind;
+                    target.FindPropertyRelative("amount").intValue = source.amount;
+                    target.FindPropertyRelative("flag").stringValue = source.flag;
+                    target.FindPropertyRelative("value").boolValue = source.value;
+                    target.FindPropertyRelative("itemRef").stringValue = source.itemRef;
+                    target.FindPropertyRelative("count").intValue = source.count;
+                    target.FindPropertyRelative("abilityRef").stringValue = source.abilityRef;
+                    target.FindPropertyRelative("rewardBundleRef").stringValue = source.rewardBundleRef;
+                    SetCombatHandoff(target.FindPropertyRelative("combatHandoff"), source.combatHandoff);
+                }
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return encounter;
+        }
+
+        private static void SetCombatHandoff(SerializedProperty property, EncounterCombatHandoffRuntimeData handoff)
+        {
+            if (handoff == null)
+            {
+                property.FindPropertyRelative("stableId").stringValue = string.Empty;
+                property.FindPropertyRelative("enemyRefs").arraySize = 0;
+                property.FindPropertyRelative("onVictoryEffects").arraySize = 0;
+                property.FindPropertyRelative("onDefeatEffects").arraySize = 0;
+                return;
+            }
+
+            property.FindPropertyRelative("stableId").stringValue = handoff.stableId;
+            property.FindPropertyRelative("seedKey").stringValue = handoff.seedKey;
+            var enemyRefs = property.FindPropertyRelative("enemyRefs");
+            enemyRefs.arraySize = handoff.enemyRefs.Length;
+            for (var i = 0; i < handoff.enemyRefs.Length; i++)
+            {
+                enemyRefs.GetArrayElementAtIndex(i).stringValue = handoff.enemyRefs[i];
+            }
+
+            SetPostCombatEffects(property.FindPropertyRelative("onVictoryEffects"), handoff.onVictoryEffects);
+            SetPostCombatEffects(property.FindPropertyRelative("onDefeatEffects"), handoff.onDefeatEffects);
+        }
+
+        private static void SetPostCombatEffects(SerializedProperty property, EncounterPostCombatEffectRuntimeData[] effects)
+        {
+            property.arraySize = effects.Length;
+            for (var i = 0; i < effects.Length; i++)
+            {
+                var source = effects[i];
+                var target = property.GetArrayElementAtIndex(i);
+                target.FindPropertyRelative("kind").stringValue = source.kind;
+                target.FindPropertyRelative("amount").intValue = source.amount;
+                target.FindPropertyRelative("flag").stringValue = source.flag;
+                target.FindPropertyRelative("value").boolValue = source.value;
+                target.FindPropertyRelative("itemRef").stringValue = source.itemRef;
+                target.FindPropertyRelative("count").intValue = source.count;
+                target.FindPropertyRelative("abilityRef").stringValue = source.abilityRef;
+                target.FindPropertyRelative("rewardBundleRef").stringValue = source.rewardBundleRef;
+            }
+        }
+
+        private static EncounterChoiceRuntimeData CreateChoice(
+            string stableId,
+            EncounterRequirementRuntimeData[] requirements,
+            EncounterEffectRuntimeData[] effects,
+            string unavailableMode = "Hidden",
+            string unavailableReasonTextKey = "")
+        {
+            return new EncounterChoiceRuntimeData
+            {
+                stableId = stableId,
+                requirementMode = "All",
+                requirements = requirements,
+                effects = effects,
+                unavailablePolicyMode = unavailableMode,
+                unavailableReasonTextKey = unavailableReasonTextKey
+            };
+        }
+
+        private static EncounterRequirementRuntimeData CreateRequirement(string kind, string stat, int value)
+        {
+            return new EncounterRequirementRuntimeData
+            {
+                kind = kind,
+                stat = stat,
+                value = value
+            };
+        }
+
+        private static EncounterEffectRuntimeData CreateEffect(string kind, int amount)
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = kind,
+                amount = amount
+            };
+        }
+
+        private static EncounterEffectRuntimeData CreateFlagEffect(string flag, bool value)
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = "SetFlag",
+                flag = flag,
+                value = value
+            };
+        }
+
+        private static EncounterEffectRuntimeData CreateItemEffect(string itemRef, int count)
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = "AddItem",
+                itemRef = itemRef,
+                count = count
+            };
+        }
+
+        private static EncounterEffectRuntimeData CreateCombatEffect(string combatId, string enemyRef, EncounterPostCombatEffectRuntimeData[] onVictoryEffects)
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = "StartCombat",
+                combatHandoff = new EncounterCombatHandoffRuntimeData
+                {
+                    stableId = combatId,
+                    seedKey = combatId,
+                    enemyRefs = new[] { enemyRef },
+                    onVictoryEffects = onVictoryEffects,
+                    onDefeatEffects = new EncounterPostCombatEffectRuntimeData[0]
+                }
+            };
+        }
+
+        private static EncounterPostCombatEffectRuntimeData CreatePostCombatEffect(string kind, int amount)
+        {
+            return new EncounterPostCombatEffectRuntimeData
+            {
+                kind = kind,
+                amount = amount
+            };
         }
 
         private static PrototypeNodeDefinition CreateNode(string nodeId, params EncounterData[] encounters)

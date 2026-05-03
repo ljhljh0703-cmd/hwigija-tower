@@ -29,3 +29,191 @@ MonoBehaviour:
   choiceStableIds:
   - CHOICE_F01_COMBAT_ENGAGE
   - CHOICE_F01_COMBAT_PREPARE
+  choices:
+  - stableId: CHOICE_F01_COMBAT_ENGAGE
+    textKey: PLACEHOLDER_CHOICE_F01_COMBAT_ENGAGE
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: StartCombat
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId: COMBAT_F01_GATE_001
+        sourceEncounterId: ENC_F01_COMBAT_GATE_001
+        sourceChoiceId: CHOICE_F01_COMBAT_ENGAGE
+        seedKey: SEED_COMBAT_F01_GATE_001
+        sourceHash: sha256:2222222222222222222222222222222222222222222222222222222222222222
+        floor: 1
+        enemyRefs:
+        - ENEMY_PLACEHOLDER_01
+        npcStage: S0_FIRST_MEETING
+        onVictoryEffects:
+        - kind: ModifyGold
+          amount: 8
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyGlitchLevel
+          amount: -2
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyAffinity
+          amount: 2
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          targetEncounterId:
+          targetNodeId:
+        - kind: SetFlag
+          amount: 0
+          flag: FLAG_F01_GATE_CLEARED
+          value: 1
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          targetEncounterId:
+          targetNodeId:
+        onDefeatEffects:
+        - kind: ModifyHp
+          amount: -6
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyGlitchLevel
+          amount: 6
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyAffinity
+          amount: -2
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          targetEncounterId:
+          targetNodeId:
+        onVictoryReturnNode: NODE_F01_GATE_VICTORY
+        onDefeatReturnNode: NODE_F01_GATE_DEFEAT
+        victoryTextKey: PLACEHOLDER_POST_F01_GATE_VICTORY
+        defeatTextKey: PLACEHOLDER_POST_F01_GATE_DEFEAT
+        deathTextKey: PLACEHOLDER_POST_F01_GATE_DEATH
+        npcReactionKey: NPC_REACT_F01_GATE_COMBAT_START
+        promptHash: sha256:3333333333333333333333333333333333333333333333333333333333333333
+        cacheKey: CACHE_F01_GATE_COMBAT_S0
+    unavailablePolicyMode: Hidden
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_F01_COMBAT_ENGAGE
+  - stableId: CHOICE_F01_COMBAT_PREPARE
+    textKey: PLACEHOLDER_CHOICE_F01_COMBAT_PREPARE
+    requirementMode: All
+    requirements:
+    - kind: StatAtLeast
+      stat: mental
+      op:
+      value: -50
+      flag:
+      expected: 0
+      itemRef:
+      minCount: 0
+      abilityRef:
+      min: 0
+      max: 0
+      minFloor: 0
+      maxFloor: 0
+    effects:
+    - kind: ModifyMental
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyAffinity
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: Hidden
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_F01_COMBAT_PREPARE
