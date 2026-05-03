@@ -150,6 +150,78 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void PrototypeRunState_ClampsCoreRunStateValues()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+
+            state.ModifyMental(150);
+            state.ModifyGold(1200);
+            state.ModifyGlitchLevel(120);
+            state.ModifyAffinity(-150);
+            var upper = state.CreateSnapshot();
+
+            Assert.AreEqual(100, upper.Mental);
+            Assert.AreEqual(999, upper.Gold);
+            Assert.AreEqual(100, upper.GlitchLevel);
+            Assert.AreEqual(-100, upper.Affinity);
+
+            state.ModifyMental(-250);
+            state.ModifyGold(-1200);
+            state.ModifyGlitchLevel(-150);
+            state.ModifyAffinity(250);
+            var lower = state.CreateSnapshot();
+
+            Assert.AreEqual(-100, lower.Mental);
+            Assert.AreEqual(0, lower.Gold);
+            Assert.AreEqual(0, lower.GlitchLevel);
+            Assert.AreEqual(100, lower.Affinity);
+        }
+
+        [Test]
+        public void PrototypeRunState_ShopFailsWhenGoldIsInsufficient()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var ability = CreateAbility("ability.shop", "shop");
+
+            var resolution = state.ResolveShop("node.shop", ability, null);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual(0, snapshot.Gold);
+            Assert.AreEqual(0, snapshot.AbilityCount);
+            Assert.AreEqual(string.Empty, resolution.PayloadId);
+            Assert.IsTrue(resolution.Message.Contains("purchase failed"));
+        }
+
+        [Test]
+        public void PrototypeRunState_ShopSpendsGoldAndGrantsAbility()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var ability = CreateAbility("ability.shop", "shop");
+            state.ModifyGold(10);
+
+            var resolution = state.ResolveShop("node.shop", ability, null);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual(0, snapshot.Gold);
+            Assert.AreEqual(1, snapshot.AbilityCount);
+            Assert.AreEqual("ability.shop", resolution.PayloadId);
+            Assert.IsTrue(resolution.Message.Contains("purchase success"));
+        }
+
+        [Test]
+        public void PrototypeRunState_ModifiesGlitchAndAffinity()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+
+            state.ModifyGlitchLevel(35);
+            state.ModifyAffinity(-20);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual(35, snapshot.GlitchLevel);
+            Assert.AreEqual(-20, snapshot.Affinity);
+        }
+
+        [Test]
         public void OnDeviceLLMProvider_FallsBackWhenNativePluginIsMissing()
         {
             var provider = new OnDeviceLLMProvider(100, new DeterministicFakeLLMProvider());
