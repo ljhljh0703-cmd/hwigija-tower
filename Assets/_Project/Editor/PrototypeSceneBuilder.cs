@@ -1,4 +1,6 @@
 using HwigiTower.Core;
+using HwigiTower.Abilities;
+using HwigiTower.Combat;
 using HwigiTower.Encounters;
 using HwigiTower.Run;
 using HwigiTower.UI;
@@ -22,10 +24,19 @@ namespace HwigiTower.EditorTools
 
             var runtimeSettings = CreateRuntimeSettings();
             var movementProfile = CreateMovementProfile();
+            var enemies = CreateEnemyPlaceholders();
+            var bosses = CreateBossPlaceholders();
+            var abilities = CreateAbilityPlaceholders();
+            var synergies = CreateSynergyPlaceholders();
+            var encounters = CreateEncounterPlaceholders(enemies, bosses);
             var battle = CreateNodeDefinition("SO_Node_Battle", "node.battle", NodeKind.Battle, "전투");
             var rest = CreateNodeDefinition("SO_Node_Rest", "node.rest", NodeKind.Rest, "휴식");
             var shop = CreateNodeDefinition("SO_Node_Shop", "node.shop", NodeKind.Shop, "상점");
             var remnant = CreateNodeDefinition("SO_Node_Remnant", "node.remnant", NodeKind.Remnant, "잔재");
+            ConfigureNodeRuntimeData(battle, encounters, enemies[0], null, synergies);
+            ConfigureNodeRuntimeData(rest, new EncounterData[0], null, null, synergies);
+            ConfigureNodeRuntimeData(shop, new EncounterData[0], null, abilities[0], synergies);
+            ConfigureNodeRuntimeData(remnant, new EncounterData[0], null, null, synergies);
             var room = CreateRoomDefinition(new[] { battle, rest, shop, remnant });
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -68,6 +79,12 @@ namespace HwigiTower.EditorTools
             EnsureFolder(DataRoot, "Nodes");
             EnsureFolder(DataRoot, "Rooms");
             EnsureFolder(DataRoot, "Settings");
+            EnsureFolder(DataRoot, "Abilities");
+            EnsureFolder(DataRoot, "Synergies");
+            EnsureFolder(DataRoot, "Enemies");
+            EnsureFolder(DataRoot, "Bosses");
+            EnsureFolder(DataRoot, "Encounters");
+            EnsureFolder(DataRoot, "MemoryFragments");
             EnsureFolder("Assets/_Project", "Scenes");
         }
 
@@ -107,6 +124,104 @@ namespace HwigiTower.EditorTools
             return definition;
         }
 
+        private static AbilityData[] CreateAbilityPlaceholders()
+        {
+            var abilities = new AbilityData[12];
+            for (var i = 0; i < abilities.Length; i++)
+            {
+                var number = i + 1;
+                var ability = LoadOrCreate<AbilityData>($"{DataRoot}/Abilities/SO_Ability_Placeholder_{number:00}.asset");
+                SetString(ability, "id", $"ability.placeholder.{number:00}");
+                SetString(ability, "displayName", $"Ability Placeholder {number:00}");
+                SetString(ability, "tag", $"tag.placeholder.{(i % 4) + 1}");
+                SetString(ability, "description", "placeholder ability; replace with writer-approved design");
+                SetNumericParams(ability, "numericParams", new[] { ("player.attack_bonus", i % 3 == 0 ? 1f : 0f), ("player.max_hp_bonus", i % 3 == 1 ? 2f : 0f) });
+                abilities[i] = ability;
+            }
+
+            return abilities;
+        }
+
+        private static SynergyData[] CreateSynergyPlaceholders()
+        {
+            var synergies = new SynergyData[4];
+            for (var i = 0; i < synergies.Length; i++)
+            {
+                var number = i + 1;
+                var synergy = LoadOrCreate<SynergyData>($"{DataRoot}/Synergies/SO_Synergy_Placeholder_{number:00}.asset");
+                SetString(synergy, "tag", $"tag.placeholder.{number}");
+                SetInt(synergy, "requiredCount", 2);
+                SetString(synergy, "effectDescription", "placeholder synergy; replace with writer-approved design");
+                SetNumericParams(synergy, "numericParams", new[] { ("player.attack_bonus", 1f) });
+                synergies[i] = synergy;
+            }
+
+            return synergies;
+        }
+
+        private static EnemyData[] CreateEnemyPlaceholders()
+        {
+            var enemies = new EnemyData[6];
+            for (var i = 0; i < enemies.Length; i++)
+            {
+                var number = i + 1;
+                var enemy = LoadOrCreate<EnemyData>($"{DataRoot}/Enemies/SO_Enemy_Placeholder_{number:00}.asset");
+                SetString(enemy, "id", $"enemy.placeholder.{number:00}");
+                SetInt(enemy, "hp", 10 + number * 2);
+                SetInt(enemy, "attack", 2 + (number / 2));
+                SetString(enemy, "patternId", $"pattern.placeholder.{number:00}");
+                enemies[i] = enemy;
+            }
+
+            return enemies;
+        }
+
+        private static EnemyData[] CreateBossPlaceholders()
+        {
+            var bosses = new EnemyData[2];
+            for (var i = 0; i < bosses.Length; i++)
+            {
+                var number = i + 1;
+                var boss = LoadOrCreate<EnemyData>($"{DataRoot}/Bosses/SO_Boss_Placeholder_{number:00}.asset");
+                SetString(boss, "id", $"boss.placeholder.{number:00}");
+                SetInt(boss, "hp", 24 + number * 8);
+                SetInt(boss, "attack", 5 + number);
+                SetString(boss, "patternId", $"boss.pattern.placeholder.{number:00}");
+                bosses[i] = boss;
+            }
+
+            return bosses;
+        }
+
+        private static EncounterData[] CreateEncounterPlaceholders(EnemyData[] enemies, EnemyData[] bosses)
+        {
+            var encounters = new EncounterData[25];
+            for (var i = 0; i < encounters.Length; i++)
+            {
+                var number = i + 1;
+                var encounter = LoadOrCreate<EncounterData>($"{DataRoot}/Encounters/SO_Encounter_Placeholder_{number:00}.asset");
+                var type = number % 5 == 0 ? EncounterType.Remnant : EncounterType.Battle;
+                var enemy = number == 15 ? bosses[0] : number == 25 ? bosses[1] : enemies[i % enemies.Length];
+                SetString(encounter, "id", $"encounter.placeholder.{number:00}");
+                SetEnum(encounter, "type", (int)type);
+                SetInt(encounter, "floor", Mathf.Clamp(((number - 1) / 5) + 1, 1, 5));
+                SetInt(encounter, "weight", type == EncounterType.Battle ? 10 : 2);
+                SetString(encounter, "deterministicSeedKey", $"encounter.placeholder.{number:00}");
+                SetObject(encounter, "enemy", enemy);
+                encounters[i] = encounter;
+            }
+
+            return encounters;
+        }
+
+        private static void ConfigureNodeRuntimeData(PrototypeNodeDefinition node, EncounterData[] encounters, EnemyData fallbackEnemy, AbilityData grantedAbility, SynergyData[] synergies)
+        {
+            SetObjectArray(node, "possibleEncounters", encounters);
+            SetObject(node, "fallbackEnemy", fallbackEnemy);
+            SetObject(node, "grantedAbility", grantedAbility);
+            SetObjectArray(node, "trackedSynergies", synergies);
+        }
+
         private static PrototypeRoomDefinition CreateRoomDefinition(PrototypeNodeDefinition[] nodes)
         {
             var room = LoadOrCreate<PrototypeRoomDefinition>($"{DataRoot}/Rooms/SO_Room_Prototype.asset");
@@ -144,11 +259,13 @@ namespace HwigiTower.EditorTools
 
             var focus = CreateText(canvasObject.transform, "Focus Text", new Vector2(0f, -32f), TextAnchor.UpperCenter);
             var interaction = CreateText(canvasObject.transform, "Interaction Text", new Vector2(0f, -80f), TextAnchor.UpperCenter);
+            var runStateText = CreateText(canvasObject.transform, "Run State Text", new Vector2(0f, -128f), TextAnchor.UpperCenter);
             interaction.text = "방";
 
             var hud = canvasObject.AddComponent<PrototypeHud>();
             SetObject(hud, "focusText", focus);
             SetObject(hud, "interactionText", interaction);
+            SetObject(hud, "runStateText", runStateText);
             return hud;
         }
 
@@ -330,6 +447,21 @@ namespace HwigiTower.EditorTools
         {
             var serializedObject = new SerializedObject(target);
             serializedObject.FindProperty(propertyName).vector2Value = value;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetNumericParams(Object target, string propertyName, (string key, float value)[] values)
+        {
+            var serializedObject = new SerializedObject(target);
+            var property = serializedObject.FindProperty(propertyName);
+            property.arraySize = values.Length;
+            for (var i = 0; i < values.Length; i++)
+            {
+                var element = property.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("key").stringValue = values[i].key;
+                element.FindPropertyRelative("value").floatValue = values[i].value;
+            }
+
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
     }

@@ -111,6 +111,33 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void PrototypeRunState_RestRestoresPersistentPlayerHp()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var context = new DeterministicRunContext("run-001", 1001);
+
+            state.ResolveBattle(context, "node.battle", "encounter.battle", null, null);
+            var afterBattle = state.CreateSnapshot();
+            state.ResolveRest("node.rest");
+            var afterRest = state.CreateSnapshot();
+
+            Assert.LessOrEqual(afterBattle.PlayerHp, afterBattle.PlayerMaxHp);
+            Assert.AreEqual(afterRest.PlayerMaxHp, afterRest.PlayerHp);
+        }
+
+        [Test]
+        public void CombatAbilityModifiers_UsesAbilityNumericParams()
+        {
+            var ability = CreateAbility("ability.1", "tag");
+            SetNumericParams(ability, ("player.attack_bonus", 2f), ("player.max_hp_bonus", 4f));
+
+            var modifiers = CombatAbilityModifiers.From(new[] { ability }, null);
+
+            Assert.AreEqual(2, modifiers.PlayerAttackBonus);
+            Assert.AreEqual(4, modifiers.PlayerMaxHpBonus);
+        }
+
+        [Test]
         public void PrototypeRunState_RemnantCompletesRunAndSavesReflection()
         {
             var state = new PrototypeRunState("run-001", new GameFlowEventBus());
@@ -130,6 +157,21 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(provider.TryComplete(request, out var response));
             Assert.AreEqual(request.CacheKey, response.CacheKey);
+        }
+
+        [Test]
+        public void PrototypeRunState_ForwardsRunEventsToAttachedNpcStateMachine()
+        {
+            var definition = ScriptableObject.CreateInstance<NpcStateMachineDefinition>();
+            SetNpcTransition(definition, NpcStage.S0, "run.completed", NpcStage.S1);
+            var bus = new GameFlowEventBus();
+            var state = new PrototypeRunState("run-001", bus);
+            var machine = new NpcStateMachine(definition, "run-001", bus);
+            state.AttachNpcStateMachine(machine);
+
+            state.ResolveRemnant("node.remnant");
+
+            Assert.AreEqual(NpcStage.S1, machine.CurrentStage);
         }
 
         [Test]
@@ -175,6 +217,34 @@ namespace HwigiTower.Tests.EditMode
             serialized.FindProperty("tag").stringValue = tag;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             return ability;
+        }
+
+        private static void SetNumericParams(ScriptableObject target, params (string key, float value)[] values)
+        {
+            var serialized = new SerializedObject(target);
+            var property = serialized.FindProperty("numericParams");
+            property.arraySize = values.Length;
+            for (var i = 0; i < values.Length; i++)
+            {
+                var element = property.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("key").stringValue = values[i].key;
+                element.FindPropertyRelative("value").floatValue = values[i].value;
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetNpcTransition(NpcStateMachineDefinition definition, NpcStage fromStage, string triggerId, NpcStage toStage)
+        {
+            var serialized = new SerializedObject(definition);
+            serialized.FindProperty("initialStage").enumValueIndex = (int)fromStage;
+            var transitions = serialized.FindProperty("transitions");
+            transitions.arraySize = 1;
+            var transition = transitions.GetArrayElementAtIndex(0);
+            transition.FindPropertyRelative("fromStage").enumValueIndex = (int)fromStage;
+            transition.FindPropertyRelative("triggerId").stringValue = triggerId;
+            transition.FindPropertyRelative("toStage").enumValueIndex = (int)toStage;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static SynergyData CreateSynergy(string tag, int requiredCount)

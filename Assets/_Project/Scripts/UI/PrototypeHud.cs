@@ -9,6 +9,7 @@ namespace HwigiTower.UI
     {
         [SerializeField] private Text focusText;
         [SerializeField] private Text interactionText;
+        [SerializeField] private Text runStateText;
 
         private void Awake()
         {
@@ -17,17 +18,22 @@ namespace HwigiTower.UI
             {
                 interactionText.text = "방";
             }
+
+            ShowRunState(default);
         }
 
-        public void Configure(Text focus, Text interaction)
+        public void Configure(Text focus, Text interaction, Text runState = null)
         {
             focusText = focus;
             interactionText = interaction;
+            runStateText = runState;
             ShowFocus(null);
             if (interactionText != null)
             {
                 interactionText.text = "방";
             }
+
+            ShowRunState(default);
         }
 
         public void ShowFocus(InteractableNode node)
@@ -60,6 +66,23 @@ namespace HwigiTower.UI
             }
 
             interactionText.text = node.Definition == null ? "진입" : node.Definition.PlaceholderOutcome;
+        }
+
+        public void ShowRunState(PrototypeRunSnapshot snapshot)
+        {
+            if (runStateText == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(snapshot.RunId))
+            {
+                runStateText.text = "run: -";
+                return;
+            }
+
+            var state = snapshot.RunCompleted ? "complete" : "active";
+            runStateText.text = $"run {state} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | ATK {snapshot.PlayerAttack} | nodes {snapshot.NodesResolved} | abilities {snapshot.AbilityCount}";
         }
     }
 }

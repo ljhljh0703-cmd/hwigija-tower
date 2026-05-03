@@ -90,6 +90,16 @@ namespace HwigiTower.Run
             return resolution;
         }
 
+        public PrototypeRunSnapshot GetSnapshot()
+        {
+            if (RunState == null)
+            {
+                return new PrototypeRunSnapshot(RunContext.RunId, 0, 0, 0, 0, 0, 0, false);
+            }
+
+            return RunState.CreateSnapshot();
+        }
+
         private void RebuildContext()
         {
             var seed = roomDefinition == null ? 1001 : roomDefinition.DeterministicSeed;
