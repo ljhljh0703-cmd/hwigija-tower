@@ -43,6 +43,10 @@ namespace HwigiTower.Encounters
                 }
 
                 hud?.ShowInteraction(_currentNode, selection, resolution);
+                if (roomController != null)
+                {
+                    hud?.ShowRunState(roomController.GetSnapshot());
+                }
             }
         }
 

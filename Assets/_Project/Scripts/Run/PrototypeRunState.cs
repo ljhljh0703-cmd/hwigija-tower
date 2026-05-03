@@ -19,6 +19,9 @@ namespace HwigiTower.Run
         private readonly SynergyDetector _synergyDetector;
         private readonly List<SynergyState> _activeSynergies = new List<SynergyState>();
         private bool _runCompleted;
+        private int _playerHp = BasePlayerMaxHp;
+        private int _playerMaxHp = BasePlayerMaxHp;
+        private int _playerAttack = BasePlayerAttack;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
         {
@@ -35,9 +38,23 @@ namespace HwigiTower.Run
         public AbilityInventory Abilities { get; }
         public INPCMemoryRepo MemoryRepo { get; }
         public ILLMProvider LLMProvider { get; }
+        public NpcStateMachine NpcStateMachine { get; private set; }
         public int NodesResolved { get; private set; }
         public int BattlesWon { get; private set; }
         public bool RunCompleted => _runCompleted;
+        public int PlayerHp => _playerHp;
+        public int PlayerMaxHp => _playerMaxHp;
+        public int PlayerAttack => _playerAttack;
+
+        public PrototypeRunSnapshot CreateSnapshot()
+        {
+            return new PrototypeRunSnapshot(RunId, _playerHp, _playerMaxHp, _playerAttack, NodesResolved, BattlesWon, Abilities.Abilities.Count, _runCompleted);
+        }
+
+        public void AttachNpcStateMachine(NpcStateMachine stateMachine)
+        {
+            NpcStateMachine = stateMachine;
+        }
 
         public PrototypeNodeResolution ResolveBattle(DeterministicRunContext context, string nodeId, string encounterId, EnemyData enemyData, IReadOnlyList<SynergyData> trackedSynergies)
         {
@@ -47,8 +64,8 @@ namespace HwigiTower.Run
             }
 
             EvaluateSynergies(trackedSynergies);
-            var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies);
-            var player = new CombatantState("player", BasePlayerMaxHp + modifiers.PlayerMaxHpBonus, BasePlayerAttack + modifiers.PlayerAttackBonus);
+            RecalculatePlayerStats();
+            var player = new CombatantState("player", _playerMaxHp, _playerAttack, _playerHp);
             var enemy = CreateEnemyState(enemyData);
             var combat = new CombatController(context, string.IsNullOrEmpty(encounterId) ? nodeId : encounterId);
 
@@ -69,13 +86,19 @@ namespace HwigiTower.Run
                 BattlesWon++;
             }
 
+            _playerHp = player.Hp;
             var resultId = enemy.IsDefeated ? "victory" : "defeat";
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatCompleted, RunId, nodeId, resultId));
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, resultId));
 
             if (player.IsDefeated)
             {
+                ApplyNpcTrigger("battle.defeat");
                 CompleteRun("defeat");
+            }
+            else if (enemy.IsDefeated)
+            {
+                ApplyNpcTrigger("battle.victory");
             }
 
             var message = $"{resultId} | player {player.Hp}/{player.MaxHp} | enemy {enemy.Hp}/{enemy.MaxHp} | rounds {rounds}";
@@ -90,7 +113,9 @@ namespace HwigiTower.Run
             }
 
             NodesResolved++;
+            _playerHp = _playerMaxHp;
             var recall = _reflectionPipeline.LoadRecallPrompt(RunId, 3);
+            ApplyNpcTrigger("rest.recall");
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, "rest"));
             return new PrototypeNodeResolution(nodeId, "recall", recall, false);
         }
@@ -105,6 +130,7 @@ namespace HwigiTower.Run
             NodesResolved++;
             var added = Abilities.Add(grantedAbility);
             EvaluateSynergies(trackedSynergies);
+            RecalculatePlayerStats();
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, added ? "ability-added" : "shop-empty"));
             return new PrototypeNodeResolution(nodeId, added ? grantedAbility.Id : string.Empty, added ? $"ability added: {grantedAbility.Id}" : "shop placeholder", false);
         }
@@ -137,6 +163,21 @@ namespace HwigiTower.Run
             _activeSynergies.AddRange(_synergyDetector.Evaluate(Abilities.Abilities, trackedSynergies));
         }
 
+        private void RecalculatePlayerStats()
+        {
+            var previousMaxHp = _playerMaxHp;
+            var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies);
+            _playerMaxHp = System.Math.Max(1, BasePlayerMaxHp + modifiers.PlayerMaxHpBonus);
+            _playerAttack = System.Math.Max(0, BasePlayerAttack + modifiers.PlayerAttackBonus);
+
+            if (_playerMaxHp > previousMaxHp)
+            {
+                _playerHp += _playerMaxHp - previousMaxHp;
+            }
+
+            _playerHp = System.Math.Max(0, System.Math.Min(_playerHp, _playerMaxHp));
+        }
+
         private void CompleteRun(string cause)
         {
             if (_runCompleted)
@@ -147,7 +188,13 @@ namespace HwigiTower.Run
             _runCompleted = true;
             var summary = $"cause={cause};nodes={NodesResolved};battles={BattlesWon}";
             _reflectionPipeline.TrySaveReflection(RunId, summary, out _);
+            ApplyNpcTrigger("run.completed");
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.RunCompleted, RunId, RunId, cause));
+        }
+
+        private void ApplyNpcTrigger(string triggerId)
+        {
+            NpcStateMachine?.TryApply(triggerId);
         }
 
         private static CombatantState CreateEnemyState(EnemyData enemyData)

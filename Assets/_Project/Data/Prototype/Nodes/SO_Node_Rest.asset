@@ -14,5 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodeId: node.rest
   kind: 1
-  displayName: 휴식
-  placeholderOutcome: 휴식
+  displayName: "\uD734\uC2DD"
+  placeholderOutcome: "\uD734\uC2DD"
+  possibleEncounters: []
+  fallbackEnemy: {fileID: 0}
+  grantedAbility: {fileID: 0}
+  trackedSynergies:
+  - {fileID: 11400000, guid: fb55be6d20d2d4941821b5f56355f4cb, type: 2}
+  - {fileID: 11400000, guid: 5392e895f6aa3463ab5f0a16264b0833, type: 2}
+  - {fileID: 11400000, guid: 958683e43d74949afabbba7960347947, type: 2}
+  - {fileID: 11400000, guid: 78c73a652a9fc4167b48589d2a3350ec, type: 2}
