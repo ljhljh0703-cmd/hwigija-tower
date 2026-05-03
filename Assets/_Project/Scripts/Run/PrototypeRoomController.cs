@@ -67,6 +67,16 @@ namespace HwigiTower.Run
                 : definition.FallbackEnemy;
 
             PrototypeNodeResolution resolution;
+            if (selection.HasEncounter
+                && selection.Encounter.Choices != null
+                && selection.Encounter.Choices.Length > 0
+                && selection.Encounter.Type != EncounterType.Battle)
+            {
+                resolution = RunState.ResolveEncounterChoice(RunContext, definition.NodeId, selection.Encounter, string.Empty);
+                NotifyNodeResolved(node, resolution.PayloadId);
+                return resolution;
+            }
+
             switch (definition.Kind)
             {
                 case NodeKind.Battle:

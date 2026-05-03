@@ -1,3 +1,5 @@
+using System.IO;
+using System.Linq;
 using HwigiTower.Encounters;
 using NUnit.Framework;
 using UnityEditor;
@@ -99,8 +101,40 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(result.Success, result.Validation.ToSummary());
             Assert.AreEqual(3, result.AssetPaths.Count);
             Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_F01_COMBAT_GATE_001.asset"));
-            Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_MORAL_CHOICE_001.asset"));
+            var moral = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_MORAL_CHOICE_001.asset");
+            Assert.NotNull(moral);
+            Assert.AreEqual(3, moral.Choices.Length);
+            Assert.AreEqual("CHOICE_F02_MORAL_HELP", moral.Choices[0].stableId);
+            Assert.AreEqual("ModifyHp", moral.Choices[0].effects[0].kind);
             Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset"));
+        }
+
+        [Test]
+        public void Baker_DryRunReportsSourceHashAndStableIdConflicts()
+        {
+            var bake = EncounterPipelineV02Baker.BakeJsonFile(SamplePackPath);
+            Assert.IsTrue(bake.Success, bake.ToSummary());
+
+            var changedHashJson = File.ReadAllText(SamplePackPath)
+                .Replace(
+                    "\"sourceHash\": \"sha256:1111111111111111111111111111111111111111111111111111111111111111\"",
+                    "\"sourceHash\": \"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"");
+
+            var hashDryRun = EncounterPipelineV02Baker.BakeJson(changedHashJson, EncounterBakeOptions.DryRunOnly);
+
+            Assert.IsTrue(hashDryRun.Success, hashDryRun.ToSummary());
+            Assert.IsTrue(hashDryRun.DryRun);
+            Assert.IsTrue(hashDryRun.Reports.Any(report => report.Contains("SOURCE_HASH_CHANGED")), hashDryRun.ToSummary());
+
+            var pathConflictJson = File.ReadAllText(SamplePackPath)
+                .Replace(
+                    "Assets/_Project/Data/Encounters/SO_Encounter_ENC_F01_COMBAT_GATE_001.asset",
+                    "Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset");
+
+            var conflictDryRun = EncounterPipelineV02Baker.BakeJson(pathConflictJson, EncounterBakeOptions.DryRunOnly);
+
+            Assert.IsTrue(conflictDryRun.Success, conflictDryRun.ToSummary());
+            Assert.IsTrue(conflictDryRun.Reports.Any(report => report.Contains("STABLE_ID_PATH_CONFLICT")), conflictDryRun.ToSummary());
         }
 
         private static string BuildCaseFailureSummary(EncounterValidationCaseRunSummary summary)

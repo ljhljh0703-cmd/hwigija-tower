@@ -3,6 +3,91 @@ using HwigiTower.Combat;
 
 namespace HwigiTower.Encounters
 {
+    [System.Serializable]
+    public sealed class EncounterChoiceRuntimeData
+    {
+        public string stableId = string.Empty;
+        public string textKey = string.Empty;
+        public string requirementMode = "All";
+        public EncounterRequirementRuntimeData[] requirements = new EncounterRequirementRuntimeData[0];
+        public EncounterEffectRuntimeData[] effects = new EncounterEffectRuntimeData[0];
+        public string unavailablePolicyMode = "Hidden";
+        public string unavailableReasonTextKey = string.Empty;
+        public string npcReactionKey = string.Empty;
+    }
+
+    [System.Serializable]
+    public sealed class EncounterRequirementRuntimeData
+    {
+        public string kind = string.Empty;
+        public string stat = string.Empty;
+        public string op = string.Empty;
+        public int value;
+        public string flag = string.Empty;
+        public bool expected;
+        public string itemRef = string.Empty;
+        public int minCount;
+        public string abilityRef = string.Empty;
+        public int min;
+        public int max;
+        public int minFloor;
+        public int maxFloor;
+    }
+
+    [System.Serializable]
+    public class EncounterEffectRuntimeData
+    {
+        public string kind = string.Empty;
+        public int amount;
+        public string flag = string.Empty;
+        public bool value;
+        public string itemRef = string.Empty;
+        public int count;
+        public string abilityRef = string.Empty;
+        public string rewardBundleRef = string.Empty;
+        public string targetEncounterId = string.Empty;
+        public string targetNodeId = string.Empty;
+        public EncounterCombatHandoffRuntimeData combatHandoff;
+    }
+
+    [System.Serializable]
+    public sealed class EncounterPostCombatEffectRuntimeData
+    {
+        public string kind = string.Empty;
+        public int amount;
+        public string flag = string.Empty;
+        public bool value;
+        public string itemRef = string.Empty;
+        public int count;
+        public string abilityRef = string.Empty;
+        public string rewardBundleRef = string.Empty;
+        public string targetEncounterId = string.Empty;
+        public string targetNodeId = string.Empty;
+    }
+
+    [System.Serializable]
+    public sealed class EncounterCombatHandoffRuntimeData
+    {
+        public string stableId = string.Empty;
+        public string sourceEncounterId = string.Empty;
+        public string sourceChoiceId = string.Empty;
+        public string seedKey = string.Empty;
+        public string sourceHash = string.Empty;
+        public int floor;
+        public string[] enemyRefs = new string[0];
+        public string npcStage = string.Empty;
+        public EncounterPostCombatEffectRuntimeData[] onVictoryEffects = new EncounterPostCombatEffectRuntimeData[0];
+        public EncounterPostCombatEffectRuntimeData[] onDefeatEffects = new EncounterPostCombatEffectRuntimeData[0];
+        public string onVictoryReturnNode = string.Empty;
+        public string onDefeatReturnNode = string.Empty;
+        public string victoryTextKey = string.Empty;
+        public string defeatTextKey = string.Empty;
+        public string deathTextKey = string.Empty;
+        public string npcReactionKey = string.Empty;
+        public string promptHash = string.Empty;
+        public string cacheKey = string.Empty;
+    }
+
     [CreateAssetMenu(menuName = "Hwigi Tower/Data/Encounter", fileName = "SO_Encounter_Placeholder")]
     public sealed class EncounterData : ScriptableObject
     {
@@ -21,6 +106,7 @@ namespace HwigiTower.Encounters
         [SerializeField] private int glitchLevel;
         [SerializeField] private int timeLimitSeconds;
         [SerializeField] private string[] choiceStableIds = new string[0];
+        [SerializeField] private EncounterChoiceRuntimeData[] choices = new EncounterChoiceRuntimeData[0];
 
         public string Id => id;
         public EncounterType Type => type;
@@ -37,5 +123,6 @@ namespace HwigiTower.Encounters
         public int GlitchLevel => glitchLevel;
         public int TimeLimitSeconds => timeLimitSeconds;
         public string[] ChoiceStableIds => choiceStableIds;
+        public EncounterChoiceRuntimeData[] Choices => choices;
     }
 }

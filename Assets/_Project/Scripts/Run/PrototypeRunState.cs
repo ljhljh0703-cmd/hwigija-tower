@@ -2,11 +2,24 @@ using System.Collections.Generic;
 using HwigiTower.Abilities;
 using HwigiTower.Combat;
 using HwigiTower.Core;
+using HwigiTower.Encounters;
 using HwigiTower.LLM;
 using HwigiTower.NPC;
 
 namespace HwigiTower.Run
 {
+    public readonly struct PrototypeCombatHandoffResolution
+    {
+        public PrototypeCombatHandoffResolution(bool applied, string resultId)
+        {
+            Applied = applied;
+            ResultId = resultId ?? string.Empty;
+        }
+
+        public bool Applied { get; }
+        public string ResultId { get; }
+    }
+
     public sealed class PrototypeRunState
     {
         private const int BasePlayerMaxHp = 24;
@@ -27,6 +40,10 @@ namespace HwigiTower.Run
         private readonly ReflectionPipeline _reflectionPipeline;
         private readonly SynergyDetector _synergyDetector;
         private readonly List<SynergyState> _activeSynergies = new List<SynergyState>();
+        private readonly HashSet<string> _flags = new HashSet<string>();
+        private readonly Dictionary<string, int> _items = new Dictionary<string, int>();
+        private readonly HashSet<string> _abilityRefs = new HashSet<string>();
+        private readonly HashSet<string> _rewardBundleRefs = new HashSet<string>();
         private bool _runCompleted;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
@@ -62,6 +79,8 @@ namespace HwigiTower.Run
         public int Gold => _gold;
         public int GlitchLevel => _glitchLevel;
         public int Affinity => _affinity;
+        public IReadOnlyCollection<string> AbilityRefs => _abilityRefs;
+        public IReadOnlyCollection<string> RewardBundleRefs => _rewardBundleRefs;
 
         public PrototypeRunSnapshot CreateSnapshot()
         {
@@ -76,7 +95,7 @@ namespace HwigiTower.Run
                 _affinity,
                 NodesResolved,
                 BattlesWon,
-                Abilities.Abilities.Count,
+                Abilities.Abilities.Count + _abilityRefs.Count,
                 _runCompleted);
         }
 
@@ -102,6 +121,79 @@ namespace HwigiTower.Run
         {
             _affinity = Clamp(_affinity + amount, MinAffinity, MaxAffinity);
             return _affinity;
+        }
+
+        public int ModifyPlayerHp(int amount)
+        {
+            _playerHp = Clamp(_playerHp + amount, 0, _playerMaxHp);
+            return _playerHp;
+        }
+
+        public void SetFlag(string flag, bool value)
+        {
+            if (string.IsNullOrEmpty(flag))
+            {
+                return;
+            }
+
+            if (value)
+            {
+                _flags.Add(flag);
+            }
+            else
+            {
+                _flags.Remove(flag);
+            }
+        }
+
+        public bool HasFlag(string flag)
+        {
+            return !string.IsNullOrEmpty(flag) && _flags.Contains(flag);
+        }
+
+        public int AddItemRef(string itemRef, int count)
+        {
+            if (string.IsNullOrEmpty(itemRef) || count == 0)
+            {
+                return GetItemCount(itemRef);
+            }
+
+            var next = Clamp(GetItemCount(itemRef) + count, 0, 999);
+            if (next == 0)
+            {
+                _items.Remove(itemRef);
+            }
+            else
+            {
+                _items[itemRef] = next;
+            }
+
+            return next;
+        }
+
+        public int GetItemCount(string itemRef)
+        {
+            return !string.IsNullOrEmpty(itemRef) && _items.TryGetValue(itemRef, out var count) ? count : 0;
+        }
+
+        public bool AddAbilityRef(string abilityRef)
+        {
+            return !string.IsNullOrEmpty(abilityRef) && _abilityRefs.Add(abilityRef);
+        }
+
+        public bool HasAbilityRef(string abilityRef)
+        {
+            return !string.IsNullOrEmpty(abilityRef) && _abilityRefs.Contains(abilityRef);
+        }
+
+        public bool GrantRewardBundleRef(string rewardBundleRef)
+        {
+            return !string.IsNullOrEmpty(rewardBundleRef) && _rewardBundleRefs.Add(rewardBundleRef);
+        }
+
+        public bool HasRewardBundleRef(string rewardBundleRef)
+        {
+            return !string.IsNullOrEmpty(rewardBundleRef) && _rewardBundleRefs.Contains(rewardBundleRef);
         }
 
         public void AttachNpcStateMachine(NpcStateMachine stateMachine)
@@ -227,6 +319,94 @@ namespace HwigiTower.Run
             }
 
             return new PrototypeNodeResolution(nodeId, payloadId, message, _runCompleted);
+        }
+
+        public PrototypeNodeResolution ResolveEncounterChoice(string nodeId, EncounterData encounter, string choiceStableId)
+        {
+            if (_runCompleted)
+            {
+                return new PrototypeNodeResolution(nodeId, encounter == null ? string.Empty : encounter.Id, "run already completed", true);
+            }
+
+            var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, new DeterministicRunContext(RunId, 0), nodeId);
+            NodesResolved++;
+            var payloadId = resolution.ChoiceStableId;
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
+            return new PrototypeNodeResolution(nodeId, payloadId, resolution.Message, false);
+        }
+
+        public PrototypeNodeResolution ResolveEncounterChoice(DeterministicRunContext context, string nodeId, EncounterData encounter, string choiceStableId)
+        {
+            if (_runCompleted)
+            {
+                return new PrototypeNodeResolution(nodeId, encounter == null ? string.Empty : encounter.Id, "run already completed", true);
+            }
+
+            var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, context, nodeId);
+            NodesResolved++;
+            var payloadId = resolution.ChoiceStableId;
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
+            return new PrototypeNodeResolution(nodeId, payloadId, resolution.Message, false);
+        }
+
+        public PrototypeCombatHandoffResolution ResolveCombatHandoff(
+            DeterministicRunContext context,
+            string nodeId,
+            EncounterData encounter,
+            EncounterCombatHandoffRuntimeData handoff,
+            System.Action<PrototypeRunState, EncounterPostCombatEffectRuntimeData[]> applyEffects)
+        {
+            if (_runCompleted || handoff == null)
+            {
+                return new PrototypeCombatHandoffResolution(false, string.Empty);
+            }
+
+            if (string.IsNullOrEmpty(context.RunId))
+            {
+                context = new DeterministicRunContext(RunId, 0);
+            }
+
+            RecalculatePlayerStats();
+            var player = new CombatantState("player", _playerMaxHp, _playerAttack, _playerHp);
+            var enemyId = handoff.enemyRefs != null && handoff.enemyRefs.Length > 0 && !string.IsNullOrEmpty(handoff.enemyRefs[0])
+                ? handoff.enemyRefs[0]
+                : "enemy.placeholder";
+            var enemy = new CombatantState(enemyId, FallbackEnemyHp, FallbackEnemyAttack);
+            var combatId = string.IsNullOrEmpty(handoff.stableId) ? encounter == null ? nodeId : encounter.Id : handoff.stableId;
+            var combat = new CombatController(context, string.IsNullOrEmpty(handoff.seedKey) ? combatId : handoff.seedKey);
+
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
+
+            var rounds = 0;
+            CombatRoundResult round;
+            do
+            {
+                round = combat.ResolveRound(player, enemy);
+                rounds++;
+            }
+            while (!round.IsComplete && rounds < 12);
+
+            if (enemy.IsDefeated)
+            {
+                BattlesWon++;
+            }
+
+            _playerHp = player.Hp;
+            var resultId = enemy.IsDefeated ? "victory" : "defeat";
+            applyEffects?.Invoke(this, enemy.IsDefeated ? handoff.onVictoryEffects : handoff.onDefeatEffects);
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatCompleted, RunId, nodeId, resultId));
+
+            if (player.IsDefeated)
+            {
+                ApplyNpcTrigger("battle.defeat");
+                CompleteRun("defeat");
+            }
+            else if (enemy.IsDefeated)
+            {
+                ApplyNpcTrigger("battle.victory");
+            }
+
+            return new PrototypeCombatHandoffResolution(true, resultId);
         }
 
         private void EvaluateSynergies(IReadOnlyList<SynergyData> trackedSynergies)
