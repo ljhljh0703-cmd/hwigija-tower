@@ -1,0 +1,268 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_ENC_COMBAT_GATE_03
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: ENC_COMBAT_GATE_03
+  type: 0
+  floor: 5
+  weight: 1
+  deterministicSeedKey: SEED_ENC_COMBAT_GATE_03
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset
+  sourceHash: sha256:4444444444444444444444444444444444444444444444444444444444444444
+  contentCategory: GeneralEncounter
+  npcStage: S4_COLLAPSE
+  bodyTextKey: PLACEHOLDER_ENC_COMBAT_GATE_03_BODY
+  writerStatus: placeholder
+  glitchLevel: 44
+  timeLimitSeconds: 45
+  choiceStableIds:
+  - CHOICE_COMBAT_03_ENGAGE
+  - CHOICE_COMBAT_03_PREPARE
+  choices:
+  - stableId: CHOICE_COMBAT_03_ENGAGE
+    textKey: PLACEHOLDER_CHOICE_COMBAT_03_ENGAGE
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: StartCombat
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId: COMBAT_GATE_03
+        sourceEncounterId: ENC_COMBAT_GATE_03
+        sourceChoiceId: CHOICE_COMBAT_03_ENGAGE
+        seedKey: SEED_COMBAT_GATE_03
+        sourceHash: sha256:8888888888888888888888888888888888888888888888888888888888888888
+        floor: 5
+        enemyRefs:
+        - ENEMY_COLLAPSE_ECHO
+        npcStage: S4_COLLAPSE
+        onVictoryEffects:
+        - kind: ModifyGold
+          amount: 11
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyGlitchLevel
+          amount: -2
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyAffinity
+          amount: 2
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        - kind: SetFlag
+          amount: 0
+          flag: FLAG_COMBAT_GATE_03_VICTORY
+          value: 1
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        onDefeatEffects:
+        - kind: ModifyHp
+          amount: -9
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyGlitchLevel
+          amount: 5
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        - kind: ModifyAffinity
+          amount: -2
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        onVictoryReturnNode: NODE_COMBAT_GATE_03_VICTORY
+        onDefeatReturnNode: NODE_COMBAT_GATE_03_DEFEAT
+        victoryTextKey: PLACEHOLDER_POST_COMBAT_GATE_03_VICTORY
+        defeatTextKey: PLACEHOLDER_POST_COMBAT_GATE_03_DEFEAT
+        deathTextKey: PLACEHOLDER_POST_COMBAT_GATE_03_DEATH
+        npcReactionKey: NPC_REACT_COMBAT_GATE_03_START
+        promptHash: sha256:9999999999999999999999999999999999999999999999999999999999999999
+        cacheKey: CACHE_COMBAT_GATE_03_S4_COLLAPSE
+    unavailablePolicyMode: Hidden
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_COMBAT_03_ENGAGE
+  - stableId: CHOICE_COMBAT_03_PREPARE
+    textKey: PLACEHOLDER_CHOICE_COMBAT_03_PREPARE
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyMental
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyAffinity
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: SetFlag
+      amount: 0
+      flag: FLAG_COMBAT_03_PREPARED
+      value: 1
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: Hidden
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_COMBAT_03_PREPARE

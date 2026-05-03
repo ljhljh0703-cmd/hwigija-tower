@@ -413,6 +413,7 @@ namespace HwigiTower.Encounters
                 element.FindPropertyRelative("max").intValue = AsInt(requirement, "max", 0);
                 element.FindPropertyRelative("minFloor").intValue = AsInt(requirement, "minFloor", 0);
                 element.FindPropertyRelative("maxFloor").intValue = AsInt(requirement, "maxFloor", 0);
+                element.FindPropertyRelative("memoryFragmentId").stringValue = AsString(requirement, "memoryFragmentId");
             }
         }
 
@@ -437,6 +438,8 @@ namespace HwigiTower.Encounters
                 element.FindPropertyRelative("count").intValue = AsInt(effect, "count", 0);
                 element.FindPropertyRelative("abilityRef").stringValue = AsString(effect, "abilityRef");
                 element.FindPropertyRelative("rewardBundleRef").stringValue = AsString(effect, "rewardBundleRef");
+                SetMemoryFragmentEffect(element, effect);
+                element.FindPropertyRelative("npcStage").stringValue = AsString(effect, "npcStage");
                 element.FindPropertyRelative("targetEncounterId").stringValue = AsString(effect, "targetEncounterId");
                 element.FindPropertyRelative("targetNodeId").stringValue = AsString(effect, "targetNodeId");
                 SetRuntimeCombatHandoff(element.FindPropertyRelative("combatHandoff"), effect);
@@ -520,9 +523,20 @@ namespace HwigiTower.Encounters
                 element.FindPropertyRelative("count").intValue = AsInt(effect, "count", 0);
                 element.FindPropertyRelative("abilityRef").stringValue = AsString(effect, "abilityRef");
                 element.FindPropertyRelative("rewardBundleRef").stringValue = AsString(effect, "rewardBundleRef");
+                SetMemoryFragmentEffect(element, effect);
+                element.FindPropertyRelative("npcStage").stringValue = AsString(effect, "npcStage");
                 element.FindPropertyRelative("targetEncounterId").stringValue = AsString(effect, "targetEncounterId");
                 element.FindPropertyRelative("targetNodeId").stringValue = AsString(effect, "targetNodeId");
             }
+        }
+
+        private static void SetMemoryFragmentEffect(SerializedProperty element, Dictionary<string, object> effect)
+        {
+            var fragment = effect != null && effect.TryGetValue("memoryFragment", out var fragmentValue)
+                ? fragmentValue as Dictionary<string, object>
+                : null;
+            element.FindPropertyRelative("memoryFragmentId").stringValue = AsString(fragment, "stableId");
+            element.FindPropertyRelative("memoryFragmentTextKey").stringValue = AsString(fragment, "textKey");
         }
 
         private static string AsString(Dictionary<string, object> map, string key)

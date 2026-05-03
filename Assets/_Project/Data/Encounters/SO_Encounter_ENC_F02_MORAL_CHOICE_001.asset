@@ -48,6 +48,7 @@ MonoBehaviour:
       max: 0
       minFloor: 0
       maxFloor: 0
+      memoryFragmentId:
     effects:
     - kind: ModifyHp
       amount: -4
@@ -57,6 +58,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -86,6 +90,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -115,6 +122,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -144,6 +154,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -181,6 +194,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -210,6 +226,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -239,6 +258,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -268,6 +290,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -309,6 +334,7 @@ MonoBehaviour:
       max: 0
       minFloor: 0
       maxFloor: 0
+      memoryFragmentId:
     effects:
     - kind: ModifyGold
       amount: -3
@@ -318,6 +344,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -347,6 +376,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -376,6 +408,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:

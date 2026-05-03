@@ -43,6 +43,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -64,6 +67,9 @@ MonoBehaviour:
           count: 0
           abilityRef:
           rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyGlitchLevel
@@ -74,6 +80,9 @@ MonoBehaviour:
           count: 0
           abilityRef:
           rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyAffinity
@@ -84,6 +93,9 @@ MonoBehaviour:
           count: 0
           abilityRef:
           rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
           targetEncounterId:
           targetNodeId:
         - kind: SetFlag
@@ -94,6 +106,9 @@ MonoBehaviour:
           count: 0
           abilityRef:
           rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
           targetEncounterId:
           targetNodeId:
         onDefeatEffects:
@@ -105,6 +120,9 @@ MonoBehaviour:
           count: 0
           abilityRef:
           rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyGlitchLevel
@@ -115,6 +133,9 @@ MonoBehaviour:
           count: 0
           abilityRef:
           rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyAffinity
@@ -125,6 +146,9 @@ MonoBehaviour:
           count: 0
           abilityRef:
           rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
           targetEncounterId:
           targetNodeId:
         onVictoryReturnNode: NODE_F01_GATE_VICTORY
@@ -155,6 +179,7 @@ MonoBehaviour:
       max: 0
       minFloor: 0
       maxFloor: 0
+      memoryFragmentId:
     effects:
     - kind: ModifyMental
       amount: -1
@@ -164,6 +189,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:
@@ -193,6 +221,9 @@ MonoBehaviour:
       count: 0
       abilityRef:
       rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
       targetEncounterId:
       targetNodeId:
       combatHandoff:

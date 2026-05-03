@@ -44,6 +44,7 @@ namespace HwigiTower.Run
         private readonly Dictionary<string, int> _items = new Dictionary<string, int>();
         private readonly HashSet<string> _abilityRefs = new HashSet<string>();
         private readonly HashSet<string> _rewardBundleRefs = new HashSet<string>();
+        private readonly HashSet<string> _memoryFragmentRefs = new HashSet<string>();
         private bool _runCompleted;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
@@ -69,6 +70,7 @@ namespace HwigiTower.Run
         public INPCMemoryRepo MemoryRepo { get; }
         public ILLMProvider LLMProvider { get; }
         public NpcStateMachine NpcStateMachine { get; private set; }
+        public EncounterRuntimeCatalogData EncounterCatalog { get; private set; }
         public int NodesResolved { get; private set; }
         public int BattlesWon { get; private set; }
         public bool RunCompleted => _runCompleted;
@@ -81,6 +83,7 @@ namespace HwigiTower.Run
         public int Affinity => _affinity;
         public IReadOnlyCollection<string> AbilityRefs => _abilityRefs;
         public IReadOnlyCollection<string> RewardBundleRefs => _rewardBundleRefs;
+        public IReadOnlyCollection<string> MemoryFragmentRefs => _memoryFragmentRefs;
 
         public PrototypeRunSnapshot CreateSnapshot()
         {
@@ -95,7 +98,7 @@ namespace HwigiTower.Run
                 _affinity,
                 NodesResolved,
                 BattlesWon,
-                Abilities.Abilities.Count + _abilityRefs.Count,
+                CountGrantedAbilities(),
                 _runCompleted);
         }
 
@@ -158,6 +161,11 @@ namespace HwigiTower.Run
                 return GetItemCount(itemRef);
             }
 
+            if (count > 0 && EncounterCatalog != null && !EncounterCatalog.TryGetItem(itemRef, out _))
+            {
+                return GetItemCount(itemRef);
+            }
+
             var next = Clamp(GetItemCount(itemRef) + count, 0, 999);
             if (next == 0)
             {
@@ -178,17 +186,50 @@ namespace HwigiTower.Run
 
         public bool AddAbilityRef(string abilityRef)
         {
-            return !string.IsNullOrEmpty(abilityRef) && _abilityRefs.Add(abilityRef);
+            if (string.IsNullOrEmpty(abilityRef) || !_abilityRefs.Add(abilityRef))
+            {
+                return false;
+            }
+
+            if (EncounterCatalog != null && EncounterCatalog.TryGetAbility(abilityRef, out var ability))
+            {
+                Abilities.Add(ability);
+            }
+
+            return true;
         }
 
         public bool HasAbilityRef(string abilityRef)
         {
-            return !string.IsNullOrEmpty(abilityRef) && _abilityRefs.Contains(abilityRef);
+            if (string.IsNullOrEmpty(abilityRef) || _abilityRefs.Contains(abilityRef))
+            {
+                return !string.IsNullOrEmpty(abilityRef) && _abilityRefs.Contains(abilityRef);
+            }
+
+            for (var i = 0; i < Abilities.Abilities.Count; i++)
+            {
+                if (Abilities.Abilities[i] != null && Abilities.Abilities[i].Id == abilityRef)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public bool GrantRewardBundleRef(string rewardBundleRef)
         {
-            return !string.IsNullOrEmpty(rewardBundleRef) && _rewardBundleRefs.Add(rewardBundleRef);
+            if (string.IsNullOrEmpty(rewardBundleRef) || !_rewardBundleRefs.Add(rewardBundleRef))
+            {
+                return false;
+            }
+
+            if (EncounterCatalog != null && EncounterCatalog.TryGetRewardBundle(rewardBundleRef, out var rewardBundle))
+            {
+                ApplyRewardBundle(rewardBundle);
+            }
+
+            return true;
         }
 
         public bool HasRewardBundleRef(string rewardBundleRef)
@@ -196,9 +237,34 @@ namespace HwigiTower.Run
             return !string.IsNullOrEmpty(rewardBundleRef) && _rewardBundleRefs.Contains(rewardBundleRef);
         }
 
+        public bool UnlockMemoryFragmentRef(string memoryFragmentRef)
+        {
+            if (string.IsNullOrEmpty(memoryFragmentRef))
+            {
+                return false;
+            }
+
+            if (EncounterCatalog != null && !EncounterCatalog.TryGetMemoryFragment(memoryFragmentRef, out _))
+            {
+                return false;
+            }
+
+            return _memoryFragmentRefs.Add(memoryFragmentRef);
+        }
+
+        public bool HasMemoryFragmentRef(string memoryFragmentRef)
+        {
+            return !string.IsNullOrEmpty(memoryFragmentRef) && _memoryFragmentRefs.Contains(memoryFragmentRef);
+        }
+
         public void AttachNpcStateMachine(NpcStateMachine stateMachine)
         {
             NpcStateMachine = stateMachine;
+        }
+
+        public void AttachEncounterCatalog(EncounterRuntimeCatalogData catalog)
+        {
+            EncounterCatalog = catalog;
         }
 
         public PrototypeNodeResolution ResolveBattle(DeterministicRunContext context, string nodeId, string encounterId, EnemyData enemyData, IReadOnlyList<SynergyData> trackedSynergies)
@@ -371,7 +437,9 @@ namespace HwigiTower.Run
             var enemyId = handoff.enemyRefs != null && handoff.enemyRefs.Length > 0 && !string.IsNullOrEmpty(handoff.enemyRefs[0])
                 ? handoff.enemyRefs[0]
                 : "enemy.placeholder";
-            var enemy = new CombatantState(enemyId, FallbackEnemyHp, FallbackEnemyAttack);
+            var enemy = EncounterCatalog != null && EncounterCatalog.TryGetEnemy(enemyId, out var enemyData)
+                ? CreateEnemyState(enemyData)
+                : new CombatantState(enemyId, FallbackEnemyHp, FallbackEnemyAttack);
             var combatId = string.IsNullOrEmpty(handoff.stableId) ? encounter == null ? nodeId : encounter.Id : handoff.stableId;
             var combat = new CombatController(context, string.IsNullOrEmpty(handoff.seedKey) ? combatId : handoff.seedKey);
 
@@ -407,6 +475,57 @@ namespace HwigiTower.Run
             }
 
             return new PrototypeCombatHandoffResolution(true, resultId);
+        }
+
+        private int CountGrantedAbilities()
+        {
+            var count = Abilities.Abilities.Count;
+            foreach (var abilityRef in _abilityRefs)
+            {
+                var hasRuntimeAbility = false;
+                for (var i = 0; i < Abilities.Abilities.Count; i++)
+                {
+                    if (Abilities.Abilities[i] != null && Abilities.Abilities[i].Id == abilityRef)
+                    {
+                        hasRuntimeAbility = true;
+                        break;
+                    }
+                }
+
+                if (!hasRuntimeAbility)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private void ApplyRewardBundle(HwigiTower.Rewards.RewardBundleData rewardBundle)
+        {
+            if (rewardBundle == null || rewardBundle.Entries == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < rewardBundle.Entries.Length; i++)
+            {
+                var entry = rewardBundle.Entries[i];
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(entry.ItemRef))
+                {
+                    AddItemRef(entry.ItemRef, System.Math.Max(1, entry.ItemCount));
+                }
+
+                if (!string.IsNullOrEmpty(entry.AbilityRef))
+                {
+                    AddAbilityRef(entry.AbilityRef);
+                }
+            }
         }
 
         private void EvaluateSynergies(IReadOnlyList<SynergyData> trackedSynergies)

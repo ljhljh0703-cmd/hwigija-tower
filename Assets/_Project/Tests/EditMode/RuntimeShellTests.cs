@@ -335,6 +335,80 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void EncounterRuntimeResolver_UsesCatalogForShopItemAndAbility()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            state.AttachEncounterCatalog(catalog);
+            state.ModifyGold(16);
+            var encounter = CreateRuntimeEncounter(
+                "encounter.shop.catalog",
+                CreateChoice(
+                    "choice.buy.bundle",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 16) },
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", -16),
+                        CreateItemEffect("ITEM_FIELD_BANDAGE", 1),
+                        CreateAbilityEffect("ABILITY_SCOUT")
+                    },
+                    "DisabledVisible",
+                    "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"));
+
+            var resolution = state.ResolveEncounterChoice("node.shop.catalog", encounter, "choice.buy.bundle");
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual("choice.buy.bundle", resolution.PayloadId);
+            Assert.AreEqual(0, snapshot.Gold);
+            Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.IsTrue(state.HasAbilityRef("ABILITY_SCOUT"));
+            Assert.AreEqual(1, snapshot.AbilityCount);
+        }
+
+        [Test]
+        public void EncounterRuntimeResolver_UsesCatalogRewardBundleEntries()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            state.AttachEncounterCatalog(catalog);
+            var encounter = CreateRuntimeEncounter(
+                "encounter.reward.catalog",
+                CreateChoice(
+                    "choice.reward",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateRewardBundleEffect("REWARD_CACHE_SMALL") }));
+
+            var resolution = state.ResolveEncounterChoice("node.reward.catalog", encounter, "choice.reward");
+
+            Assert.AreEqual("choice.reward", resolution.PayloadId);
+            Assert.IsTrue(state.HasRewardBundleRef("REWARD_CACHE_SMALL"));
+            Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+        }
+
+        [Test]
+        public void EncounterRuntimeResolver_MemoryUnlockUpdatesRunStateDeterministically()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            state.AttachEncounterCatalog(catalog);
+            var encounter = CreateRuntimeEncounter(
+                "encounter.memory.catalog",
+                CreateChoice(
+                    "choice.memory.unlock",
+                    new[] { CreateMemoryLockedRequirement("MEM_FRAGMENT_01") },
+                    new[] { CreateMemoryUnlockEffect("MEM_FRAGMENT_01") }));
+
+            var first = state.ResolveEncounterChoice("node.memory.catalog", encounter, "choice.memory.unlock");
+            var viewsAfterUnlock = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, encounter);
+            var second = state.ResolveEncounterChoice("node.memory.catalog", encounter, "choice.memory.unlock");
+
+            Assert.AreEqual("choice.memory.unlock", first.PayloadId);
+            Assert.IsTrue(state.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
+            Assert.IsFalse(viewsAfterUnlock[0].Visible);
+            Assert.IsTrue(second.Message.Contains("requirements not met"));
+        }
+
+        [Test]
         public void EncounterRuntimeResolver_StartCombatEntersCombatFlow()
         {
             var bus = new GameFlowEventBus();
@@ -357,6 +431,38 @@ namespace HwigiTower.Tests.EditMode
                 Assert.AreEqual(1, snapshot.BattlesWon);
                 CollectionAssert.Contains(events, GameFlowEventType.CombatStarted);
                 CollectionAssert.Contains(events, GameFlowEventType.CombatCompleted);
+            }
+        }
+
+        [Test]
+        public void EncounterRuntimeResolver_UsesCatalogEnemyForCombatHandoff()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var bus = new GameFlowEventBus();
+            var combatPayloads = new List<string>();
+            using (bus.Subscribe(flowEvent =>
+            {
+                if (flowEvent.Type == GameFlowEventType.CombatStarted)
+                {
+                    combatPayloads.Add(flowEvent.PayloadId);
+                }
+            }))
+            {
+                var state = new PrototypeRunState("run-001", bus);
+                state.AttachEncounterCatalog(catalog);
+                var encounter = CreateRuntimeEncounter(
+                    "encounter.combat.catalog",
+                    CreateChoice(
+                        "choice.fight.catalog",
+                        new EncounterRequirementRuntimeData[0],
+                        new[] { CreateCombatEffect("COMBAT_CATALOG_001", "ENEMY_EMPTY_ARMOR", new[] { CreatePostCombatEffect("ModifyGold", 4) }) }));
+
+                var resolution = state.ResolveEncounterChoice(new DeterministicRunContext("run-001", 1001), "node.combat.catalog", encounter, "choice.fight.catalog");
+                var snapshot = state.CreateSnapshot();
+
+                Assert.AreEqual("choice.fight.catalog", resolution.PayloadId);
+                CollectionAssert.Contains(combatPayloads, "ENEMY_EMPTY_ARMOR");
+                Assert.AreEqual(4, snapshot.Gold);
             }
         }
 
@@ -429,6 +535,9 @@ namespace HwigiTower.Tests.EditMode
                     target.FindPropertyRelative("stat").stringValue = source.stat;
                     target.FindPropertyRelative("value").intValue = source.value;
                     target.FindPropertyRelative("abilityRef").stringValue = source.abilityRef;
+                    target.FindPropertyRelative("itemRef").stringValue = source.itemRef;
+                    target.FindPropertyRelative("minCount").intValue = source.minCount;
+                    target.FindPropertyRelative("memoryFragmentId").stringValue = source.memoryFragmentId;
                     target.FindPropertyRelative("minFloor").intValue = source.minFloor;
                     target.FindPropertyRelative("maxFloor").intValue = source.maxFloor;
                 }
@@ -447,6 +556,9 @@ namespace HwigiTower.Tests.EditMode
                     target.FindPropertyRelative("count").intValue = source.count;
                     target.FindPropertyRelative("abilityRef").stringValue = source.abilityRef;
                     target.FindPropertyRelative("rewardBundleRef").stringValue = source.rewardBundleRef;
+                    target.FindPropertyRelative("memoryFragmentId").stringValue = source.memoryFragmentId;
+                    target.FindPropertyRelative("memoryFragmentTextKey").stringValue = source.memoryFragmentTextKey;
+                    target.FindPropertyRelative("npcStage").stringValue = source.npcStage;
                     SetCombatHandoff(target.FindPropertyRelative("combatHandoff"), source.combatHandoff);
                 }
             }
@@ -525,6 +637,15 @@ namespace HwigiTower.Tests.EditMode
             };
         }
 
+        private static EncounterRequirementRuntimeData CreateMemoryLockedRequirement(string memoryFragmentId)
+        {
+            return new EncounterRequirementRuntimeData
+            {
+                kind = "MemoryFragmentLocked",
+                memoryFragmentId = memoryFragmentId
+            };
+        }
+
         private static EncounterEffectRuntimeData CreateEffect(string kind, int amount)
         {
             return new EncounterEffectRuntimeData
@@ -551,6 +672,35 @@ namespace HwigiTower.Tests.EditMode
                 kind = "AddItem",
                 itemRef = itemRef,
                 count = count
+            };
+        }
+
+        private static EncounterEffectRuntimeData CreateAbilityEffect(string abilityRef)
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = "AddAbility",
+                abilityRef = abilityRef
+            };
+        }
+
+        private static EncounterEffectRuntimeData CreateRewardBundleEffect(string rewardBundleRef)
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = "GrantRewardBundle",
+                rewardBundleRef = rewardBundleRef
+            };
+        }
+
+        private static EncounterEffectRuntimeData CreateMemoryUnlockEffect(string memoryFragmentId)
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = "UnlockMemoryFragment",
+                memoryFragmentId = memoryFragmentId,
+                memoryFragmentTextKey = "PLACEHOLDER_" + memoryFragmentId,
+                npcStage = "S1_AWARENESS"
             };
         }
 

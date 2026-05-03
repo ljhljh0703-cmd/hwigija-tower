@@ -12,6 +12,7 @@ namespace HwigiTower.Run
         [SerializeField] private PrototypeRuntimeSettings runtimeSettings;
         [SerializeField] private PlayerMovementProfile movementProfile;
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
+        [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
 
         private static Sprite _placeholderSprite;
 
@@ -101,7 +102,7 @@ namespace HwigiTower.Run
         {
             var controllerObject = new GameObject("Prototype Room");
             var controller = controllerObject.AddComponent<PrototypeRoomController>();
-            controller.Configure(roomDefinition);
+            controller.Configure(roomDefinition, encounterRuntimeCatalog);
             return controller;
         }
 

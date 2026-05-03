@@ -24,6 +24,34 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PrototypeRoom_AttachesEncounterRuntimeCatalogToRunState()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(controller.EncounterRuntimeCatalog);
+
+            controller.BeginRun();
+            Assert.IsNotNull(controller.RunState);
+            Assert.IsNotNull(controller.RunState.EncounterCatalog);
+
+            controller.RunState.ModifyGold(5);
+            var encounter = CreateEncounterFromJson(
+                "{\"id\":\"encounter.scene.catalog.shop\",\"type\":2,\"floor\":2,\"choices\":[{\"stableId\":\"choice.scene.buy\",\"textKey\":\"PLACEHOLDER_CHOICE_SCENE_BUY\",\"requirementMode\":\"All\",\"unavailablePolicyMode\":\"DisabledVisible\",\"unavailableReasonTextKey\":\"PLACEHOLDER_REASON_NOT_ENOUGH_GOLD\",\"requirements\":[{\"kind\":\"StatAtLeast\",\"stat\":\"gold\",\"value\":5}],\"effects\":[{\"kind\":\"ModifyGold\",\"amount\":-5},{\"kind\":\"AddItem\",\"itemRef\":\"ITEM_FIELD_BANDAGE\",\"count\":1}]}]}");
+
+            var resolution = controller.RunState.ResolveEncounterChoice(
+                new DeterministicRunContext("run-scene-catalog", 1001),
+                "node.scene.catalog.shop",
+                encounter,
+                "choice.scene.buy");
+
+            Assert.AreEqual("choice.scene.buy", resolution.PayloadId);
+            Assert.AreEqual(1, controller.RunState.GetItemCount("ITEM_FIELD_BANDAGE"));
+        }
+
+        [UnityTest]
         public IEnumerator BakedEncounterRuntime_ShowsChoicesAndAppliesShopPurchase()
         {
             yield return null;

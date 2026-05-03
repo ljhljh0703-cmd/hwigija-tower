@@ -204,6 +204,8 @@ namespace HwigiTower.Run
                     return state.GetItemCount(requirement.itemRef) >= System.Math.Max(1, requirement.minCount);
                 case "HasAbility":
                     return state.HasAbilityRef(requirement.abilityRef);
+                case "MemoryFragmentLocked":
+                    return !state.HasMemoryFragmentRef(requirement.memoryFragmentId);
                 default:
                     return true;
             }
@@ -246,6 +248,8 @@ namespace HwigiTower.Run
                     return state.AddAbilityRef(effect.abilityRef);
                 case "GrantRewardBundle":
                     return state.GrantRewardBundleRef(effect.rewardBundleRef);
+                case "UnlockMemoryFragment":
+                    return state.UnlockMemoryFragmentRef(effect.memoryFragmentId);
                 case "StartCombat":
                     return state.ResolveCombatHandoff(context, nodeId, encounter, effect.combatHandoff, ApplyPostCombatEffects).Applied;
                 default:
@@ -303,6 +307,8 @@ namespace HwigiTower.Run
                     return state.AddAbilityRef(effect.abilityRef);
                 case "GrantRewardBundle":
                     return state.GrantRewardBundleRef(effect.rewardBundleRef);
+                case "UnlockMemoryFragment":
+                    return state.UnlockMemoryFragmentRef(effect.memoryFragmentId);
                 default:
                     return false;
             }

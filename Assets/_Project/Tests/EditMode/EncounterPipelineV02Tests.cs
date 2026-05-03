@@ -9,6 +9,7 @@ namespace HwigiTower.Tests.EditMode
     public sealed class EncounterPipelineV02Tests
     {
         private const string SamplePackPath = "/Users/godju/Downloads/외주 폴더/pack_PACK_SAMPLE_3_V002.json";
+        private const string FullPackPath = "/Users/godju/Downloads/외주 폴더/pack_FULL_25_V003.json";
         private const string ValidationCasesPath = "/Users/godju/Downloads/외주 폴더/encounter_validation_cases_v0.2.json";
 
         [Test]
@@ -17,6 +18,66 @@ namespace HwigiTower.Tests.EditMode
             var result = EncounterPipelineV02Validator.ValidateFile(SamplePackPath);
 
             Assert.IsTrue(result.IsValid, result.ToSummary());
+        }
+
+        [Test]
+        public void FullPack_PassesV02Validation()
+        {
+            var result = EncounterPipelineV02Validator.ValidateFile(FullPackPath);
+
+            Assert.IsTrue(result.IsValid, result.ToSummary());
+        }
+
+        [Test]
+        public void RuntimeCatalog_BuildsRequiredStableIdLookups()
+        {
+            var result = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog();
+            var catalog = result.Catalog;
+
+            Assert.NotNull(catalog);
+            Assert.IsTrue(catalog.TryGetItem("ITEM_FIELD_BANDAGE", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_LANTERN_OIL", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_TORN_CHARM", out _));
+            Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_MEMORY", out _));
+            Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_SMALL", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_SCOUT", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_RECALL_ANCHOR", out _));
+            Assert.IsTrue(catalog.TryGetEnemy("ENEMY_COLLAPSE_ECHO", out _));
+            Assert.IsTrue(catalog.TryGetEnemy("ENEMY_EMPTY_ARMOR", out _));
+            Assert.IsTrue(catalog.TryGetEnemy("ENEMY_FRACTURE_HOUND", out _));
+            Assert.IsTrue(catalog.TryGetMemoryFragment("MEM_FRAGMENT_01", out _));
+            Assert.IsTrue(catalog.TryGetMemoryFragment("MEM_FRAGMENT_02", out _));
+            Assert.IsTrue(catalog.TryGetMemoryFragment("MEM_FRAGMENT_03", out _));
+            Assert.IsTrue(catalog.TryGetMemoryFragment("MEM_FRAGMENT_04", out _));
+            Assert.IsTrue(catalog.TryGetMemoryFragment("MEM_FRAGMENT_05", out _));
+        }
+
+        [Test]
+        public void RuntimeCatalogReferenceValidator_FullPackHasNoMissingRefsAndRecognizesMemoryFragments()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+
+            var report = EncounterRuntimeCatalogReferenceValidator.ValidateFile(FullPackPath, catalog);
+
+            Assert.AreEqual(25, report.EncounterCount);
+            Assert.AreEqual(0, report.MissingCatalogRefs.Count, string.Join("; ", report.MissingCatalogRefs));
+            Assert.AreEqual(0, report.DuplicateStableIds.Count, string.Join("; ", report.DuplicateStableIds));
+            Assert.AreEqual(5, report.RecognizedMemoryFragmentRefs.Count);
+            CollectionAssert.Contains(report.RecognizedMemoryFragmentRefs, "MEM_FRAGMENT_01");
+            CollectionAssert.Contains(report.RecognizedMemoryFragmentRefs, "MEM_FRAGMENT_05");
+        }
+
+        [Test]
+        public void RuntimeCatalogReferenceValidator_ReportsDuplicateEncounterStableIds()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var json = File.ReadAllText(FullPackPath).Replace(
+                "\"stableId\": \"ENC_REST_02\"",
+                "\"stableId\": \"ENC_REST_01\"");
+
+            var report = EncounterRuntimeCatalogReferenceValidator.ValidateJson(json, catalog);
+
+            CollectionAssert.Contains(report.DuplicateStableIds, "ENC_REST_01");
         }
 
         [Test]
@@ -107,6 +168,27 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual("CHOICE_F02_MORAL_HELP", moral.Choices[0].stableId);
             Assert.AreEqual("ModifyHp", moral.Choices[0].effects[0].kind);
             Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset"));
+        }
+
+        [Test]
+        public void Baker_DryRunThenBakesFullPackIntoFormalEncounterAssets()
+        {
+            EncounterRuntimeCatalogBuilder.BuildDefaultCatalog();
+
+            var dryRun = EncounterPipelineV02Baker.BakeJsonFile(FullPackPath, EncounterBakeOptions.DryRunOnly);
+
+            Assert.IsTrue(dryRun.Success, dryRun.Validation.ToSummary());
+            Assert.IsTrue(dryRun.DryRun);
+            Assert.AreEqual(25, dryRun.AssetPaths.Count);
+            Assert.AreEqual(0, dryRun.Reports.Count, string.Join("; ", dryRun.Reports));
+
+            var bake = EncounterPipelineV02Baker.BakeJsonFile(FullPackPath, EncounterBakeOptions.Apply);
+
+            Assert.IsTrue(bake.Success, bake.Validation.ToSummary());
+            Assert.AreEqual(25, bake.AssetPaths.Count);
+            Assert.AreEqual(25, bake.AssetPaths.Count(path => AssetDatabase.LoadAssetAtPath<EncounterData>(path) != null));
+            Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_01.asset"));
+            Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset"));
         }
 
         [Test]
