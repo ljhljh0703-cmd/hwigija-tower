@@ -42,6 +42,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 325ae76dd4623417286cf54d8baa47f0, type: 2}
   - {fileID: 11400000, guid: fb2a3779afec64d5e835ddb39e46c52f, type: 2}
   - {fileID: 11400000, guid: cd3ab81d630164440bc6db8153e694a6, type: 2}
+  - {fileID: 11400000, guid: ecdd4eac1864a4aa5afa8b657062dfb4, type: 2}
+  - {fileID: 11400000, guid: e5dfdc49569854fb7af7703292f176fd, type: 2}
+  - {fileID: 11400000, guid: 3bd1e84b6ca3541e5a372d2f2e87d45e, type: 2}
   fallbackEnemy: {fileID: 11400000, guid: a3c69785c051b4d87b4b7c519505c51d, type: 2}
   grantedAbility: {fileID: 0}
   trackedSynergies:

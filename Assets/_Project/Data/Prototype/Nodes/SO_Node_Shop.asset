@@ -16,7 +16,8 @@ MonoBehaviour:
   kind: 2
   displayName: "\uC0C1\uC810"
   placeholderOutcome: "\uC0C1\uC810"
-  possibleEncounters: []
+  possibleEncounters:
+  - {fileID: 11400000, guid: ff39a529854a5432d94a3dd9b33505b5, type: 2}
   fallbackEnemy: {fileID: 0}
   grantedAbility: {fileID: 11400000, guid: 1acbd827c2af040d8bfdf793bd938216, type: 2}
   trackedSynergies:

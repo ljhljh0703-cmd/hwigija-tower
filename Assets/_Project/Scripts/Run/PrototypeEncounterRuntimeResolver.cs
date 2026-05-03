@@ -6,14 +6,21 @@ namespace HwigiTower.Run
     public readonly struct PrototypeEncounterChoiceView
     {
         public PrototypeEncounterChoiceView(string choiceStableId, bool visible, bool enabled, string reasonTextKey)
+            : this(choiceStableId, string.Empty, visible, enabled, reasonTextKey)
+        {
+        }
+
+        public PrototypeEncounterChoiceView(string choiceStableId, string textKey, bool visible, bool enabled, string reasonTextKey)
         {
             ChoiceStableId = choiceStableId ?? string.Empty;
+            TextKey = textKey ?? string.Empty;
             Visible = visible;
             Enabled = enabled;
             ReasonTextKey = reasonTextKey ?? string.Empty;
         }
 
         public string ChoiceStableId { get; }
+        public string TextKey { get; }
         public bool Visible { get; }
         public bool Enabled { get; }
         public string ReasonTextKey { get; }
@@ -92,6 +99,7 @@ namespace HwigiTower.Run
                 var hidden = !met && choices[i].unavailablePolicyMode == "Hidden";
                 views[i] = new PrototypeEncounterChoiceView(
                     choices[i].stableId,
+                    choices[i].textKey,
                     !hidden,
                     met,
                     met ? string.Empty : choices[i].unavailableReasonTextKey);
