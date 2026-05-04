@@ -81,8 +81,10 @@ namespace HwigiTower.Tests.PlayMode
             });
 
             Assert.AreEqual(3, hud.ChoiceButtonCount);
-            Assert.IsFalse(FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM").interactable);
-            StringAssert.Contains("PLACEHOLDER_REASON_NOT_ENOUGH_GOLD", ReadButtonText(FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM")));
+            AssertChoiceLayout(hud);
+            var insufficientButton = FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM");
+            Assert.IsFalse(insufficientButton.interactable);
+            StringAssert.Contains("PLACEHOLDER_REASON_NOT_ENOUGH_GOLD", ReadButtonText(insufficientButton));
 
             controller.RunState.ModifyGold(5);
             hud.ShowChoices(shopEncounter, controller.BuildEncounterChoiceViews(shopSelection), choiceStableId =>
@@ -94,6 +96,13 @@ namespace HwigiTower.Tests.PlayMode
             FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM").onClick.Invoke();
             Assert.AreEqual(0, controller.RunState.Gold);
             Assert.AreEqual(1, controller.RunState.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.AreEqual(0, hud.ChoiceButtonCount);
+            StringAssert.Contains("choice applied: CHOICE_SHOP_01_BUY_ITEM", hud.ResultMessage);
+
+            var revisit = controller.ResolveEncounterChoice(shopNode, shopEncounter, "CHOICE_SHOP_01_BUY_ITEM");
+            Assert.AreEqual(1, controller.RunState.GetItemCount("ITEM_FIELD_BANDAGE"));
+            StringAssert.Contains("already resolved: CHOICE_SHOP_01_BUY_ITEM", revisit.Message);
+            hud.ShowChoices(shopEncounter, controller.BuildEncounterChoiceViews(shopSelection), _ => { });
             Assert.AreEqual(0, hud.ChoiceButtonCount);
 
             var moralEncounter = FindEncounter(battleNode, "ENC_MORAL_CHOICE_01");
@@ -112,12 +121,13 @@ namespace HwigiTower.Tests.PlayMode
             {
                 controller.ResolveEncounterChoice(battleNode, memoryEncounter, choiceStableId);
             });
+            Assert.AreEqual(2, hud.ChoiceButtonCount);
+            AssertChoiceLayout(hud);
             FindChoiceButton(hud, "CHOICE_MEMORY_01_UNLOCK").onClick.Invoke();
             Assert.IsTrue(controller.RunState.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
 
             hud.ShowChoices(memoryEncounter, controller.BuildEncounterChoiceViews(memorySelection), _ => { });
-            Assert.IsNull(FindChoiceButton(hud, "CHOICE_MEMORY_01_UNLOCK"));
-            Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_MEMORY_01_WITHDRAW"));
+            Assert.AreEqual(0, hud.ChoiceButtonCount);
 
             var events = new List<GameFlowEventType>();
             using (controller.EventBus.Subscribe(flowEvent => events.Add(flowEvent.Type)))
@@ -239,6 +249,24 @@ namespace HwigiTower.Tests.PlayMode
             var text = button.GetComponentInChildren<Text>();
             Assert.IsNotNull(text);
             return text.text;
+        }
+
+        private static void AssertChoiceLayout(PrototypeHud hud)
+        {
+            Assert.GreaterOrEqual(hud.ChoiceButtonCount, 2);
+            Assert.LessOrEqual(hud.ChoiceButtonCount, 3);
+
+            var previousY = float.PositiveInfinity;
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                Assert.IsNotNull(button);
+                var rect = button.GetComponent<RectTransform>();
+                Assert.IsNotNull(rect);
+                Assert.GreaterOrEqual(rect.sizeDelta.y, 96f);
+                Assert.Less(rect.anchoredPosition.y, previousY);
+                previousY = rect.anchoredPosition.y;
+            }
         }
     }
 }

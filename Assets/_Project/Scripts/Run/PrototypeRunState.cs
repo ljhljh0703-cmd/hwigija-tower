@@ -45,6 +45,7 @@ namespace HwigiTower.Run
         private readonly HashSet<string> _abilityRefs = new HashSet<string>();
         private readonly HashSet<string> _rewardBundleRefs = new HashSet<string>();
         private readonly HashSet<string> _memoryFragmentRefs = new HashSet<string>();
+        private readonly Dictionary<string, string> _resolvedEncounterChoices = new Dictionary<string, string>();
         private bool _runCompleted;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
@@ -257,6 +258,26 @@ namespace HwigiTower.Run
             return !string.IsNullOrEmpty(memoryFragmentRef) && _memoryFragmentRefs.Contains(memoryFragmentRef);
         }
 
+        public bool HasResolvedEncounterChoice(string nodeId, string encounterId)
+        {
+            return TryGetResolvedEncounterChoice(nodeId, encounterId, out _);
+        }
+
+        public bool TryGetResolvedEncounterChoice(string nodeId, string encounterId, out string choiceStableId)
+        {
+            return _resolvedEncounterChoices.TryGetValue(BuildResolvedEncounterKey(nodeId, encounterId), out choiceStableId);
+        }
+
+        public void MarkEncounterChoiceResolved(string nodeId, string encounterId, string choiceStableId)
+        {
+            if (string.IsNullOrEmpty(nodeId) || string.IsNullOrEmpty(encounterId) || string.IsNullOrEmpty(choiceStableId))
+            {
+                return;
+            }
+
+            _resolvedEncounterChoices[BuildResolvedEncounterKey(nodeId, encounterId)] = choiceStableId;
+        }
+
         public void AttachNpcStateMachine(NpcStateMachine stateMachine)
         {
             NpcStateMachine = stateMachine;
@@ -394,7 +415,18 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution(nodeId, encounter == null ? string.Empty : encounter.Id, "run already completed", true);
             }
 
+            var encounterId = encounter == null ? string.Empty : encounter.Id;
+            if (TryGetResolvedEncounterChoice(nodeId, encounterId, out var resolvedChoiceStableId))
+            {
+                return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", false);
+            }
+
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, new DeterministicRunContext(RunId, 0), nodeId);
+            if (resolution.Applied)
+            {
+                MarkEncounterChoiceResolved(nodeId, encounterId, resolution.ChoiceStableId);
+            }
+
             NodesResolved++;
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
@@ -408,7 +440,18 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution(nodeId, encounter == null ? string.Empty : encounter.Id, "run already completed", true);
             }
 
+            var encounterId = encounter == null ? string.Empty : encounter.Id;
+            if (TryGetResolvedEncounterChoice(nodeId, encounterId, out var resolvedChoiceStableId))
+            {
+                return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", false);
+            }
+
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, context, nodeId);
+            if (resolution.Applied)
+            {
+                MarkEncounterChoiceResolved(nodeId, encounterId, resolution.ChoiceStableId);
+            }
+
             NodesResolved++;
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
@@ -571,6 +614,11 @@ namespace HwigiTower.Run
         private static int Clamp(int value, int min, int max)
         {
             return System.Math.Max(min, System.Math.Min(value, max));
+        }
+
+        private static string BuildResolvedEncounterKey(string nodeId, string encounterId)
+        {
+            return (nodeId ?? string.Empty) + "::" + (encounterId ?? string.Empty);
         }
 
         private static CombatantState CreateEnemyState(EnemyData enemyData)
