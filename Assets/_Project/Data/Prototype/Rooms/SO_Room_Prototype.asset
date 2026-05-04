@@ -20,3 +20,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1f21543f9f4c4da18f3d6418b63289ee, type: 2}
   - {fileID: 11400000, guid: 361ee713d307457ebd4a381ae5cd32a6, type: 2}
   - {fileID: 11400000, guid: aeb80fd187104b66bc34ab85f79a432d, type: 2}
+  demoRunPath:
+  - node: {fileID: 11400000, guid: 361ee713d307457ebd4a381ae5cd32a6, type: 2}
+    encounter: {fileID: 11400000, guid: ff39a529854a5432d94a3dd9b33505b5, type: 2}
+  - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+    encounter: {fileID: 11400000, guid: ecdd4eac1864a4aa5afa8b657062dfb4, type: 2}
+  - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+    encounter: {fileID: 11400000, guid: e5dfdc49569854fb7af7703292f176fd, type: 2}
+  - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+    encounter: {fileID: 11400000, guid: 3bd1e84b6ca3541e5a372d2f2e87d45e, type: 2}

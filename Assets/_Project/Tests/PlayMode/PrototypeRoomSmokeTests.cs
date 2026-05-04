@@ -108,18 +108,24 @@ namespace HwigiTower.Tests.PlayMode
             var moralEncounter = FindEncounter(battleNode, "ENC_MORAL_CHOICE_01");
             var moralSelection = new EncounterSelection(battleNode.Definition, moralEncounter);
             var affinityBeforeMoral = controller.RunState.Affinity;
+            var glitchBeforeMoral = controller.RunState.GlitchLevel;
             hud.ShowChoices(moralEncounter, controller.BuildEncounterChoiceViews(moralSelection), choiceStableId =>
             {
-                controller.ResolveEncounterChoice(battleNode, moralEncounter, choiceStableId);
+                var resolution = controller.ResolveEncounterChoice(battleNode, moralEncounter, choiceStableId);
+                hud.ShowInteraction(battleNode, moralSelection, resolution);
+                hud.ShowRunState(controller.GetSnapshot());
             });
             FindChoiceButton(hud, "CHOICE_MORAL_01_REFUSE").onClick.Invoke();
             Assert.AreEqual(affinityBeforeMoral - 5, controller.RunState.Affinity);
+            Assert.AreEqual(glitchBeforeMoral + 4, controller.RunState.GlitchLevel);
 
             var memoryEncounter = FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01");
             var memorySelection = new EncounterSelection(battleNode.Definition, memoryEncounter);
             hud.ShowChoices(memoryEncounter, controller.BuildEncounterChoiceViews(memorySelection), choiceStableId =>
             {
-                controller.ResolveEncounterChoice(battleNode, memoryEncounter, choiceStableId);
+                var resolution = controller.ResolveEncounterChoice(battleNode, memoryEncounter, choiceStableId);
+                hud.ShowInteraction(battleNode, memorySelection, resolution);
+                hud.ShowRunState(controller.GetSnapshot());
             });
             Assert.AreEqual(2, hud.ChoiceButtonCount);
             AssertChoiceLayout(hud);
@@ -136,13 +142,18 @@ namespace HwigiTower.Tests.PlayMode
                 var combatSelection = new EncounterSelection(battleNode.Definition, combatEncounter);
                 hud.ShowChoices(combatEncounter, controller.BuildEncounterChoiceViews(combatSelection), choiceStableId =>
                 {
-                    controller.ResolveEncounterChoice(battleNode, combatEncounter, choiceStableId);
+                    var resolution = controller.ResolveEncounterChoice(battleNode, combatEncounter, choiceStableId);
+                    hud.ShowInteraction(battleNode, combatSelection, resolution);
+                    hud.ShowRunState(controller.GetSnapshot());
                 });
                 FindChoiceButton(hud, "CHOICE_COMBAT_01_ENGAGE").onClick.Invoke();
             }
 
             CollectionAssert.Contains(events, GameFlowEventType.CombatStarted);
             CollectionAssert.Contains(events, GameFlowEventType.CombatCompleted);
+            Assert.IsTrue(controller.RunState.RunCompleted);
+            Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
+            StringAssert.Contains("demo.complete", hud.ResultMessage);
         }
 
         [UnityTest]

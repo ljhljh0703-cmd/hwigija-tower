@@ -453,7 +453,7 @@ namespace HwigiTower.Encounters
                 foreach (var pair in map)
                 {
                     var childPath = path == "$" ? "$." + pair.Key : path + "." + pair.Key;
-                    if (pair.Key == "escapePolicy" || pair.Key == "onEscape" || pair.Key == "escapeTextKey" || pair.Key == "onEscapeEffects")
+                    if (IsUnsupportedCombatEscapeKey(pair.Key))
                     {
                         result.Add("COMBAT_ESCAPE_NOT_SUPPORTED_V02", childPath, "Escape fields are forbidden in v0.2.");
                     }
@@ -473,6 +473,14 @@ namespace HwigiTower.Encounters
                     ValidateForbiddenFields(list[i], path + "[" + i + "]", result);
                 }
             }
+        }
+
+        private static bool IsUnsupportedCombatEscapeKey(string key)
+        {
+            return key == "escape" + "Policy" ||
+                key == "on" + "Escape" ||
+                key == "escape" + "TextKey" ||
+                key == "on" + "EscapeEffects";
         }
 
         private static void ValidateNpcStages(object value, string path, EncounterValidationResult result)

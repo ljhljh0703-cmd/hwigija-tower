@@ -169,7 +169,10 @@ namespace HwigiTower.UI
             }
 
             var state = snapshot.RunCompleted ? "complete" : "active";
-            runStateText.text = $"run {state} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | ATK {snapshot.PlayerAttack} | gold {snapshot.Gold} | mental {snapshot.Mental} | glitch {snapshot.GlitchLevel} | affinity {snapshot.Affinity} | abilities {snapshot.AbilityCount}";
+            var demo = string.IsNullOrEmpty(snapshot.NextDemoEncounterId)
+                ? snapshot.DemoStatus
+                : $"{snapshot.DemoStatus} next {snapshot.NextDemoNodeId}/{snapshot.NextDemoEncounterId}";
+            runStateText.text = $"run {state} | {demo} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | ATK {snapshot.PlayerAttack} | gold {snapshot.Gold} | mental {snapshot.Mental} | glitch {snapshot.GlitchLevel} | affinity {snapshot.Affinity} | abilities {snapshot.AbilityCount}";
         }
 
         private Button CreateChoiceButton(PrototypeEncounterChoiceView view, Action<string> onChoiceSelected)

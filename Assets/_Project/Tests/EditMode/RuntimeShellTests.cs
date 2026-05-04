@@ -496,6 +496,75 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void DemoProgression_CompletesOnlyAfterRequiredFourEncounters()
+        {
+            var shop = CreateRuntimeEncounter("ENC_SHOP_DEMO", CreateChoice("CHOICE_SHOP_DEMO", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 5) }));
+            var moral = CreateRuntimeEncounter("ENC_MORAL_DEMO", CreateChoice("CHOICE_MORAL_DEMO", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", -5), CreateEffect("ModifyGlitchLevel", 3) }));
+            var memory = CreateRuntimeEncounter("ENC_MEMORY_DEMO", CreateChoice("CHOICE_MEMORY_DEMO", new EncounterRequirementRuntimeData[0], new[] { CreateMemoryUnlockEffect("MEM_FRAGMENT_01") }));
+            var combat = CreateRuntimeEncounter("ENC_COMBAT_DEMO", CreateChoice("CHOICE_COMBAT_DEMO", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_DEMO", "ENEMY_DEMO", new[] { CreatePostCombatEffect("ModifyGold", 1) }) }));
+            var shopNode = CreateNode("node.shop.demo", shop);
+            var battleNode = CreateNode("node.battle.demo", moral, memory, combat);
+            var state = new PrototypeRunState("run-demo", new GameFlowEventBus());
+            state.AttachDemoRunPath(new[]
+            {
+                new PrototypeDemoRunStep(shopNode, shop),
+                new PrototypeDemoRunStep(battleNode, moral),
+                new PrototypeDemoRunStep(battleNode, memory),
+                new PrototypeDemoRunStep(battleNode, combat)
+            });
+
+            Assert.AreEqual("demo.active", state.DemoStatus);
+            Assert.AreEqual("ENC_SHOP_DEMO", state.NextDemoEncounterId);
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-demo", 1001), shopNode.NodeId, shop, "CHOICE_SHOP_DEMO");
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-demo", 1001), battleNode.NodeId, moral, "CHOICE_MORAL_DEMO");
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-demo", 1001), battleNode.NodeId, memory, "CHOICE_MEMORY_DEMO");
+            Assert.IsFalse(state.RunCompleted);
+            Assert.AreEqual("ENC_COMBAT_DEMO", state.NextDemoEncounterId);
+
+            var completion = state.ResolveEncounterChoice(new DeterministicRunContext("run-demo", 1001), battleNode.NodeId, combat, "CHOICE_COMBAT_DEMO");
+
+            Assert.IsTrue(state.RunCompleted);
+            Assert.IsTrue(state.DemoComplete);
+            Assert.AreEqual("demo.complete", state.DemoStatus);
+            StringAssert.Contains("demo.complete", completion.Message);
+        }
+
+        [Test]
+        public void DemoProgression_DoesNotAdvanceOrReapplyOnResolvedRevisit()
+        {
+            var encounter = CreateRuntimeEncounter("ENC_SHOP_DEMO_REVISIT", CreateChoice("CHOICE_SHOP_REVISIT", new EncounterRequirementRuntimeData[0], new[] { CreateItemEffect("ITEM_FIELD_BANDAGE", 1) }));
+            var node = CreateNode("node.shop.demo.revisit", encounter);
+            var state = new PrototypeRunState("run-demo-revisit", new GameFlowEventBus());
+            state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
+
+            var first = state.ResolveEncounterChoice(new DeterministicRunContext("run-demo-revisit", 1001), node.NodeId, encounter, "CHOICE_SHOP_REVISIT");
+            var second = state.ResolveEncounterChoice(new DeterministicRunContext("run-demo-revisit", 1001), node.NodeId, encounter, "CHOICE_SHOP_REVISIT");
+
+            Assert.IsTrue(first.Message.Contains("demo.complete"));
+            Assert.IsTrue(second.Message.Contains("already resolved: CHOICE_SHOP_REVISIT"));
+            Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.AreEqual(1, state.CreateSnapshot().NodesResolved);
+        }
+
+        [Test]
+        public void DemoProgression_OrderIsReproducibleForSameSeed()
+        {
+            var shop = CreateRuntimeEncounter("ENC_SHOP_DEMO_ORDER", CreateChoice("CHOICE_SHOP_ORDER", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 1) }));
+            var moral = CreateRuntimeEncounter("ENC_MORAL_DEMO_ORDER", CreateChoice("CHOICE_MORAL_ORDER", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", 1) }));
+            var shopNode = CreateNode("node.shop.demo.order", shop);
+            var battleNode = CreateNode("node.battle.demo.order", moral);
+
+            var first = CreateDemoOrderState(shopNode, shop, battleNode, moral);
+            var second = CreateDemoOrderState(shopNode, shop, battleNode, moral);
+
+            Assert.AreEqual(first.NextDemoEncounterId, second.NextDemoEncounterId);
+            first.ResolveEncounterChoice(new DeterministicRunContext("run-demo-order", 1001), shopNode.NodeId, shop, "CHOICE_SHOP_ORDER");
+            second.ResolveEncounterChoice(new DeterministicRunContext("run-demo-order", 1001), shopNode.NodeId, shop, "CHOICE_SHOP_ORDER");
+            Assert.AreEqual(first.NextDemoEncounterId, second.NextDemoEncounterId);
+        }
+
+        [Test]
         public void OnDeviceLLMProvider_FallsBackWhenNativePluginIsMissing()
         {
             var provider = new OnDeviceLLMProvider(100, new DeterministicFakeLLMProvider());
@@ -756,6 +825,21 @@ namespace HwigiTower.Tests.EditMode
                 kind = kind,
                 amount = amount
             };
+        }
+
+        private static PrototypeRunState CreateDemoOrderState(
+            PrototypeNodeDefinition firstNode,
+            EncounterData firstEncounter,
+            PrototypeNodeDefinition secondNode,
+            EncounterData secondEncounter)
+        {
+            var state = new PrototypeRunState("run-demo-order", new GameFlowEventBus());
+            state.AttachDemoRunPath(new[]
+            {
+                new PrototypeDemoRunStep(firstNode, firstEncounter),
+                new PrototypeDemoRunStep(secondNode, secondEncounter)
+            });
+            return state;
         }
 
         private static PrototypeNodeDefinition CreateNode(string nodeId, params EncounterData[] encounters)
