@@ -71,9 +71,25 @@ namespace HwigiTower.Run
                 BeginRun();
             }
 
+            if (TryGetResolvedEncounterChoice(selection, out _))
+            {
+                return new PrototypeEncounterChoiceView[0];
+            }
+
             return HasEncounterChoices(selection)
                 ? PrototypeEncounterRuntimeResolver.BuildChoiceViews(RunState, selection.Encounter)
                 : new PrototypeEncounterChoiceView[0];
+        }
+
+        public bool TryGetResolvedEncounterChoice(EncounterSelection selection, out string choiceStableId)
+        {
+            choiceStableId = string.Empty;
+            if (RunState == null || !selection.HasEncounter || selection.Node == null)
+            {
+                return false;
+            }
+
+            return RunState.TryGetResolvedEncounterChoice(selection.Node.NodeId, selection.EncounterId, out choiceStableId);
         }
 
         public PrototypeNodeResolution ResolveEncounterChoice(InteractableNode node, EncounterData encounter, string choiceStableId)
@@ -110,6 +126,11 @@ namespace HwigiTower.Run
             PrototypeNodeResolution resolution;
             if (HasEncounterChoices(selection))
             {
+                if (RunState.TryGetResolvedEncounterChoice(definition.NodeId, encounterId, out var resolvedChoiceStableId))
+                {
+                    return new PrototypeNodeResolution(definition.NodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", false);
+                }
+
                 return new PrototypeNodeResolution(definition.NodeId, encounterId, $"choices pending: {encounterId}", false);
             }
 

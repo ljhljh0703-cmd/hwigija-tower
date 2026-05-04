@@ -105,6 +105,19 @@ namespace HwigiTower.Encounters
 
         private void ShowEncounterChoices(InteractableNode node, EncounterSelection selection)
         {
+            if (roomController.TryGetResolvedEncounterChoice(selection, out var resolvedChoiceStableId))
+            {
+                hud?.ClearChoices();
+                var resolution = new PrototypeNodeResolution(
+                    node == null || node.Definition == null ? string.Empty : node.Definition.NodeId,
+                    resolvedChoiceStableId,
+                    $"already resolved: {resolvedChoiceStableId}",
+                    false);
+                hud?.ShowInteraction(node, selection, resolution);
+                hud?.ShowRunState(roomController.GetSnapshot());
+                return;
+            }
+
             var views = roomController.BuildEncounterChoiceViews(selection);
             hud?.ShowChoices(selection.Encounter, views, choiceStableId =>
             {

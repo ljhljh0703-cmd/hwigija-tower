@@ -251,6 +251,35 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void PrototypeRunState_BlocksResolvedEncounterChoiceRevisit()
+        {
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            state.ModifyGold(10);
+            var encounter = CreateRuntimeEncounter(
+                "encounter.revisit",
+                CreateChoice(
+                    "choice.once",
+                    new EncounterRequirementRuntimeData[0],
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", -3),
+                        CreateItemEffect("ITEM_FIELD_BANDAGE", 1)
+                    }));
+
+            var first = state.ResolveEncounterChoice("node.revisit", encounter, "choice.once");
+            var second = state.ResolveEncounterChoice("node.revisit", encounter, "choice.once");
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual("choice.once", first.PayloadId);
+            Assert.AreEqual("choice.once", second.PayloadId);
+            Assert.IsTrue(second.Message.Contains("already resolved: choice.once"));
+            Assert.IsTrue(state.HasResolvedEncounterChoice("node.revisit", "encounter.revisit"));
+            Assert.AreEqual(7, snapshot.Gold);
+            Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.AreEqual(1, snapshot.NodesResolved);
+        }
+
+        [Test]
         public void EncounterRuntimeResolver_BlocksChoiceWhenRequirementFails()
         {
             var state = new PrototypeRunState("run-001", new GameFlowEventBus());
@@ -405,7 +434,7 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual("choice.memory.unlock", first.PayloadId);
             Assert.IsTrue(state.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
             Assert.IsFalse(viewsAfterUnlock[0].Visible);
-            Assert.IsTrue(second.Message.Contains("requirements not met"));
+            Assert.IsTrue(second.Message.Contains("already resolved: choice.memory.unlock"));
         }
 
         [Test]

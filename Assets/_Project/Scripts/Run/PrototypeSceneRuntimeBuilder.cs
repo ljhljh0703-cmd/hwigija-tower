@@ -73,8 +73,9 @@ namespace HwigiTower.Run
             var focus = CreateText(canvasObject.transform, "Focus Text", new Vector2(0f, -40f));
             var interaction = CreateText(canvasObject.transform, "Interaction Text", new Vector2(0f, -96f));
             var runState = CreateText(canvasObject.transform, "Run State Text", new Vector2(0f, -152f));
+            var result = CreateText(canvasObject.transform, "Encounter Result Text", new Vector2(0f, -208f));
             var hud = canvasObject.AddComponent<PrototypeHud>();
-            hud.Configure(focus, interaction, runState);
+            hud.Configure(focus, interaction, runState, result);
             return hud;
         }
 
