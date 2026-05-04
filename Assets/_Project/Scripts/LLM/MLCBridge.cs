@@ -19,6 +19,27 @@ namespace HwigiTower.LLM
             }
         }
 
+        public static bool TryInitialize(string modelPath, string tokenizerPath)
+        {
+            if (!IsAvailable || string.IsNullOrWhiteSpace(modelPath) || string.IsNullOrWhiteSpace(tokenizerPath))
+            {
+                return false;
+            }
+
+            try
+            {
+                return HwigiMlcInitialize(modelPath, tokenizerPath);
+            }
+            catch (DllNotFoundException)
+            {
+                return false;
+            }
+            catch (EntryPointNotFoundException)
+            {
+                return false;
+            }
+        }
+
         public static bool TryComplete(string prompt, int maxOutputTokens, out string text)
         {
             text = string.Empty;
@@ -48,6 +69,9 @@ namespace HwigiTower.LLM
                 return false;
             }
         }
+
+        [DllImport(LibraryName, EntryPoint = "hwigi_mlc_initialize")]
+        private static extern bool HwigiMlcInitialize(string modelPath, string tokenizerPath);
 
         [DllImport(LibraryName, EntryPoint = "hwigi_mlc_complete")]
         private static extern IntPtr HwigiMlcComplete(string prompt, int maxOutputTokens);
