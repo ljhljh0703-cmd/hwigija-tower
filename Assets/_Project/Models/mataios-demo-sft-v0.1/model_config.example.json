@@ -1,0 +1,19 @@
+{
+  "modelId": "mataios-demo-sft-v0.1",
+  "baseModel": "TBD",
+  "runtime": "mlc-llm",
+  "platform": "android",
+  "compiledPath": "LLM/mataios-demo-sft-v0.1/compiled/android",
+  "tokenizerPath": "LLM/mataios-demo-sft-v0.1/tokenizer",
+  "maxInputTokens": 2048,
+  "maxOutputTokens": 100,
+  "temperature": 0.0,
+  "topP": 1.0,
+  "deterministicCacheRequired": true,
+  "license": "TBD",
+  "checksum": {
+    "algorithm": "sha256",
+    "compiledArtifact": "TBD",
+    "tokenizer": "TBD"
+  }
+}

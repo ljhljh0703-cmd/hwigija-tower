@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using HwigiTower.Abilities;
 using HwigiTower.Combat;
 using HwigiTower.Core;
@@ -572,6 +573,74 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(provider.TryComplete(request, out var response));
             Assert.AreEqual(request.CacheKey, response.CacheKey);
+        }
+
+        [Test]
+        public void LLMProviderFactory_UsesFakeProviderWhenConfigIsEmpty()
+        {
+            var repo = new InMemoryNpcMemoryRepo();
+            var provider = LLMProviderFactory.Create((LLMRuntimeConfig)null, repo);
+            var request = new LLMRequest("run-empty-model", "prompt", "profile");
+
+            Assert.IsTrue(provider.TryComplete(request, out var response));
+            Assert.AreEqual(request.CacheKey, response.CacheKey);
+            Assert.IsTrue(response.Text.Contains(request.CacheKey.PromptHash));
+        }
+
+        [Test]
+        public void LLMProviderFactory_CachesByRunIdAndPromptHash()
+        {
+            var repo = new InMemoryNpcMemoryRepo();
+            var provider = LLMProviderFactory.Create(LLMRuntimeConfig.FakeDefault(), repo);
+            var request = new LLMRequest("run-cache-model", "same prompt", "profile");
+
+            Assert.IsTrue(provider.TryComplete(request, out var first));
+            Assert.IsTrue(repo.TryGetCachedResponse(request.CacheKey, out var cached));
+            Assert.IsTrue(provider.TryComplete(request, out var second));
+
+            Assert.AreEqual(first.CacheKey, cached.CacheKey);
+            Assert.AreEqual(cached.Text, second.Text);
+        }
+
+        [Test]
+        public void LLMModelManifestLoader_InvalidModelPathFallsBackWithoutBreakingFlow()
+        {
+            var configPath = Path.Combine(Application.temporaryCachePath, "hwigi-llm-invalid-model-config.json");
+            File.WriteAllText(configPath,
+                "{\"providerMode\":1,\"modelId\":\"missing-model\",\"streamingAssetsRelativePath\":\"LLM/missing-model/model\",\"tokenizerRelativePath\":\"LLM/missing-model/tokenizer\",\"maxInputTokens\":128,\"maxOutputTokens\":16,\"deterministicCacheEnabled\":true,\"fallbackEnabled\":true}");
+
+            Assert.IsTrue(LLMModelManifestLoader.TryLoadConfigFile(configPath, out var config));
+            var provider = LLMProviderFactory.Create(config, new InMemoryNpcMemoryRepo());
+            var request = new LLMRequest("run-invalid-model", "prompt", "profile");
+
+            Assert.IsTrue(provider.TryComplete(request, out var response));
+            Assert.AreEqual(request.CacheKey, response.CacheKey);
+        }
+
+        [Test]
+        public void LLMModelManifestLoader_EmptyModelIdReturnsFakeConfig()
+        {
+            Assert.IsFalse(LLMModelManifestLoader.TryLoadProjectModelConfig(string.Empty, out var config));
+            var provider = LLMProviderFactory.Create(config, new InMemoryNpcMemoryRepo());
+            var request = new LLMRequest("run-empty-manifest", "prompt", "profile");
+
+            Assert.IsTrue(provider.TryComplete(request, out var response));
+            Assert.AreEqual(request.CacheKey, response.CacheKey);
+        }
+
+        [Test]
+        public void LLMModelIntakeFiles_ExistInExpectedFolders()
+        {
+            Assert.IsTrue(Directory.Exists("Assets/_Project/Models/_training/datasets"));
+            Assert.IsTrue(Directory.Exists("Assets/_Project/Models/_training/adapters"));
+            Assert.IsTrue(Directory.Exists("Assets/_Project/Models/_training/evals"));
+            Assert.IsTrue(Directory.Exists("Assets/_Project/Models/mataios-demo-sft-v0.1/tokenizer"));
+            Assert.IsTrue(Directory.Exists("Assets/_Project/Models/mataios-demo-sft-v0.1/compiled/android"));
+            Assert.IsTrue(Directory.Exists("Assets/_Project/Models/mataios-demo-sft-v0.1/eval"));
+            Assert.IsTrue(Directory.Exists("Assets/StreamingAssets/LLM/mataios-demo-sft-v0.1"));
+            Assert.IsTrue(File.Exists("Assets/_Project/Models/mataios-demo-sft-v0.1/MODEL_MANIFEST.md"));
+            Assert.IsTrue(File.Exists("Assets/_Project/Models/mataios-demo-sft-v0.1/model_config.example.json"));
+            Assert.IsTrue(File.Exists("Assets/StreamingAssets/LLM/_README.md"));
         }
 
         [Test]

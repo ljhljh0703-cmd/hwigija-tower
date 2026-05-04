@@ -73,11 +73,16 @@ namespace HwigiTower.Run
         private string _lastCombatResultId = string.Empty;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
+            : this(runId, eventBus, null)
+        {
+        }
+
+        public PrototypeRunState(string runId, GameFlowEventBus eventBus, LLMRuntimeSettings llmRuntimeSettings)
         {
             RunId = runId ?? string.Empty;
             _eventBus = eventBus;
             MemoryRepo = new InMemoryNpcMemoryRepo();
-            LLMProvider = new CachedLLMProvider(MemoryRepo, new OnDeviceLLMProvider(100, new DeterministicFakeLLMProvider()));
+            LLMProvider = LLMProviderFactory.Create(llmRuntimeSettings, MemoryRepo);
             _reflectionPipeline = new ReflectionPipeline(MemoryRepo, LLMProvider, eventBus);
             _synergyDetector = new SynergyDetector(eventBus, RunId);
             Abilities = new AbilityInventory(eventBus, RunId);
