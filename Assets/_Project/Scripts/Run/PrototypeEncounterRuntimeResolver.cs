@@ -68,12 +68,14 @@ namespace HwigiTower.Run
             var visibleChoices = BuildVisibleChoiceSummary(state, encounter);
             var applied = 0;
             var ignored = 0;
+            var effectSummary = string.Empty;
             var effects = choice.effects ?? new EncounterEffectRuntimeData[0];
             for (var i = 0; i < effects.Length; i++)
             {
-                if (ApplyEffect(state, encounter, effects[i], context, nodeId))
+                if (ApplyEffect(state, encounter, effects[i], context, nodeId, out var effectDetail))
                 {
                     applied++;
+                    AppendSummary(ref effectSummary, effectDetail);
                 }
                 else
                 {
@@ -81,7 +83,13 @@ namespace HwigiTower.Run
                 }
             }
 
-            return new PrototypeEncounterChoiceResolution(choice.stableId, true, $"choices: {visibleChoices} | choice applied: {choice.stableId}; effects={applied}; ignored={ignored}");
+            var message = $"choices: {visibleChoices} | choice applied: {choice.stableId}; effects={applied}; ignored={ignored}";
+            if (!string.IsNullOrEmpty(effectSummary))
+            {
+                message += " | " + effectSummary;
+            }
+
+            return new PrototypeEncounterChoiceResolution(choice.stableId, true, message);
         }
 
         public static PrototypeEncounterChoiceView[] BuildChoiceViews(PrototypeRunState state, EncounterData encounter)
@@ -219,8 +227,9 @@ namespace HwigiTower.Run
             }
         }
 
-        private static bool ApplyEffect(PrototypeRunState state, EncounterData encounter, EncounterEffectRuntimeData effect, DeterministicRunContext context, string nodeId)
+        private static bool ApplyEffect(PrototypeRunState state, EncounterData encounter, EncounterEffectRuntimeData effect, DeterministicRunContext context, string nodeId, out string summary)
         {
+            summary = string.Empty;
             if (effect == null)
             {
                 return false;
@@ -230,36 +239,56 @@ namespace HwigiTower.Run
             {
                 case "ModifyHp":
                     state.ModifyPlayerHp(effect.amount);
+                    summary = FormatDelta("HP", effect.amount);
                     return true;
                 case "ModifyMental":
                     state.ModifyMental(effect.amount);
+                    summary = FormatDelta("Mental", effect.amount);
                     return true;
                 case "ModifyGold":
                     state.ModifyGold(effect.amount);
+                    summary = FormatDelta("Gold", effect.amount);
                     return true;
                 case "ModifyGlitchLevel":
                     state.ModifyGlitchLevel(effect.amount);
+                    summary = FormatDelta("Glitch", effect.amount);
                     return true;
                 case "ModifyAffinity":
                     state.ModifyAffinity(effect.amount);
+                    summary = FormatDelta("Affinity", effect.amount);
                     return true;
                 case "SetFlag":
                     state.SetFlag(effect.flag, effect.value);
+                    summary = "flag " + effect.flag + "=" + effect.value;
                     return true;
                 case "AddItem":
                     state.AddItemRef(effect.itemRef, System.Math.Max(1, effect.count));
+                    summary = "item " + effect.itemRef + " +" + System.Math.Max(1, effect.count);
                     return true;
                 case "RemoveItem":
                     state.AddItemRef(effect.itemRef, -System.Math.Max(1, effect.count));
+                    summary = "item " + effect.itemRef + " -" + System.Math.Max(1, effect.count);
                     return true;
                 case "AddAbility":
-                    return state.AddAbilityRef(effect.abilityRef);
+                    var abilityAdded = state.AddAbilityRef(effect.abilityRef);
+                    summary = abilityAdded ? "ability " + effect.abilityRef : string.Empty;
+                    return abilityAdded;
                 case "GrantRewardBundle":
-                    return state.GrantRewardBundleRef(effect.rewardBundleRef);
+                    var rewardGranted = state.GrantRewardBundleRef(effect.rewardBundleRef);
+                    summary = rewardGranted ? "reward " + effect.rewardBundleRef : string.Empty;
+                    return rewardGranted;
                 case "UnlockMemoryFragment":
-                    return state.UnlockMemoryFragmentRef(effect.memoryFragmentId);
+                    var unlocked = state.UnlockMemoryFragmentRef(effect.memoryFragmentId);
+                    summary = unlocked ? "memory unlocked " + effect.memoryFragmentId : string.Empty;
+                    return unlocked;
                 case "StartCombat":
-                    return state.ResolveCombatHandoff(context, nodeId, encounter, effect.combatHandoff, ApplyPostCombatEffects).Applied;
+                    var combat = state.ResolveCombatHandoff(context, nodeId, encounter, effect.combatHandoff, ApplyPostCombatEffects);
+                    if (combat.Applied)
+                    {
+                        summary = BuildCombatSummary(combat, effect.combatHandoff);
+                    }
+
+                    return combat.Applied;
                 default:
                     return false;
             }
@@ -320,6 +349,94 @@ namespace HwigiTower.Run
                 default:
                     return false;
             }
+        }
+
+        private static string BuildCombatSummary(PrototypeCombatHandoffResolution combat, EncounterCombatHandoffRuntimeData handoff)
+        {
+            var combatId = string.IsNullOrEmpty(combat.CombatStableId) ? "combat" : combat.CombatStableId;
+            var enemyId = string.IsNullOrEmpty(combat.EnemyId) ? "enemy.placeholder" : combat.EnemyId;
+            var resultId = string.IsNullOrEmpty(combat.ResultId) ? "unknown" : combat.ResultId;
+            var summary = "combat started " + combatId + "; enemy " + enemyId + "; result " + resultId;
+            var postEffects = handoff == null
+                ? null
+                : resultId == "victory"
+                    ? handoff.onVictoryEffects
+                    : handoff.onDefeatEffects;
+            var postSummary = BuildPostCombatEffectSummary(postEffects);
+            return string.IsNullOrEmpty(postSummary) ? summary : summary + "; " + postSummary;
+        }
+
+        private static string BuildPostCombatEffectSummary(EncounterPostCombatEffectRuntimeData[] effects)
+        {
+            if (effects == null || effects.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            var summary = string.Empty;
+            for (var i = 0; i < effects.Length; i++)
+            {
+                var effect = effects[i];
+                if (effect == null)
+                {
+                    continue;
+                }
+
+                AppendSummary(ref summary, DescribePostCombatEffect(effect));
+            }
+
+            return summary;
+        }
+
+        private static string DescribePostCombatEffect(EncounterPostCombatEffectRuntimeData effect)
+        {
+            switch (effect.kind)
+            {
+                case "ModifyHp":
+                    return FormatDelta("HP", effect.amount);
+                case "ModifyMental":
+                    return FormatDelta("Mental", effect.amount);
+                case "ModifyGold":
+                    return FormatDelta("Gold", effect.amount);
+                case "ModifyGlitchLevel":
+                    return FormatDelta("Glitch", effect.amount);
+                case "ModifyAffinity":
+                    return FormatDelta("Affinity", effect.amount);
+                case "SetFlag":
+                    return "flag " + effect.flag + "=" + effect.value;
+                case "AddItem":
+                    return "item " + effect.itemRef + " +" + System.Math.Max(1, effect.count);
+                case "RemoveItem":
+                    return "item " + effect.itemRef + " -" + System.Math.Max(1, effect.count);
+                case "AddAbility":
+                    return "ability " + effect.abilityRef;
+                case "GrantRewardBundle":
+                    return "reward " + effect.rewardBundleRef;
+                case "UnlockMemoryFragment":
+                    return "memory unlocked " + effect.memoryFragmentId;
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string FormatDelta(string label, int amount)
+        {
+            return label + " " + (amount >= 0 ? "+" : string.Empty) + amount;
+        }
+
+        private static void AppendSummary(ref string summary, string detail)
+        {
+            if (string.IsNullOrEmpty(detail))
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(summary))
+            {
+                summary += ", ";
+            }
+
+            summary += detail;
         }
 
         private static int ReadStat(PrototypeRunState state, EncounterData encounter, string stat)
