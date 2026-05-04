@@ -11,13 +11,22 @@ namespace HwigiTower.Run
     public readonly struct PrototypeCombatHandoffResolution
     {
         public PrototypeCombatHandoffResolution(bool applied, string resultId)
+            : this(applied, resultId, string.Empty, string.Empty)
+        {
+        }
+
+        public PrototypeCombatHandoffResolution(bool applied, string resultId, string combatStableId, string enemyId)
         {
             Applied = applied;
             ResultId = resultId ?? string.Empty;
+            CombatStableId = combatStableId ?? string.Empty;
+            EnemyId = enemyId ?? string.Empty;
         }
 
         public bool Applied { get; }
         public string ResultId { get; }
+        public string CombatStableId { get; }
+        public string EnemyId { get; }
     }
 
     public sealed class PrototypeRunState
@@ -56,6 +65,12 @@ namespace HwigiTower.Run
         private int _gold;
         private int _glitchLevel;
         private int _affinity;
+        private string _lastMemoryFragmentId = string.Empty;
+        private string _lastMemoryFragmentTitleKey = string.Empty;
+        private string _lastMemoryFragmentBodyKey = string.Empty;
+        private string _lastCombatId = string.Empty;
+        private string _lastCombatEnemyId = string.Empty;
+        private string _lastCombatResultId = string.Empty;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
         {
@@ -79,6 +94,8 @@ namespace HwigiTower.Run
         public bool RunCompleted => _runCompleted;
         public bool DemoComplete => _demoRunPath.Count > 0 && _resolvedDemoSteps.Count >= _demoRunPath.Count;
         public string DemoStatus => DemoComplete ? "demo.complete" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
+        public int DemoStepCount => _demoRunPath.Count;
+        public int DemoResolvedStepCount => _resolvedDemoSteps.Count;
         public int PlayerHp => _playerHp;
         public int PlayerMaxHp => _playerMaxHp;
         public int PlayerAttack => _playerAttack;
@@ -89,6 +106,12 @@ namespace HwigiTower.Run
         public IReadOnlyCollection<string> AbilityRefs => _abilityRefs;
         public IReadOnlyCollection<string> RewardBundleRefs => _rewardBundleRefs;
         public IReadOnlyCollection<string> MemoryFragmentRefs => _memoryFragmentRefs;
+        public string LastMemoryFragmentId => _lastMemoryFragmentId;
+        public string LastMemoryFragmentTitleKey => _lastMemoryFragmentTitleKey;
+        public string LastMemoryFragmentBodyKey => _lastMemoryFragmentBodyKey;
+        public string LastCombatId => _lastCombatId;
+        public string LastCombatEnemyId => _lastCombatEnemyId;
+        public string LastCombatResultId => _lastCombatResultId;
 
         public PrototypeRunSnapshot CreateSnapshot()
         {
@@ -107,7 +130,16 @@ namespace HwigiTower.Run
                 _runCompleted,
                 DemoStatus,
                 NextDemoNodeId,
-                NextDemoEncounterId);
+                NextDemoEncounterId,
+                DemoStepCount,
+                DemoResolvedStepCount,
+                _memoryFragmentRefs.Count,
+                LastMemoryFragmentId,
+                LastMemoryFragmentTitleKey,
+                LastMemoryFragmentBodyKey,
+                LastCombatId,
+                LastCombatEnemyId,
+                LastCombatResultId);
         }
 
         public string NextDemoNodeId
@@ -273,7 +305,23 @@ namespace HwigiTower.Run
                 return false;
             }
 
-            return _memoryFragmentRefs.Add(memoryFragmentRef);
+            var added = _memoryFragmentRefs.Add(memoryFragmentRef);
+            if (added)
+            {
+                _lastMemoryFragmentId = memoryFragmentRef;
+                if (EncounterCatalog != null && EncounterCatalog.TryGetMemoryFragment(memoryFragmentRef, out var memoryFragment))
+                {
+                    _lastMemoryFragmentTitleKey = memoryFragment.TitleKey;
+                    _lastMemoryFragmentBodyKey = memoryFragment.BodyKey;
+                }
+                else
+                {
+                    _lastMemoryFragmentTitleKey = string.Empty;
+                    _lastMemoryFragmentBodyKey = string.Empty;
+                }
+            }
+
+            return added;
         }
 
         public bool HasMemoryFragmentRef(string memoryFragmentRef)
@@ -547,6 +595,9 @@ namespace HwigiTower.Run
             var combatId = string.IsNullOrEmpty(handoff.stableId) ? encounter == null ? nodeId : encounter.Id : handoff.stableId;
             var combat = new CombatController(context, string.IsNullOrEmpty(handoff.seedKey) ? combatId : handoff.seedKey);
 
+            _lastCombatId = combatId;
+            _lastCombatEnemyId = enemy.Id;
+            _lastCombatResultId = "started";
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
 
             var rounds = 0;
@@ -565,6 +616,7 @@ namespace HwigiTower.Run
 
             _playerHp = player.Hp;
             var resultId = enemy.IsDefeated ? "victory" : "defeat";
+            _lastCombatResultId = resultId;
             applyEffects?.Invoke(this, enemy.IsDefeated ? handoff.onVictoryEffects : handoff.onDefeatEffects);
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatCompleted, RunId, nodeId, resultId));
 
@@ -578,7 +630,7 @@ namespace HwigiTower.Run
                 ApplyNpcTrigger("battle.victory");
             }
 
-            return new PrototypeCombatHandoffResolution(true, resultId);
+            return new PrototypeCombatHandoffResolution(true, resultId, combatId, enemy.Id);
         }
 
         private int CountGrantedAbilities()

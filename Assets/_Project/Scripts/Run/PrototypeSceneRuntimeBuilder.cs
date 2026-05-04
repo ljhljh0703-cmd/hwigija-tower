@@ -76,6 +76,7 @@ namespace HwigiTower.Run
             var result = CreateText(canvasObject.transform, "Encounter Result Text", new Vector2(0f, -208f));
             var hud = canvasObject.AddComponent<PrototypeHud>();
             hud.Configure(focus, interaction, runState, result);
+            hud.ConfigureDemoRoute(roomDefinition == null ? null : roomDefinition.DemoRunPath);
             return hud;
         }
 
@@ -95,6 +96,12 @@ namespace HwigiTower.Run
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.fontSize = 30;
             text.alignment = TextAnchor.UpperCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 13;
+            text.resizeTextMaxSize = 30;
+            text.supportRichText = false;
             text.color = new Color(0.84f, 0.88f, 0.90f, 1f);
             return text;
         }

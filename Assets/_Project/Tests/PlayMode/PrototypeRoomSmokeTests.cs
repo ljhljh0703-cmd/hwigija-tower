@@ -69,6 +69,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(battleNode);
 
             controller.BeginRun();
+            hud.ShowRunState(controller.GetSnapshot());
+            StringAssert.Contains("[current] Shop", hud.RouteMessage);
 
             var shopEncounter = FindEncounter(shopNode, "ENC_SHOP_01");
             var shopSelection = new EncounterSelection(shopNode.Definition, shopEncounter);
@@ -98,6 +100,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(1, controller.RunState.GetItemCount("ITEM_FIELD_BANDAGE"));
             Assert.AreEqual(0, hud.ChoiceButtonCount);
             StringAssert.Contains("choice applied: CHOICE_SHOP_01_BUY_ITEM", hud.ResultMessage);
+            StringAssert.Contains("Gold -5", hud.ResultMessage);
+            StringAssert.Contains("item ITEM_FIELD_BANDAGE +1", hud.ResultMessage);
 
             var revisit = controller.ResolveEncounterChoice(shopNode, shopEncounter, "CHOICE_SHOP_01_BUY_ITEM");
             Assert.AreEqual(1, controller.RunState.GetItemCount("ITEM_FIELD_BANDAGE"));
@@ -118,6 +122,8 @@ namespace HwigiTower.Tests.PlayMode
             FindChoiceButton(hud, "CHOICE_MORAL_01_REFUSE").onClick.Invoke();
             Assert.AreEqual(affinityBeforeMoral - 5, controller.RunState.Affinity);
             Assert.AreEqual(glitchBeforeMoral + 4, controller.RunState.GlitchLevel);
+            StringAssert.Contains("Affinity -5", hud.ResultMessage);
+            StringAssert.Contains("Glitch +4", hud.ResultMessage);
 
             var memoryEncounter = FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01");
             var memorySelection = new EncounterSelection(battleNode.Definition, memoryEncounter);
@@ -131,6 +137,8 @@ namespace HwigiTower.Tests.PlayMode
             AssertChoiceLayout(hud);
             FindChoiceButton(hud, "CHOICE_MEMORY_01_UNLOCK").onClick.Invoke();
             Assert.IsTrue(controller.RunState.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
+            StringAssert.Contains("memory unlocked MEM_FRAGMENT_01", hud.ResultMessage);
+            StringAssert.Contains("MEM_FRAGMENT_01", hud.MemoryMessage);
 
             hud.ShowChoices(memoryEncounter, controller.BuildEncounterChoiceViews(memorySelection), _ => { });
             Assert.AreEqual(0, hud.ChoiceButtonCount);
@@ -153,7 +161,10 @@ namespace HwigiTower.Tests.PlayMode
             CollectionAssert.Contains(events, GameFlowEventType.CombatCompleted);
             Assert.IsTrue(controller.RunState.RunCompleted);
             Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
+            StringAssert.Contains("combat started COMBAT_GATE_01", hud.ResultMessage);
+            StringAssert.Contains("enemy ENEMY_FRACTURE_HOUND", hud.ResultMessage);
             StringAssert.Contains("demo.complete", hud.ResultMessage);
+            StringAssert.Contains("COMBAT_GATE_01", hud.MemoryMessage);
         }
 
         [UnityTest]

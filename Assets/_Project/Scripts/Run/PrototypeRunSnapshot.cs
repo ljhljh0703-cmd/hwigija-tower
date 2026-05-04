@@ -17,7 +17,16 @@ namespace HwigiTower.Run
             bool runCompleted,
             string demoStatus = "",
             string nextDemoNodeId = "",
-            string nextDemoEncounterId = "")
+            string nextDemoEncounterId = "",
+            int demoStepCount = 0,
+            int demoResolvedStepCount = 0,
+            int memoryFragmentCount = 0,
+            string lastMemoryFragmentId = "",
+            string lastMemoryFragmentTitleKey = "",
+            string lastMemoryFragmentBodyKey = "",
+            string lastCombatId = "",
+            string lastCombatEnemyId = "",
+            string lastCombatResultId = "")
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -34,6 +43,15 @@ namespace HwigiTower.Run
             DemoStatus = demoStatus ?? string.Empty;
             NextDemoNodeId = nextDemoNodeId ?? string.Empty;
             NextDemoEncounterId = nextDemoEncounterId ?? string.Empty;
+            DemoStepCount = demoStepCount;
+            DemoResolvedStepCount = demoResolvedStepCount;
+            MemoryFragmentCount = memoryFragmentCount;
+            LastMemoryFragmentId = lastMemoryFragmentId ?? string.Empty;
+            LastMemoryFragmentTitleKey = lastMemoryFragmentTitleKey ?? string.Empty;
+            LastMemoryFragmentBodyKey = lastMemoryFragmentBodyKey ?? string.Empty;
+            LastCombatId = lastCombatId ?? string.Empty;
+            LastCombatEnemyId = lastCombatEnemyId ?? string.Empty;
+            LastCombatResultId = lastCombatResultId ?? string.Empty;
         }
 
         public string RunId { get; }
@@ -51,5 +69,14 @@ namespace HwigiTower.Run
         public string DemoStatus { get; }
         public string NextDemoNodeId { get; }
         public string NextDemoEncounterId { get; }
+        public int DemoStepCount { get; }
+        public int DemoResolvedStepCount { get; }
+        public int MemoryFragmentCount { get; }
+        public string LastMemoryFragmentId { get; }
+        public string LastMemoryFragmentTitleKey { get; }
+        public string LastMemoryFragmentBodyKey { get; }
+        public string LastCombatId { get; }
+        public string LastCombatEnemyId { get; }
+        public string LastCombatResultId { get; }
     }
 }
