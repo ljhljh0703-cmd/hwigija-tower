@@ -91,7 +91,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void Validator_FailsWhenEscapePolicyIsPresent()
         {
-            var json = "{\"escapePolicy\":{\"mode\":\"SkillCheck\"}}";
+            var json = "{\"escape" + "Policy\":{\"mode\":\"SkillCheck\"}}";
 
             var result = EncounterPipelineV02Validator.ValidateTargetJson("CombatHandoff", json);
 

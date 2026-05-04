@@ -14,7 +14,10 @@ namespace HwigiTower.Run
             int nodesResolved,
             int battlesWon,
             int abilityCount,
-            bool runCompleted)
+            bool runCompleted,
+            string demoStatus = "",
+            string nextDemoNodeId = "",
+            string nextDemoEncounterId = "")
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -28,6 +31,9 @@ namespace HwigiTower.Run
             BattlesWon = battlesWon;
             AbilityCount = abilityCount;
             RunCompleted = runCompleted;
+            DemoStatus = demoStatus ?? string.Empty;
+            NextDemoNodeId = nextDemoNodeId ?? string.Empty;
+            NextDemoEncounterId = nextDemoEncounterId ?? string.Empty;
         }
 
         public string RunId { get; }
@@ -42,5 +48,8 @@ namespace HwigiTower.Run
         public int BattlesWon { get; }
         public int AbilityCount { get; }
         public bool RunCompleted { get; }
+        public string DemoStatus { get; }
+        public string NextDemoNodeId { get; }
+        public string NextDemoEncounterId { get; }
     }
 }

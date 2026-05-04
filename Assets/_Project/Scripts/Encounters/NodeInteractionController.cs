@@ -13,7 +13,6 @@ namespace HwigiTower.Encounters
 
         private PlayerMovementController _movement;
         private InteractableNode _currentNode;
-        private readonly EncounterSelector _encounterSelector = new EncounterSelector();
 
         private void Awake()
         {
@@ -33,7 +32,7 @@ namespace HwigiTower.Encounters
                 _currentNode.Interact();
                 var selection = roomController == null
                     ? new EncounterSelection(_currentNode.Definition, null)
-                    : _encounterSelector.Select(roomController.RunContext, _currentNode.Definition);
+                    : roomController.SelectEncounter(_currentNode);
                 var encounterId = selection.EncounterId;
                 PrototypeNodeResolution resolution = default;
                 if (roomController != null && _currentNode.Definition != null)

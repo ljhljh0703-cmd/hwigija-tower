@@ -46,6 +46,8 @@ namespace HwigiTower.Run
         private readonly HashSet<string> _rewardBundleRefs = new HashSet<string>();
         private readonly HashSet<string> _memoryFragmentRefs = new HashSet<string>();
         private readonly Dictionary<string, string> _resolvedEncounterChoices = new Dictionary<string, string>();
+        private readonly List<PrototypeDemoRunStep> _demoRunPath = new List<PrototypeDemoRunStep>();
+        private readonly HashSet<string> _resolvedDemoSteps = new HashSet<string>();
         private bool _runCompleted;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
@@ -75,6 +77,8 @@ namespace HwigiTower.Run
         public int NodesResolved { get; private set; }
         public int BattlesWon { get; private set; }
         public bool RunCompleted => _runCompleted;
+        public bool DemoComplete => _demoRunPath.Count > 0 && _resolvedDemoSteps.Count >= _demoRunPath.Count;
+        public string DemoStatus => DemoComplete ? "demo.complete" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
         public int PlayerHp => _playerHp;
         public int PlayerMaxHp => _playerMaxHp;
         public int PlayerAttack => _playerAttack;
@@ -100,7 +104,26 @@ namespace HwigiTower.Run
                 NodesResolved,
                 BattlesWon,
                 CountGrantedAbilities(),
-                _runCompleted);
+                _runCompleted,
+                DemoStatus,
+                NextDemoNodeId,
+                NextDemoEncounterId);
+        }
+
+        public string NextDemoNodeId
+        {
+            get
+            {
+                return TryGetNextDemoStep(out var step) ? step.NodeId : string.Empty;
+            }
+        }
+
+        public string NextDemoEncounterId
+        {
+            get
+            {
+                return TryGetNextDemoStep(out var step) ? step.EncounterId : string.Empty;
+            }
         }
 
         public int ModifyMental(int amount)
@@ -288,6 +311,42 @@ namespace HwigiTower.Run
             EncounterCatalog = catalog;
         }
 
+        public void AttachDemoRunPath(IReadOnlyList<PrototypeDemoRunStep> demoRunPath)
+        {
+            _demoRunPath.Clear();
+            _resolvedDemoSteps.Clear();
+
+            if (demoRunPath == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < demoRunPath.Count; i++)
+            {
+                var step = demoRunPath[i];
+                if (step != null && step.IsValid)
+                {
+                    _demoRunPath.Add(step);
+                }
+            }
+        }
+
+        public bool TryGetNextDemoStep(out PrototypeDemoRunStep step)
+        {
+            for (var i = 0; i < _demoRunPath.Count; i++)
+            {
+                var candidate = _demoRunPath[i];
+                if (!_resolvedDemoSteps.Contains(BuildResolvedEncounterKey(candidate.NodeId, candidate.EncounterId)))
+                {
+                    step = candidate;
+                    return true;
+                }
+            }
+
+            step = null;
+            return false;
+        }
+
         public PrototypeNodeResolution ResolveBattle(DeterministicRunContext context, string nodeId, string encounterId, EnemyData enemyData, IReadOnlyList<SynergyData> trackedSynergies)
         {
             if (_runCompleted)
@@ -410,15 +469,15 @@ namespace HwigiTower.Run
 
         public PrototypeNodeResolution ResolveEncounterChoice(string nodeId, EncounterData encounter, string choiceStableId)
         {
-            if (_runCompleted)
-            {
-                return new PrototypeNodeResolution(nodeId, encounter == null ? string.Empty : encounter.Id, "run already completed", true);
-            }
-
             var encounterId = encounter == null ? string.Empty : encounter.Id;
             if (TryGetResolvedEncounterChoice(nodeId, encounterId, out var resolvedChoiceStableId))
             {
-                return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", false);
+                return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", _runCompleted);
+            }
+
+            if (_runCompleted)
+            {
+                return new PrototypeNodeResolution(nodeId, encounterId, "run already completed", true);
             }
 
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, new DeterministicRunContext(RunId, 0), nodeId);
@@ -428,22 +487,23 @@ namespace HwigiTower.Run
             }
 
             NodesResolved++;
+            UpdateDemoProgression(nodeId, encounterId, resolution.Applied);
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
-            return new PrototypeNodeResolution(nodeId, payloadId, resolution.Message, false);
+            return new PrototypeNodeResolution(nodeId, payloadId, BuildChoiceResolutionMessage(resolution.Message), _runCompleted);
         }
 
         public PrototypeNodeResolution ResolveEncounterChoice(DeterministicRunContext context, string nodeId, EncounterData encounter, string choiceStableId)
         {
-            if (_runCompleted)
-            {
-                return new PrototypeNodeResolution(nodeId, encounter == null ? string.Empty : encounter.Id, "run already completed", true);
-            }
-
             var encounterId = encounter == null ? string.Empty : encounter.Id;
             if (TryGetResolvedEncounterChoice(nodeId, encounterId, out var resolvedChoiceStableId))
             {
-                return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", false);
+                return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", _runCompleted);
+            }
+
+            if (_runCompleted)
+            {
+                return new PrototypeNodeResolution(nodeId, encounterId, "run already completed", true);
             }
 
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, context, nodeId);
@@ -453,9 +513,10 @@ namespace HwigiTower.Run
             }
 
             NodesResolved++;
+            UpdateDemoProgression(nodeId, encounterId, resolution.Applied);
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
-            return new PrototypeNodeResolution(nodeId, payloadId, resolution.Message, false);
+            return new PrototypeNodeResolution(nodeId, payloadId, BuildChoiceResolutionMessage(resolution.Message), _runCompleted);
         }
 
         public PrototypeCombatHandoffResolution ResolveCombatHandoff(
@@ -604,6 +665,46 @@ namespace HwigiTower.Run
             _reflectionPipeline.TrySaveReflection(RunId, summary, out _);
             ApplyNpcTrigger("run.completed");
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.RunCompleted, RunId, RunId, cause));
+        }
+
+        private void UpdateDemoProgression(string nodeId, string encounterId, bool applied)
+        {
+            if (!applied || _demoRunPath.Count == 0)
+            {
+                return;
+            }
+
+            var key = BuildResolvedEncounterKey(nodeId, encounterId);
+            for (var i = 0; i < _demoRunPath.Count; i++)
+            {
+                var step = _demoRunPath[i];
+                if (BuildResolvedEncounterKey(step.NodeId, step.EncounterId) == key)
+                {
+                    _resolvedDemoSteps.Add(key);
+                    break;
+                }
+            }
+
+            if (DemoComplete)
+            {
+                CompleteRun("demo.complete");
+            }
+        }
+
+        private string BuildChoiceResolutionMessage(string baseMessage)
+        {
+            if (DemoComplete)
+            {
+                return string.IsNullOrEmpty(baseMessage) ? "demo.complete" : baseMessage + " | demo.complete";
+            }
+
+            if (TryGetNextDemoStep(out var next))
+            {
+                var nextMessage = "next: " + next.NodeId + "/" + next.EncounterId;
+                return string.IsNullOrEmpty(baseMessage) ? nextMessage : baseMessage + " | " + nextMessage;
+            }
+
+            return baseMessage ?? string.Empty;
         }
 
         private void ApplyNpcTrigger(string triggerId)

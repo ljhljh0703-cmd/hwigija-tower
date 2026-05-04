@@ -35,6 +35,7 @@ namespace HwigiTower.Run
         {
             RunState = new PrototypeRunState(RunContext.RunId, EventBus);
             RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
+            RunState.AttachDemoRunPath(roomDefinition == null ? null : roomDefinition.DemoRunPath);
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, RunContext.RunId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, RunContext.RunId, RunContext.RunId, string.Empty));
         }
@@ -62,6 +63,28 @@ namespace HwigiTower.Run
             return selection.HasEncounter
                 && selection.Encounter.Choices != null
                 && selection.Encounter.Choices.Length > 0;
+        }
+
+        public EncounterSelection SelectEncounter(InteractableNode node)
+        {
+            if (node == null || node.Definition == null)
+            {
+                return new EncounterSelection(null, null);
+            }
+
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (RunState != null &&
+                RunState.TryGetNextDemoStep(out var step) &&
+                step.Node == node.Definition)
+            {
+                return new EncounterSelection(node.Definition, step.Encounter);
+            }
+
+            return new EncounterSelector().Select(RunContext, node.Definition);
         }
 
         public PrototypeEncounterChoiceView[] BuildEncounterChoiceViews(EncounterSelection selection)
