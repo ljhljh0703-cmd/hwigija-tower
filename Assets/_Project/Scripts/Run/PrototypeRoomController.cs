@@ -1,5 +1,6 @@
 using HwigiTower.Core;
 using HwigiTower.Encounters;
+using HwigiTower.UI;
 using UnityEngine;
 
 namespace HwigiTower.Run
@@ -8,6 +9,7 @@ namespace HwigiTower.Run
     {
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
+        [SerializeField] private PrototypeHud hud;
 
         public DeterministicRunContext RunContext { get; private set; }
         public GameFlowEventBus EventBus { get; } = new GameFlowEventBus();
@@ -17,6 +19,7 @@ namespace HwigiTower.Run
         private void Awake()
         {
             RebuildContext();
+            ResolveHudReference();
         }
 
         public void Configure(PrototypeRoomDefinition definition)
@@ -36,6 +39,7 @@ namespace HwigiTower.Run
             RunState = new PrototypeRunState(RunContext.RunId, EventBus);
             RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
             RunState.AttachDemoRunPath(roomDefinition == null ? null : roomDefinition.DemoRunPath);
+            ConfigureHudDemoRoute();
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, RunContext.RunId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, RunContext.RunId, RunContext.RunId, string.Empty));
         }
@@ -195,6 +199,23 @@ namespace HwigiTower.Run
             var seed = roomDefinition == null ? 1001 : roomDefinition.DeterministicSeed;
             var roomId = roomDefinition == null ? "room.prototype" : roomDefinition.RoomId;
             RunContext = new DeterministicRunContext(roomId, seed);
+        }
+
+        private void ConfigureHudDemoRoute()
+        {
+            ResolveHudReference();
+            if (hud != null)
+            {
+                hud.ConfigureDemoRoute(roomDefinition == null ? null : roomDefinition.DemoRunPath);
+            }
+        }
+
+        private void ResolveHudReference()
+        {
+            if (hud == null)
+            {
+                hud = FindFirstObjectByType<PrototypeHud>();
+            }
         }
     }
 }
