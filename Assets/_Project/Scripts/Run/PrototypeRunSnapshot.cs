@@ -26,7 +26,10 @@ namespace HwigiTower.Run
             string lastMemoryFragmentBodyKey = "",
             string lastCombatId = "",
             string lastCombatEnemyId = "",
-            string lastCombatResultId = "")
+            string lastCombatResultId = "",
+            bool isInCombat = false,
+            int enemyHp = 0,
+            int enemyMaxHp = 0)
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -52,6 +55,9 @@ namespace HwigiTower.Run
             LastCombatId = lastCombatId ?? string.Empty;
             LastCombatEnemyId = lastCombatEnemyId ?? string.Empty;
             LastCombatResultId = lastCombatResultId ?? string.Empty;
+            IsInCombat = isInCombat;
+            EnemyHp = enemyHp;
+            EnemyMaxHp = enemyMaxHp;
         }
 
         public string RunId { get; }
@@ -78,5 +84,8 @@ namespace HwigiTower.Run
         public string LastCombatId { get; }
         public string LastCombatEnemyId { get; }
         public string LastCombatResultId { get; }
+        public bool IsInCombat { get; }
+        public int EnemyHp { get; }
+        public int EnemyMaxHp { get; }
     }
 }

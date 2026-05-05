@@ -43,8 +43,8 @@ namespace HwigiTower.Tests.EditMode
             var secondPlayer = new CombatantState("player", 20, 4);
             var secondEnemy = new CombatantState("enemy", 12, 3);
 
-            var firstRound = first.ResolveRound(firstPlayer, firstEnemy);
-            var secondRound = second.ResolveRound(secondPlayer, secondEnemy);
+            var firstRound = first.ResolveRound(firstPlayer, firstEnemy, CombatAction.Attack);
+            var secondRound = second.ResolveRound(secondPlayer, secondEnemy, CombatAction.Attack);
 
             Assert.AreEqual(firstRound.PlayerDamage, secondRound.PlayerDamage);
             Assert.AreEqual(firstRound.EnemyDamage, secondRound.EnemyDamage);
@@ -100,7 +100,7 @@ namespace HwigiTower.Tests.EditMode
             var events = new System.Collections.Generic.List<GameFlowEventType>();
             using (bus.Subscribe(flowEvent => events.Add(flowEvent.Type)))
             {
-                var state = new PrototypeRunState("run-001", bus);
+                var state = new PrototypeRunState("run-001", bus) { AutoResolveCombat = true };
                 var context = new DeterministicRunContext("run-001", 1001);
 
                 var resolution = state.ResolveBattle(context, "node.battle", "encounter.battle", null, null);
@@ -115,7 +115,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PrototypeRunState_RestRestoresPersistentPlayerHp()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             var context = new DeterministicRunContext("run-001", 1001);
 
             state.ResolveBattle(context, "node.battle", "encounter.battle", null, null);
@@ -142,7 +142,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PrototypeRunState_RemnantCompletesRunAndSavesReflection()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
 
             var resolution = state.ResolveRemnant("node.remnant");
 
@@ -154,7 +154,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PrototypeRunState_ClampsCoreRunStateValues()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
 
             state.ModifyMental(150);
             state.ModifyGold(1200);
@@ -182,7 +182,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PrototypeRunState_ShopFailsWhenGoldIsInsufficient()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             var ability = CreateAbility("ability.shop", "shop");
 
             var resolution = state.ResolveShop("node.shop", ability, null);
@@ -197,7 +197,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PrototypeRunState_ShopSpendsGoldAndGrantsAbility()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             var ability = CreateAbility("ability.shop", "shop");
             state.ModifyGold(10);
 
@@ -213,7 +213,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PrototypeRunState_ModifiesGlitchAndAffinity()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
 
             state.ModifyGlitchLevel(35);
             state.ModifyAffinity(-20);
@@ -226,7 +226,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void EncounterRuntimeResolver_AppliesChoiceEffects()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.ModifyGold(10);
             var encounter = CreateRuntimeEncounter(
                 "encounter.moral",
@@ -254,7 +254,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PrototypeRunState_BlocksResolvedEncounterChoiceRevisit()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.ModifyGold(10);
             var encounter = CreateRuntimeEncounter(
                 "encounter.revisit",
@@ -283,7 +283,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void EncounterRuntimeResolver_BlocksChoiceWhenRequirementFails()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             var encounter = CreateRuntimeEncounter(
                 "encounter.shop",
                 CreateChoice(
@@ -307,7 +307,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void EncounterRuntimeResolver_HandlesHiddenAndDisabledVisibleChoices()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             var encounter = CreateRuntimeEncounter(
                 "encounter.policy",
                 CreateChoice(
@@ -341,7 +341,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void EncounterRuntimeResolver_ShopSpendsGoldAndAddsItem()
         {
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.ModifyGold(6);
             var encounter = CreateRuntimeEncounter(
                 "encounter.shop.runtime",
@@ -368,7 +368,7 @@ namespace HwigiTower.Tests.EditMode
         public void EncounterRuntimeResolver_UsesCatalogForShopItemAndAbility()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.AttachEncounterCatalog(catalog);
             state.ModifyGold(16);
             var encounter = CreateRuntimeEncounter(
@@ -399,7 +399,7 @@ namespace HwigiTower.Tests.EditMode
         public void EncounterRuntimeResolver_UsesCatalogRewardBundleEntries()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.AttachEncounterCatalog(catalog);
             var encounter = CreateRuntimeEncounter(
                 "encounter.reward.catalog",
@@ -419,7 +419,7 @@ namespace HwigiTower.Tests.EditMode
         public void EncounterRuntimeResolver_MemoryUnlockUpdatesRunStateDeterministically()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
-            var state = new PrototypeRunState("run-001", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.AttachEncounterCatalog(catalog);
             var encounter = CreateRuntimeEncounter(
                 "encounter.memory.catalog",
@@ -445,7 +445,7 @@ namespace HwigiTower.Tests.EditMode
             var events = new List<GameFlowEventType>();
             using (bus.Subscribe(flowEvent => events.Add(flowEvent.Type)))
             {
-                var state = new PrototypeRunState("run-001", bus);
+                var state = new PrototypeRunState("run-001", bus) { AutoResolveCombat = true };
                 var encounter = CreateRuntimeEncounter(
                     "encounter.combat.runtime",
                     CreateChoice(
@@ -478,7 +478,7 @@ namespace HwigiTower.Tests.EditMode
                 }
             }))
             {
-                var state = new PrototypeRunState("run-001", bus);
+                var state = new PrototypeRunState("run-001", bus) { AutoResolveCombat = true };
                 state.AttachEncounterCatalog(catalog);
                 var encounter = CreateRuntimeEncounter(
                     "encounter.combat.catalog",
@@ -505,7 +505,7 @@ namespace HwigiTower.Tests.EditMode
             var combat = CreateRuntimeEncounter("ENC_COMBAT_DEMO", CreateChoice("CHOICE_COMBAT_DEMO", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_DEMO", "ENEMY_DEMO", new[] { CreatePostCombatEffect("ModifyGold", 1) }) }));
             var shopNode = CreateNode("node.shop.demo", shop);
             var battleNode = CreateNode("node.battle.demo", moral, memory, combat);
-            var state = new PrototypeRunState("run-demo", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-demo", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.AttachDemoRunPath(new[]
             {
                 new PrototypeDemoRunStep(shopNode, shop),
@@ -536,7 +536,7 @@ namespace HwigiTower.Tests.EditMode
         {
             var encounter = CreateRuntimeEncounter("ENC_SHOP_DEMO_REVISIT", CreateChoice("CHOICE_SHOP_REVISIT", new EncounterRequirementRuntimeData[0], new[] { CreateItemEffect("ITEM_FIELD_BANDAGE", 1) }));
             var node = CreateNode("node.shop.demo.revisit", encounter);
-            var state = new PrototypeRunState("run-demo-revisit", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-demo-revisit", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
 
             var first = state.ResolveEncounterChoice(new DeterministicRunContext("run-demo-revisit", 1001), node.NodeId, encounter, "CHOICE_SHOP_REVISIT");
@@ -649,7 +649,7 @@ namespace HwigiTower.Tests.EditMode
             var definition = ScriptableObject.CreateInstance<NpcStateMachineDefinition>();
             SetNpcTransition(definition, NpcStage.S0, "run.completed", NpcStage.S1);
             var bus = new GameFlowEventBus();
-            var state = new PrototypeRunState("run-001", bus);
+            var state = new PrototypeRunState("run-001", bus) { AutoResolveCombat = true };
             var machine = new NpcStateMachine(definition, "run-001", bus);
             state.AttachNpcStateMachine(machine);
 
@@ -902,7 +902,7 @@ namespace HwigiTower.Tests.EditMode
             PrototypeNodeDefinition secondNode,
             EncounterData secondEncounter)
         {
-            var state = new PrototypeRunState("run-demo-order", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-demo-order", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.AttachDemoRunPath(new[]
             {
                 new PrototypeDemoRunStep(firstNode, firstEncounter),

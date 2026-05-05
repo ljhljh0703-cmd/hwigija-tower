@@ -172,7 +172,7 @@ namespace HwigiTower.Tests.PlayMode
         {
             yield return null;
 
-            var state = new PrototypeRunState("run-playmode-shop", new GameFlowEventBus());
+            var state = new PrototypeRunState("run-playmode-shop", new GameFlowEventBus()) { AutoResolveCombat = true };
             state.ModifyGold(6);
             var encounter = CreateEncounterFromJson(
                 "{\"id\":\"encounter.shop.playmode\",\"type\":2,\"floor\":2,\"choices\":[{\"stableId\":\"choice.buy\",\"textKey\":\"PLACEHOLDER_CHOICE_BUY\",\"requirementMode\":\"All\",\"unavailablePolicyMode\":\"DisabledVisible\",\"unavailableReasonTextKey\":\"PLACEHOLDER_REASON_NOT_ENOUGH_GOLD\",\"requirements\":[{\"kind\":\"StatAtLeast\",\"stat\":\"gold\",\"value\":6}],\"effects\":[{\"kind\":\"ModifyGold\",\"amount\":-6},{\"kind\":\"AddItem\",\"itemRef\":\"ITEM_PLAYMODE_BANDAGE\",\"count\":1}]}]}");
@@ -198,7 +198,7 @@ namespace HwigiTower.Tests.PlayMode
             var events = new List<GameFlowEventType>();
             using (bus.Subscribe(flowEvent => events.Add(flowEvent.Type)))
             {
-                var state = new PrototypeRunState("run-playmode-combat", bus);
+                var state = new PrototypeRunState("run-playmode-combat", bus) { AutoResolveCombat = true };
                 var encounter = CreateEncounterFromJson(
                     "{\"id\":\"encounter.combat.playmode\",\"type\":0,\"floor\":1,\"choices\":[{\"stableId\":\"choice.fight\",\"textKey\":\"PLACEHOLDER_CHOICE_FIGHT\",\"requirementMode\":\"All\",\"unavailablePolicyMode\":\"Hidden\",\"requirements\":[],\"effects\":[{\"kind\":\"StartCombat\",\"combatHandoff\":{\"stableId\":\"COMBAT_PLAYMODE_001\",\"seedKey\":\"COMBAT_PLAYMODE_001\",\"enemyRefs\":[\"ENEMY_PLAYMODE_001\"],\"onVictoryEffects\":[{\"kind\":\"ModifyGold\",\"amount\":8}],\"onDefeatEffects\":[]}}]}]}");
 
