@@ -144,7 +144,10 @@ namespace HwigiTower.Run
                 LastMemoryFragmentBodyKey,
                 LastCombatId,
                 LastCombatEnemyId,
-                LastCombatResultId);
+                LastCombatResultId,
+                IsInCombat,
+                _activeCombatEnemy?.Hp ?? 0,
+                _activeCombatEnemy?.MaxHp ?? 0);
         }
 
         public string NextDemoNodeId
@@ -419,7 +422,7 @@ namespace HwigiTower.Run
             CombatRoundResult round;
             do
             {
-                round = combat.ResolveRound(player, enemy);
+                round = combat.ResolveRound(player, enemy, CombatAction.Attack);
                 rounds++;
             }
             while (!round.IsComplete && rounds < 12);
@@ -572,6 +575,68 @@ namespace HwigiTower.Run
             return new PrototypeNodeResolution(nodeId, payloadId, BuildChoiceResolutionMessage(resolution.Message), _runCompleted);
         }
 
+        private CombatantState _activeCombatPlayer;
+        private CombatantState _activeCombatEnemy;
+        private CombatController _activeCombatController;
+        private EncounterCombatHandoffRuntimeData _activeCombatHandoff;
+        private string _activeCombatNodeId;
+        private System.Action<PrototypeRunState, EncounterPostCombatEffectRuntimeData[]> _activeCombatEffectApplier;
+
+        public bool IsInCombat => _activeCombatPlayer != null && _activeCombatEnemy != null && !_activeCombatPlayer.IsDefeated && !_activeCombatEnemy.IsDefeated;
+        public CombatantState ActiveCombatPlayer => _activeCombatPlayer;
+        public CombatantState ActiveCombatEnemy => _activeCombatEnemy;
+
+        public CombatRoundResult ResolveCombatRoundInteractive(CombatAction action)
+        {
+            if (!IsInCombat)
+            {
+                return new CombatRoundResult(0, 0, _activeCombatPlayer?.IsDefeated ?? true, _activeCombatEnemy?.IsDefeated ?? true);
+            }
+
+            var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action);
+
+            if (result.IsComplete)
+            {
+                FinalizeCombat();
+            }
+
+            return result;
+        }
+
+        private void FinalizeCombat()
+        {
+            if (_activeCombatEnemy.IsDefeated)
+            {
+                BattlesWon++;
+            }
+
+            _playerHp = _activeCombatPlayer.Hp;
+            var resultId = _activeCombatEnemy.IsDefeated ? "victory" : "defeat";
+            _lastCombatResultId = resultId;
+            
+            _activeCombatEffectApplier?.Invoke(this, _activeCombatEnemy.IsDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatCompleted, RunId, _activeCombatNodeId, resultId));
+
+            if (_activeCombatPlayer.IsDefeated)
+            {
+                ApplyNpcTrigger("battle.defeat");
+                CompleteRun("defeat");
+            }
+            else if (_activeCombatEnemy.IsDefeated)
+            {
+                ApplyNpcTrigger("battle.victory");
+            }
+
+            // Clear active combat if complete
+            if (resultId != "started")
+            {
+                // We keep the states for one turn so UI can show the final result, 
+                // but IsInCombat will return false because someone is defeated.
+            }
+        }
+
+        public bool AutoResolveCombat { get; set; }
+
         public PrototypeCombatHandoffResolution ResolveCombatHandoff(
             DeterministicRunContext context,
             string nodeId,
@@ -605,37 +670,26 @@ namespace HwigiTower.Run
             _lastCombatResultId = "started";
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
 
-            var rounds = 0;
-            CombatRoundResult round;
-            do
-            {
-                round = combat.ResolveRound(player, enemy);
-                rounds++;
-            }
-            while (!round.IsComplete && rounds < 12);
+            // Initialize interactive state
+            _activeCombatPlayer = player;
+            _activeCombatEnemy = enemy;
+            _activeCombatController = combat;
+            _activeCombatHandoff = handoff;
+            _activeCombatNodeId = nodeId;
+            _activeCombatEffectApplier = applyEffects;
 
-            if (enemy.IsDefeated)
+            if (AutoResolveCombat)
             {
-                BattlesWon++;
-            }
-
-            _playerHp = player.Hp;
-            var resultId = enemy.IsDefeated ? "victory" : "defeat";
-            _lastCombatResultId = resultId;
-            applyEffects?.Invoke(this, enemy.IsDefeated ? handoff.onVictoryEffects : handoff.onDefeatEffects);
-            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatCompleted, RunId, nodeId, resultId));
-
-            if (player.IsDefeated)
-            {
-                ApplyNpcTrigger("battle.defeat");
-                CompleteRun("defeat");
-            }
-            else if (enemy.IsDefeated)
-            {
-                ApplyNpcTrigger("battle.victory");
+                var rounds = 0;
+                while (IsInCombat && rounds < 12)
+                {
+                    ResolveCombatRoundInteractive(CombatAction.Attack);
+                    rounds++;
+                }
+                return new PrototypeCombatHandoffResolution(true, _lastCombatResultId, combatId, enemy.Id);
             }
 
-            return new PrototypeCombatHandoffResolution(true, resultId, combatId, enemy.Id);
+            return new PrototypeCombatHandoffResolution(true, "started", combatId, enemy.Id);
         }
 
         private int CountGrantedAbilities()
