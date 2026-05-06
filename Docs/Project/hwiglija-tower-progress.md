@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-06 15:42 — W2 demo readiness docs 최신 전투 UI 기준 refresh
+- **Phase**: W2-1
+- **Done**:
+  - `origin/Proto` 최신 `9300cc1`을 `Juho/Codex`에 병합해 interactive combat UI / Mataios portrait 구현 상태 확인
+  - W2 readiness audit에서 CombatGate, DemoComplete, Combat UI, Mataios portrait 상태를 ready-for-review로 갱신
+  - 전투 QA 스크립트를 manual Attack/Defend 중심 경로로 갱신하고 auto-resolve를 회귀 smoke 경로로 낮춤
+  - 마타이오스 art brief와 dev handoff에서 portrait wiring / combat button TODO를 QA·polish 항목으로 재분류
+- **Files**: 변경/추가 5개 (`Docs/Outsource/Juho/W2DemoReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음
+- **Next**: portrait viewport screenshot QA와 Android build host blocker 해결
+- **Agent**: Codex
+
+---
+
 ### 2026-05-06 15:00 — W2 demo readiness audit and handoff packet 작성
 - **Phase**: W2-1
 - **Done**:

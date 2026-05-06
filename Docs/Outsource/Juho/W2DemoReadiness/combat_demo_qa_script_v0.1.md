@@ -5,8 +5,8 @@
 - Combat entry: `ENC_COMBAT_GATE_01` through `CHOICE_COMBAT_01_ENGAGE`
 - Combat stableId: `COMBAT_GATE_01`
 - Enemy: `ENEMY_FRACTURE_HOUND`
-- Current demo behavior: `PrototypeRoomController.BeginRun()` sets `AutoResolveCombat = true`, so the scene smoke path resolves combat automatically after CombatGate.
-- Manual combat QA applies after Attack / Defend / Skill controls are exposed to the player.
+- Current default scene behavior: `Assets/_Project/Scenes/PrototypeRoom.unity` sets `autoResolveCombat: 0`, so CombatGate opens the interactive combat panel.
+- Legacy smoke behavior: tests can set `controller.AutoResolveCombat = true` to verify the route without manual clicks.
 
 ## Pre-Combat State
 
@@ -17,29 +17,40 @@
 | memory before combat | `MEM_FRAGMENT_01` unlocked; title/body keys available as placeholders |
 | expected combat handoff marker | `combat started COMBAT_GATE_01; enemy ENEMY_FRACTURE_HOUND` |
 | current enemy SO values | `SO_Enemy_ENEMY_FRACTURE_HOUND.asset`: hp `12`, attack `3`, pattern `PATTERN_PLACEHOLDER` |
-| expected state panel | player HP, player ATK, Gold, Glitch, Affinity, combat id, enemy id, combat result |
+| expected portrait | Mataios portrait is visible before CombatGate and remains separate from choices/result/combat panel. |
+| expected state panel | player HP, player ATK, Gold, Glitch, Affinity, combat id, enemy id, combat round, last action, and result |
 
-## Auto-Resolve Smoke Path
+## Interactive Combat Path
 
-Use this for the public 1-minute route until manual combat controls are wired.
+Use this as the primary W2 demo QA path.
 
 | step | action | expected result |
 |---|---|---|
 | 1 | Reach `ENC_COMBAT_GATE_01`. | HUD route shows CombatGate current. |
 | 2 | Press `CHOICE_COMBAT_01_ENGAGE`. | Result contains `choice applied: CHOICE_COMBAT_01_ENGAGE`. |
-| 3 | Wait for auto-resolve. | Result contains `combat started COMBAT_GATE_01`, `enemy ENEMY_FRACTURE_HOUND`, and result `victory` or `defeat`. |
-| 4 | Check post-combat state. | Victory applies Gold +7, Glitch -2, Affinity +2, `FLAG_COMBAT_GATE_01_VICTORY`; defeat applies HP -5, Glitch +5, Affinity -2. |
-| 5 | Check completion. | HUD/result includes `demo.complete`; run state is completed; no duplicate memory unlock or duplicate combat reward on revisit. |
+| 3 | Confirm combat panel. | Combat panel is visible; Attack and Defend buttons are interactable; Skill button exists but is disabled. |
+| 4 | Press Attack once. | Enemy HP decreases; combat round increments; last action includes `Attack`. |
+| 5 | Press Defend once if combat is still active. | Last action includes `Defend`; incoming damage is reduced compared with a normal hit branch. |
+| 6 | Continue Attack until combat resolves. | Result becomes `victory` or `defeat`; post-combat effects apply. |
+| 7 | Check completion. | `demo.complete` appears only after combat result; no duplicate memory unlock or duplicate combat reward on revisit. |
 
-## Manual Combat QA
+## Auto-Resolve Smoke Path
 
-Only run this section after `AutoResolveCombat` is off for the reviewed build and UI buttons call `ResolveCombatRoundInteractive`.
+Use only for route regression checks when a test harness sets `AutoResolveCombat = true`.
+
+| step | action | expected result |
+|---|---|---|
+| 1 | Set `controller.AutoResolveCombat = true` before `BeginRun()`. | CombatGate resolves without manual round clicks. |
+| 2 | Press `CHOICE_COMBAT_01_ENGAGE`. | Result contains `combat started COMBAT_GATE_01`, `enemy ENEMY_FRACTURE_HOUND`, and result `victory` or `defeat`. |
+| 3 | Check completion. | HUD/result includes `demo.complete`; run state is completed. |
+
+## Button Behavior
 
 | button | expected behavior from current code | QA notes |
 |---|---|---|
 | Attack | Calls `CombatAction.Attack`; enemy HP decreases by deterministic player damage; if enemy survives, player takes enemy damage. | Damage includes deterministic variance from the combat seed. Do not expect final balance numbers beyond visible HP movement. |
 | Defend | Calls `CombatAction.Defend`; player deals no damage in current code; incoming enemy damage is halved. | This verifies defensive branch only. Parry/timer text is not implemented in current UI. |
-| Skill | Calls `CombatAction.Skill`; current combat layer treats it like Attack unless an upper ability layer handles extra skill effects. | Mark as partial if no skill picker or ability-specific effect is visible. |
+| Skill | Button is present but disabled in the current HUD. | This is intentional until ability-specific skill selection is wired. Do not report as blocker unless the demo brief promises usable Skill. |
 
 ## Combo Damage Display
 
@@ -47,7 +58,7 @@ Only run this section after `AutoResolveCombat` is off for the reviewed build an
 |---|---|
 | normal 1-action combat | `ComboDamage = 0`; no combo line required. |
 | TRAIT_OFFENSE_04 or explicit second action test path | `CombatRoundResult.ComboDamage > 0`; enemy HP should subtract player damage plus combo damage. |
-| current public HUD | Combo damage is not displayed separately. Record as P1 UI gap, not a failed current smoke path. |
+| current public HUD | Combo damage is displayed when `LastCombatComboDamage > 0`, but there is no public route that triggers a second action yet. |
 
 ## Victory / Defeat Checks
 
@@ -55,7 +66,7 @@ Only run this section after `AutoResolveCombat` is off for the reviewed build an
 |---|---|---|
 | Victory | `LastCombatResultId = victory`; `BattlesWon` increases. | Gold +7, Glitch -2 clamped at 0, Affinity +2, `FLAG_COMBAT_GATE_01_VICTORY = true`. |
 | Defeat | `LastCombatResultId = defeat`; run may complete through defeat if player HP reaches 0. | HP -5, Glitch +5, Affinity -2. |
-| DemoComplete | `DemoStatus = demo.complete`; completion panel active. | Should occur after the reviewed combat result. If manual combat is used and DemoComplete appears before final result, report as blocker. |
+| DemoComplete | `DemoStatus = demo.complete`; completion panel active. | Should occur after the reviewed combat result. If DemoComplete appears at combat start, report as regression. |
 
 ## Failure Report Template
 
@@ -70,6 +81,8 @@ Only run this section after `AutoResolveCombat` is off for the reviewed build an
 | actual marker |  |
 | player HP before/after |  |
 | enemy HP before/after |  |
+| combat panel visible |  |
+| portrait visible / overlap note |  |
 | Gold/Glitch/Affinity before/after |  |
 | screenshot/video ref |  |
 | likely owner | dev / writer / outsource / AI-training |
