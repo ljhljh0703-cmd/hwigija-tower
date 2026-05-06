@@ -235,6 +235,7 @@ namespace HwigiTower.UI
                 $"Abilities {snapshot.AbilityCount} | Step {snapshot.DemoResolvedStepCount}/{snapshot.DemoStepCount}";
             UpdateRouteIndicator(snapshot);
             UpdateMemoryAndCombatPanel(snapshot);
+            UpdateResultVisibility(snapshot);
             UpdateDemoCompletePanel(snapshot);
         }
 
@@ -643,8 +644,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            var hasCombat = snapshot.IsInCombat ||
-                (!string.IsNullOrEmpty(snapshot.LastCombatId) && snapshot.LastCombatResultId != "started");
+            var hasCombat = snapshot.IsInCombat;
             combatPanel.gameObject.SetActive(hasCombat);
             if (!hasCombat || combatText == null)
             {
@@ -699,8 +699,18 @@ namespace HwigiTower.UI
                 return;
             }
 
-            demoCompleteText.gameObject.SetActive(snapshot.DemoStatus == "demo.complete");
+            demoCompleteText.gameObject.SetActive(snapshot.DemoStatus == "demo.complete" && !snapshot.IsInCombat);
             demoCompleteText.text = "demo.complete\nDemo Route Complete";
+        }
+
+        private void UpdateResultVisibility(PrototypeRunSnapshot snapshot)
+        {
+            if (resultText == null)
+            {
+                return;
+            }
+
+            resultText.gameObject.SetActive(!snapshot.IsInCombat);
         }
 
         private static string BuildChoiceLabel(PrototypeEncounterChoiceView view)
