@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-06 15:00 — W2 demo readiness audit and handoff packet 작성
+- **Phase**: W2-1
+- **Done**:
+  - 외주 요청 v3 기준 필수 문서/GDD/디자인/AI 모델/데모 QA 맥락 검토
+  - W2 데모 준비 상태 audit, 전투 QA 스크립트, 마타이오스 일러스트 적용 기준 작성
+  - AI 모델 수령 acceptance checklist, 작가 결정 packet, 개발 handoff TODO 작성
+  - 받은 `마타이오스 전신.png`를 확인하고 S0-S2 portrait 후보 기준 정리
+- **Files**: 변경/추가 7개 (`Docs/Outsource/Juho/W2DemoReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음
+- **Next**: 전투 데모 경로를 auto-resolve로 고정할지, Attack/Defend/Skill 수동 UI를 먼저 붙일지 결정 후 P0 개발 진행
+- **Agent**: Codex
+
+---
+
 ### 2026-05-05 18:45 — GDD v0.3.0 업데이트 및 전투 수직 슬라이스 구현
 - **Phase**: W2-1
 - **Done**:
