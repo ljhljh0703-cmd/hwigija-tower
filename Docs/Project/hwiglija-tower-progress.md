@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-06 23:20 — W2 vertical slice UI/asset/combat/cutscene spec 작성
+- **Phase**: W2-1
+- **Done**:
+  - Unity 없이 코드/문서/기존 screenshot 기준으로 화면별 UI wireframe spec 작성
+  - stableId/usage 기준 Asset Integration Manifest v0.2 작성
+  - Attack/Defend/Skill 시연 이해도와 combat feedback 부족분을 acceptance criteria로 정리
+  - lightweight cutscene storyboard, writer decision packet v0.2, vertical slice test plan 작성
+- **Files**: 변경/추가 7개 (`Docs/Outsource/Juho/W2ProductionReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음
+- **Next**: writer v0.2 결정 회수 후 raw key/debug label toggle + combat feedback P0 구현 세션 진행
+- **Agent**: Codex
+
+---
+
 ### 2026-05-06 22:40 — Unityless W2 production readiness 문서 패킷 작성
 - **Phase**: W2-1
 - **Done**:
