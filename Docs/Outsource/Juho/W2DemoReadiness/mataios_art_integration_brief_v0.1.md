@@ -3,8 +3,8 @@
 ## Source Asset
 
 - Current file: `Assets/_Project/Art/Characters/마타이오스 전신.png`
-- Current state: received full-body illustration, not modified in this pass.
-- Demo role: S0-S2 common portrait or bust candidate.
+- Current state: imported as a Sprite with `.meta`, assigned to `PrototypeHud.mataiosPortrait` in `Assets/_Project/Scenes/PrototypeRoom.unity`.
+- Demo role: S0-S2 common HUD portrait candidate for W2 review.
 
 ## Recommended Rename Candidates
 
@@ -14,7 +14,7 @@
 | cropped UI portrait derivative | `char_mataios_bust_s0_s2.png` |
 | future transparent cutout | `char_mataios_fullbody_s0_s2_transparent.png` |
 
-Use lowercase English plus underscores for imported runtime files. Keep the original Korean filename only as a raw intake/source file if needed.
+Use lowercase English plus underscores for future imported runtime files. The current Korean source filename is already wired for W2 and should not be renamed without updating the scene reference.
 
 ## Import Settings
 
@@ -30,6 +30,17 @@ Use lowercase English plus underscores for imported runtime files. Keep the orig
 | sRGB | On |
 | Alpha | Current image appears to include a background. Use alpha only after a transparent derivative is exported. |
 
+## Current Import State
+
+| setting | current state |
+|---|---|
+| Texture Type | Sprite |
+| Sprite Mode | Single |
+| Max Size | 2048 |
+| Mip Maps | Off |
+| sRGB | On |
+| Alpha Is Transparency | On |
+
 ## UI Placement
 
 | screen | placement |
@@ -38,6 +49,16 @@ Use lowercase English plus underscores for imported runtime files. Keep the orig
 | Rest / NPC reaction surface | Bust crop from hood to upper torso; face should be the first read. |
 | CombatGate | Small side portrait only, not centered over the enemy/action surface. |
 | MemoryFragment | Optional low-opacity portrait accent; do not imply final memory truth. |
+
+## Current HUD Placement
+
+| element | current placement note |
+|---|---|
+| Mataios portrait | Created by `PrototypeHud.EnsurePortraitImage`, anchored on the left upper-middle band. |
+| Combat panel | Created by `PrototypeHud.EnsureCombatPanel`, anchored to the right of the portrait. |
+| Choice buttons | Lower screen stack, separated from portrait/combat panel. |
+| Result panel | Lower-mid band, below memory/combat readout. |
+| Current overlap risk | No obvious layout overlap from anchors, but one portrait-device screenshot pass is still required. |
 
 ## Portrait Crop Criteria
 
@@ -49,7 +70,7 @@ Use lowercase English plus underscores for imported runtime files. Keep the orig
 
 ## S0-S2 Usage
 
-- Use as S0-S2 common portrait if the writer accepts the current expression as neutral/cautious.
+- Use as S0-S2 common portrait if the writer accepts the current expression as neutral/cautious. This is already the W2 implementation path.
 - Do not use as S3/S4 by applying heavy filter directly to the source.
 - S3/S4 need separate approved variants or controlled overlay treatment after writer direction.
 
@@ -64,9 +85,7 @@ Use lowercase English plus underscores for imported runtime files. Keep the orig
 
 ## Dev Handoff Tasks
 
-1. Rename or duplicate source under stable English filename.
-2. Export or request `char_mataios_bust_s0_s2.png` as transparent 1024x1024.
-3. Import as Sprite (2D and UI), mipmaps off.
-4. Add a UI Image slot for Mataios portrait on the demo HUD or encounter panel.
-5. Wire portrait visibility for Shop/MoralChoice/MemoryFragment/CombatGate review surfaces.
-6. Keep all dialogue and story text out of the image asset.
+1. Run one portrait-device visual QA pass for crop/readability and overlap.
+2. If the current full-body source reads poorly, export a cropped `char_mataios_bust_s0_s2.png` derivative and update the scene sprite reference.
+3. Keep the current source unmodified unless a new derivative is explicitly approved.
+4. Keep all dialogue and story text out of the image asset.
