@@ -14,6 +14,7 @@ namespace HwigiTower.Run
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
         [SerializeField] private Sprite mataiosPortrait;
+        [SerializeField] private bool showDemoNodeDebugLabels;
 
         private static Sprite _placeholderSprite;
 
@@ -28,6 +29,7 @@ namespace HwigiTower.Run
             var player = CreatePlayer(camera, hud, roomController);
             camera.GetComponent<CameraFollow2D>().SetTarget(player.transform);
             CreateNodes(roomDefinition == null ? null : roomDefinition.AvailableNodes);
+            roomController.SetDemoNodeDebugLabelsVisible(showDemoNodeDebugLabels);
             roomController.BeginRun();
         }
 
@@ -195,10 +197,14 @@ namespace HwigiTower.Run
             var interactable = node.AddComponent<InteractableNode>();
             interactable.Configure(definition, node.GetComponent<SpriteRenderer>());
 
+            if (!showDemoNodeDebugLabels)
+            {
+                return;
+            }
+
             var label = new GameObject("Label");
             label.transform.SetParent(node.transform, false);
             label.transform.localPosition = new Vector3(0f, -0.85f, 0f);
-
             var text = label.AddComponent<TextMesh>();
             text.text = definition.DisplayName;
             text.anchor = TextAnchor.MiddleCenter;

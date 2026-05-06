@@ -12,6 +12,10 @@
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_03_combat_portrait_panel.png`
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_04_combat_layering_fixed.png`
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_05_demo_complete_after_combat.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_06_shop_labels_hidden.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_07_memory_labels_hidden.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_08_combat_labels_hidden.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_09_demo_complete_labels_hidden.png`
 
 ## Validation
 
@@ -21,7 +25,7 @@
 | `git diff --check` | Pass | no whitespace errors |
 | Fresh EditMode | Pass | `60/60`, `/private/tmp/hwigi-w2-demo-combat-editmode.xml` |
 | Fresh PlayMode | Pass | `6/6`, `/private/tmp/hwigi-w2-demo-combat-playmode.xml` |
-| Real `1080x1920` screenshot capture | Pass | 5 PNGs captured at `1080 x 1920`; screenshots 04/05 verify the layering fix |
+| Real `1080x1920` screenshot capture | Pass | 9 PNGs captured at `1080 x 1920`; screenshots 06/07/08/09 verify debug labels hidden |
 
 ## Pass/Fail Table
 
@@ -30,6 +34,7 @@
 | 1 | `PrototypeRoom` scene load | Pass | PlayMode smoke loads scene and finds runtime/controller/player/HUD |
 | 2 | Play enter | Pass | Screenshot run entered PlayMode and captured live Game view |
 | 3 | Shop -> MoralChoice -> MemoryFragment -> CombatGate route | Pass | Existing route smoke still asserts `[current] Shop` and demo completion |
+| 3 | Oversized world/debug node labels hidden | Pass | Screenshots 06/07/08/09 show only small node markers, no large Korean world labels |
 | 4 | Mataios portrait displayed | Pass | Visible in all three real screenshots |
 | 5 | Portrait does not cover route indicator | Pass | Screenshot 01/02/03: portrait remains lower-left; route indicator remains top-center |
 | 5 | Portrait does not cover HUD stats | Pass | Screenshot 01/02/03: top HUD remains readable |
@@ -53,6 +58,7 @@
 - Real screenshots confirm the portrait is safe at `1080x1920`.
 - Screenshot 04 confirms combat panel remains visible without `demo.complete` overlay/result text while combat is active.
 - Screenshot 05 confirms combat panel closes before `demo.complete` overlay/result text appears.
+- Screenshots 06/07/08/09 confirm the recording default hides world/debug node labels while keeping HUD route/status visible.
 
 ## Overlap Issues
 
@@ -61,11 +67,13 @@
 - Screenshot 03: CombatGate combat panel + portrait exposes a real overlap issue. `demo.complete` overlay and result text are drawn over the combat panel/stat area, making the combat state visually confusing.
 - Screenshot 04: fixed CombatGate active-combat view has no `demo.complete` overlay/result text on top of the combat panel.
 - Screenshot 05: fixed post-combat view shows `demo.complete` after the combat panel is closed.
+- Screenshots 06/07/08/09: no oversized world/debug node labels visible in Shop, MemoryFragment, active CombatGate, or DemoComplete states.
 
 ## Required UI Fixes
 
 - Fixed: `demo.complete` overlay and result text are hidden while `RunState.IsInCombat` is true.
 - Fixed: combat panel is active only during active combat, then closes before DemoComplete display.
+- Fixed: world/debug node labels are hidden in the default recording view and remain restorable through a development toggle.
 - Recommended polish later: reduce result text density or move result panel away from the lower combat panel zone at `1080x1920`.
 
 ## Blockers

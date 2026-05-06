@@ -12,6 +12,7 @@ namespace HwigiTower.Run
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
         [SerializeField] private PrototypeHud hud;
         [SerializeField] private bool autoResolveCombat;
+        [SerializeField] private bool showDemoNodeDebugLabels;
 
         public DeterministicRunContext RunContext { get; private set; }
         public GameFlowEventBus EventBus { get; } = new GameFlowEventBus();
@@ -34,6 +35,13 @@ namespace HwigiTower.Run
         {
             RebuildContext();
             ResolveHudReference();
+            ApplyDemoNodeDebugLabelVisibility();
+        }
+
+        public void SetDemoNodeDebugLabelsVisible(bool visible)
+        {
+            showDemoNodeDebugLabels = visible;
+            ApplyDemoNodeDebugLabelVisibility();
         }
 
         public void Configure(PrototypeRoomDefinition definition)
@@ -268,6 +276,24 @@ namespace HwigiTower.Run
             if (hud == null)
             {
                 hud = FindFirstObjectByType<PrototypeHud>();
+            }
+        }
+
+        private void ApplyDemoNodeDebugLabelVisibility()
+        {
+            var labels = Object.FindObjectsByType<TextMesh>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (var i = 0; i < labels.Length; i++)
+            {
+                var label = labels[i];
+                if (label == null || label.gameObject.name != "Label" || label.transform.parent == null)
+                {
+                    continue;
+                }
+
+                if (label.transform.parent.GetComponent<InteractableNode>() != null)
+                {
+                    label.gameObject.SetActive(showDemoNodeDebugLabels);
+                }
             }
         }
 
