@@ -23,6 +23,7 @@ namespace HwigiTower.Encounters
         {
             hud = prototypeHud;
             this.roomController = roomController;
+            hud?.BindRoomController(roomController);
         }
 
         private void Update()

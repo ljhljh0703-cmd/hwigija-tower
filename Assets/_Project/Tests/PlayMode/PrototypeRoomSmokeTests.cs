@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using HwigiTower.Combat;
 using HwigiTower.Core;
 using HwigiTower.Encounters;
 using HwigiTower.Run;
@@ -68,6 +69,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(shopNode);
             Assert.IsNotNull(battleNode);
 
+            controller.AutoResolveCombat = true;
             controller.BeginRun();
             hud.ShowRunState(controller.GetSnapshot());
             StringAssert.Contains("[current] Shop", hud.RouteMessage);
@@ -165,6 +167,79 @@ namespace HwigiTower.Tests.PlayMode
             StringAssert.Contains("enemy ENEMY_FRACTURE_HOUND", hud.ResultMessage);
             StringAssert.Contains("demo.complete", hud.ResultMessage);
             StringAssert.Contains("COMBAT_GATE_01", hud.MemoryMessage);
+        }
+
+        [UnityTest]
+        public IEnumerator PrototypeRoom_CombatGateShowsInteractiveCombatPanel()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            var shopNode = FindNode("node.shop");
+            var battleNode = FindNode("node.battle");
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+            Assert.IsNotNull(shopNode);
+            Assert.IsNotNull(battleNode);
+
+            controller.AutoResolveCombat = false;
+            controller.BeginRun();
+            hud.ShowRunState(controller.GetSnapshot());
+            Assert.IsTrue(hud.PortraitVisible);
+
+            controller.RunState.ModifyGold(5);
+            var shopEncounter = FindEncounter(shopNode, "ENC_SHOP_01");
+            controller.ResolveEncounterChoice(shopNode, shopEncounter, "CHOICE_SHOP_01_BUY_ITEM");
+            var moralEncounter = FindEncounter(battleNode, "ENC_MORAL_CHOICE_01");
+            controller.ResolveEncounterChoice(battleNode, moralEncounter, "CHOICE_MORAL_01_REFUSE");
+            var memoryEncounter = FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01");
+            controller.ResolveEncounterChoice(battleNode, memoryEncounter, "CHOICE_MEMORY_01_UNLOCK");
+
+            var combatEncounter = FindEncounter(battleNode, "ENC_COMBAT_GATE_01");
+            var combatSelection = new EncounterSelection(battleNode.Definition, combatEncounter);
+            hud.ShowChoices(combatEncounter, controller.BuildEncounterChoiceViews(combatSelection), choiceStableId =>
+            {
+                var resolution = controller.ResolveEncounterChoice(battleNode, combatEncounter, choiceStableId);
+                hud.ShowInteraction(battleNode, combatSelection, resolution);
+                hud.ShowRunState(controller.GetSnapshot());
+            });
+            FindChoiceButton(hud, "CHOICE_COMBAT_01_ENGAGE").onClick.Invoke();
+
+            Assert.IsTrue(controller.RunState.IsInCombat);
+            Assert.IsTrue(hud.CombatPanelVisible);
+            var beforeEnemyHp = controller.GetSnapshot().EnemyHp;
+            var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+            var defendButton = GameObject.Find("Combat Button Defend").GetComponent<Button>();
+            var skillButton = GameObject.Find("Combat Button Skill").GetComponent<Button>();
+            Assert.IsNotNull(attackButton);
+            Assert.IsNotNull(defendButton);
+            Assert.IsNotNull(skillButton);
+            Assert.IsFalse(skillButton.interactable);
+
+            attackButton.onClick.Invoke();
+            yield return null;
+            Assert.Less(controller.GetSnapshot().EnemyHp, beforeEnemyHp);
+
+            var hpBeforeDefend = controller.GetSnapshot().PlayerHp;
+            defendButton.onClick.Invoke();
+            yield return null;
+            StringAssert.Contains("Defend", controller.GetSnapshot().LastCombatRoundResult);
+            Assert.LessOrEqual(hpBeforeDefend - controller.GetSnapshot().PlayerHp, 3);
+
+            var guard = 0;
+            while (controller.RunState.IsInCombat && guard < 12)
+            {
+                attackButton.onClick.Invoke();
+                yield return null;
+                guard++;
+            }
+
+            Assert.IsFalse(controller.RunState.IsInCombat);
+            Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
+            StringAssert.Contains("demo.complete", hud.ResultMessage);
+            Assert.IsTrue(hud.CombatPanelVisible);
         }
 
         [UnityTest]

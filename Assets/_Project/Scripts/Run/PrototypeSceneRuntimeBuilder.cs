@@ -13,6 +13,7 @@ namespace HwigiTower.Run
         [SerializeField] private PlayerMovementProfile movementProfile;
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
+        [SerializeField] private Sprite mataiosPortrait;
 
         private static Sprite _placeholderSprite;
 
@@ -76,6 +77,7 @@ namespace HwigiTower.Run
             var result = CreateText(canvasObject.transform, "Encounter Result Text", new Vector2(0f, -208f));
             var hud = canvasObject.AddComponent<PrototypeHud>();
             hud.Configure(focus, interaction, runState, result);
+            hud.SetNpcPortrait(mataiosPortrait);
             hud.ConfigureDemoRoute(roomDefinition == null ? null : roomDefinition.DemoRunPath);
             return hud;
         }

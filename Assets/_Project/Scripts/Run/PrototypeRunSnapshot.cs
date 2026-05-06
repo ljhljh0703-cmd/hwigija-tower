@@ -27,9 +27,16 @@ namespace HwigiTower.Run
             string lastCombatId = "",
             string lastCombatEnemyId = "",
             string lastCombatResultId = "",
+            string lastCombatRoundResult = "",
             bool isInCombat = false,
             int enemyHp = 0,
-            int enemyMaxHp = 0)
+            int enemyMaxHp = 0,
+            int combatRound = 0,
+            int lastCombatGoldReward = 0,
+            int lastCombatGlitchDelta = 0,
+            int lastCombatAffinityDelta = 0,
+            bool lastCombatEnemyDefeated = false,
+            int lastCombatComboDamage = 0)
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -55,9 +62,16 @@ namespace HwigiTower.Run
             LastCombatId = lastCombatId ?? string.Empty;
             LastCombatEnemyId = lastCombatEnemyId ?? string.Empty;
             LastCombatResultId = lastCombatResultId ?? string.Empty;
+            LastCombatRoundResult = lastCombatRoundResult ?? string.Empty;
             IsInCombat = isInCombat;
             EnemyHp = enemyHp;
             EnemyMaxHp = enemyMaxHp;
+            CombatRound = combatRound;
+            LastCombatGoldReward = lastCombatGoldReward;
+            LastCombatGlitchDelta = lastCombatGlitchDelta;
+            LastCombatAffinityDelta = lastCombatAffinityDelta;
+            LastCombatEnemyDefeated = lastCombatEnemyDefeated;
+            LastCombatComboDamage = lastCombatComboDamage;
         }
 
         public string RunId { get; }
@@ -84,8 +98,15 @@ namespace HwigiTower.Run
         public string LastCombatId { get; }
         public string LastCombatEnemyId { get; }
         public string LastCombatResultId { get; }
+        public string LastCombatRoundResult { get; }
         public bool IsInCombat { get; }
         public int EnemyHp { get; }
         public int EnemyMaxHp { get; }
+        public int CombatRound { get; }
+        public int LastCombatGoldReward { get; }
+        public int LastCombatGlitchDelta { get; }
+        public int LastCombatAffinityDelta { get; }
+        public bool LastCombatEnemyDefeated { get; }
+        public int LastCombatComboDamage { get; }
     }
 }
