@@ -27,6 +27,23 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PrototypeRoom_HidesDebugNodeLabelsByDefaultAndRestoresWithToggle()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            Assert.IsNotNull(controller);
+            Assert.AreEqual(0, CountActiveWorldNodeLabels());
+
+            controller.SetDemoNodeDebugLabelsVisible(true);
+            Assert.GreaterOrEqual(CountActiveWorldNodeLabels(), 4);
+
+            controller.SetDemoNodeDebugLabelsVisible(false);
+            Assert.AreEqual(0, CountActiveWorldNodeLabels());
+        }
+
+        [UnityTest]
         public IEnumerator PrototypeRoom_AttachesEncounterRuntimeCatalogToRunState()
         {
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
@@ -366,6 +383,27 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.Less(rect.anchoredPosition.y, previousY);
                 previousY = rect.anchoredPosition.y;
             }
+        }
+
+        private static int CountActiveWorldNodeLabels()
+        {
+            var count = 0;
+            var labels = Object.FindObjectsByType<TextMesh>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (var i = 0; i < labels.Length; i++)
+            {
+                var label = labels[i];
+                if (label == null || label.gameObject.name != "Label" || !label.gameObject.activeInHierarchy || label.transform.parent == null)
+                {
+                    continue;
+                }
+
+                if (label.transform.parent.GetComponent<InteractableNode>() != null)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
     }
 }
