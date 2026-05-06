@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b97ba27375f04b9c8df1aa8acfb3dcd, type: 3}
+  m_Name: SO_Item_RELIC_SWORD_01
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Items.ItemData
+  stableId: RELIC_SWORD_01
+  displayNameKey: PLACEHOLDER_RELIC_SWORD_01_NAME
+  descriptionKey: PLACEHOLDER_RELIC_SWORD_01_DESC
+  maxStack: 1
+  tier: 1
+  passiveTrigger: ability_tag_sword_activated
+  numericParams:
+  - key: atk_per_trigger
+    value: 1
+  - key: atk_max
+    value: -1

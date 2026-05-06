@@ -16,3 +16,6 @@ MonoBehaviour:
   displayNameKey: PLACEHOLDER_ITEM_LANTERN_OIL_NAME
   descriptionKey: PLACEHOLDER_ITEM_LANTERN_OIL_DESC
   maxStack: 99
+  tier: 0
+  passiveTrigger:
+  numericParams: []

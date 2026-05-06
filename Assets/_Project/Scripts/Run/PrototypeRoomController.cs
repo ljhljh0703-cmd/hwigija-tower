@@ -36,7 +36,7 @@ namespace HwigiTower.Run
 
         public void BeginRun()
         {
-            RunState = new PrototypeRunState(RunContext.RunId, EventBus);
+            RunState = new PrototypeRunState(RunContext.RunId, EventBus) { AutoResolveCombat = true };
             RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
             RunState.AttachDemoRunPath(roomDefinition == null ? null : roomDefinition.DemoRunPath);
             ConfigureHudDemoRoute();

@@ -5,6 +5,7 @@ using HwigiTower.Abilities;
 using HwigiTower.Combat;
 using HwigiTower.Core;
 using HwigiTower.Encounters;
+using HwigiTower.Items;
 using HwigiTower.LLM;
 using HwigiTower.NPC;
 using HwigiTower.Run;
@@ -48,6 +49,20 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.AreEqual(firstRound.PlayerDamage, secondRound.PlayerDamage);
             Assert.AreEqual(firstRound.EnemyDamage, secondRound.EnemyDamage);
+        }
+
+        [Test]
+        public void CombatController_SecondAttackAddsComboDamage()
+        {
+            var context = new DeterministicRunContext("run-combo", 2002);
+            var combat = new CombatController(context, "battle.combo");
+            var player = new CombatantState("player", 20, 10);
+            var enemy = new CombatantState("enemy", 50, 1);
+
+            var round = combat.ResolveRound(player, enemy, CombatAction.Attack, CombatAction.Attack);
+
+            Assert.Greater(round.ComboDamage, 0);
+            Assert.AreEqual(50 - round.PlayerDamage - round.ComboDamage, enemy.Hp);
         }
 
         [Test]
@@ -137,6 +152,55 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.AreEqual(2, modifiers.PlayerAttackBonus);
             Assert.AreEqual(4, modifiers.PlayerMaxHpBonus);
+        }
+
+        [Test]
+        public void CombatAbilityModifiers_UsesItemPassiveNumericParams()
+        {
+            var attack = CreateItem("item.attack", "player_attack");
+            SetNumericParams(attack, ("atk_bonus", 1f), ("flat_damage_bonus", 2f));
+            var defend = CreateItem("item.defend", "player_defend");
+            SetNumericParams(defend, ("damage_reduce", 3f));
+            var firstHit = CreateItem("item.first_hit", "first_hit_per_combat");
+            SetNumericParams(firstHit, ("damage_reduce", 4f));
+            var start = CreateItem("item.start", "combat_start");
+            SetNumericParams(start, ("hp_restore", 5f), ("poison_damage_per_round", 1f));
+
+            var modifiers = CombatAbilityModifiers.From(null, null, new[] { attack, defend, firstHit, start });
+
+            Assert.AreEqual(1, modifiers.PlayerAttackBonus);
+            Assert.AreEqual(2, modifiers.FlatDamageBonus);
+            Assert.AreEqual(3, modifiers.DefendDamageReduce);
+            Assert.AreEqual(4, modifiers.FirstHitDamageReduce);
+            Assert.AreEqual(5, modifiers.CombatStartHpRestore);
+            Assert.AreEqual(1, modifiers.PoisonDamagePerRound);
+        }
+
+        [Test]
+        public void CombatLoopContent_RequiredScriptableObjectsExist()
+        {
+            var requiredPaths = new[]
+            {
+                "Assets/_Project/Data/EnemyPatterns/SO_EnemyPattern_PATTERN_BASIC.asset",
+                "Assets/_Project/Data/EnemyPatterns/SO_EnemyPattern_PATTERN_GLITCH.asset",
+                "Assets/_Project/Data/EnemyPatterns/SO_EnemyPattern_PATTERN_ELITE.asset",
+                "Assets/_Project/Data/Enemies/SO_Enemy_ENEMY_WALKER_01.asset",
+                "Assets/_Project/Data/Enemies/SO_Enemy_ENEMY_CRAWLER_02.asset",
+                "Assets/_Project/Data/Enemies/SO_Enemy_ENEMY_SHADE_03.asset",
+                "Assets/_Project/Data/Enemies/SO_Enemy_ENEMY_WRAITH_04.asset",
+                "Assets/_Project/Data/Enemies/SO_Enemy_ENEMY_HERALD_05.asset",
+                "Assets/_Project/Data/Enemies/SO_Enemy_BOSS_GATE_01.asset",
+                "Assets/_Project/Data/Enemies/SO_Enemy_BOSS_APEX_02.asset",
+                "Assets/_Project/Data/Items/SO_Item_ITEM_01.asset",
+                "Assets/_Project/Data/Items/SO_Item_ITEM_12.asset",
+                "Assets/_Project/Data/Items/SO_Item_RELIC_SWORD_01.asset",
+                "Assets/_Project/Data/Items/SO_Item_RELIC_GENERIC_02.asset"
+            };
+
+            foreach (var path in requiredPaths)
+            {
+                Assert.IsTrue(File.Exists(path), path);
+            }
         }
 
         [Test]
@@ -935,6 +999,16 @@ namespace HwigiTower.Tests.EditMode
             serialized.FindProperty("tag").stringValue = tag;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             return ability;
+        }
+
+        private static ItemData CreateItem(string id, string passiveTrigger)
+        {
+            var item = ScriptableObject.CreateInstance<ItemData>();
+            var serialized = new SerializedObject(item);
+            serialized.FindProperty("stableId").stringValue = id;
+            serialized.FindProperty("passiveTrigger").stringValue = passiveTrigger;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return item;
         }
 
         private static void SetNumericParams(ScriptableObject target, params (string key, float value)[] values)

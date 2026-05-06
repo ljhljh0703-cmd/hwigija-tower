@@ -16,3 +16,6 @@ MonoBehaviour:
   displayNameKey: PLACEHOLDER_ITEM_FIELD_BANDAGE_NAME
   descriptionKey: PLACEHOLDER_ITEM_FIELD_BANDAGE_DESC
   maxStack: 99
+  tier: 0
+  passiveTrigger:
+  numericParams: []
