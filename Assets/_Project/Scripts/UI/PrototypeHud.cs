@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HwigiTower.Combat;
 using HwigiTower.Encounters;
 using HwigiTower.Run;
 using UnityEngine;
@@ -19,14 +20,35 @@ namespace HwigiTower.UI
         [SerializeField] private Text memoryText;
         [SerializeField] private Text demoCompleteText;
         [SerializeField] private RectTransform choiceContainer;
+        [SerializeField] private Sprite mataiosPortrait;
+        [SerializeField] private Image npcPortraitImage;
+        [SerializeField] private RectTransform combatPanel;
+        [SerializeField] private Text combatText;
+        [SerializeField] private Button attackButton;
+        [SerializeField] private Button defendButton;
+        [SerializeField] private Button skillButton;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<string> _demoRouteLabels = new List<string>();
+        private PrototypeRoomController _roomController;
 
         public int ChoiceButtonCount => _choiceButtons.Count;
         public string ResultMessage => resultText == null ? string.Empty : resultText.text;
         public string RouteMessage => routeText == null ? string.Empty : routeText.text;
         public string MemoryMessage => memoryText == null ? string.Empty : memoryText.text;
+        public bool CombatPanelVisible => combatPanel != null && combatPanel.gameObject.activeSelf;
+        public bool PortraitVisible => npcPortraitImage != null && npcPortraitImage.gameObject.activeSelf;
+
+        public void BindRoomController(PrototypeRoomController controller)
+        {
+            _roomController = controller;
+        }
+
+        public void SetNpcPortrait(Sprite portrait)
+        {
+            mataiosPortrait = portrait;
+            ApplyPortrait();
+        }
 
         private void Awake()
         {
@@ -43,6 +65,7 @@ namespace HwigiTower.UI
                 resultText.text = "result: -";
             }
 
+            ApplyPortrait();
             ClearChoices();
         }
 
@@ -65,6 +88,7 @@ namespace HwigiTower.UI
                 resultText.text = "result: -";
             }
 
+            ApplyPortrait();
             ClearChoices();
         }
 
@@ -390,6 +414,115 @@ namespace HwigiTower.UI
             demoCompleteText = CreateHudText("Demo Complete Text", new Vector2(0.12f, 0.5f), new Vector2(0.88f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(0f, 120f), 32, TextAnchor.MiddleCenter, new Color(0.88f, 0.92f, 0.78f, 1f));
         }
 
+        private void ApplyPortrait()
+        {
+            EnsurePortraitImage();
+            if (npcPortraitImage == null)
+            {
+                return;
+            }
+
+            npcPortraitImage.sprite = mataiosPortrait;
+            npcPortraitImage.preserveAspect = true;
+            npcPortraitImage.gameObject.SetActive(mataiosPortrait != null);
+        }
+
+        private void EnsurePortraitImage()
+        {
+            if (npcPortraitImage != null)
+            {
+                return;
+            }
+
+            var portraitObject = new GameObject("Mataios Portrait");
+            portraitObject.transform.SetParent(transform, false);
+
+            var rect = portraitObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.06f, 0f);
+            rect.anchorMax = new Vector2(0.30f, 0f);
+            rect.pivot = new Vector2(0f, 0f);
+            rect.anchoredPosition = new Vector2(0f, 720f);
+            rect.sizeDelta = new Vector2(0f, 360f);
+
+            npcPortraitImage = portraitObject.AddComponent<Image>();
+            npcPortraitImage.color = Color.white;
+            npcPortraitImage.raycastTarget = false;
+        }
+
+        private void EnsureCombatPanel()
+        {
+            if (combatPanel != null)
+            {
+                return;
+            }
+
+            var panelObject = new GameObject("Combat Panel");
+            panelObject.transform.SetParent(transform, false);
+
+            combatPanel = panelObject.AddComponent<RectTransform>();
+            combatPanel.anchorMin = new Vector2(0.34f, 0f);
+            combatPanel.anchorMax = new Vector2(0.94f, 0f);
+            combatPanel.pivot = new Vector2(0.5f, 0f);
+            combatPanel.anchoredPosition = new Vector2(0f, 728f);
+            combatPanel.sizeDelta = new Vector2(0f, 310f);
+
+            var image = panelObject.AddComponent<Image>();
+            image.color = new Color(0.08f, 0.10f, 0.12f, 0.88f);
+
+            combatText = CreateHudText("Combat Status Text", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(-24f, 154f), 20, TextAnchor.UpperLeft, new Color(0.78f, 0.84f, 0.86f, 1f));
+            combatText.transform.SetParent(panelObject.transform, false);
+            var combatTextRect = combatText.GetComponent<RectTransform>();
+            combatTextRect.anchorMin = new Vector2(0f, 1f);
+            combatTextRect.anchorMax = new Vector2(1f, 1f);
+            combatTextRect.pivot = new Vector2(0.5f, 1f);
+            combatTextRect.anchoredPosition = new Vector2(0f, -12f);
+            combatTextRect.sizeDelta = new Vector2(-24f, 154f);
+
+            attackButton = CreateCombatButton(panelObject.transform, "Combat Button Attack", "Attack", new Vector2(0.17f, 0f), CombatAction.Attack);
+            defendButton = CreateCombatButton(panelObject.transform, "Combat Button Defend", "Defend", new Vector2(0.50f, 0f), CombatAction.Defend);
+            skillButton = CreateCombatButton(panelObject.transform, "Combat Button Skill", "Skill", new Vector2(0.83f, 0f), CombatAction.Skill);
+            skillButton.interactable = false;
+        }
+
+        private Button CreateCombatButton(Transform parent, string name, string labelText, Vector2 anchor, CombatAction action)
+        {
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, 18f);
+            rect.sizeDelta = new Vector2(150f, 64f);
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.18f, 0.22f, 0.26f, 0.96f);
+
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(() => ResolveCombatAction(action));
+
+            var labelObject = new GameObject("Label");
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            var labelRect = labelObject.AddComponent<RectTransform>();
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(8f, 4f);
+            labelRect.offsetMax = new Vector2(-8f, -4f);
+
+            var label = labelObject.AddComponent<Text>();
+            label.font = ResolveFont();
+            label.fontSize = 22;
+            label.alignment = TextAnchor.MiddleCenter;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 14;
+            label.resizeTextMaxSize = 22;
+            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.text = labelText;
+            return button;
+        }
+
         private Text CreateHudText(string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size, int fontSize, TextAnchor alignment, Color color)
         {
             var textObject = new GameObject(name);
@@ -486,6 +619,7 @@ namespace HwigiTower.UI
         private void UpdateMemoryAndCombatPanel(PrototypeRunSnapshot snapshot)
         {
             EnsureMemoryText();
+            UpdateCombatPanel(snapshot);
             if (memoryText == null)
             {
                 return;
@@ -499,6 +633,62 @@ namespace HwigiTower.UI
                 ? "combat: -"
                 : "combat: " + snapshot.LastCombatId + " | enemy " + snapshot.LastCombatEnemyId + " | " + snapshot.LastCombatResultId;
             memoryText.text = memory + "\n" + combat;
+        }
+
+        private void UpdateCombatPanel(PrototypeRunSnapshot snapshot)
+        {
+            EnsureCombatPanel();
+            if (combatPanel == null)
+            {
+                return;
+            }
+
+            var hasCombat = snapshot.IsInCombat ||
+                (!string.IsNullOrEmpty(snapshot.LastCombatId) && snapshot.LastCombatResultId != "started");
+            combatPanel.gameObject.SetActive(hasCombat);
+            if (!hasCombat || combatText == null)
+            {
+                return;
+            }
+
+            combatText.text =
+                "combat: " + snapshot.LastCombatId + "\n" +
+                "enemy: " + snapshot.LastCombatEnemyId + " | HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "\n" +
+                "player HP: " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + " | round " + snapshot.CombatRound + "\n" +
+                "last: " + (string.IsNullOrEmpty(snapshot.LastCombatRoundResult) ? "-" : snapshot.LastCombatRoundResult) + "\n" +
+                "result: " + snapshot.LastCombatResultId + " | gold " + snapshot.LastCombatGoldReward +
+                " | glitch " + FormatDelta(snapshot.LastCombatGlitchDelta) +
+                " | affinity " + FormatDelta(snapshot.LastCombatAffinityDelta) +
+                (snapshot.LastCombatComboDamage > 0 ? " | combo " + snapshot.LastCombatComboDamage : string.Empty);
+
+            var canAct = snapshot.IsInCombat && _roomController != null;
+            if (attackButton != null)
+            {
+                attackButton.interactable = canAct;
+            }
+
+            if (defendButton != null)
+            {
+                defendButton.interactable = canAct;
+            }
+
+            if (skillButton != null)
+            {
+                skillButton.interactable = false;
+            }
+        }
+
+        private void ResolveCombatAction(CombatAction action)
+        {
+            if (_roomController == null)
+            {
+                ShowResultMessage("combat unavailable");
+                return;
+            }
+
+            var resolution = _roomController.ResolveCombatAction(action);
+            ShowResult(resolution);
+            ShowRunState(_roomController.GetSnapshot());
         }
 
         private void UpdateDemoCompletePanel(PrototypeRunSnapshot snapshot)
@@ -577,6 +767,11 @@ namespace HwigiTower.UI
         private static Font ResolveFont()
         {
             return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+        }
+
+        private static string FormatDelta(int amount)
+        {
+            return amount > 0 ? "+" + amount : amount.ToString();
         }
 
         private static void EnsureEventSystem()

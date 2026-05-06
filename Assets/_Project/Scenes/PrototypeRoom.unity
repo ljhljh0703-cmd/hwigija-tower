@@ -1763,6 +1763,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Run.PrototypeRoomController
   roomDefinition: {fileID: 11400000, guid: b7fc2e1baedb4111b932084e957598cf, type: 2}
   encounterRuntimeCatalog: {fileID: 11400000, guid: aa0b8235976974de2a42762d873de12c, type: 2}
+  hud: {fileID: 1703257808}
+  autoResolveCombat: 0
 --- !u!114 &1698282653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1826,6 +1828,18 @@ MonoBehaviour:
   focusText: {fileID: 1715932666}
   interactionText: {fileID: 1512422815}
   runStateText: {fileID: 1624730126}
+  resultText: {fileID: 0}
+  routeText: {fileID: 0}
+  memoryText: {fileID: 0}
+  demoCompleteText: {fileID: 0}
+  choiceContainer: {fileID: 0}
+  mataiosPortrait: {fileID: 21300000, guid: bb62d23ff1824ebb813932a8f2c13d4b, type: 3}
+  npcPortraitImage: {fileID: 0}
+  combatPanel: {fileID: 0}
+  combatText: {fileID: 0}
+  attackButton: {fileID: 0}
+  defendButton: {fileID: 0}
+  skillButton: {fileID: 0}
 --- !u!224 &1703257809
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1877,12 +1891,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96

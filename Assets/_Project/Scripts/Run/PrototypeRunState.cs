@@ -71,6 +71,13 @@ namespace HwigiTower.Run
         private string _lastCombatId = string.Empty;
         private string _lastCombatEnemyId = string.Empty;
         private string _lastCombatResultId = string.Empty;
+        private string _lastCombatRoundResult = string.Empty;
+        private int _combatRound;
+        private int _lastCombatGoldReward;
+        private int _lastCombatGlitchDelta;
+        private int _lastCombatAffinityDelta;
+        private bool _lastCombatEnemyDefeated;
+        private int _lastCombatComboDamage;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
             : this(runId, eventBus, null)
@@ -122,8 +129,8 @@ namespace HwigiTower.Run
         {
             return new PrototypeRunSnapshot(
                 RunId,
-                _playerHp,
-                _playerMaxHp,
+                _activeCombatPlayer?.Hp ?? _playerHp,
+                _activeCombatPlayer?.MaxHp ?? _playerMaxHp,
                 _playerAttack,
                 _mental,
                 _gold,
@@ -145,9 +152,16 @@ namespace HwigiTower.Run
                 LastCombatId,
                 LastCombatEnemyId,
                 LastCombatResultId,
+                _lastCombatRoundResult,
                 IsInCombat,
                 _activeCombatEnemy?.Hp ?? 0,
-                _activeCombatEnemy?.MaxHp ?? 0);
+                _activeCombatEnemy?.MaxHp ?? 0,
+                _combatRound,
+                _lastCombatGoldReward,
+                _lastCombatGlitchDelta,
+                _lastCombatAffinityDelta,
+                _lastCombatEnemyDefeated,
+                _lastCombatComboDamage);
         }
 
         public string NextDemoNodeId
@@ -580,6 +594,7 @@ namespace HwigiTower.Run
         private CombatController _activeCombatController;
         private EncounterCombatHandoffRuntimeData _activeCombatHandoff;
         private string _activeCombatNodeId;
+        private string _activeCombatEncounterId;
         private System.Action<PrototypeRunState, EncounterPostCombatEffectRuntimeData[]> _activeCombatEffectApplier;
 
         public bool IsInCombat => _activeCombatPlayer != null && _activeCombatEnemy != null && !_activeCombatPlayer.IsDefeated && !_activeCombatEnemy.IsDefeated;
@@ -594,6 +609,14 @@ namespace HwigiTower.Run
             }
 
             var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action);
+            _combatRound++;
+            _lastCombatComboDamage = result.ComboDamage;
+            _lastCombatRoundResult =
+                "round " + _combatRound +
+                " | action " + action +
+                " | playerDamage " + result.PlayerDamage +
+                " | enemyDamage " + result.EnemyDamage +
+                (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty);
 
             if (result.IsComplete)
             {
@@ -613,6 +636,8 @@ namespace HwigiTower.Run
             _playerHp = _activeCombatPlayer.Hp;
             var resultId = _activeCombatEnemy.IsDefeated ? "victory" : "defeat";
             _lastCombatResultId = resultId;
+            _lastCombatEnemyDefeated = _activeCombatEnemy.IsDefeated;
+            CapturePostCombatDeltas(_activeCombatEnemy.IsDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
             
             _activeCombatEffectApplier?.Invoke(this, _activeCombatEnemy.IsDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatCompleted, RunId, _activeCombatNodeId, resultId));
@@ -632,6 +657,11 @@ namespace HwigiTower.Run
             {
                 // We keep the states for one turn so UI can show the final result, 
                 // but IsInCombat will return false because someone is defeated.
+            }
+
+            if (!AutoResolveCombat)
+            {
+                UpdateDemoProgression(_activeCombatNodeId, _activeCombatEncounterId, true);
             }
         }
 
@@ -668,6 +698,13 @@ namespace HwigiTower.Run
             _lastCombatId = combatId;
             _lastCombatEnemyId = enemy.Id;
             _lastCombatResultId = "started";
+            _lastCombatRoundResult = "round 0 | ready";
+            _combatRound = 0;
+            _lastCombatGoldReward = 0;
+            _lastCombatGlitchDelta = 0;
+            _lastCombatAffinityDelta = 0;
+            _lastCombatEnemyDefeated = false;
+            _lastCombatComboDamage = 0;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
 
             // Initialize interactive state
@@ -676,6 +713,7 @@ namespace HwigiTower.Run
             _activeCombatController = combat;
             _activeCombatHandoff = handoff;
             _activeCombatNodeId = nodeId;
+            _activeCombatEncounterId = encounter == null ? string.Empty : encounter.Id;
             _activeCombatEffectApplier = applyEffects;
 
             if (AutoResolveCombat)
@@ -690,6 +728,40 @@ namespace HwigiTower.Run
             }
 
             return new PrototypeCombatHandoffResolution(true, "started", combatId, enemy.Id);
+        }
+
+        private void CapturePostCombatDeltas(EncounterPostCombatEffectRuntimeData[] effects)
+        {
+            _lastCombatGoldReward = 0;
+            _lastCombatGlitchDelta = 0;
+            _lastCombatAffinityDelta = 0;
+
+            if (effects == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < effects.Length; i++)
+            {
+                var effect = effects[i];
+                if (effect == null)
+                {
+                    continue;
+                }
+
+                switch (effect.kind)
+                {
+                    case "ModifyGold":
+                        _lastCombatGoldReward += effect.amount;
+                        break;
+                    case "ModifyGlitchLevel":
+                        _lastCombatGlitchDelta += effect.amount;
+                        break;
+                    case "ModifyAffinity":
+                        _lastCombatAffinityDelta += effect.amount;
+                        break;
+                }
+            }
         }
 
         private int CountGrantedAbilities()

@@ -1,4 +1,5 @@
 using HwigiTower.Core;
+using HwigiTower.Combat;
 using HwigiTower.Encounters;
 using HwigiTower.UI;
 using UnityEngine;
@@ -10,11 +11,24 @@ namespace HwigiTower.Run
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
         [SerializeField] private PrototypeHud hud;
+        [SerializeField] private bool autoResolveCombat;
 
         public DeterministicRunContext RunContext { get; private set; }
         public GameFlowEventBus EventBus { get; } = new GameFlowEventBus();
         public PrototypeRunState RunState { get; private set; }
         public EncounterRuntimeCatalogData EncounterRuntimeCatalog => encounterRuntimeCatalog;
+        public bool AutoResolveCombat
+        {
+            get => autoResolveCombat;
+            set
+            {
+                autoResolveCombat = value;
+                if (RunState != null)
+                {
+                    RunState.AutoResolveCombat = value;
+                }
+            }
+        }
 
         private void Awake()
         {
@@ -36,7 +50,7 @@ namespace HwigiTower.Run
 
         public void BeginRun()
         {
-            RunState = new PrototypeRunState(RunContext.RunId, EventBus) { AutoResolveCombat = true };
+            RunState = new PrototypeRunState(RunContext.RunId, EventBus) { AutoResolveCombat = autoResolveCombat };
             RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
             RunState.AttachDemoRunPath(roomDefinition == null ? null : roomDefinition.DemoRunPath);
             ConfigureHudDemoRoute();
@@ -132,6 +146,44 @@ namespace HwigiTower.Run
             return resolution;
         }
 
+        public PrototypeNodeResolution ResolveCombatAction(CombatAction action)
+        {
+            if (RunState == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "combat unavailable", false);
+            }
+
+            var hpBefore = RunState.ActiveCombatPlayer?.Hp ?? RunState.PlayerHp;
+            var round = RunState.ResolveCombatRoundInteractive(action);
+            var snapshot = RunState.CreateSnapshot();
+            var message =
+                "combat " + snapshot.LastCombatResultId +
+                " | round " + snapshot.CombatRound +
+                " | player HP " + hpBefore + " -> " + snapshot.PlayerHp +
+                " | enemy " + snapshot.LastCombatEnemyId + " " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp +
+                " | playerDamage " + round.PlayerDamage +
+                " | enemyDamage " + round.EnemyDamage;
+            if (round.ComboDamage > 0)
+            {
+                message += " | combo " + round.ComboDamage;
+            }
+
+            if (!snapshot.IsInCombat)
+            {
+                message +=
+                    " | enemyDefeated " + snapshot.LastCombatEnemyDefeated +
+                    " | gold reward " + snapshot.LastCombatGoldReward +
+                    " | glitch " + FormatDelta(snapshot.LastCombatGlitchDelta) +
+                    " | affinity " + FormatDelta(snapshot.LastCombatAffinityDelta);
+                if (snapshot.DemoStatus == "demo.complete")
+                {
+                    message += " | demo.complete";
+                }
+            }
+
+            return new PrototypeNodeResolution(snapshot.LastCombatId, snapshot.LastCombatResultId, message, snapshot.RunCompleted);
+        }
+
         public PrototypeNodeResolution ResolveNode(InteractableNode node, EncounterSelection selection)
         {
             if (RunState == null)
@@ -206,6 +258,7 @@ namespace HwigiTower.Run
             ResolveHudReference();
             if (hud != null)
             {
+                hud.BindRoomController(this);
                 hud.ConfigureDemoRoute(roomDefinition == null ? null : roomDefinition.DemoRunPath);
             }
         }
@@ -216,6 +269,11 @@ namespace HwigiTower.Run
             {
                 hud = FindFirstObjectByType<PrototypeHud>();
             }
+        }
+
+        private static string FormatDelta(int amount)
+        {
+            return amount > 0 ? "+" + amount : amount.ToString();
         }
     }
 }
