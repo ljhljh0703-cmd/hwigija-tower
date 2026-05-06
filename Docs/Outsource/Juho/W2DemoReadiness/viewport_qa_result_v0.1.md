@@ -10,6 +10,8 @@
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_01_shop_portrait.png`
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_02_memory_portrait_panel.png`
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_03_combat_portrait_panel.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_04_combat_layering_fixed.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_05_demo_complete_after_combat.png`
 
 ## Validation
 
@@ -19,7 +21,7 @@
 | `git diff --check` | Pass | no whitespace errors |
 | Fresh EditMode | Pass | `60/60`, `/private/tmp/hwigi-w2-demo-combat-editmode.xml` |
 | Fresh PlayMode | Pass | `6/6`, `/private/tmp/hwigi-w2-demo-combat-playmode.xml` |
-| Real `1080x1920` screenshot capture | Pass | 3 PNGs captured at `1080 x 1920` |
+| Real `1080x1920` screenshot capture | Pass | 5 PNGs captured at `1080 x 1920`; screenshots 04/05 verify the layering fix |
 
 ## Pass/Fail Table
 
@@ -34,7 +36,7 @@
 | 5 | Portrait does not cover choice buttons | Pass | Screenshot 02/03: portrait does not block interaction areas |
 | 5 | Portrait does not cover result panel | Pass | Screenshot 02/03: result text is dense but not covered by portrait |
 | 5 | Portrait does not cover memory panel | Pass | Screenshot 02: memory panel remains readable below portrait band |
-| 5 | Portrait does not cover combat panel | Fail | Screenshot 03: portrait does not cover it, but `demo.complete` overlay/result text overlap the combat panel |
+| 5 | Portrait does not cover combat panel | Pass | Screenshot 04: combat panel is readable and no longer shares the screen with `demo.complete` overlay/result text |
 | 6 | CombatGate shows Attack / Defend / Skill | Pass | PlayMode finds all three combat buttons |
 | 7 | Skill disabled | Pass | PlayMode asserts Skill button is not interactable |
 | 8 | Attack lowers enemy HP | Pass | PlayMode asserts enemy HP decreases after Attack click |
@@ -48,21 +50,25 @@
 - Portrait raycast is disabled, so it should not block buttons even if a future layout shifts nearby.
 - Combat panel uses the lower-right HUD area and remains separated from the lower-left portrait region.
 - Skill is intentionally disabled until a real ability resolver/selection path exists.
-- Real screenshots confirm the portrait is safe at `1080x1920`; the remaining visible problem is not portrait placement but combat/demo-complete HUD layering.
+- Real screenshots confirm the portrait is safe at `1080x1920`.
+- Screenshot 04 confirms combat panel remains visible without `demo.complete` overlay/result text while combat is active.
+- Screenshot 05 confirms combat panel closes before `demo.complete` overlay/result text appears.
 
 ## Overlap Issues
 
 - Screenshot 01: initial Shop + portrait has no blocking overlap with route/HUD.
 - Screenshot 02: MemoryFragment + portrait + memory panel is readable; result text is dense but not portrait-blocked.
 - Screenshot 03: CombatGate combat panel + portrait exposes a real overlap issue. `demo.complete` overlay and result text are drawn over the combat panel/stat area, making the combat state visually confusing.
+- Screenshot 04: fixed CombatGate active-combat view has no `demo.complete` overlay/result text on top of the combat panel.
+- Screenshot 05: fixed post-combat view shows `demo.complete` after the combat panel is closed.
 
 ## Required UI Fixes
 
-- Fix combat/demo-complete layering before external demo recording.
-- Recommended minimal fix: suppress or defer `demo.complete` overlay while `RunState.IsInCombat` is true, then show completion after combat panel closes.
+- Fixed: `demo.complete` overlay and result text are hidden while `RunState.IsInCombat` is true.
+- Fixed: combat panel is active only during active combat, then closes before DemoComplete display.
 - Recommended polish later: reduce result text density or move result panel away from the lower combat panel zone at `1080x1920`.
 
 ## Blockers
 
 - No screenshot blocker remains.
-- UI blocker: CombatGate screenshot confirms `demo.complete`/result overlay conflict with the combat panel.
+- CombatGate demo complete layering blocker is closed by screenshots 04/05.

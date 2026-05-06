@@ -209,6 +209,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.IsTrue(hud.CombatPanelVisible);
+            Assert.IsFalse(GameObject.Find("Demo Complete Text") != null && GameObject.Find("Demo Complete Text").activeInHierarchy);
             var beforeEnemyHp = controller.GetSnapshot().EnemyHp;
             var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
             var defendButton = GameObject.Find("Combat Button Defend").GetComponent<Button>();
@@ -239,7 +240,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(controller.RunState.IsInCombat);
             Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
             StringAssert.Contains("demo.complete", hud.ResultMessage);
-            Assert.IsTrue(hud.CombatPanelVisible);
+            Assert.IsFalse(hud.CombatPanelVisible);
+            Assert.IsTrue(GameObject.Find("Demo Complete Text").activeInHierarchy);
         }
 
         [UnityTest]
