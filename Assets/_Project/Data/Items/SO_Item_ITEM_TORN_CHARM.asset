@@ -16,3 +16,6 @@ MonoBehaviour:
   displayNameKey: PLACEHOLDER_ITEM_TORN_CHARM_NAME
   descriptionKey: PLACEHOLDER_ITEM_TORN_CHARM_DESC
   maxStack: 99
+  tier: 0
+  passiveTrigger:
+  numericParams: []

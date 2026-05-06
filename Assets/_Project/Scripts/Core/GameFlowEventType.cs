@@ -16,6 +16,12 @@ namespace HwigiTower.Core
         ReflectionSaved = 11,
         RecallLoaded = 12,
         NpcStageChanged = 13,
-        RunCompleted = 14
+        RunCompleted = 14,
+        // per GDD D-022 / OQ-011
+        CombatRoundResolved = 15,
+        TraitUnlocked = 16,
+        ShopRerolled = 17,
+        PlayerDefeated = 18,
+        EnemyDefeated = 19
     }
 }

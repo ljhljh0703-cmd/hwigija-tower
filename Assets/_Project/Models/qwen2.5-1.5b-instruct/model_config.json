@@ -1,0 +1,70 @@
+{
+  "modelId": "qwen2.5-1.5b-instruct",
+  "baseModel": "Qwen/Qwen2.5-1.5B-Instruct",
+  "trainingMethod": "BIW + SFT + LoRA (fallback — D-005 불합격 시 실행)",
+  "version": "0.1.0",
+  "status": "standby",
+
+  "runtime": "mlc-llm",
+  "runtimeFallback": "llama-cpp",
+  "platform": "android-arm64-vulkan",
+
+  "compiledPath": "LLM/qwen2.5-1.5b-instruct/compiled/android",
+  "tokenizerPath": "LLM/qwen2.5-1.5b-instruct/tokenizer",
+
+  "contextWindow": 512,
+  "maxInputTokens": 450,
+  "maxOutputTokens": 100,
+
+  "temperature": 0.4,
+  "temperatureByStage": {
+    "S0": 0.3,
+    "S1": 0.3,
+    "S2": 0.4,
+    "S3": 0.7,
+    "S4": 0.9,
+    "S5": 0.2
+  },
+  "topP": 0.9,
+  "repetitionPenalty": 1.1,
+  "stopTokens": ["\n\n", "</s>", "[END]"],
+
+  "deterministicCacheRequired": true,
+  "cacheKeyFormat": "run_id + prompt_hash",
+  "deterministicDemoRuns": [1, 2, 3, 4, 5],
+
+  "quantization": {
+    "target": "q4f16_1",
+    "format": "mlc",
+    "fallbackFormat": "Q4_K_M_gguf"
+  },
+
+  "license": "apache-2.0",
+  "checksum": null,
+
+  "constraints": {
+    "callsPerRun": 2,
+    "latencyFirstTokenMs": 300,
+    "latencyFullOutputMs": 1500,
+    "modelFileSizeMb": 900,
+    "runtimeMemoryMb": 700
+  },
+
+  "honorificByStage": {
+    "S0": "당신",
+    "S1": "당신",
+    "S2": "오빠",
+    "S3": "오빠/당신 혼재",
+    "S4": "호칭 상실",
+    "S5_rest": "오빠",
+    "S5_loop": "당신"
+  },
+
+  "systemPrompt": "너는 마타이오스. 잃어버린 것을 찾아 탑에 들어온 소녀 전사.\n은발, 대검, 피로한 눈. 말은 짧고 여백이 많다.\n기억이 선명할 때는 따뜻하게, 흐려질 때는 단편적으로 말한다.\n모르는 것은 모른다고 한다. 지어내지 않는다.",
+
+  "knownFailureCases": [
+    "1.5B → q4 양자화 후 ~900MB, 앱 분리 다운로드 필수",
+    "callsPerRun 2로 축소 — reflection은 캐시 전용",
+    "한국어 품질 HCX-SEED 대비 열위 — LoRA 보정 필수"
+  ]
+}

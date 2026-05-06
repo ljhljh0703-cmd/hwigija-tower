@@ -16,4 +16,5 @@ MonoBehaviour:
   displayName: PLACEHOLDER_ABILITY_SCOUT_NAME
   tag:
   description: PLACEHOLDER_ABILITY_SCOUT_DESC
+  costGold: 20
   numericParams: []

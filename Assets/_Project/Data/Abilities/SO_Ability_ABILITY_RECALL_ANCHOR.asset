@@ -16,4 +16,5 @@ MonoBehaviour:
   displayName: PLACEHOLDER_ABILITY_RECALL_ANCHOR_NAME
   tag:
   description: PLACEHOLDER_ABILITY_RECALL_ANCHOR_DESC
+  costGold: 20
   numericParams: []

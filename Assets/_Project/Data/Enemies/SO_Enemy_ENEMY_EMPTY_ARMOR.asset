@@ -16,3 +16,8 @@ MonoBehaviour:
   hp: 12
   attack: 3
   patternId: PATTERN_PLACEHOLDER
+  pattern: {fileID: 0}
+  goldReward: 0
+  xpReward: 0
+  glitchDelta: 0
+  affinityDelta: 0

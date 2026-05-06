@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="52" result="Passed" total="52" passed="52" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:28Z" duration="1.6742931">
+  <test-suite type="TestSuite" id="1000" name="hwigija-tower" fullname="hwigija-tower" runstate="Runnable" testcasecount="52" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:28Z" duration="1.674293" total="52" passed="52" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1057" name="HwigiTower.EditModeTests.dll" fullname="/Users/godju/Downloads/AI Game/hwigi-tower/Library/ScriptAssemblies/HwigiTower.EditModeTests.dll" runstate="Runnable" testcasecount="52" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:28Z" duration="1.670810" total="52" passed="52" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="54205" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1058" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="52" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:28Z" duration="1.670333" total="52" passed="52" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1059" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="52" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:28Z" duration="1.669917" total="52" passed="52" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1060" name="EditMode" fullname="HwigiTower.Tests.EditMode" runstate="Runnable" testcasecount="52" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:28Z" duration="1.669529" total="52" passed="52" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="CoreArchitectureTests" fullname="HwigiTower.Tests.EditMode.CoreArchitectureTests" classname="HwigiTower.Tests.EditMode.CoreArchitectureTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.015437" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1002" name="DeterministicRandom_ReplaysSameSequenceForSameSeed" fullname="HwigiTower.Tests.EditMode.CoreArchitectureTests.DeterministicRandom_ReplaysSameSequenceForSameSeed" methodname="DeterministicRandom_ReplaysSameSequenceForSameSeed" classname="HwigiTower.Tests.EditMode.CoreArchitectureTests" runstate="Runnable" seed="1187416389" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.006178" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="DeterministicRunContext_CreatesStableSeedKeyForks" fullname="HwigiTower.Tests.EditMode.CoreArchitectureTests.DeterministicRunContext_CreatesStableSeedKeyForks" methodname="DeterministicRunContext_CreatesStableSeedKeyForks" classname="HwigiTower.Tests.EditMode.CoreArchitectureTests" runstate="Runnable" seed="825717747" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.000716" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1005" name="GameFlowEventBus_RaisesEventsInCallOrder" fullname="HwigiTower.Tests.EditMode.CoreArchitectureTests.GameFlowEventBus_RaisesEventsInCallOrder" methodname="GameFlowEventBus_RaisesEventsInCallOrder" classname="HwigiTower.Tests.EditMode.CoreArchitectureTests" runstate="Runnable" seed="1779932306" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.001004" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="NpcStateMachine_AppliesMatchingTriggerOnly" fullname="HwigiTower.Tests.EditMode.CoreArchitectureTests.NpcStateMachine_AppliesMatchingTriggerOnly" methodname="NpcStateMachine_AppliesMatchingTriggerOnly" classname="HwigiTower.Tests.EditMode.CoreArchitectureTests" runstate="Runnable" seed="209556681" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.001659" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1006" name="DeterministicCacheTests" fullname="HwigiTower.Tests.EditMode.DeterministicCacheTests" classname="HwigiTower.Tests.EditMode.DeterministicCacheTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.002295" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1008" name="CacheKey_UsesRunIdAndPromptHash" fullname="HwigiTower.Tests.EditMode.DeterministicCacheTests.CacheKey_UsesRunIdAndPromptHash" methodname="CacheKey_UsesRunIdAndPromptHash" classname="HwigiTower.Tests.EditMode.DeterministicCacheTests" runstate="Runnable" seed="998679905" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.000450" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="InMemoryRepo_DoesNotReturnCacheForDifferentRunId" fullname="HwigiTower.Tests.EditMode.DeterministicCacheTests.InMemoryRepo_DoesNotReturnCacheForDifferentRunId" methodname="InMemoryRepo_DoesNotReturnCacheForDifferentRunId" classname="HwigiTower.Tests.EditMode.DeterministicCacheTests" runstate="Runnable" seed="500016046" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.000999" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="InMemoryRepo_ReturnsCachedResponseForSameRunAndPromptHash" fullname="HwigiTower.Tests.EditMode.DeterministicCacheTests.InMemoryRepo_ReturnsCachedResponseForSameRunAndPromptHash" methodname="InMemoryRepo_ReturnsCachedResponseForSameRunAndPromptHash" classname="HwigiTower.Tests.EditMode.DeterministicCacheTests" runstate="Runnable" seed="1488037899" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.000166" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="PromptHash_IsStableForSamePrompt" fullname="HwigiTower.Tests.EditMode.DeterministicCacheTests.PromptHash_IsStableForSamePrompt" methodname="PromptHash_IsStableForSamePrompt" classname="HwigiTower.Tests.EditMode.DeterministicCacheTests" runstate="Runnable" seed="1586043576" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.000077" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1011" name="EncounterPipelineV02Tests" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:27Z" duration="1.080537" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1024" name="Baker_BakesSamplePackIntoFormalEncounterAssets" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Baker_BakesSamplePackIntoFormalEncounterAssets" methodname="Baker_BakesSamplePackIntoFormalEncounterAssets" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="1173995079" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.164392" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Encounter bake v0.2: validation=valid; dryRun=False; assets=3; created=0; updated=3; reports=0
+]]></output>
+              </test-case>
+              <test-case id="1026" name="Baker_DryRunReportsSourceHashAndStableIdConflicts" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Baker_DryRunReportsSourceHashAndStableIdConflicts" methodname="Baker_DryRunReportsSourceHashAndStableIdConflicts" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="838535563" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:26Z" duration="0.132622" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Encounter bake v0.2: validation=valid; dryRun=False; assets=3; created=0; updated=3; reports=0
+Encounter bake v0.2: validation=valid; dryRun=True; assets=3; created=0; updated=3; reports=1
+Encounter bake v0.2: validation=valid; dryRun=True; assets=3; created=0; updated=3; reports=2
+]]></output>
+              </test-case>
+              <test-case id="1025" name="Baker_DryRunThenBakesFullPackIntoFormalEncounterAssets" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Baker_DryRunThenBakesFullPackIntoFormalEncounterAssets" methodname="Baker_DryRunThenBakesFullPackIntoFormalEncounterAssets" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="1630165975" result="Passed" start-time="2026-05-04 07:10:26Z" end-time="2026-05-04 07:10:27Z" duration="0.360458" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Encounter bake v0.2: validation=valid; dryRun=True; assets=25; created=0; updated=25; reports=0
+Encounter bake v0.2: validation=valid; dryRun=False; assets=25; created=0; updated=25; reports=0
+]]></output>
+              </test-case>
+              <test-case id="1013" name="FullPack_PassesV02Validation" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.FullPack_PassesV02Validation" methodname="FullPack_PassesV02Validation" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="569684312" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.002611" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1014" name="RuntimeCatalog_BuildsRequiredStableIdLookups" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.RuntimeCatalog_BuildsRequiredStableIdLookups" methodname="RuntimeCatalog_BuildsRequiredStableIdLookups" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="1103071459" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.142114" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="RuntimeCatalogReferenceValidator_FullPackHasNoMissingRefsAndRecognizesMemoryFragments" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.RuntimeCatalogReferenceValidator_FullPackHasNoMissingRefsAndRecognizesMemoryFragments" methodname="RuntimeCatalogReferenceValidator_FullPackHasNoMissingRefsAndRecognizesMemoryFragments" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="615536081" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.136906" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1016" name="RuntimeCatalogReferenceValidator_ReportsDuplicateEncounterStableIds" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.RuntimeCatalogReferenceValidator_ReportsDuplicateEncounterStableIds" methodname="RuntimeCatalogReferenceValidator_ReportsDuplicateEncounterStableIds" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="33530726" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.136661" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="SamplePack_PassesV02Validation" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.SamplePack_PassesV02Validation" methodname="SamplePack_PassesV02Validation" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="1720677934" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000501" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1017" name="ValidationCases_RunnerMatchesExpectedResults" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.ValidationCases_RunnerMatchesExpectedResults" methodname="ValidationCases_RunnerMatchesExpectedResults" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="1998330788" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.002183" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1020" name="Validator_FailsInvalidAssetPath" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Validator_FailsInvalidAssetPath" methodname="Validator_FailsInvalidAssetPath" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="602815259" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000155" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1023" name="Validator_FailsMoralChoiceWithoutAffinityOrGlitch" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Validator_FailsMoralChoiceWithoutAffinityOrGlitch" methodname="Validator_FailsMoralChoiceWithoutAffinityOrGlitch" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="709401292" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000075" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1019" name="Validator_FailsOldNpcStageEnum" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Validator_FailsOldNpcStageEnum" methodname="Validator_FailsOldNpcStageEnum" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="718294533" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000050" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1022" name="Validator_FailsShopMissingGoldRequirement" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Validator_FailsShopMissingGoldRequirement" methodname="Validator_FailsShopMissingGoldRequirement" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="510897251" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000071" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1021" name="Validator_FailsSilentChoice" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Validator_FailsSilentChoice" methodname="Validator_FailsSilentChoice" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="2125325253" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000053" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="Validator_FailsWhenEscapePolicyIsPresent" fullname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests.Validator_FailsWhenEscapePolicyIsPresent" methodname="Validator_FailsWhenEscapePolicyIsPresent" classname="HwigiTower.Tests.EditMode.EncounterPipelineV02Tests" runstate="Runnable" seed="1293541475" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000052" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1027" name="RuntimeShellTests" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" testcasecount="29" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:28Z" duration="0.570118" total="29" passed="29" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1031" name="CachedLLMProvider_ReusesStoredResponse" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.CachedLLMProvider_ReusesStoredResponse" methodname="CachedLLMProvider_ReusesStoredResponse" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="875518523" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000338" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="CombatAbilityModifiers_UsesAbilityNumericParams" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.CombatAbilityModifiers_UsesAbilityNumericParams" methodname="CombatAbilityModifiers_UsesAbilityNumericParams" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="2058073001" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000810" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1029" name="CombatController_ResolvesDeterministicRounds" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.CombatController_ResolvesDeterministicRounds" methodname="CombatController_ResolvesDeterministicRounds" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="123355263" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000312" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1051" name="DemoProgression_CompletesOnlyAfterRequiredFourEncounters" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.DemoProgression_CompletesOnlyAfterRequiredFourEncounters" methodname="DemoProgression_CompletesOnlyAfterRequiredFourEncounters" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="247261856" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.012052" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="DemoProgression_DoesNotAdvanceOrReapplyOnResolvedRevisit" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.DemoProgression_DoesNotAdvanceOrReapplyOnResolvedRevisit" methodname="DemoProgression_DoesNotAdvanceOrReapplyOnResolvedRevisit" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1811888124" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000691" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="DemoProgression_OrderIsReproducibleForSameSeed" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.DemoProgression_OrderIsReproducibleForSameSeed" methodname="DemoProgression_OrderIsReproducibleForSameSeed" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1532422176" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000381" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1041" name="EncounterRuntimeResolver_AppliesChoiceEffects" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_AppliesChoiceEffects" methodname="EncounterRuntimeResolver_AppliesChoiceEffects" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="733192752" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000717" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1043" name="EncounterRuntimeResolver_BlocksChoiceWhenRequirementFails" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_BlocksChoiceWhenRequirementFails" methodname="EncounterRuntimeResolver_BlocksChoiceWhenRequirementFails" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="90695614" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000272" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1044" name="EncounterRuntimeResolver_HandlesHiddenAndDisabledVisibleChoices" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_HandlesHiddenAndDisabledVisibleChoices" methodname="EncounterRuntimeResolver_HandlesHiddenAndDisabledVisibleChoices" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="2098052538" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000458" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="EncounterRuntimeResolver_MemoryUnlockUpdatesRunStateDeterministically" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_MemoryUnlockUpdatesRunStateDeterministically" methodname="EncounterRuntimeResolver_MemoryUnlockUpdatesRunStateDeterministically" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="974937105" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.130672" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1045" name="EncounterRuntimeResolver_ShopSpendsGoldAndAddsItem" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_ShopSpendsGoldAndAddsItem" methodname="EncounterRuntimeResolver_ShopSpendsGoldAndAddsItem" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1609811757" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000361" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1049" name="EncounterRuntimeResolver_StartCombatEntersCombatFlow" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_StartCombatEntersCombatFlow" methodname="EncounterRuntimeResolver_StartCombatEntersCombatFlow" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1144850620" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.000428" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1050" name="EncounterRuntimeResolver_UsesCatalogEnemyForCombatHandoff" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_UsesCatalogEnemyForCombatHandoff" methodname="EncounterRuntimeResolver_UsesCatalogEnemyForCombatHandoff" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1141603144" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.132609" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1046" name="EncounterRuntimeResolver_UsesCatalogForShopItemAndAbility" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_UsesCatalogForShopItemAndAbility" methodname="EncounterRuntimeResolver_UsesCatalogForShopItemAndAbility" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1889083153" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:27Z" duration="0.136191" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="EncounterRuntimeResolver_UsesCatalogRewardBundleEntries" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterRuntimeResolver_UsesCatalogRewardBundleEntries" methodname="EncounterRuntimeResolver_UsesCatalogRewardBundleEntries" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="227927306" result="Passed" start-time="2026-05-04 07:10:27Z" end-time="2026-05-04 07:10:28Z" duration="0.137442" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="EncounterSelector_ReplaysSameChoiceForSameRunAndNode" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.EncounterSelector_ReplaysSameChoiceForSameRunAndNode" methodname="EncounterSelector_ReplaysSameChoiceForSameRunAndNode" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1639225360" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000970" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="OnDeviceLLMProvider_FallsBackWhenNativePluginIsMissing" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.OnDeviceLLMProvider_FallsBackWhenNativePluginIsMissing" methodname="OnDeviceLLMProvider_FallsBackWhenNativePluginIsMissing" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1153788148" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000126" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="PrototypeRunState_BattleEmitsCombatAndCompletionEvents" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_BattleEmitsCombatAndCompletionEvents" methodname="PrototypeRunState_BattleEmitsCombatAndCompletionEvents" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="574264527" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000774" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1042" name="PrototypeRunState_BlocksResolvedEncounterChoiceRevisit" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_BlocksResolvedEncounterChoiceRevisit" methodname="PrototypeRunState_BlocksResolvedEncounterChoiceRevisit" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1097544118" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000326" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1037" name="PrototypeRunState_ClampsCoreRunStateValues" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_ClampsCoreRunStateValues" methodname="PrototypeRunState_ClampsCoreRunStateValues" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="624195354" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000133" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="PrototypeRunState_ForwardsRunEventsToAttachedNpcStateMachine" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_ForwardsRunEventsToAttachedNpcStateMachine" methodname="PrototypeRunState_ForwardsRunEventsToAttachedNpcStateMachine" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1640380253" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000265" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1040" name="PrototypeRunState_ModifiesGlitchAndAffinity" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_ModifiesGlitchAndAffinity" methodname="PrototypeRunState_ModifiesGlitchAndAffinity" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="803059145" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000060" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="PrototypeRunState_RemnantCompletesRunAndSavesReflection" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_RemnantCompletesRunAndSavesReflection" methodname="PrototypeRunState_RemnantCompletesRunAndSavesReflection" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1973781565" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000125" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="PrototypeRunState_RestRestoresPersistentPlayerHp" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_RestRestoresPersistentPlayerHp" methodname="PrototypeRunState_RestRestoresPersistentPlayerHp" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="166644049" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.001386" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1038" name="PrototypeRunState_ShopFailsWhenGoldIsInsufficient" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_ShopFailsWhenGoldIsInsufficient" methodname="PrototypeRunState_ShopFailsWhenGoldIsInsufficient" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="361648236" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000262" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1039" name="PrototypeRunState_ShopSpendsGoldAndGrantsAbility" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.PrototypeRunState_ShopSpendsGoldAndGrantsAbility" methodname="PrototypeRunState_ShopSpendsGoldAndGrantsAbility" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="816601652" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000110" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="ReflectionPipeline_SavesReflectionAndBuildsRecentRecallPrompt" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.ReflectionPipeline_SavesReflectionAndBuildsRecentRecallPrompt" methodname="ReflectionPipeline_SavesReflectionAndBuildsRecentRecallPrompt" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="526394584" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000107" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="SqliteRepo_ExposesSchemaWithoutExternalPlugin" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.SqliteRepo_ExposesSchemaWithoutExternalPlugin" methodname="SqliteRepo_ExposesSchemaWithoutExternalPlugin" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="378483381" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000148" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="SynergyDetector_ActivatesWhenRequiredTagCountIsMet" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.SynergyDetector_ActivatesWhenRequiredTagCountIsMet" methodname="SynergyDetector_ActivatesWhenRequiredTagCountIsMet" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="2110951255" result="Passed" start-time="2026-05-04 07:10:28Z" end-time="2026-05-04 07:10:28Z" duration="0.000478" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/DefaultCompany/hwigija-tower/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
