@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-06 22:40 — Unityless W2 production readiness 문서 패킷 작성
+- **Phase**: W2-1
+- **Done**:
+  - `origin/Proto` 기준 커밋 `57077ee`를 `Juho/Codex`에 병합해 viewport screenshot / CombatGate layering fix 맥락 반영
+  - Unity 없이 기존 문서와 5개 screenshot만 기반으로 W2 production readiness 검토 범위 정리
+  - demo recording runbook, screenshot visual audit, debug label 제거 명세, 다음 개발 지시서 작성
+  - 아트/사운드/AI 상태표와 모델 수령 시 Unity 전 평가 packet 작성
+- **Files**: 변경/추가 8개 (`Docs/Outsource/Juho/W2ProductionReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음
+- **Next**: 큰 world/debug node label 숨김 구현 후 1080x1920 recording screenshot QA 진행
+- **Agent**: Codex
+
+---
+
 ### 2026-05-06 15:42 — W2 demo readiness docs 최신 전투 UI 기준 refresh
 - **Phase**: W2-1
 - **Done**:
