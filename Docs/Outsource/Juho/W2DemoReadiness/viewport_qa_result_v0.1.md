@@ -41,6 +41,28 @@
 
 Remaining visual risk: the same full-body Mataios illustration appears both as HUD portrait and cutscene image. This is acceptable for scaffold QA, but a cropped/transparent portrait and separate cutscene image slots are still recommended before public recording.
 
+## Presentation Polish QA Addendum 2026-05-07
+
+- Tested commit: local P0 presentation polish after `3f4cdab` screenshot audit
+- Target viewport: `1080x1920` portrait
+- QA method: PlayMode screenshot capture through a temporary camera-render runner, removed after capture
+- Screenshot file paths:
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_16_shop_polish.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_17_memory_cutscene_polish.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_18_combatgate_cutscene_polish.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_19_active_combat_polish.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_20_demo_complete_polish.png`
+
+| QA item | Result | Notes |
+|---|---:|---|
+| Recording labels | Pass | CamelCase route labels replaced in recording mode; raw stableIds/textKeys remain debug-only |
+| Active combat route gating | Pass | Active combat shows `Combat in progress`; DemoComplete is not marked complete until combat closes |
+| Cutscene composition | Pass | Cutscene uses scrim + focus frame + encounter-specific image slots; full-body Mataios is no longer reused as center cutscene art |
+| Combat readability | Pass | Enemy sprite, visual HP bars, action buttons, and disabled Skill state are visible |
+| Asset slot binding | Pass | Shop, moral, memory, combat, completion backgrounds/focus/portrait/enemy slots are wired through `SO_DemoPresentationData` |
+
+Remaining visual risk: Combat start and DemoComplete currently use available background-style focus art rather than final approved cutscene plates. This is recording-safe scaffolding, not final art direction.
+
 ## Validation
 
 | Check | Result | Evidence |

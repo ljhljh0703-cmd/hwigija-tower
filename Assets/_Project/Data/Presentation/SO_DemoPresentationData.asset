@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0091e88dbabb94742bdcccae9360d366, type: 3}
   m_Name: SO_DemoPresentationData
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.UI.DemoPresentationData
-  defaultMataiosPortrait: {fileID: 21300000, guid: bb62d23ff1824ebb813932a8f2c13d4b, type: 3}
+  defaultMataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
   slots:
   - encounterStableId: ENC_SHOP_01
     displayName: Shop
-    backgroundSprite: {fileID: 0}
+    backgroundSprite: {fileID: 21300000, guid: 969e3db55755b46e5beb783cf1e38e3f, type: 3}
     titleTextKey: PLACEHOLDER_ENC_SHOP_01_TITLE
     bodyTextKey: PLACEHOLDER_ENC_SHOP_01_BODY
-    mataiosPortrait: {fileID: 21300000, guid: bb62d23ff1824ebb813932a8f2c13d4b, type: 3}
+    mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
     enemySprite: {fileID: 0}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
@@ -28,11 +28,11 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_MORAL_CHOICE_01
-    displayName: MoralChoice
-    backgroundSprite: {fileID: 0}
+    displayName: Decision
+    backgroundSprite: {fileID: 21300000, guid: 047e5ba6da7a14c98be1618ba95948d8, type: 3}
     titleTextKey: PLACEHOLDER_ENC_MORAL_CHOICE_01_TITLE
     bodyTextKey: PLACEHOLDER_ENC_MORAL_CHOICE_01_BODY
-    mataiosPortrait: {fileID: 21300000, guid: bb62d23ff1824ebb813932a8f2c13d4b, type: 3}
+    mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
     enemySprite: {fileID: 0}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
@@ -41,25 +41,25 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_MEMORY_FRAGMENT_01
-    displayName: MemoryFragment
-    backgroundSprite: {fileID: 0}
+    displayName: Memory
+    backgroundSprite: {fileID: 21300000, guid: 64bb8f8e97cfc4c138a4b3614e14587a, type: 3}
     titleTextKey: PLACEHOLDER_MEM_FRAGMENT_01_TITLE
     bodyTextKey: PLACEHOLDER_ENC_MEMORY_FRAGMENT_01_BODY
-    mataiosPortrait: {fileID: 21300000, guid: bb62d23ff1824ebb813932a8f2c13d4b, type: 3}
+    mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
     enemySprite: {fileID: 0}
-    memoryFragmentSprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 21300000, guid: 7182560263f734a59a51eb2c184c9672, type: 3}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}
     memoryFragmentCutscene: {fileID: 11400000, guid: 8ac99426a88842fbad9a2f2c5f0409a6, type: 2}
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_COMBAT_GATE_01
-    displayName: CombatGate
-    backgroundSprite: {fileID: 0}
+    displayName: Combat
+    backgroundSprite: {fileID: 21300000, guid: dc026561195a64ace934931c2ed5c285, type: 3}
     titleTextKey: PLACEHOLDER_ENC_COMBAT_GATE_01_TITLE
     bodyTextKey: PLACEHOLDER_ENC_COMBAT_GATE_01_BODY
-    mataiosPortrait: {fileID: 21300000, guid: bb62d23ff1824ebb813932a8f2c13d4b, type: 3}
-    enemySprite: {fileID: 0}
+    mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
+    enemySprite: {fileID: 21300000, guid: 3551576cb7aa3414bba08acef4c9d6ab, type: 3}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}

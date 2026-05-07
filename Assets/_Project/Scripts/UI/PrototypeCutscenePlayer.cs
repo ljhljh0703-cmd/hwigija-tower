@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,12 +8,15 @@ namespace HwigiTower.UI
     public sealed class PrototypeCutscenePlayer : MonoBehaviour
     {
         [SerializeField] private CanvasGroup canvasGroup;
+        [SerializeField] private Image scrim;
+        [SerializeField] private Image frame;
         [SerializeField] private Image image;
         [SerializeField] private Text text;
 
         private Coroutine _playRoutine;
 
         public bool IsPlaying => _playRoutine != null;
+        public event Action Finished;
 
         public void Play(CutsceneData cutscene)
         {
@@ -35,6 +39,7 @@ namespace HwigiTower.UI
         public void Hide()
         {
             EnsureView();
+            var wasPlaying = _playRoutine != null;
             if (_playRoutine != null)
             {
                 StopCoroutine(_playRoutine);
@@ -49,6 +54,10 @@ namespace HwigiTower.UI
             }
 
             gameObject.SetActive(false);
+            if (wasPlaying)
+            {
+                Finished?.Invoke();
+            }
         }
 
         private IEnumerator PlayRoutine(CutsceneData cutscene)
@@ -65,6 +74,7 @@ namespace HwigiTower.UI
                 image.sprite = step.Image;
                 image.preserveAspect = true;
                 image.gameObject.SetActive(step.Image != null);
+                frame.gameObject.SetActive(step.Image != null);
                 text.text = ShouldShowTextKey(step.TextKey) ? step.TextKey : string.Empty;
                 yield return FadeTo(1f, step.FadeInSeconds);
                 yield return new WaitForSeconds(step.DurationSeconds);
@@ -81,8 +91,8 @@ namespace HwigiTower.UI
                 yield break;
             }
 
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = targetAlpha > 0f || canvasGroup.alpha > 0.01f;
+            canvasGroup.interactable = targetAlpha > 0f || canvasGroup.alpha > 0.01f;
             if (duration <= 0f)
             {
                 canvasGroup.alpha = targetAlpha;
@@ -108,13 +118,41 @@ namespace HwigiTower.UI
                 canvasGroup = gameObject.GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
             }
 
+            if (scrim == null)
+            {
+                var scrimObject = new GameObject("Cutscene Scrim");
+                scrimObject.transform.SetParent(transform, false);
+                var rect = scrimObject.AddComponent<RectTransform>();
+                rect.anchorMin = Vector2.zero;
+                rect.anchorMax = Vector2.one;
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.zero;
+                scrim = scrimObject.AddComponent<Image>();
+                scrim.color = new Color(0.01f, 0.015f, 0.02f, 0.72f);
+                scrim.raycastTarget = true;
+            }
+
+            if (frame == null)
+            {
+                var frameObject = new GameObject("Cutscene Focus Frame");
+                frameObject.transform.SetParent(transform, false);
+                var rect = frameObject.AddComponent<RectTransform>();
+                rect.anchorMin = new Vector2(0.12f, 0.58f);
+                rect.anchorMax = new Vector2(0.88f, 0.88f);
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.zero;
+                frame = frameObject.AddComponent<Image>();
+                frame.color = new Color(0.05f, 0.06f, 0.07f, 0.88f);
+                frame.raycastTarget = false;
+            }
+
             if (image == null)
             {
                 var imageObject = new GameObject("Cutscene Image");
-                imageObject.transform.SetParent(transform, false);
+                imageObject.transform.SetParent(frame.transform, false);
                 var rect = imageObject.AddComponent<RectTransform>();
-                rect.anchorMin = new Vector2(0.08f, 0.52f);
-                rect.anchorMax = new Vector2(0.92f, 0.86f);
+                rect.anchorMin = new Vector2(0.04f, 0.06f);
+                rect.anchorMax = new Vector2(0.96f, 0.94f);
                 rect.offsetMin = Vector2.zero;
                 rect.offsetMax = Vector2.zero;
                 image = imageObject.AddComponent<Image>();
@@ -126,8 +164,8 @@ namespace HwigiTower.UI
                 var textObject = new GameObject("Cutscene Text");
                 textObject.transform.SetParent(transform, false);
                 var rect = textObject.AddComponent<RectTransform>();
-                rect.anchorMin = new Vector2(0.10f, 0.42f);
-                rect.anchorMax = new Vector2(0.90f, 0.52f);
+                rect.anchorMin = new Vector2(0.14f, 0.47f);
+                rect.anchorMax = new Vector2(0.86f, 0.56f);
                 rect.offsetMin = Vector2.zero;
                 rect.offsetMax = Vector2.zero;
                 text = textObject.AddComponent<Text>();
