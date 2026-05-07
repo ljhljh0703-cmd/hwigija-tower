@@ -62,6 +62,7 @@ namespace HwigiTower.Run
 
             if (!RequirementsMet(state, encounter, choice))
             {
+                state.RecordNpcReaction(choice.npcReactionKey);
                 return new PrototypeEncounterChoiceResolution(choice.stableId, false, "choice failed: requirements not met");
             }
 
@@ -89,6 +90,7 @@ namespace HwigiTower.Run
                 message += " | " + effectSummary;
             }
 
+            state.RecordNpcReaction(choice.npcReactionKey);
             return new PrototypeEncounterChoiceResolution(choice.stableId, true, message);
         }
 

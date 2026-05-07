@@ -162,6 +162,11 @@ namespace HwigiTower.Encounters
             serialized.FindProperty("displayNameKey").stringValue = "PLACEHOLDER_" + stableId + "_NAME";
             serialized.FindProperty("descriptionKey").stringValue = "PLACEHOLDER_" + stableId + "_DESC";
             serialized.FindProperty("maxStack").intValue = 99;
+            serialized.FindProperty("passiveTrigger").stringValue = stableId == "ITEM_FIELD_BANDAGE" ? "combat_start" : string.Empty;
+            SetNumericParams(serialized.FindProperty("numericParams"),
+                stableId == "ITEM_FIELD_BANDAGE"
+                    ? new[] { new NumericParamSpec("max_hp_bonus", 2f), new NumericParamSpec("hp_restore", 4f) }
+                    : new NumericParamSpec[0]);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(item);
         }
@@ -173,7 +178,12 @@ namespace HwigiTower.Encounters
             serialized.FindProperty("displayName").stringValue = "PLACEHOLDER_" + stableId + "_NAME";
             serialized.FindProperty("tag").stringValue = string.Empty;
             serialized.FindProperty("description").stringValue = "PLACEHOLDER_" + stableId + "_DESC";
-            serialized.FindProperty("numericParams").arraySize = 0;
+            SetNumericParams(serialized.FindProperty("numericParams"),
+                stableId == "ABILITY_SCOUT"
+                    ? new[] { new NumericParamSpec("player.attack_bonus", 1f) }
+                    : stableId == "ABILITY_RECALL_ANCHOR"
+                        ? new[] { new NumericParamSpec("recall_anchor_restore", 6f) }
+                        : new NumericParamSpec[0]);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(ability);
         }
@@ -239,6 +249,29 @@ namespace HwigiTower.Encounters
             for (var i = 0; i < values.Length; i++)
             {
                 property.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+            }
+        }
+
+        private readonly struct NumericParamSpec
+        {
+            public NumericParamSpec(string key, float value)
+            {
+                Key = key;
+                Value = value;
+            }
+
+            public string Key { get; }
+            public float Value { get; }
+        }
+
+        private static void SetNumericParams(SerializedProperty property, NumericParamSpec[] values)
+        {
+            property.arraySize = values.Length;
+            for (var i = 0; i < values.Length; i++)
+            {
+                var element = property.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("key").stringValue = values[i].Key;
+                element.FindPropertyRelative("value").floatValue = values[i].Value;
             }
         }
 

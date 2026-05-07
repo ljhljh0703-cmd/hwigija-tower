@@ -67,8 +67,16 @@ namespace HwigiTower.Run
         {
             RunState = new PrototypeRunState(RunContext.RunId, EventBus) { AutoResolveCombat = autoResolveCombat };
             RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
-            RunState.AttachDemoRunPath(roomDefinition == null ? null : roomDefinition.DemoRunPath);
+            if (roomDefinition == null)
+            {
+                RunState.AttachDemoRunPath(null);
+            }
+            else
+            {
+                RunState.AttachFloorRunPaths(roomDefinition.FloorRunPaths, roomDefinition.DemoRunPath);
+            }
             ConfigureHudDemoRoute();
+            RunState.ModifyGold(6);
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, RunContext.RunId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, RunContext.RunId, RunContext.RunId, string.Empty));
         }
@@ -161,6 +169,18 @@ namespace HwigiTower.Run
             return resolution;
         }
 
+        public PrototypeNodeResolution ResolveNextFloor()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            var resolution = RunState.ResolveNextFloor();
+            ConfigureHudDemoRoute();
+            return resolution;
+        }
+
         public PrototypeNodeResolution ResolveCombatAction(CombatAction action)
         {
             if (RunState == null)
@@ -190,9 +210,13 @@ namespace HwigiTower.Run
                     " | gold reward " + snapshot.LastCombatGoldReward +
                     " | glitch " + FormatDelta(snapshot.LastCombatGlitchDelta) +
                     " | affinity " + FormatDelta(snapshot.LastCombatAffinityDelta);
-                if (snapshot.DemoStatus == "demo.complete")
+                if (snapshot.RunClear)
                 {
-                    message += " | demo.complete";
+                    message += " | run.clear";
+                }
+                else if (snapshot.StairUnlocked)
+                {
+                    message += " | stair unlocked";
                 }
             }
 
@@ -275,7 +299,8 @@ namespace HwigiTower.Run
             {
                 hud.BindRoomController(this);
                 hud.SetPresentationData(demoPresentationData);
-                hud.ConfigureDemoRoute(roomDefinition == null ? null : roomDefinition.DemoRunPath);
+                var floor = RunState == null ? 1 : RunState.CurrentFloor;
+                hud.ConfigureDemoRoute(roomDefinition == null ? null : roomDefinition.GetRunPathForFloor(floor));
             }
         }
 

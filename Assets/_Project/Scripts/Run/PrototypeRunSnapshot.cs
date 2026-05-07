@@ -36,7 +36,12 @@ namespace HwigiTower.Run
             int lastCombatGlitchDelta = 0,
             int lastCombatAffinityDelta = 0,
             bool lastCombatEnemyDefeated = false,
-            int lastCombatComboDamage = 0)
+            int lastCombatComboDamage = 0,
+            int currentFloor = 1,
+            bool stairUnlocked = false,
+            bool runClear = false,
+            string lastNpcReactionKey = "",
+            int itemCount = 0)
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -72,6 +77,11 @@ namespace HwigiTower.Run
             LastCombatAffinityDelta = lastCombatAffinityDelta;
             LastCombatEnemyDefeated = lastCombatEnemyDefeated;
             LastCombatComboDamage = lastCombatComboDamage;
+            CurrentFloor = currentFloor < 1 ? 1 : currentFloor;
+            StairUnlocked = stairUnlocked;
+            RunClear = runClear;
+            LastNpcReactionKey = lastNpcReactionKey ?? string.Empty;
+            ItemCount = itemCount;
         }
 
         public string RunId { get; }
@@ -108,5 +118,10 @@ namespace HwigiTower.Run
         public int LastCombatAffinityDelta { get; }
         public bool LastCombatEnemyDefeated { get; }
         public int LastCombatComboDamage { get; }
+        public int CurrentFloor { get; }
+        public bool StairUnlocked { get; }
+        public bool RunClear { get; }
+        public string LastNpcReactionKey { get; }
+        public int ItemCount { get; }
     }
 }

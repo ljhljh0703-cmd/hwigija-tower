@@ -17,4 +17,6 @@ MonoBehaviour:
   tag:
   description: PLACEHOLDER_ABILITY_RECALL_ANCHOR_DESC
   costGold: 20
-  numericParams: []
+  numericParams:
+  - key: recall_anchor_restore
+    value: 6

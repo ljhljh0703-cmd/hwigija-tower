@@ -17,5 +17,9 @@ MonoBehaviour:
   descriptionKey: PLACEHOLDER_ITEM_FIELD_BANDAGE_DESC
   maxStack: 99
   tier: 0
-  passiveTrigger:
-  numericParams: []
+  passiveTrigger: combat_start
+  numericParams:
+  - key: max_hp_bonus
+    value: 2
+  - key: hp_restore
+    value: 4
