@@ -227,7 +227,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.IsTrue(hud.CombatPanelVisible);
-            StringAssert.Contains("CombatGate", hud.CombatMessage);
+            StringAssert.Contains("Combat", hud.CombatMessage);
             StringAssert.Contains("Enemy HP", hud.CombatMessage);
             StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
             Assert.IsFalse(GameObject.Find("Demo Complete Text") != null && GameObject.Find("Demo Complete Text").activeInHierarchy);
@@ -260,7 +260,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsFalse(controller.RunState.IsInCombat);
             Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
-            StringAssert.Contains("DemoComplete", hud.ResultMessage);
+            StringAssert.Contains("Run complete", hud.ResultMessage);
             Assert.IsFalse(hud.CombatPanelVisible);
             Assert.IsTrue(GameObject.Find("Demo Complete Text").activeInHierarchy);
         }
@@ -295,7 +295,8 @@ namespace HwigiTower.Tests.PlayMode
             hud.ShowRunState(controller.GetSnapshot());
             hud.ShowRunState(controller.GetSnapshot());
             Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
-            StringAssert.Contains("[current] CombatGate", hud.RouteMessage);
+            StringAssert.Contains("Combat", hud.RouteMessage);
+            StringAssert.DoesNotContain("[current]", hud.RouteMessage);
 
             var combatEncounter = FindEncounter(battleNode, "ENC_COMBAT_GATE_01");
             var combatSelection = new EncounterSelection(battleNode.Definition, combatEncounter);
@@ -321,7 +322,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(controller.RunState.IsInCombat);
             Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
             Assert.IsFalse(hud.CombatPanelVisible);
-            StringAssert.Contains("DemoComplete", hud.RouteMessage);
+            StringAssert.Contains("Run complete", hud.RouteMessage);
             Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
             Assert.IsTrue(Object.FindFirstObjectByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include).IsPlaying);
         }
@@ -342,7 +343,11 @@ namespace HwigiTower.Tests.PlayMode
 
             controller.BeginRun();
             hud.ShowRunState(controller.GetSnapshot());
-            StringAssert.Contains("[current] Shop", hud.RouteMessage);
+            StringAssert.Contains("Shop", hud.RouteMessage);
+            StringAssert.DoesNotContain("[current]", hud.RouteMessage);
+            StringAssert.DoesNotContain("MoralChoice", hud.RouteMessage);
+            StringAssert.DoesNotContain("MemoryFragment", hud.RouteMessage);
+            StringAssert.DoesNotContain("CombatGate", hud.RouteMessage);
             StringAssert.DoesNotContain("ENC_SHOP_01", hud.RouteMessage);
             StringAssert.DoesNotContain("node.shop", hud.RouteMessage);
 
@@ -352,6 +357,7 @@ namespace HwigiTower.Tests.PlayMode
             var button = hud.GetChoiceButton(0);
             Assert.IsNotNull(button);
             var label = ReadButtonText(button);
+            StringAssert.DoesNotContain("Choice 1", label);
             StringAssert.DoesNotContain("CHOICE_", label);
             StringAssert.DoesNotContain("PLACEHOLDER_", label);
         }

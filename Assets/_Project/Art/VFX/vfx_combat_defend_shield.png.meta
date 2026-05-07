@@ -1,0 +1,728 @@
+fileFormatVersion: 2
+guid: 45f6c1a27044f47af807672256db288f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -381851472142307448
+    second: vfx_combat_defend_shield_0
+  - first:
+      213: 6291812915206459289
+    second: vfx_combat_defend_shield_1
+  - first:
+      213: -8648285645038765631
+    second: vfx_combat_defend_shield_2
+  - first:
+      213: 1055490644647410095
+    second: vfx_combat_defend_shield_3
+  - first:
+      213: -2822736898458963807
+    second: vfx_combat_defend_shield_4
+  - first:
+      213: -6975119859120870358
+    second: vfx_combat_defend_shield_5
+  - first:
+      213: -5556307740378676734
+    second: vfx_combat_defend_shield_6
+  - first:
+      213: 193891029456996959
+    second: vfx_combat_defend_shield_7
+  - first:
+      213: -3064455231878532946
+    second: vfx_combat_defend_shield_8
+  - first:
+      213: -7079604346450874251
+    second: vfx_combat_defend_shield_9
+  - first:
+      213: 647302724627130448
+    second: vfx_combat_defend_shield_10
+  - first:
+      213: -9052722046045895786
+    second: vfx_combat_defend_shield_11
+  - first:
+      213: 5600269576805143418
+    second: vfx_combat_defend_shield_12
+  - first:
+      213: 8296186608594611626
+    second: vfx_combat_defend_shield_13
+  - first:
+      213: -2161486127435893518
+    second: vfx_combat_defend_shield_14
+  - first:
+      213: -7531696337521777648
+    second: vfx_combat_defend_shield_15
+  - first:
+      213: 4526156559793356195
+    second: vfx_combat_defend_shield_16
+  - first:
+      213: -5807323921021592898
+    second: vfx_combat_defend_shield_17
+  - first:
+      213: -4998010519237046032
+    second: vfx_combat_defend_shield_18
+  - first:
+      213: 1709881744555861841
+    second: vfx_combat_defend_shield_19
+  - first:
+      213: 5779146218519478240
+    second: vfx_combat_defend_shield_20
+  - first:
+      213: -7299691336474338801
+    second: vfx_combat_defend_shield_21
+  - first:
+      213: 8802113227766984914
+    second: vfx_combat_defend_shield_22
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_0
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 0
+        width: 1002
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88f6ff5fb1463baf0800000000000000
+      internalID: -381851472142307448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_1
+      rect:
+        serializedVersion: 2
+        x: 617
+        y: 1015
+        width: 62
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99f881cc282015750800000000000000
+      internalID: 6291812915206459289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_2
+      rect:
+        serializedVersion: 2
+        x: 662
+        y: 1008
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c9ba53c60e1bf780800000000000000
+      internalID: -8648285645038765631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_3
+      rect:
+        serializedVersion: 2
+        x: 662
+        y: 977
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa9f4f9262bd5ae00800000000000000
+      internalID: 1055490644647410095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_4
+      rect:
+        serializedVersion: 2
+        x: 662
+        y: 968
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a037f01fbf93d8d0800000000000000
+      internalID: -2822736898458963807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_5
+      rect:
+        serializedVersion: 2
+        x: 662
+        y: 960
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2ce353a175633f90800000000000000
+      internalID: -6975119859120870358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_6
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 666
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 202c9f77c8704e2b0800000000000000
+      internalID: -5556307740378676734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_7
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 622
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5a4bef2dd6d0b200800000000000000
+      internalID: 193891029456996959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_8
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 578
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea0fac9e33ed875d0800000000000000
+      internalID: -3064455231878532946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_9
+      rect:
+        serializedVersion: 2
+        x: 725
+        y: 394
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 570fb733b5130cd90800000000000000
+      internalID: -7079604346450874251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_10
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 350
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 058ea83066eabf800800000000000000
+      internalID: 647302724627130448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_11
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 303
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 693461333454e5280800000000000000
+      internalID: -9052722046045895786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_12
+      rect:
+        serializedVersion: 2
+        x: 725
+        y: 307
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a73d5e3328728bd40800000000000000
+      internalID: 5600269576805143418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_13
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 286
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aad62a3f3c9f12370800000000000000
+      internalID: 8296186608594611626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_14
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 275
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f4bf33b1dbd002e0800000000000000
+      internalID: -2161486127435893518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_15
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 266
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01467ede51a0a7790800000000000000
+      internalID: -7531696337521777648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_16
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 253
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ad7948196320de30800000000000000
+      internalID: 4526156559793356195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_17
+      rect:
+        serializedVersion: 2
+        x: 725
+        y: 226
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eba11ef89ad386fa0800000000000000
+      internalID: -5807323921021592898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_18
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 102
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f0d531d9ef73aab0800000000000000
+      internalID: -4998010519237046032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_19
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 94
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1576d282368bab710800000000000000
+      internalID: 1709881744555861841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_20
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 86
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ef35e3ddd6a33050800000000000000
+      internalID: 5779146218519478240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_21
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 15
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0a5377a76942ba90800000000000000
+      internalID: -7299691336474338801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vfx_combat_defend_shield_22
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 0
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d071d55853672a70800000000000000
+      internalID: 8802113227766984914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      vfx_combat_defend_shield_0: -381851472142307448
+      vfx_combat_defend_shield_1: 6291812915206459289
+      vfx_combat_defend_shield_10: 647302724627130448
+      vfx_combat_defend_shield_11: -9052722046045895786
+      vfx_combat_defend_shield_12: 5600269576805143418
+      vfx_combat_defend_shield_13: 8296186608594611626
+      vfx_combat_defend_shield_14: -2161486127435893518
+      vfx_combat_defend_shield_15: -7531696337521777648
+      vfx_combat_defend_shield_16: 4526156559793356195
+      vfx_combat_defend_shield_17: -5807323921021592898
+      vfx_combat_defend_shield_18: -4998010519237046032
+      vfx_combat_defend_shield_19: 1709881744555861841
+      vfx_combat_defend_shield_2: -8648285645038765631
+      vfx_combat_defend_shield_20: 5779146218519478240
+      vfx_combat_defend_shield_21: -7299691336474338801
+      vfx_combat_defend_shield_22: 8802113227766984914
+      vfx_combat_defend_shield_3: 1055490644647410095
+      vfx_combat_defend_shield_4: -2822736898458963807
+      vfx_combat_defend_shield_5: -6975119859120870358
+      vfx_combat_defend_shield_6: -5556307740378676734
+      vfx_combat_defend_shield_7: 193891029456996959
+      vfx_combat_defend_shield_8: -3064455231878532946
+      vfx_combat_defend_shield_9: -7079604346450874251
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

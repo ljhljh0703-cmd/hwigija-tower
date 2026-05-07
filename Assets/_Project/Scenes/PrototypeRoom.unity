@@ -1835,7 +1835,7 @@ MonoBehaviour:
   memoryText: {fileID: 0}
   demoCompleteText: {fileID: 0}
   choiceContainer: {fileID: 0}
-  mataiosPortrait: {fileID: 21300000, guid: bb62d23ff1824ebb813932a8f2c13d4b, type: 3}
+  mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
   presentationData: {fileID: 11400000, guid: 5703f9a7a30146be840838f928a21ea7, type: 2}
   cutscenePlayer: {fileID: 0}
   showRawDebugText: 0

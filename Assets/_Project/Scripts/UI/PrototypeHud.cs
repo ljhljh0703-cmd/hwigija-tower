@@ -24,9 +24,13 @@ namespace HwigiTower.UI
         [SerializeField] private DemoPresentationData presentationData;
         [SerializeField] private PrototypeCutscenePlayer cutscenePlayer;
         [SerializeField] private bool showRawDebugText;
+        [SerializeField] private Image encounterBackgroundImage;
         [SerializeField] private Image npcPortraitImage;
         [SerializeField] private RectTransform combatPanel;
         [SerializeField] private Text combatText;
+        [SerializeField] private Image combatEnemyImage;
+        [SerializeField] private Image enemyHpFill;
+        [SerializeField] private Image playerHpFill;
         [SerializeField] private Button attackButton;
         [SerializeField] private Button defendButton;
         [SerializeField] private Button skillButton;
@@ -38,6 +42,7 @@ namespace HwigiTower.UI
         private string _lastMemoryCutsceneKey = string.Empty;
         private string _lastCombatCutsceneKey = string.Empty;
         private string _lastDemoCompleteCutsceneKey = string.Empty;
+        private bool _cutsceneFinishedSubscribed;
 
         public int ChoiceButtonCount => _choiceButtons.Count;
         public string ResultMessage => resultText == null ? string.Empty : resultText.text;
@@ -82,13 +87,13 @@ namespace HwigiTower.UI
             ShowFocus(null);
             if (interactionText != null)
             {
-                interactionText.text = "room";
+                interactionText.text = showRawDebugText ? "room" : "Ready";
             }
 
             ShowRunState(default);
             if (resultText != null)
             {
-                resultText.text = "result: -";
+                resultText.text = showRawDebugText ? "result: -" : "Result\n-";
             }
 
             ApplyPortrait();
@@ -105,13 +110,13 @@ namespace HwigiTower.UI
             ShowFocus(null);
             if (interactionText != null)
             {
-                interactionText.text = "room";
+                interactionText.text = showRawDebugText ? "room" : "Ready";
             }
 
             ShowRunState(default);
             if (resultText != null)
             {
-                resultText.text = "result: -";
+                resultText.text = showRawDebugText ? "result: -" : "Result\n-";
             }
 
             ApplyPortrait();
@@ -140,7 +145,7 @@ namespace HwigiTower.UI
 
             if (_demoRouteLabels.Count > 0)
             {
-                _demoRouteLabels.Add("DemoComplete");
+                _demoRouteLabels.Add("Run complete");
                 _demoRouteEncounterIds.Add("demo.complete");
             }
         }
@@ -175,9 +180,10 @@ namespace HwigiTower.UI
 
             if (interactionText != null && encounter != null)
             {
+                ApplyPresentationSlot(encounter.Id);
                 interactionText.text = showRawDebugText
                     ? $"node: {ResolveEncounterDisplayName(encounter)} | encounter: {encounter.Id} | choices pending"
-                    : ResolveEncounterDisplayName(encounter) + " | choices";
+                    : ResolvePresentationDisplayName(encounter);
             }
 
             ShowResultMessage(string.Empty);
@@ -203,7 +209,9 @@ namespace HwigiTower.UI
                 return;
             }
 
-            focusText.text = node == null ? "-" : node.DisplayName;
+            focusText.text = node == null
+                ? (showRawDebugText ? "-" : string.Empty)
+                : (showRawDebugText ? node.DisplayName : string.Empty);
         }
 
         public void ShowInteraction(InteractableNode node, EncounterSelection selection, PrototypeNodeResolution resolution)
@@ -219,7 +227,7 @@ namespace HwigiTower.UI
                     ? (string.IsNullOrEmpty(resolution.PayloadId)
                         ? $"encounter: {selection.EncounterId}"
                         : $"encounter: {selection.EncounterId} | payload: {resolution.PayloadId}")
-                    : ResolveEncounterDisplayName(selection.Encounter);
+                    : ResolvePresentationDisplayName(selection.Encounter);
                 ShowResult(resolution);
                 TryPlayInteractionCutscene(selection.EncounterId, resolution.Message);
                 return;
@@ -279,6 +287,7 @@ namespace HwigiTower.UI
                     $"Glitch {snapshot.GlitchLevel} | Affinity {snapshot.Affinity} | Ability {snapshot.AbilityCount}";
             }
 
+            UpdatePresentationState(snapshot);
             UpdateRouteIndicator(snapshot);
             UpdateMemoryAndCombatPanel(snapshot);
             UpdateResultVisibility(snapshot);
@@ -439,7 +448,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            routeText = CreateHudText("Demo Route Text", new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -306f), new Vector2(0f, 190f), 20, TextAnchor.UpperCenter, new Color(0.70f, 0.76f, 0.82f, 1f));
+            routeText = CreateHudText("Demo Route Text", new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -300f), new Vector2(0f, 82f), 20, TextAnchor.UpperCenter, new Color(0.70f, 0.76f, 0.82f, 1f));
         }
 
         private void EnsureMemoryText()
@@ -497,6 +506,30 @@ namespace HwigiTower.UI
             npcPortraitImage.raycastTarget = false;
         }
 
+        private void EnsureEncounterBackgroundImage()
+        {
+            if (encounterBackgroundImage != null)
+            {
+                return;
+            }
+
+            var backgroundObject = new GameObject("Encounter Background");
+            backgroundObject.transform.SetParent(transform, false);
+            backgroundObject.transform.SetAsFirstSibling();
+
+            var rect = backgroundObject.AddComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            encounterBackgroundImage = backgroundObject.AddComponent<Image>();
+            encounterBackgroundImage.color = new Color(1f, 1f, 1f, 0.72f);
+            encounterBackgroundImage.preserveAspect = false;
+            encounterBackgroundImage.raycastTarget = false;
+            encounterBackgroundImage.gameObject.SetActive(false);
+        }
+
         private void EnsureCombatPanel()
         {
             if (combatPanel != null)
@@ -517,19 +550,75 @@ namespace HwigiTower.UI
             var image = panelObject.AddComponent<Image>();
             image.color = new Color(0.08f, 0.10f, 0.12f, 0.88f);
 
-            combatText = CreateHudText("Combat Status Text", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(-24f, 154f), 20, TextAnchor.UpperLeft, new Color(0.78f, 0.84f, 0.86f, 1f));
+            combatEnemyImage = CreateCombatImage(panelObject.transform, "Combat Enemy Image", new Vector2(0.02f, 0.36f), new Vector2(0.30f, 0.92f));
+            combatText = CreateHudText("Combat Status Text", new Vector2(0.33f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(-24f, 122f), 20, TextAnchor.UpperLeft, new Color(0.78f, 0.84f, 0.86f, 1f));
             combatText.transform.SetParent(panelObject.transform, false);
             var combatTextRect = combatText.GetComponent<RectTransform>();
-            combatTextRect.anchorMin = new Vector2(0f, 1f);
+            combatTextRect.anchorMin = new Vector2(0.33f, 1f);
             combatTextRect.anchorMax = new Vector2(1f, 1f);
             combatTextRect.pivot = new Vector2(0.5f, 1f);
             combatTextRect.anchoredPosition = new Vector2(0f, -12f);
-            combatTextRect.sizeDelta = new Vector2(-24f, 154f);
+            combatTextRect.sizeDelta = new Vector2(-24f, 122f);
+
+            enemyHpFill = CreateHpBar(panelObject.transform, "Enemy HP Bar", new Vector2(0.34f, 0.53f), new Vector2(0.94f, 0.60f), new Color(0.76f, 0.22f, 0.22f, 1f));
+            playerHpFill = CreateHpBar(panelObject.transform, "Player HP Bar", new Vector2(0.34f, 0.40f), new Vector2(0.94f, 0.47f), new Color(0.28f, 0.68f, 0.46f, 1f));
 
             attackButton = CreateCombatButton(panelObject.transform, "Combat Button Attack", "Attack", new Vector2(0.17f, 0f), CombatAction.Attack);
             defendButton = CreateCombatButton(panelObject.transform, "Combat Button Defend", "Defend", new Vector2(0.50f, 0f), CombatAction.Defend);
-            skillButton = CreateCombatButton(panelObject.transform, "Combat Button Skill", "Skill", new Vector2(0.83f, 0f), CombatAction.Skill);
+            skillButton = CreateCombatButton(panelObject.transform, "Combat Button Skill", "Skill locked", new Vector2(0.83f, 0f), CombatAction.Skill);
             skillButton.interactable = false;
+        }
+
+        private Image CreateCombatImage(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            var imageObject = new GameObject(name);
+            imageObject.transform.SetParent(parent, false);
+
+            var rect = imageObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            var image = imageObject.AddComponent<Image>();
+            image.color = new Color(1f, 1f, 1f, 0.96f);
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            image.gameObject.SetActive(false);
+            return image;
+        }
+
+        private Image CreateHpBar(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Color fillColor)
+        {
+            var frameObject = new GameObject(name + " Frame");
+            frameObject.transform.SetParent(parent, false);
+
+            var frameRect = frameObject.AddComponent<RectTransform>();
+            frameRect.anchorMin = anchorMin;
+            frameRect.anchorMax = anchorMax;
+            frameRect.offsetMin = Vector2.zero;
+            frameRect.offsetMax = Vector2.zero;
+
+            var frame = frameObject.AddComponent<Image>();
+            frame.color = new Color(0.02f, 0.025f, 0.03f, 0.92f);
+            frame.raycastTarget = false;
+
+            var fillObject = new GameObject(name + " Fill");
+            fillObject.transform.SetParent(frameObject.transform, false);
+            var fillRect = fillObject.AddComponent<RectTransform>();
+            fillRect.anchorMin = new Vector2(0.02f, 0.18f);
+            fillRect.anchorMax = new Vector2(0.98f, 0.82f);
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+
+            var fill = fillObject.AddComponent<Image>();
+            fill.color = fillColor;
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = 0;
+            fill.fillAmount = 1f;
+            fill.raycastTarget = false;
+            return fill;
         }
 
         private Button CreateCombatButton(Transform parent, string name, string labelText, Vector2 anchor, CombatAction action)
@@ -611,16 +700,22 @@ namespace HwigiTower.UI
                     ? (string.IsNullOrEmpty(snapshot.NextDemoEncounterId)
                     ? "route: " + snapshot.DemoStatus
                     : "route next: " + snapshot.NextDemoNodeId + "/" + snapshot.NextDemoEncounterId)
-                    : "route: " + (string.IsNullOrEmpty(snapshot.DemoStatus) ? "-" : snapshot.DemoStatus);
+                    : "Progress: " + (string.IsNullOrEmpty(snapshot.DemoStatus) ? "-" : ResolvePublicDemoStatus(snapshot));
+                return;
+            }
+
+            var currentIndex = GetCurrentRouteIndex(snapshot);
+            if (!showRawDebugText)
+            {
+                routeText.text = BuildPublicRouteSummary(snapshot, currentIndex);
                 return;
             }
 
             var text = "route\n";
-            var currentIndex = GetCurrentRouteIndex(snapshot);
             for (var i = 0; i < _demoRouteLabels.Count; i++)
             {
                 string marker;
-                if (snapshot.DemoStatus == "demo.complete" || i < currentIndex)
+                if ((snapshot.DemoStatus == "demo.complete" && !snapshot.IsInCombat) || i < currentIndex)
                 {
                     marker = "[complete]";
                 }
@@ -650,6 +745,17 @@ namespace HwigiTower.UI
 
         private int GetCurrentRouteIndex(PrototypeRunSnapshot snapshot)
         {
+            if (snapshot.IsInCombat)
+            {
+                for (var i = _demoRouteEncounterIds.Count - 1; i >= 0; i--)
+                {
+                    if (IsCombatEncounterId(_demoRouteEncounterIds[i]))
+                    {
+                        return i;
+                    }
+                }
+            }
+
             if (snapshot.DemoStatus == "demo.complete")
             {
                 return _demoRouteLabels.Count;
@@ -669,6 +775,35 @@ namespace HwigiTower.UI
             }
 
             return Mathf.Clamp(snapshot.DemoResolvedStepCount, 0, Mathf.Max(0, _demoRouteLabels.Count - 1));
+        }
+
+        private string BuildPublicRouteSummary(PrototypeRunSnapshot snapshot, int currentIndex)
+        {
+            if (snapshot.IsInCombat)
+            {
+                return "Progress\nCombat in progress";
+            }
+
+            if (snapshot.DemoStatus == "demo.complete")
+            {
+                return "Progress\nRun complete";
+            }
+
+            var label = currentIndex >= 0 && currentIndex < _demoRouteLabels.Count
+                ? _demoRouteLabels[currentIndex]
+                : ResolvePublicDemoStatus(snapshot);
+            var step = Mathf.Clamp(currentIndex + 1, 1, Mathf.Max(1, _demoRouteLabels.Count));
+            return "Progress\n" + label + "  " + step + "/" + _demoRouteLabels.Count;
+        }
+
+        private static string ResolvePublicDemoStatus(PrototypeRunSnapshot snapshot)
+        {
+            if (snapshot.IsInCombat)
+            {
+                return "Combat in progress";
+            }
+
+            return snapshot.DemoStatus == "demo.complete" ? "Run complete" : "Ready";
         }
 
         private void UpdateMemoryAndCombatPanel(PrototypeRunSnapshot snapshot)
@@ -696,7 +831,7 @@ namespace HwigiTower.UI
             {
                 memory = string.IsNullOrEmpty(snapshot.LastMemoryFragmentId)
                     ? "Memory: locked"
-                    : "Memory: unlocked | count " + snapshot.MemoryFragmentCount;
+                    : "Memory: unlocked";
                 combat = string.IsNullOrEmpty(snapshot.LastCombatId)
                     ? "Combat: -"
                     : "Combat: " + BuildCombatOutcomeLabel(snapshot);
@@ -731,7 +866,9 @@ namespace HwigiTower.UI
                   (snapshot.LastCombatComboDamage > 0 ? " | combo " + snapshot.LastCombatComboDamage : string.Empty)
                 : BuildCombatPresentation(snapshot);
 
-            var canAct = snapshot.IsInCombat && _roomController != null;
+            UpdateCombatVisuals(snapshot);
+
+            var canAct = snapshot.IsInCombat && _roomController != null && !IsCutscenePlaying();
             if (attackButton != null)
             {
                 attackButton.interactable = canAct;
@@ -745,6 +882,26 @@ namespace HwigiTower.UI
             if (skillButton != null)
             {
                 skillButton.interactable = canAct && snapshot.AbilityCount > 0;
+            }
+        }
+
+        private void UpdateCombatVisuals(PrototypeRunSnapshot snapshot)
+        {
+            var slot = ResolveCurrentPresentationSlot(snapshot);
+            if (combatEnemyImage != null)
+            {
+                combatEnemyImage.sprite = slot == null ? null : slot.EnemySprite;
+                combatEnemyImage.gameObject.SetActive(combatEnemyImage.sprite != null);
+            }
+
+            if (enemyHpFill != null)
+            {
+                enemyHpFill.fillAmount = Ratio(snapshot.EnemyHp, snapshot.EnemyMaxHp);
+            }
+
+            if (playerHpFill != null)
+            {
+                playerHpFill.fillAmount = Ratio(snapshot.PlayerHp, snapshot.PlayerMaxHp);
             }
         }
 
@@ -770,7 +927,7 @@ namespace HwigiTower.UI
             }
 
             demoCompleteText.gameObject.SetActive(snapshot.DemoStatus == "demo.complete" && !snapshot.IsInCombat);
-            demoCompleteText.text = showRawDebugText ? "demo.complete\nDemo Route Complete" : "DemoComplete";
+            demoCompleteText.text = showRawDebugText ? "demo.complete\nDemo Route Complete" : "Run Complete";
         }
 
         private void UpdateResultVisibility(PrototypeRunSnapshot snapshot)
@@ -787,12 +944,12 @@ namespace HwigiTower.UI
         {
             var label = showRawDebugText
                 ? (string.IsNullOrEmpty(view.TextKey) ? view.ChoiceStableId : view.TextKey)
-                : "Choice " + (index + 1);
+                : ResolvePublicChoiceLabel(view.ChoiceStableId, index);
             if (!view.Enabled)
             {
                 label += showRawDebugText && !string.IsNullOrEmpty(view.ReasonTextKey)
                     ? "\n" + view.ReasonTextKey
-                    : "\nUnavailable";
+                    : "\nLocked";
             }
 
             return label;
@@ -860,10 +1017,10 @@ namespace HwigiTower.UI
                 presentationData.TryGetSlot(encounter.Id, out var slot) &&
                 !string.IsNullOrEmpty(slot.DisplayName))
             {
-                return slot.DisplayName;
+                return showRawDebugText ? slot.DisplayName : ResolvePublicEncounterLabel(slot.DisplayName, encounter);
             }
 
-            return ResolveEncounterDisplayName(encounter);
+            return showRawDebugText ? ResolveEncounterDisplayName(encounter) : ResolvePublicEncounterLabel(string.Empty, encounter);
         }
 
         private string BuildResultSummary(string message)
@@ -887,7 +1044,7 @@ namespace HwigiTower.UI
 
             if (message.Contains("combat started"))
             {
-                summary += "\nCombat started";
+                summary += "\nCombat begins";
             }
 
             if (message.Contains("enemyDefeated True") || message.Contains("victory"))
@@ -906,14 +1063,10 @@ namespace HwigiTower.UI
 
             if (message.Contains("demo.complete"))
             {
-                summary += "\nNext: DemoComplete";
-            }
-            else
-            {
-                summary += "\nNext: route";
+                summary += "\nRun complete";
             }
 
-            return summary == "Result\nNext: route" ? "Result\n-" : summary;
+            return summary == "Result" ? "Result\n-" : summary;
         }
 
         private static void AppendIfPresent(ref string summary, string source, string token, string label)
@@ -938,7 +1091,7 @@ namespace HwigiTower.UI
             }
 
             var value = source.Substring(start, end - start).Trim();
-            if (!string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value) && !IsNoOpDelta(value))
             {
                 summary += "\n" + label + value;
             }
@@ -961,20 +1114,43 @@ namespace HwigiTower.UI
 
         private static string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
-            var enemyHp = BuildBar(snapshot.EnemyHp, snapshot.EnemyMaxHp);
-            var playerHp = BuildBar(snapshot.PlayerHp, snapshot.PlayerMaxHp);
             var text =
-                "CombatGate\n" +
-                "Enemy HP " + enemyHp + " " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "\n" +
-                "Player HP " + playerHp + " " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
+                "Combat\n" +
+                "Enemy HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "\n" +
+                "Player HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
                 "Round " + snapshot.CombatRound + "\n" +
-                "Last " + (string.IsNullOrEmpty(snapshot.LastCombatRoundResult) ? "-" : snapshot.LastCombatRoundResult);
+                "Feedback " + BuildCombatFeedback(snapshot.LastCombatRoundResult);
             if (snapshot.LastCombatComboDamage > 0)
             {
                 text += "\nCombo " + snapshot.LastCombatComboDamage;
             }
 
             return text;
+        }
+
+        private static string BuildCombatFeedback(string roundResult)
+        {
+            if (string.IsNullOrEmpty(roundResult))
+            {
+                return "Ready";
+            }
+
+            if (roundResult.Contains("ready", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Ready";
+            }
+
+            if (roundResult.Contains("Defend", StringComparison.Ordinal))
+            {
+                return "Defend reduced damage";
+            }
+
+            if (roundResult.Contains("Attack", StringComparison.Ordinal))
+            {
+                return "Attack dealt damage";
+            }
+
+            return "Round resolved";
         }
 
         private static string BuildBar(int value, int max)
@@ -986,6 +1162,68 @@ namespace HwigiTower.UI
 
             var filled = Mathf.Clamp(Mathf.CeilToInt((float)value / max * 5f), 0, 5);
             return "[" + new string('#', filled) + new string('-', 5 - filled) + "]";
+        }
+
+        private void UpdatePresentationState(PrototypeRunSnapshot snapshot)
+        {
+            var slot = ResolveCurrentPresentationSlot(snapshot);
+            ApplyPresentationSlot(slot);
+            if (interactionText != null && !showRawDebugText && snapshot.DemoStatus == "demo.complete" && !snapshot.IsInCombat)
+            {
+                interactionText.text = "Run complete";
+            }
+        }
+
+        private DemoPresentationSlot ResolveCurrentPresentationSlot(PrototypeRunSnapshot snapshot)
+        {
+            if (presentationData == null)
+            {
+                return null;
+            }
+
+            var encounterId = snapshot.IsInCombat ? ResolveCombatEncounterId() : snapshot.NextDemoEncounterId;
+            if (string.IsNullOrEmpty(encounterId) && snapshot.DemoStatus == "demo.complete")
+            {
+                encounterId = ResolveDemoCompleteCutsceneEncounterId(snapshot);
+            }
+
+            return presentationData.TryGetSlot(encounterId, out var slot) ? slot : null;
+        }
+
+        private void ApplyPresentationSlot(string encounterStableId)
+        {
+            if (presentationData != null && presentationData.TryGetSlot(encounterStableId, out var slot))
+            {
+                ApplyPresentationSlot(slot);
+            }
+        }
+
+        private void ApplyPresentationSlot(DemoPresentationSlot slot)
+        {
+            EnsureEncounterBackgroundImage();
+            if (encounterBackgroundImage != null)
+            {
+                encounterBackgroundImage.sprite = slot == null ? null : slot.BackgroundSprite;
+                encounterBackgroundImage.gameObject.SetActive(encounterBackgroundImage.sprite != null);
+            }
+
+            if (slot != null && slot.MataiosPortrait != null)
+            {
+                SetNpcPortrait(slot.MataiosPortrait);
+            }
+        }
+
+        private string ResolveCombatEncounterId()
+        {
+            for (var i = _demoRouteEncounterIds.Count - 1; i >= 0; i--)
+            {
+                if (IsCombatEncounterId(_demoRouteEncounterIds[i]))
+                {
+                    return _demoRouteEncounterIds[i];
+                }
+            }
+
+            return string.Empty;
         }
 
         private void UpdateCutsceneTriggers(PrototypeRunSnapshot snapshot)
@@ -1085,8 +1323,28 @@ namespace HwigiTower.UI
             }
 
             EnsureCutscenePlayer();
+            SubscribeCutsceneFinished();
             cutscenePlayer.Play(cutscene);
+            SetCombatButtonsInteractable(false);
             lastKey = key;
+        }
+
+        private void SetCombatButtonsInteractable(bool interactable)
+        {
+            if (attackButton != null)
+            {
+                attackButton.interactable = interactable;
+            }
+
+            if (defendButton != null)
+            {
+                defendButton.interactable = interactable;
+            }
+
+            if (skillButton != null)
+            {
+                skillButton.interactable = interactable && _roomController != null && _roomController.GetSnapshot().AbilityCount > 0;
+            }
         }
 
         private void EnsureCutscenePlayer()
@@ -1104,7 +1362,105 @@ namespace HwigiTower.UI
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             cutscenePlayer = playerObject.AddComponent<PrototypeCutscenePlayer>();
+            SubscribeCutsceneFinished();
             cutscenePlayer.Hide();
+        }
+
+        private void SubscribeCutsceneFinished()
+        {
+            if (cutscenePlayer == null || _cutsceneFinishedSubscribed)
+            {
+                return;
+            }
+
+            cutscenePlayer.Finished += HandleCutsceneFinished;
+            _cutsceneFinishedSubscribed = true;
+        }
+
+        private void HandleCutsceneFinished()
+        {
+            if (_roomController != null)
+            {
+                ShowRunState(_roomController.GetSnapshot());
+            }
+        }
+
+        private bool IsCutscenePlaying()
+        {
+            return cutscenePlayer != null && cutscenePlayer.gameObject.activeInHierarchy && cutscenePlayer.IsPlaying;
+        }
+
+        private static bool IsCombatEncounterId(string encounterId)
+        {
+            return encounterId == "ENC_COMBAT_GATE_01";
+        }
+
+        private static string ResolvePublicChoiceLabel(string choiceStableId, int index)
+        {
+            return choiceStableId switch
+            {
+                "CHOICE_SHOP_01_BUY_ITEM" => "Buy supply",
+                "CHOICE_SHOP_01_BUY_ABILITY" => "Buy ability",
+                "CHOICE_SHOP_01_LEAVE" => "Leave",
+                "CHOICE_MORAL_01_AID" => "Aid",
+                "CHOICE_MORAL_01_REFUSE" => "Refuse",
+                "CHOICE_MORAL_01_TRADE" => "Trade",
+                "CHOICE_MEMORY_01_UNLOCK" => "Unlock memory",
+                "CHOICE_MEMORY_01_WITHDRAW" => "Withdraw",
+                "CHOICE_COMBAT_01_ENGAGE" => "Engage",
+                "CHOICE_COMBAT_01_PREPARE" => "Prepare",
+                _ => "Option " + (index + 1)
+            };
+        }
+
+        private static string ResolvePublicEncounterLabel(string configuredLabel, EncounterData encounter)
+        {
+            if (!string.IsNullOrEmpty(configuredLabel) && !LooksLikeInternalLabel(configuredLabel))
+            {
+                return configuredLabel;
+            }
+
+            if (encounter == null)
+            {
+                return "Encounter";
+            }
+
+            return encounter.Id switch
+            {
+                "ENC_SHOP_01" => "Shop",
+                "ENC_MORAL_CHOICE_01" => "Decision",
+                "ENC_MEMORY_FRAGMENT_01" => "Memory",
+                "ENC_COMBAT_GATE_01" => "Combat",
+                _ => encounter.Type == EncounterType.MoralChoice ? "Decision" :
+                    encounter.Type == EncounterType.MemoryFragment ? "Memory" :
+                    "Encounter"
+            };
+        }
+
+        private static bool LooksLikeInternalLabel(string value)
+        {
+            return value == "MoralChoice" ||
+                   value == "MemoryFragment" ||
+                   value == "CombatGate" ||
+                   value == "DemoComplete";
+        }
+
+        private static bool IsNoOpDelta(string value)
+        {
+            var arrow = value.IndexOf("->", StringComparison.Ordinal);
+            if (arrow < 0)
+            {
+                return false;
+            }
+
+            var before = value.Substring(0, arrow).Trim();
+            var after = value.Substring(arrow + 2).Trim();
+            return before == after;
+        }
+
+        private static float Ratio(int value, int max)
+        {
+            return max <= 0 ? 0f : Mathf.Clamp01((float)value / max);
         }
 
         private static Font ResolveFont()
