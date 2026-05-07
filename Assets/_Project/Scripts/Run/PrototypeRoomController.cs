@@ -10,6 +10,7 @@ namespace HwigiTower.Run
     {
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
+        [SerializeField] private DemoPresentationData demoPresentationData;
         [SerializeField] private PrototypeHud hud;
         [SerializeField] private bool autoResolveCombat;
         [SerializeField] private bool showDemoNodeDebugLabels;
@@ -42,6 +43,12 @@ namespace HwigiTower.Run
         {
             showDemoNodeDebugLabels = visible;
             ApplyDemoNodeDebugLabelVisibility();
+        }
+
+        public void SetDemoPresentationData(DemoPresentationData data)
+        {
+            demoPresentationData = data;
+            ConfigureHudDemoRoute();
         }
 
         public void Configure(PrototypeRoomDefinition definition)
@@ -267,6 +274,7 @@ namespace HwigiTower.Run
             if (hud != null)
             {
                 hud.BindRoomController(this);
+                hud.SetPresentationData(demoPresentationData);
                 hud.ConfigureDemoRoute(roomDefinition == null ? null : roomDefinition.DemoRunPath);
             }
         }

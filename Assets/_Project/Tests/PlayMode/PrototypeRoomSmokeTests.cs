@@ -88,6 +88,7 @@ namespace HwigiTower.Tests.PlayMode
 
             controller.AutoResolveCombat = true;
             controller.BeginRun();
+            hud.SetRawDebugTextVisible(true);
             hud.ShowRunState(controller.GetSnapshot());
             StringAssert.Contains("[current] Shop", hud.RouteMessage);
 
@@ -226,6 +227,9 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.IsTrue(hud.CombatPanelVisible);
+            StringAssert.Contains("CombatGate", hud.CombatMessage);
+            StringAssert.Contains("Enemy HP", hud.CombatMessage);
+            StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
             Assert.IsFalse(GameObject.Find("Demo Complete Text") != null && GameObject.Find("Demo Complete Text").activeInHierarchy);
             var beforeEnemyHp = controller.GetSnapshot().EnemyHp;
             var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
@@ -256,9 +260,99 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsFalse(controller.RunState.IsInCombat);
             Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
-            StringAssert.Contains("demo.complete", hud.ResultMessage);
+            StringAssert.Contains("DemoComplete", hud.ResultMessage);
             Assert.IsFalse(hud.CombatPanelVisible);
             Assert.IsTrue(GameObject.Find("Demo Complete Text").activeInHierarchy);
+        }
+
+        [UnityTest]
+        public IEnumerator PrototypeRoom_CutsceneScaffoldDoesNotBlockRouteOrDuplicateTriggers()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            var shopNode = FindNode("node.shop");
+            var battleNode = FindNode("node.battle");
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+            Assert.IsNotNull(shopNode);
+            Assert.IsNotNull(battleNode);
+
+            controller.AutoResolveCombat = false;
+            controller.BeginRun();
+            controller.RunState.ModifyGold(5);
+            controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_BUY_ITEM");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MORAL_CHOICE_01"), "CHOICE_MORAL_01_REFUSE");
+
+            var memoryEncounter = FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01");
+            var memorySelection = new EncounterSelection(battleNode.Definition, memoryEncounter);
+            hud.ShowInteraction(
+                battleNode,
+                memorySelection,
+                controller.ResolveEncounterChoice(battleNode, memoryEncounter, "CHOICE_MEMORY_01_UNLOCK"));
+            hud.ShowRunState(controller.GetSnapshot());
+            hud.ShowRunState(controller.GetSnapshot());
+            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsSortMode.None).Length);
+            StringAssert.Contains("[current] CombatGate", hud.RouteMessage);
+
+            var combatEncounter = FindEncounter(battleNode, "ENC_COMBAT_GATE_01");
+            var combatSelection = new EncounterSelection(battleNode.Definition, combatEncounter);
+            hud.ShowInteraction(
+                battleNode,
+                combatSelection,
+                controller.ResolveEncounterChoice(battleNode, combatEncounter, "CHOICE_COMBAT_01_ENGAGE"));
+            hud.ShowRunState(controller.GetSnapshot());
+            hud.ShowRunState(controller.GetSnapshot());
+            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsSortMode.None).Length);
+            Assert.IsTrue(controller.RunState.IsInCombat);
+            Assert.IsTrue(hud.CombatPanelVisible);
+
+            var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+            var guard = 0;
+            while (controller.RunState.IsInCombat && guard < 12)
+            {
+                attackButton.onClick.Invoke();
+                yield return null;
+                guard++;
+            }
+
+            Assert.IsFalse(controller.RunState.IsInCombat);
+            Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
+            Assert.IsFalse(hud.CombatPanelVisible);
+            StringAssert.Contains("DemoComplete", hud.RouteMessage);
+            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsSortMode.None).Length);
+        }
+
+        [UnityTest]
+        public IEnumerator PrototypeRoom_DefaultPresentationHidesRawRouteAndChoiceKeys()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            var shopNode = FindNode("node.shop");
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+            Assert.IsNotNull(shopNode);
+            Assert.IsTrue(hud.HasPresentationData);
+
+            controller.BeginRun();
+            hud.ShowRunState(controller.GetSnapshot());
+            StringAssert.Contains("[current] Shop", hud.RouteMessage);
+            StringAssert.DoesNotContain("ENC_SHOP_01", hud.RouteMessage);
+            StringAssert.DoesNotContain("node.shop", hud.RouteMessage);
+
+            var shopEncounter = FindEncounter(shopNode, "ENC_SHOP_01");
+            var shopSelection = new EncounterSelection(shopNode.Definition, shopEncounter);
+            hud.ShowChoices(shopEncounter, controller.BuildEncounterChoiceViews(shopSelection), _ => { });
+            var button = hud.GetChoiceButton(0);
+            Assert.IsNotNull(button);
+            var label = ReadButtonText(button);
+            StringAssert.DoesNotContain("CHOICE_", label);
+            StringAssert.DoesNotContain("PLACEHOLDER_", label);
         }
 
         [UnityTest]
