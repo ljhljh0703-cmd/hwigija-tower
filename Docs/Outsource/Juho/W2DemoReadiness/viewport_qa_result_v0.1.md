@@ -17,6 +17,30 @@
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_08_combat_labels_hidden.png`
   - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_09_demo_complete_labels_hidden.png`
 
+## Presentation/Cutscene QA Addendum 2026-05-07
+
+- Tested commit: `7092b17` plus local QA fixes for cutscene lifecycle/result summarization
+- Target viewport: `1080x1920` portrait
+- QA method: PlayMode screenshot capture through a temporary camera-render runner
+- Screenshot file paths:
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_10_shop_presentation.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_11_moral_presentation.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_12_memory_cutscene_overlay.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_13_combatgate_cutscene_overlay.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_14_active_combat_presentation.png`
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_15_demo_complete_cutscene_overlay.png`
+
+| QA item | Result | Notes |
+|---|---:|---|
+| Shop presentation state | Pass | Raw encounter/choice IDs hidden; route/HUD readable |
+| Moral presentation state | Pass | Choice labels are public demo placeholders, not raw stableIds/textKeys |
+| Memory cutscene overlay | Pass | Overlay image displays; placeholder textKey hidden; result summary no longer exposes flag payload |
+| CombatGate cutscene overlay | Pass | Combat starts with overlay image; no premature DemoComplete text |
+| Active combat | Pass | Cutscene overlay is hidden; combat HP bars/buttons are readable |
+| DemoComplete cutscene overlay | Pass | Combat panel closes first; DemoComplete/result state remains readable |
+
+Remaining visual risk: the same full-body Mataios illustration appears both as HUD portrait and cutscene image. This is acceptable for scaffold QA, but a cropped/transparent portrait and separate cutscene image slots are still recommended before public recording.
+
 ## Validation
 
 | Check | Result | Evidence |

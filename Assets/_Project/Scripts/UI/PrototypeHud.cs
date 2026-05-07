@@ -926,6 +926,12 @@ namespace HwigiTower.UI
 
             var start = index + token.Length;
             var end = source.IndexOf(" |", start, StringComparison.Ordinal);
+            var commaEnd = source.IndexOf(",", start, StringComparison.Ordinal);
+            if (commaEnd >= 0 && (end < 0 || commaEnd < end))
+            {
+                end = commaEnd;
+            }
+
             if (end < 0)
             {
                 end = source.Length;
@@ -1007,14 +1013,33 @@ namespace HwigiTower.UI
                     ref _lastCombatCutsceneKey);
             }
 
-            if (snapshot.DemoStatus == "demo.complete")
+            if (snapshot.DemoStatus == "demo.complete" && !snapshot.IsInCombat)
             {
                 TryPlayCutsceneOnce(
-                    snapshot.NextDemoEncounterId,
+                    ResolveDemoCompleteCutsceneEncounterId(snapshot),
                     "complete:" + snapshot.DemoResolvedStepCount,
                     PrototypeCutsceneTrigger.DemoComplete,
-                ref _lastDemoCompleteCutsceneKey);
+                    ref _lastDemoCompleteCutsceneKey);
             }
+        }
+
+        private string ResolveDemoCompleteCutsceneEncounterId(PrototypeRunSnapshot snapshot)
+        {
+            if (!string.IsNullOrEmpty(snapshot.NextDemoEncounterId))
+            {
+                return snapshot.NextDemoEncounterId;
+            }
+
+            for (var i = _demoRouteEncounterIds.Count - 1; i >= 0; i--)
+            {
+                var encounterId = _demoRouteEncounterIds[i];
+                if (!string.IsNullOrEmpty(encounterId) && encounterId != "demo.complete")
+                {
+                    return encounterId;
+                }
+            }
+
+            return string.Empty;
         }
 
         private void TryPlayInteractionCutscene(string encounterStableId, string message)

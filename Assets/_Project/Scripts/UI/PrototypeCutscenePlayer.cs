@@ -16,6 +16,7 @@ namespace HwigiTower.UI
 
         public void Play(CutsceneData cutscene)
         {
+            gameObject.SetActive(true);
             EnsureView();
             if (cutscene == null || !cutscene.HasSteps)
             {
@@ -46,6 +47,8 @@ namespace HwigiTower.UI
                 canvasGroup.blocksRaycasts = false;
                 canvasGroup.interactable = false;
             }
+
+            gameObject.SetActive(false);
         }
 
         private IEnumerator PlayRoutine(CutsceneData cutscene)
@@ -62,7 +65,7 @@ namespace HwigiTower.UI
                 image.sprite = step.Image;
                 image.preserveAspect = true;
                 image.gameObject.SetActive(step.Image != null);
-                text.text = step.TextKey;
+                text.text = ShouldShowTextKey(step.TextKey) ? step.TextKey : string.Empty;
                 yield return FadeTo(1f, step.FadeInSeconds);
                 yield return new WaitForSeconds(step.DurationSeconds);
                 yield return FadeTo(0f, step.FadeOutSeconds);
@@ -138,6 +141,11 @@ namespace HwigiTower.UI
                 text.resizeTextMaxSize = 24;
                 text.color = new Color(0.86f, 0.90f, 0.92f, 1f);
             }
+        }
+
+        private static bool ShouldShowTextKey(string textKey)
+        {
+            return !string.IsNullOrEmpty(textKey) && !textKey.StartsWith("PLACEHOLDER_", System.StringComparison.Ordinal);
         }
     }
 }
