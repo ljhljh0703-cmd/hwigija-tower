@@ -294,7 +294,7 @@ namespace HwigiTower.Tests.PlayMode
                 controller.ResolveEncounterChoice(battleNode, memoryEncounter, "CHOICE_MEMORY_01_UNLOCK"));
             hud.ShowRunState(controller.GetSnapshot());
             hud.ShowRunState(controller.GetSnapshot());
-            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsSortMode.None).Length);
+            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
             StringAssert.Contains("[current] CombatGate", hud.RouteMessage);
 
             var combatEncounter = FindEncounter(battleNode, "ENC_COMBAT_GATE_01");
@@ -305,7 +305,7 @@ namespace HwigiTower.Tests.PlayMode
                 controller.ResolveEncounterChoice(battleNode, combatEncounter, "CHOICE_COMBAT_01_ENGAGE"));
             hud.ShowRunState(controller.GetSnapshot());
             hud.ShowRunState(controller.GetSnapshot());
-            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsSortMode.None).Length);
+            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.IsTrue(hud.CombatPanelVisible);
 
@@ -322,7 +322,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual("demo.complete", controller.RunState.DemoStatus);
             Assert.IsFalse(hud.CombatPanelVisible);
             StringAssert.Contains("DemoComplete", hud.RouteMessage);
-            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsSortMode.None).Length);
+            Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
+            Assert.IsTrue(Object.FindFirstObjectByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include).IsPlaying);
         }
 
         [UnityTest]
