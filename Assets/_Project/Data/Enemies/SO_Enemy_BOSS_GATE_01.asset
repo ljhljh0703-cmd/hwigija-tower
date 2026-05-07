@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: SO_Enemy_BOSS_GATE_01
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Combat.EnemyData
   id: BOSS_GATE_01
-  hp: 50
-  attack: 10
+  hp: 28
+  attack: 4
   patternId: PATTERN_ELITE
   pattern: {fileID: 0}
-  goldReward: 40
+  goldReward: 16
   xpReward: 50
-  glitchDelta: 3
-  affinityDelta: 5
+  glitchDelta: -4
+  affinityDelta: 4

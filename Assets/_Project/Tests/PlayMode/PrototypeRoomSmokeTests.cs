@@ -339,6 +339,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsTrue(controller.RunState.RunClear);
             Assert.IsTrue(controller.RunState.RestartReady);
             StringAssert.Contains("Run clear", hud.RouteMessage);
+            StringAssert.Contains("Run Clear", hud.RunStateMessage);
+            Assert.AreEqual(0, hud.ChoiceButtonCount);
 
             var restartButton = GameObject.Find("Restart Run Button").GetComponent<Button>();
             Assert.IsTrue(restartButton.gameObject.activeInHierarchy);
@@ -351,6 +353,126 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(6, controller.RunState.Gold);
             Assert.IsFalse(controller.RunState.RunCompleted);
             StringAssert.Contains("Shop", hud.RouteMessage);
+        }
+
+        [UnityTest]
+        public IEnumerator PrototypeRoom_FloorTwoBossGateFailureShowsRestartState()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            var shopNode = FindNode("node.shop");
+            var battleNode = FindNode("node.battle");
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+            Assert.IsNotNull(shopNode);
+            Assert.IsNotNull(battleNode);
+
+            controller.AutoResolveCombat = true;
+            controller.BeginRun();
+            controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_LEAVE");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MORAL_CHOICE_01"), "CHOICE_MORAL_01_REFUSE");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01"), "CHOICE_MEMORY_01_UNLOCK");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_COMBAT_GATE_01"), "CHOICE_COMBAT_01_ENGAGE");
+            controller.ResolveNextFloor();
+
+            var floorTwoShop = controller.SelectEncounter(shopNode);
+            controller.ResolveEncounterChoice(shopNode, floorTwoShop.Encounter, "CHOICE_F02_SHOP_LEAVE");
+            var floorTwoMoral = controller.SelectEncounter(battleNode);
+            controller.ResolveEncounterChoice(battleNode, floorTwoMoral.Encounter, "CHOICE_F02_MORAL_LEAVE");
+            controller.RunState.ModifyPlayerHp(-999);
+            controller.RunState.ModifyPlayerHp(1);
+
+            controller.AutoResolveCombat = false;
+            var bossSelectionFromRoute = controller.SelectEncounter(battleNode);
+            Assert.AreEqual("ENC_COMBAT_GATE_02", bossSelectionFromRoute.EncounterId);
+            var bossEncounter = bossSelectionFromRoute.Encounter;
+            var bossSelection = new EncounterSelection(battleNode.Definition, bossEncounter);
+            hud.ShowChoices(bossEncounter, controller.BuildEncounterChoiceViews(bossSelection), choiceStableId =>
+            {
+                var resolution = controller.ResolveEncounterChoice(battleNode, bossEncounter, choiceStableId);
+                hud.ShowInteraction(battleNode, bossSelection, resolution);
+                hud.ShowRunState(controller.GetSnapshot());
+            });
+            FindChoiceButton(hud, "CHOICE_COMBAT_02_ENGAGE").onClick.Invoke();
+            yield return null;
+
+            var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+            Assert.IsNotNull(attackButton);
+            attackButton.onClick.Invoke();
+            yield return null;
+
+            Assert.IsTrue(controller.RunState.RunFailed);
+            Assert.IsTrue(controller.RunState.RestartReady);
+            Assert.IsFalse(hud.CombatPanelVisible);
+            Assert.AreEqual(0, hud.ChoiceButtonCount);
+            StringAssert.Contains("Run failed", hud.RouteMessage);
+            StringAssert.Contains("Run Failed", hud.RunStateMessage);
+
+            var restartButton = GameObject.Find("Restart Run Button").GetComponent<Button>();
+            Assert.IsTrue(restartButton.gameObject.activeInHierarchy);
+            restartButton.onClick.Invoke();
+            yield return null;
+
+            Assert.AreEqual(1, controller.RunState.CurrentFloor);
+            Assert.AreEqual(6, controller.RunState.Gold);
+            Assert.AreEqual(controller.RunState.PlayerMaxHp, controller.RunState.PlayerHp);
+            Assert.IsFalse(controller.RunState.RunCompleted);
+        }
+
+        [UnityTest]
+        public IEnumerator PrototypeRoom_FloorTwoBossGateRecallFallbackDelaysFailure()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            var shopNode = FindNode("node.shop");
+            var battleNode = FindNode("node.battle");
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+            Assert.IsNotNull(shopNode);
+            Assert.IsNotNull(battleNode);
+
+            controller.AutoResolveCombat = true;
+            controller.BeginRun();
+            controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_LEAVE");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MORAL_CHOICE_01"), "CHOICE_MORAL_01_REFUSE");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01"), "CHOICE_MEMORY_01_UNLOCK");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_COMBAT_GATE_01"), "CHOICE_COMBAT_01_ENGAGE");
+            controller.ResolveNextFloor();
+            controller.ResolveEncounterChoice(shopNode, controller.SelectEncounter(shopNode).Encounter, "CHOICE_F02_SHOP_LEAVE");
+            controller.ResolveEncounterChoice(battleNode, controller.SelectEncounter(battleNode).Encounter, "CHOICE_F02_MORAL_LEAVE");
+            controller.RunState.AddAbilityRef("ABILITY_RECALL_ANCHOR");
+            controller.RunState.ModifyPlayerHp(-999);
+            controller.RunState.ModifyPlayerHp(1);
+
+            controller.AutoResolveCombat = false;
+            var bossSelectionFromRoute = controller.SelectEncounter(battleNode);
+            var bossEncounter = bossSelectionFromRoute.Encounter;
+            var bossSelection = new EncounterSelection(battleNode.Definition, bossEncounter);
+            hud.ShowChoices(bossEncounter, controller.BuildEncounterChoiceViews(bossSelection), choiceStableId =>
+            {
+                var resolution = controller.ResolveEncounterChoice(battleNode, bossEncounter, choiceStableId);
+                hud.ShowInteraction(battleNode, bossSelection, resolution);
+                hud.ShowRunState(controller.GetSnapshot());
+            });
+            FindChoiceButton(hud, "CHOICE_COMBAT_02_ENGAGE").onClick.Invoke();
+            yield return null;
+
+            var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+            attackButton.onClick.Invoke();
+            yield return null;
+
+            Assert.IsFalse(controller.RunState.RunFailed);
+            Assert.IsFalse(controller.RunState.RunCompleted);
+            Assert.IsTrue(controller.RunState.IsInCombat);
+            Assert.AreEqual("recall", controller.RunState.LastCombatResultId);
+            Assert.IsTrue(controller.RunState.HasFlag("FLAG_RECALL_ANCHOR_USED"));
+            Assert.IsTrue(hud.CombatPanelVisible);
         }
 
         [UnityTest]

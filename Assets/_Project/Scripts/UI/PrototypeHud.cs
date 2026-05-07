@@ -48,6 +48,7 @@ namespace HwigiTower.UI
 
         public int ChoiceButtonCount => _choiceButtons.Count;
         public string ResultMessage => resultText == null ? string.Empty : resultText.text;
+        public string RunStateMessage => runStateText == null ? string.Empty : runStateText.text;
         public string RouteMessage => routeText == null ? string.Empty : routeText.text;
         public string MemoryMessage => memoryText == null ? string.Empty : memoryText.text;
         public string CombatMessage => combatText == null ? string.Empty : combatText.text;
@@ -284,9 +285,15 @@ namespace HwigiTower.UI
             }
             else
             {
+                var status = snapshot.RunClear ? " | Run Clear" : snapshot.RunFailed ? " | Run Failed" : string.Empty;
                 runStateText.text =
-                    $"Floor {snapshot.CurrentFloor} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | Mental {snapshot.Mental} | Gold {snapshot.Gold}\n" +
+                    $"Floor {snapshot.CurrentFloor}{status} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | Mental {snapshot.Mental} | Gold {snapshot.Gold}\n" +
                     $"Glitch {snapshot.GlitchLevel} | Affinity {snapshot.Affinity} | Ability {snapshot.AbilityCount} | Item {snapshot.ItemCount}";
+            }
+
+            if (snapshot.RunCompleted)
+            {
+                ClearChoices();
             }
 
             UpdateNextFloorButton(snapshot);
