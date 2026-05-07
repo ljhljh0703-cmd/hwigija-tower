@@ -389,7 +389,7 @@
       "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_05.asset",
       "seedKey": "SEED_ENC_REST_05",
       "sourceHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
-      "floor": 2,
+      "floor": 3,
       "encounterType": "Rest",
       "contentCategory": "NpcRest",
       "tags": [
@@ -1678,9 +1678,9 @@
                 "sourceChoiceId": "CHOICE_COMBAT_02_ENGAGE",
                 "seedKey": "SEED_COMBAT_GATE_02",
                 "sourceHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
-                "floor": 2,
+                "floor": 3,
                 "enemyRefs": [
-                  "BOSS_GATE_01"
+                  "ENEMY_EMPTY_ARMOR"
                 ],
                 "playerSnapshot": {
                   "kind": "PlayerSnapshotCaptureSpec",
@@ -1703,16 +1703,16 @@
                 "onVictoryEffects": [
                   {
                     "kind": "ModifyGold",
-                    "amount": 16
+                    "amount": 9
                   },
                   {
                     "kind": "ModifyGlitchLevel",
-                    "amount": -4,
+                    "amount": -2,
                     "clamp": "0..100"
                   },
                   {
                     "kind": "ModifyAffinity",
-                    "amount": 4,
+                    "amount": 2,
                     "clamp": "-100..100"
                   },
                   {

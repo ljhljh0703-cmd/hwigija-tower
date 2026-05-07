@@ -174,6 +174,7 @@ namespace HwigiTower.Encounters
 
             if (!options.DryRun)
             {
+                EncounterRuntimeCatalogBuilder.ApplyPrototypeRuntimeOverrides();
                 AssetDatabase.SaveAssets();
                 TrimTrailingWhitespace(result.AssetPaths);
                 AssetDatabase.Refresh();
