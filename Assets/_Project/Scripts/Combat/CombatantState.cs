@@ -28,5 +28,10 @@ namespace HwigiTower.Combat
         {
             Hp = Math.Max(0, Hp - Math.Max(0, amount));
         }
+
+        public void RestoreHp(int amount)
+        {
+            Hp = Math.Min(MaxHp, Hp + Math.Max(0, amount));
+        }
     }
 }

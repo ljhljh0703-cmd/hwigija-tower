@@ -56,8 +56,11 @@ namespace HwigiTower.Run
         private readonly HashSet<string> _memoryFragmentRefs = new HashSet<string>();
         private readonly Dictionary<string, string> _resolvedEncounterChoices = new Dictionary<string, string>();
         private readonly List<PrototypeDemoRunStep> _demoRunPath = new List<PrototypeDemoRunStep>();
+        private readonly List<PrototypeFloorRunPath> _floorRunPaths = new List<PrototypeFloorRunPath>();
         private readonly HashSet<string> _resolvedDemoSteps = new HashSet<string>();
         private bool _runCompleted;
+        private bool _runClear;
+        private bool _stairUnlocked;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
         private int _playerAttack = BasePlayerAttack;
@@ -65,6 +68,7 @@ namespace HwigiTower.Run
         private int _gold;
         private int _glitchLevel;
         private int _affinity;
+        private int _currentFloor = 1;
         private string _lastMemoryFragmentId = string.Empty;
         private string _lastMemoryFragmentTitleKey = string.Empty;
         private string _lastMemoryFragmentBodyKey = string.Empty;
@@ -78,6 +82,7 @@ namespace HwigiTower.Run
         private int _lastCombatAffinityDelta;
         private bool _lastCombatEnemyDefeated;
         private int _lastCombatComboDamage;
+        private string _lastNpcReactionKey = string.Empty;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
             : this(runId, eventBus, null)
@@ -104,10 +109,14 @@ namespace HwigiTower.Run
         public int NodesResolved { get; private set; }
         public int BattlesWon { get; private set; }
         public bool RunCompleted => _runCompleted;
-        public bool DemoComplete => _demoRunPath.Count > 0 && _resolvedDemoSteps.Count >= _demoRunPath.Count;
-        public string DemoStatus => DemoComplete ? "demo.complete" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
+        public bool DemoComplete => _runClear;
+        public bool FloorComplete => _demoRunPath.Count > 0 && _resolvedDemoSteps.Count >= _demoRunPath.Count;
+        public bool StairUnlocked => _stairUnlocked;
+        public bool RunClear => _runClear;
+        public string DemoStatus => _runClear ? "run.clear" : _stairUnlocked ? "stair.unlocked" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
         public int DemoStepCount => _demoRunPath.Count;
         public int DemoResolvedStepCount => _resolvedDemoSteps.Count;
+        public int CurrentFloor => _currentFloor;
         public int PlayerHp => _playerHp;
         public int PlayerMaxHp => _playerMaxHp;
         public int PlayerAttack => _playerAttack;
@@ -124,6 +133,7 @@ namespace HwigiTower.Run
         public string LastCombatId => _lastCombatId;
         public string LastCombatEnemyId => _lastCombatEnemyId;
         public string LastCombatResultId => _lastCombatResultId;
+        public string LastNpcReactionKey => _lastNpcReactionKey;
 
         public PrototypeRunSnapshot CreateSnapshot()
         {
@@ -161,7 +171,12 @@ namespace HwigiTower.Run
                 _lastCombatGlitchDelta,
                 _lastCombatAffinityDelta,
                 _lastCombatEnemyDefeated,
-                _lastCombatComboDamage);
+                _lastCombatComboDamage,
+                _currentFloor,
+                _stairUnlocked,
+                _runClear,
+                _lastNpcReactionKey,
+                CountOwnedItems());
         }
 
         public string NextDemoNodeId
@@ -254,6 +269,7 @@ namespace HwigiTower.Run
                 _items[itemRef] = next;
             }
 
+            RecalculatePlayerStats();
             return next;
         }
 
@@ -274,6 +290,7 @@ namespace HwigiTower.Run
                 Abilities.Add(ability);
             }
 
+            RecalculatePlayerStats();
             return true;
         }
 
@@ -346,6 +363,11 @@ namespace HwigiTower.Run
             return added;
         }
 
+        public void RecordNpcReaction(string reactionKey)
+        {
+            SetNpcReaction(string.IsNullOrEmpty(reactionKey) ? "NPC_REACT_FALLBACK" : reactionKey);
+        }
+
         public bool HasMemoryFragmentRef(string memoryFragmentRef)
         {
             return !string.IsNullOrEmpty(memoryFragmentRef) && _memoryFragmentRefs.Contains(memoryFragmentRef);
@@ -401,6 +423,28 @@ namespace HwigiTower.Run
             }
         }
 
+        public void AttachFloorRunPaths(IReadOnlyList<PrototypeFloorRunPath> floorRunPaths, IReadOnlyList<PrototypeDemoRunStep> fallbackFloorOnePath)
+        {
+            _floorRunPaths.Clear();
+            _currentFloor = 1;
+            _stairUnlocked = false;
+            _runClear = false;
+
+            if (floorRunPaths != null)
+            {
+                for (var i = 0; i < floorRunPaths.Count; i++)
+                {
+                    var path = floorRunPaths[i];
+                    if (path != null && path.Floor > 0 && path.Steps != null && path.Steps.Count > 0)
+                    {
+                        _floorRunPaths.Add(path);
+                    }
+                }
+            }
+
+            AttachDemoRunPath(GetFloorRunPath(1, fallbackFloorOnePath));
+        }
+
         public bool TryGetNextDemoStep(out PrototypeDemoRunStep step)
         {
             for (var i = 0; i < _demoRunPath.Count; i++)
@@ -415,6 +459,26 @@ namespace HwigiTower.Run
 
             step = null;
             return false;
+        }
+
+        public bool CanAdvanceToNextFloor => _stairUnlocked && HasFloorRunPath(_currentFloor + 1);
+
+        public PrototypeNodeResolution ResolveNextFloor()
+        {
+            if (!CanAdvanceToNextFloor)
+            {
+                return new PrototypeNodeResolution("node.stair", string.Empty, "next floor unavailable", _runCompleted);
+            }
+
+            var completedFloor = _currentFloor;
+            _currentFloor++;
+            _stairUnlocked = false;
+            _resolvedDemoSteps.Clear();
+            AttachDemoRunPath(GetFloorRunPath(_currentFloor, null));
+            SaveFloorReflection(completedFloor);
+            SetNpcReaction("NPC_REACT_FLOOR_" + _currentFloor);
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, RunId, "floor." + _currentFloor, string.Empty));
+            return new PrototypeNodeResolution("node.stair", "floor." + _currentFloor, "floor " + _currentFloor + " entered", false);
         }
 
         public PrototypeNodeResolution ResolveBattle(DeterministicRunContext context, string nodeId, string encounterId, EnemyData enemyData, IReadOnlyList<SynergyData> trackedSynergies)
@@ -608,7 +672,8 @@ namespace HwigiTower.Run
                 return new CombatRoundResult(0, 0, _activeCombatPlayer?.IsDefeated ?? true, _activeCombatEnemy?.IsDefeated ?? true);
             }
 
-            var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action);
+            var secondAction = action == CombatAction.Skill && HasPlayableSkill() ? (CombatAction?)CombatAction.Attack : null;
+            var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action, secondAction);
             _combatRound++;
             _lastCombatComboDamage = result.ComboDamage;
             _lastCombatRoundResult =
@@ -617,6 +682,16 @@ namespace HwigiTower.Run
                 " | playerDamage " + result.PlayerDamage +
                 " | enemyDamage " + result.EnemyDamage +
                 (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty);
+
+            if (action == CombatAction.Defend)
+            {
+                var defendReduce = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData()).DefendDamageReduce;
+                if (defendReduce > 0 && result.EnemyDamage > 0)
+                {
+                    _activeCombatPlayer.RestoreHp(defendReduce);
+                    _lastCombatRoundResult += " | item guard " + defendReduce;
+                }
+            }
 
             if (result.IsComplete)
             {
@@ -644,12 +719,22 @@ namespace HwigiTower.Run
 
             if (_activeCombatPlayer.IsDefeated)
             {
+                if (TryApplyRecallAnchor())
+                {
+                    _lastCombatResultId = "recall";
+                    _lastCombatRoundResult += " | recall anchor";
+                    SetNpcReaction("NPC_REACT_RECALL_ANCHOR");
+                    return;
+                }
+
                 ApplyNpcTrigger("battle.defeat");
+                SetNpcReaction("NPC_REACT_COMBAT_DEFEAT");
                 CompleteRun("defeat");
             }
             else if (_activeCombatEnemy.IsDefeated)
             {
                 ApplyNpcTrigger("battle.victory");
+                SetNpcReaction("NPC_REACT_COMBAT_VICTORY");
             }
 
             // Clear active combat if complete
@@ -686,6 +771,12 @@ namespace HwigiTower.Run
 
             RecalculatePlayerStats();
             var player = new CombatantState("player", _playerMaxHp, _playerAttack, _playerHp);
+            var combatStartRestore = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData()).CombatStartHpRestore;
+            if (combatStartRestore > 0)
+            {
+                player.RestoreHp(combatStartRestore);
+            }
+
             var enemyId = handoff.enemyRefs != null && handoff.enemyRefs.Length > 0 && !string.IsNullOrEmpty(handoff.enemyRefs[0])
                 ? handoff.enemyRefs[0]
                 : "enemy.placeholder";
@@ -788,6 +879,17 @@ namespace HwigiTower.Run
             return count;
         }
 
+        private int CountOwnedItems()
+        {
+            var total = 0;
+            foreach (var pair in _items)
+            {
+                total += System.Math.Max(0, pair.Value);
+            }
+
+            return total;
+        }
+
         private void ApplyRewardBundle(HwigiTower.Rewards.RewardBundleData rewardBundle)
         {
             if (rewardBundle == null || rewardBundle.Entries == null)
@@ -824,7 +926,7 @@ namespace HwigiTower.Run
         private void RecalculatePlayerStats()
         {
             var previousMaxHp = _playerMaxHp;
-            var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies);
+            var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData());
             _playerMaxHp = System.Math.Max(1, BasePlayerMaxHp + modifiers.PlayerMaxHpBonus);
             _playerAttack = System.Math.Max(0, BasePlayerAttack + modifiers.PlayerAttackBonus);
 
@@ -834,6 +936,50 @@ namespace HwigiTower.Run
             }
 
             _playerHp = System.Math.Max(0, System.Math.Min(_playerHp, _playerMaxHp));
+        }
+
+        private List<HwigiTower.Items.ItemData> BuildOwnedItemData()
+        {
+            var result = new List<HwigiTower.Items.ItemData>();
+            if (EncounterCatalog == null)
+            {
+                return result;
+            }
+
+            foreach (var pair in _items)
+            {
+                if (pair.Value <= 0 || !EncounterCatalog.TryGetItem(pair.Key, out var item) || item == null)
+                {
+                    continue;
+                }
+
+                for (var i = 0; i < pair.Value; i++)
+                {
+                    result.Add(item);
+                }
+            }
+
+            return result;
+        }
+
+        private bool HasPlayableSkill()
+        {
+            return Abilities.Abilities.Count > 0 || _abilityRefs.Count > 0;
+        }
+
+        private bool TryApplyRecallAnchor()
+        {
+            if (!HasAbilityRef("ABILITY_RECALL_ANCHOR") || HasFlag("FLAG_RECALL_ANCHOR_USED") || _activeCombatPlayer == null)
+            {
+                return false;
+            }
+
+            SetFlag("FLAG_RECALL_ANCHOR_USED", true);
+            _activeCombatPlayer.RestoreHp(6);
+            _playerHp = _activeCombatPlayer.Hp;
+            ModifyGlitchLevel(3);
+            ModifyAffinity(1);
+            return true;
         }
 
         private void CompleteRun(string cause)
@@ -868,17 +1014,31 @@ namespace HwigiTower.Run
                 }
             }
 
-            if (DemoComplete)
+            if (FloorComplete)
             {
-                CompleteRun("demo.complete");
+                if (HasFloorRunPath(_currentFloor + 1))
+                {
+                    _stairUnlocked = true;
+                    SetNpcReaction("NPC_REACT_STAIR_UNLOCKED");
+                }
+                else
+                {
+                    _runClear = true;
+                    CompleteRun("run.clear");
+                }
             }
         }
 
         private string BuildChoiceResolutionMessage(string baseMessage)
         {
-            if (DemoComplete)
+            if (_runClear)
             {
-                return string.IsNullOrEmpty(baseMessage) ? "demo.complete" : baseMessage + " | demo.complete";
+                return string.IsNullOrEmpty(baseMessage) ? "run.clear" : baseMessage + " | run.clear";
+            }
+
+            if (_stairUnlocked)
+            {
+                return string.IsNullOrEmpty(baseMessage) ? "stair unlocked" : baseMessage + " | stair unlocked";
             }
 
             if (TryGetNextDemoStep(out var next))
@@ -893,6 +1053,43 @@ namespace HwigiTower.Run
         private void ApplyNpcTrigger(string triggerId)
         {
             NpcStateMachine?.TryApply(triggerId);
+        }
+
+        private void SetNpcReaction(string reactionKey)
+        {
+            _lastNpcReactionKey = reactionKey ?? string.Empty;
+        }
+
+        private IReadOnlyList<PrototypeDemoRunStep> GetFloorRunPath(int floor, IReadOnlyList<PrototypeDemoRunStep> fallbackFloorOnePath)
+        {
+            for (var i = 0; i < _floorRunPaths.Count; i++)
+            {
+                if (_floorRunPaths[i] != null && _floorRunPaths[i].Floor == floor)
+                {
+                    return _floorRunPaths[i].Steps;
+                }
+            }
+
+            return floor == 1 ? fallbackFloorOnePath : null;
+        }
+
+        private bool HasFloorRunPath(int floor)
+        {
+            for (var i = 0; i < _floorRunPaths.Count; i++)
+            {
+                if (_floorRunPaths[i] != null && _floorRunPaths[i].Floor == floor && _floorRunPaths[i].Steps != null && _floorRunPaths[i].Steps.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void SaveFloorReflection(int completedFloor)
+        {
+            var summary = "floor=" + completedFloor + ";nodes=" + NodesResolved + ";battles=" + BattlesWon;
+            _reflectionPipeline.TrySaveReflection(RunId + ".floor." + completedFloor, summary, out _);
         }
 
         private static int Clamp(int value, int min, int max)

@@ -591,8 +591,8 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(state.RunCompleted);
             Assert.IsTrue(state.DemoComplete);
-            Assert.AreEqual("demo.complete", state.DemoStatus);
-            StringAssert.Contains("demo.complete", completion.Message);
+            Assert.AreEqual("run.clear", state.DemoStatus);
+            StringAssert.Contains("run.clear", completion.Message);
         }
 
         [Test]
@@ -606,10 +606,115 @@ namespace HwigiTower.Tests.EditMode
             var first = state.ResolveEncounterChoice(new DeterministicRunContext("run-demo-revisit", 1001), node.NodeId, encounter, "CHOICE_SHOP_REVISIT");
             var second = state.ResolveEncounterChoice(new DeterministicRunContext("run-demo-revisit", 1001), node.NodeId, encounter, "CHOICE_SHOP_REVISIT");
 
-            Assert.IsTrue(first.Message.Contains("demo.complete"));
+            Assert.IsTrue(first.Message.Contains("run.clear"));
             Assert.IsTrue(second.Message.Contains("already resolved: CHOICE_SHOP_REVISIT"));
             Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
             Assert.AreEqual(1, state.CreateSnapshot().NodesResolved);
+        }
+
+        [Test]
+        public void FloorProgression_UnlocksStairAndAdvancesToFloorTwo()
+        {
+            var floorOneEncounter = CreateRuntimeEncounter("ENC_FLOOR_1", CreateChoice("CHOICE_FLOOR_1", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", 1) }));
+            var floorTwoEncounter = CreateRuntimeEncounter("ENC_FLOOR_2", CreateChoice("CHOICE_FLOOR_2", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGlitchLevel", 1) }));
+            var shopNode = CreateNode("node.floor.shop", floorOneEncounter);
+            var battleNode = CreateNode("node.floor.battle", floorTwoEncounter);
+            var state = new PrototypeRunState("run-floor", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachFloorRunPaths(new[]
+            {
+                CreateFloorPath(1, new PrototypeDemoRunStep(shopNode, floorOneEncounter)),
+                CreateFloorPath(2, new PrototypeDemoRunStep(battleNode, floorTwoEncounter))
+            }, null);
+
+            Assert.AreEqual(1, state.CurrentFloor);
+            Assert.AreEqual("ENC_FLOOR_1", state.NextDemoEncounterId);
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-floor", 1001), shopNode.NodeId, floorOneEncounter, "CHOICE_FLOOR_1");
+
+            Assert.IsTrue(state.StairUnlocked);
+            Assert.IsFalse(state.RunCompleted);
+
+            var next = state.ResolveNextFloor();
+
+            Assert.AreEqual("floor.2", next.PayloadId);
+            Assert.AreEqual(2, state.CurrentFloor);
+            Assert.IsFalse(state.StairUnlocked);
+            Assert.AreEqual("ENC_FLOOR_2", state.NextDemoEncounterId);
+            Assert.IsTrue(state.MemoryRepo.TryGetReflection("run-floor.floor.1", out _));
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-floor", 1001), battleNode.NodeId, floorTwoEncounter, "CHOICE_FLOOR_2");
+
+            Assert.IsTrue(state.RunClear);
+            Assert.IsTrue(state.RunCompleted);
+        }
+
+        [Test]
+        public void ItemAndAbilityEffects_ApplyToCombatLoop()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-effects", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AddItemRef("ITEM_FIELD_BANDAGE", 1);
+            state.AddAbilityRef("ABILITY_SCOUT");
+            var encounter = CreateRuntimeEncounter(
+                "ENC_EFFECT_COMBAT",
+                CreateChoice(
+                    "CHOICE_EFFECT_COMBAT",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_EFFECT", "ENEMY_EMPTY_ARMOR", new[] { CreatePostCombatEffect("ModifyGold", 4) }) }));
+
+            state.ModifyPlayerHp(-10);
+            var before = state.CreateSnapshot();
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-effects", 1001), "node.effects.combat", encounter, "CHOICE_EFFECT_COMBAT");
+            var started = state.CreateSnapshot();
+            var round = state.ResolveCombatRoundInteractive(CombatAction.Skill);
+
+            Assert.Greater(before.ItemCount, 0);
+            Assert.Greater(started.PlayerMaxHp, 24);
+            Assert.Greater(started.PlayerHp, before.PlayerHp);
+            Assert.Greater(round.ComboDamage, 0);
+        }
+
+        [Test]
+        public void CombatReward_DoesNotApplyTwiceOnResolvedRevisit()
+        {
+            var state = new PrototypeRunState("run-combat-revisit", new GameFlowEventBus()) { AutoResolveCombat = true };
+            var encounter = CreateRuntimeEncounter(
+                "ENC_COMBAT_REVISIT",
+                CreateChoice(
+                    "CHOICE_COMBAT_REVISIT",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_REVISIT", "ENEMY_REVISIT", new[] { CreatePostCombatEffect("ModifyGold", 8) }) }));
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-combat-revisit", 1001), "node.combat.revisit", encounter, "CHOICE_COMBAT_REVISIT");
+            var firstGold = state.Gold;
+            var second = state.ResolveEncounterChoice(new DeterministicRunContext("run-combat-revisit", 1001), "node.combat.revisit", encounter, "CHOICE_COMBAT_REVISIT");
+
+            Assert.AreEqual(8, firstGold);
+            Assert.AreEqual(firstGold, state.Gold);
+            StringAssert.Contains("already resolved: CHOICE_COMBAT_REVISIT", second.Message);
+        }
+
+        [Test]
+        public void NpcFallbackReaction_IsDeterministicForSameChoice()
+        {
+            var first = new PrototypeRunState("run-npc", new GameFlowEventBus()) { AutoResolveCombat = true };
+            var second = new PrototypeRunState("run-npc", new GameFlowEventBus()) { AutoResolveCombat = true };
+            var encounter = CreateRuntimeEncounter(
+                "ENC_NPC_REACTION",
+                CreateChoice(
+                    "CHOICE_NPC_REACTION",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateEffect("ModifyAffinity", 1) },
+                    "Hidden",
+                    string.Empty,
+                    "NPC_REACT_TEST_CHOICE"));
+
+            first.ResolveEncounterChoice(new DeterministicRunContext("run-npc", 1001), "node.npc", encounter, "CHOICE_NPC_REACTION");
+            second.ResolveEncounterChoice(new DeterministicRunContext("run-npc", 1001), "node.npc", encounter, "CHOICE_NPC_REACTION");
+
+            Assert.AreEqual(first.LastNpcReactionKey, second.LastNpcReactionKey);
+            Assert.AreEqual("NPC_REACT_TEST_CHOICE", first.LastNpcReactionKey);
         }
 
         [Test]
@@ -756,6 +861,7 @@ namespace HwigiTower.Tests.EditMode
                 choice.FindPropertyRelative("requirementMode").stringValue = choices[i].requirementMode;
                 choice.FindPropertyRelative("unavailablePolicyMode").stringValue = choices[i].unavailablePolicyMode;
                 choice.FindPropertyRelative("unavailableReasonTextKey").stringValue = choices[i].unavailableReasonTextKey;
+                choice.FindPropertyRelative("npcReactionKey").stringValue = choices[i].npcReactionKey;
                 var requirements = choice.FindPropertyRelative("requirements");
                 requirements.arraySize = choices[i].requirements.Length;
                 for (var r = 0; r < choices[i].requirements.Length; r++)
@@ -845,7 +951,8 @@ namespace HwigiTower.Tests.EditMode
             EncounterRequirementRuntimeData[] requirements,
             EncounterEffectRuntimeData[] effects,
             string unavailableMode = "Hidden",
-            string unavailableReasonTextKey = "")
+            string unavailableReasonTextKey = "",
+            string npcReactionKey = "")
         {
             return new EncounterChoiceRuntimeData
             {
@@ -854,7 +961,8 @@ namespace HwigiTower.Tests.EditMode
                 requirements = requirements,
                 effects = effects,
                 unavailablePolicyMode = unavailableMode,
-                unavailableReasonTextKey = unavailableReasonTextKey
+                unavailableReasonTextKey = unavailableReasonTextKey,
+                npcReactionKey = npcReactionKey
             };
         }
 
@@ -973,6 +1081,11 @@ namespace HwigiTower.Tests.EditMode
                 new PrototypeDemoRunStep(secondNode, secondEncounter)
             });
             return state;
+        }
+
+        private static PrototypeFloorRunPath CreateFloorPath(int floor, params PrototypeDemoRunStep[] steps)
+        {
+            return new PrototypeFloorRunPath(floor, steps);
         }
 
         private static PrototypeNodeDefinition CreateNode(string nodeId, params EncounterData[] encounters)

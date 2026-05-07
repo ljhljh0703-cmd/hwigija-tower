@@ -17,4 +17,6 @@ MonoBehaviour:
   tag:
   description: PLACEHOLDER_ABILITY_SCOUT_DESC
   costGold: 20
-  numericParams: []
+  numericParams:
+  - key: player.attack_bonus
+    value: 1
