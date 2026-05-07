@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
   id: ENC_COMBAT_GATE_02
   type: 0
-  floor: 3
+  floor: 2
   weight: 1
   deterministicSeedKey: SEED_ENC_COMBAT_GATE_02
   enemy: {fileID: 0}
@@ -54,13 +54,13 @@ MonoBehaviour:
         sourceChoiceId: CHOICE_COMBAT_02_ENGAGE
         seedKey: SEED_COMBAT_GATE_02
         sourceHash: sha256:5555555555555555555555555555555555555555555555555555555555555555
-        floor: 3
+        floor: 2
         enemyRefs:
-        - ENEMY_EMPTY_ARMOR
+        - BOSS_GATE_01
         npcStage: S3_FRACTURE
         onVictoryEffects:
         - kind: ModifyGold
-          amount: 9
+          amount: 16
           flag:
           value: 0
           itemRef:
@@ -73,7 +73,7 @@ MonoBehaviour:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyGlitchLevel
-          amount: -2
+          amount: -4
           flag:
           value: 0
           itemRef:
@@ -86,7 +86,7 @@ MonoBehaviour:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyAffinity
-          amount: 2
+          amount: 4
           flag:
           value: 0
           itemRef:

@@ -146,6 +146,11 @@ namespace HwigiTower.Run
                 BeginRun();
             }
 
+            if (RunState != null && RunState.RunCompleted)
+            {
+                return new EncounterSelection(node.Definition, null);
+            }
+
             if (RunState != null &&
                 RunState.TryGetNextDemoStep(out var step) &&
                 step.Node == node.Definition)
@@ -161,6 +166,11 @@ namespace HwigiTower.Run
             if (RunState == null)
             {
                 BeginRun();
+            }
+
+            if (RunState != null && RunState.RunCompleted)
+            {
+                return new PrototypeEncounterChoiceView[0];
             }
 
             if (TryGetResolvedEncounterChoice(selection, out _))
@@ -189,6 +199,11 @@ namespace HwigiTower.Run
             if (RunState == null)
             {
                 BeginRun();
+            }
+
+            if (RunState != null && RunState.RunCompleted)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "run already completed", true);
             }
 
             var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
@@ -265,6 +280,15 @@ namespace HwigiTower.Run
             if (RunState == null)
             {
                 BeginRun();
+            }
+
+            if (RunState.RunCompleted)
+            {
+                return new PrototypeNodeResolution(
+                    node == null || node.Definition == null ? string.Empty : node.Definition.NodeId,
+                    string.Empty,
+                    "run already completed",
+                    true);
             }
 
             if (node == null || node.Definition == null)

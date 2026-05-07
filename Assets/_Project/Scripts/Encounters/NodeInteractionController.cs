@@ -31,6 +31,13 @@ namespace HwigiTower.Encounters
             if (_currentNode != null && _movement.LatestInput.InteractPressed)
             {
                 _currentNode.Interact();
+                if (roomController != null && roomController.GetSnapshot().RunCompleted)
+                {
+                    hud?.ClearChoices();
+                    hud?.ShowRunState(roomController.GetSnapshot());
+                    return;
+                }
+
                 var selection = roomController == null
                     ? new EncounterSelection(_currentNode.Definition, null)
                     : roomController.SelectEncounter(_currentNode);
@@ -105,6 +112,13 @@ namespace HwigiTower.Encounters
 
         private void ShowEncounterChoices(InteractableNode node, EncounterSelection selection)
         {
+            if (roomController.GetSnapshot().RunCompleted)
+            {
+                hud?.ClearChoices();
+                hud?.ShowRunState(roomController.GetSnapshot());
+                return;
+            }
+
             if (roomController.TryGetResolvedEncounterChoice(selection, out var resolvedChoiceStableId))
             {
                 hud?.ClearChoices();

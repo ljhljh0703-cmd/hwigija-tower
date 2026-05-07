@@ -675,6 +675,35 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void FloorTwoBossGate_UsesDedicatedBossEnemyFromCatalog()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
+            var boss = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_BOSS_GATE_01.asset");
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset");
+
+            Assert.IsNotNull(catalog);
+            Assert.IsNotNull(boss);
+            Assert.IsNotNull(encounter);
+            Assert.IsTrue(catalog.TryGetEnemy("BOSS_GATE_01", out var catalogBoss));
+            Assert.AreSame(boss, catalogBoss);
+            Assert.AreEqual("BOSS_GATE_01", encounter.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
+            Assert.AreNotEqual("ENEMY_EMPTY_ARMOR", encounter.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
+        }
+
+        [Test]
+        public void FloorTwoBossGate_BalanceSupportsThreeToSixTurnClear()
+        {
+            var boss = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_BOSS_GATE_01.asset");
+            Assert.IsNotNull(boss);
+            Assert.AreEqual("BOSS_GATE_01", boss.Id);
+            Assert.GreaterOrEqual(boss.Hp, 24);
+            Assert.LessOrEqual(boss.Hp, 32);
+            Assert.GreaterOrEqual(boss.Attack, 3);
+            Assert.LessOrEqual(boss.Attack, 5);
+            Assert.GreaterOrEqual(boss.GoldReward, 12);
+        }
+
+        [Test]
         public void FloorTwoBossGate_VictoryClearsRunAndSavesReflection()
         {
             var floorOneEncounter = CreateRuntimeEncounter("ENC_FLOOR_ONE_CLEAR_BOSS", CreateChoice("CHOICE_FLOOR_ONE_CLEAR_BOSS", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", 1) }));
@@ -700,6 +729,24 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(state.RestartReady);
             Assert.AreEqual("run.clear", state.RunStatus);
             Assert.IsTrue(state.MemoryRepo.TryGetReflection("run-boss-clear", out _));
+        }
+
+        [Test]
+        public void FloorTwoBossGate_ClearRewardDoesNotApplyOnRevisit()
+        {
+            var bossGate = CreateRuntimeEncounter("ENC_FLOOR_TWO_BOSS_REVISIT", CreateChoice("CHOICE_FLOOR_TWO_BOSS_REVISIT", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_FLOOR_TWO_BOSS_REVISIT", "BOSS_GATE_01", new[] { CreatePostCombatEffect("ModifyGold", 16) }) }));
+            var bossNode = CreateNode("node.floor.two.boss.revisit", bossGate);
+            var state = new PrototypeRunState("run-boss-revisit", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(bossNode, bossGate) });
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-revisit", 1001), bossNode.NodeId, bossGate, "CHOICE_FLOOR_TWO_BOSS_REVISIT");
+            var goldAfterClear = state.Gold;
+            var revisit = state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-revisit", 1001), bossNode.NodeId, bossGate, "CHOICE_FLOOR_TWO_BOSS_REVISIT");
+
+            Assert.IsTrue(state.RunClear);
+            Assert.AreEqual(16, goldAfterClear);
+            Assert.AreEqual(goldAfterClear, state.Gold);
+            StringAssert.Contains("already resolved: CHOICE_FLOOR_TWO_BOSS_REVISIT", revisit.Message);
         }
 
         [Test]

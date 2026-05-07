@@ -58,7 +58,8 @@ namespace HwigiTower.Encounters
         {
             "ENEMY_COLLAPSE_ECHO",
             "ENEMY_EMPTY_ARMOR",
-            "ENEMY_FRACTURE_HOUND"
+            "ENEMY_FRACTURE_HOUND",
+            "BOSS_GATE_01"
         };
 
         private static readonly string[] MemoryFragmentIds =
@@ -192,9 +193,13 @@ namespace HwigiTower.Encounters
         {
             var serialized = new SerializedObject(enemy);
             serialized.FindProperty("id").stringValue = stableId;
-            serialized.FindProperty("hp").intValue = 12;
-            serialized.FindProperty("attack").intValue = 3;
-            serialized.FindProperty("patternId").stringValue = "PATTERN_PLACEHOLDER";
+            serialized.FindProperty("hp").intValue = stableId == "BOSS_GATE_01" ? 28 : 12;
+            serialized.FindProperty("attack").intValue = stableId == "BOSS_GATE_01" ? 4 : 3;
+            serialized.FindProperty("patternId").stringValue = stableId == "BOSS_GATE_01" ? "PATTERN_ELITE" : "PATTERN_PLACEHOLDER";
+            serialized.FindProperty("goldReward").intValue = stableId == "BOSS_GATE_01" ? 16 : 0;
+            serialized.FindProperty("xpReward").intValue = stableId == "BOSS_GATE_01" ? 50 : 0;
+            serialized.FindProperty("glitchDelta").intValue = stableId == "BOSS_GATE_01" ? -4 : 0;
+            serialized.FindProperty("affinityDelta").intValue = stableId == "BOSS_GATE_01" ? 4 : 0;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(enemy);
         }
