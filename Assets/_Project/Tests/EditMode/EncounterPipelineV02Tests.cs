@@ -189,6 +189,8 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(25, bake.AssetPaths.Count(path => AssetDatabase.LoadAssetAtPath<EncounterData>(path) != null));
             Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_01.asset"));
             Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset"));
+            var bossGate = AssetDatabase.LoadAssetAtPath<EncounterData>(EncounterRuntimeCatalogBuilder.PrototypeBossGateEncounterPath);
+            Assert.AreEqual("BOSS_GATE_01", bossGate.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
         }
 
         [Test]
