@@ -35,6 +35,7 @@ namespace HwigiTower.UI
         [SerializeField] private Button defendButton;
         [SerializeField] private Button skillButton;
         [SerializeField] private Button nextFloorButton;
+        [SerializeField] private Button restartButton;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<string> _demoRouteLabels = new List<string>();
@@ -279,7 +280,7 @@ namespace HwigiTower.UI
                     $"run {state} | {demo}\n" +
                     $"HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | ATK {snapshot.PlayerAttack} | Mental {snapshot.Mental}\n" +
                     $"Gold {snapshot.Gold} | Glitch {snapshot.GlitchLevel} | Affinity {snapshot.Affinity}\n" +
-                    $"Abilities {snapshot.AbilityCount} | Step {snapshot.DemoResolvedStepCount}/{snapshot.DemoStepCount}";
+                    $"Abilities {snapshot.AbilityCount} | Step {snapshot.DemoResolvedStepCount}/{snapshot.DemoStepCount} | {snapshot.RunStatus}";
             }
             else
             {
@@ -289,6 +290,7 @@ namespace HwigiTower.UI
             }
 
             UpdateNextFloorButton(snapshot);
+            UpdateRestartButton(snapshot);
             UpdatePresentationState(snapshot);
             UpdateRouteIndicator(snapshot);
             UpdateMemoryAndCombatPanel(snapshot);
@@ -718,6 +720,62 @@ namespace HwigiTower.UI
             nextFloorButton.interactable = nextFloorButton.gameObject.activeSelf && _roomController != null;
         }
 
+        private void EnsureRestartButton()
+        {
+            if (restartButton != null)
+            {
+                return;
+            }
+
+            var buttonObject = new GameObject("Restart Run Button");
+            buttonObject.transform.SetParent(transform, false);
+
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.28f, 0f);
+            rect.anchorMax = new Vector2(0.72f, 0f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, 218f);
+            rect.sizeDelta = new Vector2(0f, 76f);
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.20f, 0.24f, 0.28f, 0.96f);
+
+            restartButton = buttonObject.AddComponent<Button>();
+            restartButton.targetGraphic = image;
+            restartButton.onClick.AddListener(ResolveRestart);
+
+            var labelObject = new GameObject("Label");
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            var labelRect = labelObject.AddComponent<RectTransform>();
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(12f, 4f);
+            labelRect.offsetMax = new Vector2(-12f, -4f);
+
+            var label = labelObject.AddComponent<Text>();
+            label.font = ResolveFont();
+            label.fontSize = 24;
+            label.alignment = TextAnchor.MiddleCenter;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 14;
+            label.resizeTextMaxSize = 24;
+            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.text = "Restart Run";
+            buttonObject.SetActive(false);
+        }
+
+        private void UpdateRestartButton(PrototypeRunSnapshot snapshot)
+        {
+            EnsureRestartButton();
+            if (restartButton == null)
+            {
+                return;
+            }
+
+            restartButton.gameObject.SetActive(snapshot.RestartReady && !snapshot.IsInCombat);
+            restartButton.interactable = restartButton.gameObject.activeSelf && _roomController != null;
+        }
+
         private void ResolveNextFloor()
         {
             if (_roomController == null)
@@ -727,6 +785,19 @@ namespace HwigiTower.UI
             }
 
             var resolution = _roomController.ResolveNextFloor();
+            ShowResult(resolution);
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void ResolveRestart()
+        {
+            if (_roomController == null)
+            {
+                ShowResultMessage("restart unavailable");
+                return;
+            }
+
+            var resolution = _roomController.RestartRun();
             ShowResult(resolution);
             ShowRunState(_roomController.GetSnapshot());
         }
@@ -860,9 +931,19 @@ namespace HwigiTower.UI
                 return "Progress\nRun clear";
             }
 
+            if (snapshot.RunFailed)
+            {
+                return "Progress\nRun failed";
+            }
+
             if (snapshot.StairUnlocked)
             {
                 return "Progress\nFloor " + snapshot.CurrentFloor + " clear | Stair";
+            }
+
+            if (snapshot.BossGateUnlocked)
+            {
+                return "Progress\nFloor " + snapshot.CurrentFloor + " | Boss Gate";
             }
 
             var label = currentIndex >= 0 && currentIndex < _demoRouteLabels.Count
@@ -879,7 +960,7 @@ namespace HwigiTower.UI
                 return "Combat in progress";
             }
 
-            return snapshot.RunClear ? "Run clear" : snapshot.StairUnlocked ? "Stair" : "Ready";
+            return snapshot.RunClear ? "Run clear" : snapshot.RunFailed ? "Run failed" : snapshot.StairUnlocked ? "Stair" : "Ready";
         }
 
         private void UpdateMemoryAndCombatPanel(PrototypeRunSnapshot snapshot)
@@ -1005,8 +1086,14 @@ namespace HwigiTower.UI
                 return;
             }
 
-            demoCompleteText.gameObject.SetActive(snapshot.RunClear && !snapshot.IsInCombat);
-            demoCompleteText.text = showRawDebugText ? "run.clear\nRun Route Complete" : "Run Clear";
+            demoCompleteText.gameObject.SetActive((snapshot.RunClear || snapshot.RunFailed) && !snapshot.IsInCombat);
+            if (snapshot.RunFailed)
+            {
+                demoCompleteText.text = showRawDebugText ? "run.failed\nRestart Ready" : "Run Failed";
+                return;
+            }
+
+            demoCompleteText.text = showRawDebugText ? "run.clear\nRestart Ready" : "Run Clear";
         }
 
         private void UpdateResultVisibility(PrototypeRunSnapshot snapshot)
