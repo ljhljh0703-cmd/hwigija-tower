@@ -1,6 +1,7 @@
 using HwigiTower.Core;
 using HwigiTower.Combat;
 using HwigiTower.Encounters;
+using HwigiTower.NPC;
 using HwigiTower.UI;
 using UnityEngine;
 
@@ -19,6 +20,9 @@ namespace HwigiTower.Run
         public GameFlowEventBus EventBus { get; } = new GameFlowEventBus();
         public PrototypeRunState RunState { get; private set; }
         public EncounterRuntimeCatalogData EncounterRuntimeCatalog => encounterRuntimeCatalog;
+        private INPCMemoryRepo _persistentMemoryRepo;
+        private int _restartIndex;
+        private string ActiveRunId => RunState == null ? RunContext.RunId : RunState.RunId;
         public bool AutoResolveCombat
         {
             get => autoResolveCombat;
@@ -65,7 +69,31 @@ namespace HwigiTower.Run
 
         public void BeginRun()
         {
-            RunState = new PrototypeRunState(RunContext.RunId, EventBus) { AutoResolveCombat = autoResolveCombat };
+            _restartIndex = 0;
+            StartRun(RunContext.RunId);
+        }
+
+        public PrototypeNodeResolution RestartRun()
+        {
+            if (RunState == null || !RunState.RestartReady)
+            {
+                return new PrototypeNodeResolution("run.restart", string.Empty, "restart unavailable", false);
+            }
+
+            _restartIndex++;
+            var nextRunId = RunContext.RunId + ".restart." + _restartIndex;
+            StartRun(nextRunId);
+            return new PrototypeNodeResolution("run.restart", nextRunId, "run restarted: " + nextRunId, false);
+        }
+
+        private void StartRun(string runId)
+        {
+            if (_persistentMemoryRepo == null)
+            {
+                _persistentMemoryRepo = new InMemoryNpcMemoryRepo();
+            }
+
+            RunState = new PrototypeRunState(runId, EventBus, null, _persistentMemoryRepo) { AutoResolveCombat = autoResolveCombat };
             RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
             if (roomDefinition == null)
             {
@@ -77,26 +105,26 @@ namespace HwigiTower.Run
             }
             ConfigureHudDemoRoute();
             RunState.ModifyGold(6);
-            EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, RunContext.RunId, string.Empty, string.Empty));
-            EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, RunContext.RunId, RunContext.RunId, string.Empty));
+            EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, runId, string.Empty, string.Empty));
+            EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, runId, RunContext.RunId, string.Empty));
         }
 
         public void NotifyNodeEntered(InteractableNode node)
         {
             var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
-            EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeEntered, RunContext.RunId, nodeId, string.Empty));
+            EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeEntered, ActiveRunId, nodeId, string.Empty));
         }
 
         public void NotifyNodeExited(InteractableNode node)
         {
             var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
-            EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeExited, RunContext.RunId, nodeId, string.Empty));
+            EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeExited, ActiveRunId, nodeId, string.Empty));
         }
 
         public void NotifyNodeResolved(InteractableNode node, string payloadId)
         {
             var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
-            EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeResolved, RunContext.RunId, nodeId, payloadId));
+            EventBus.Raise(new GameFlowEvent(GameFlowEventType.NodeResolved, ActiveRunId, nodeId, payloadId));
         }
 
         public bool HasEncounterChoices(EncounterSelection selection)
@@ -164,7 +192,7 @@ namespace HwigiTower.Run
             }
 
             var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
-            var resolution = RunState.ResolveEncounterChoice(RunContext, nodeId, encounter, choiceStableId);
+            var resolution = RunState.ResolveEncounterChoice(CreateActiveContext(), nodeId, encounter, choiceStableId);
             NotifyNodeResolved(node, resolution.PayloadId);
             return resolution;
         }
@@ -214,9 +242,18 @@ namespace HwigiTower.Run
                 {
                     message += " | run.clear";
                 }
+                else if (snapshot.RunFailed)
+                {
+                    message += " | run.failed";
+                }
                 else if (snapshot.StairUnlocked)
                 {
                     message += " | stair unlocked";
+                }
+
+                if (snapshot.RestartReady)
+                {
+                    message += " | run.restartReady";
                 }
             }
 
@@ -255,7 +292,7 @@ namespace HwigiTower.Run
             switch (definition.Kind)
             {
                 case NodeKind.Battle:
-                    resolution = RunState.ResolveBattle(RunContext, definition.NodeId, encounterId, enemy, definition.TrackedSynergies);
+                    resolution = RunState.ResolveBattle(CreateActiveContext(), definition.NodeId, encounterId, enemy, definition.TrackedSynergies);
                     break;
                 case NodeKind.Rest:
                     resolution = RunState.ResolveRest(definition.NodeId);
@@ -290,6 +327,11 @@ namespace HwigiTower.Run
             var seed = roomDefinition == null ? 1001 : roomDefinition.DeterministicSeed;
             var roomId = roomDefinition == null ? "room.prototype" : roomDefinition.RoomId;
             RunContext = new DeterministicRunContext(roomId, seed);
+        }
+
+        private DeterministicRunContext CreateActiveContext()
+        {
+            return new DeterministicRunContext(ActiveRunId, RunContext.Seed);
         }
 
         private void ConfigureHudDemoRoute()

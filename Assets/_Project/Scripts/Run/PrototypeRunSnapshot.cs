@@ -40,6 +40,10 @@ namespace HwigiTower.Run
             int currentFloor = 1,
             bool stairUnlocked = false,
             bool runClear = false,
+            bool runFailed = false,
+            bool restartReady = false,
+            bool bossGateUnlocked = false,
+            string runStatus = "",
             string lastNpcReactionKey = "",
             int itemCount = 0)
         {
@@ -80,6 +84,10 @@ namespace HwigiTower.Run
             CurrentFloor = currentFloor < 1 ? 1 : currentFloor;
             StairUnlocked = stairUnlocked;
             RunClear = runClear;
+            RunFailed = runFailed;
+            RestartReady = restartReady;
+            BossGateUnlocked = bossGateUnlocked;
+            RunStatus = string.IsNullOrEmpty(runStatus) ? runClear ? "run.clear" : runFailed ? "run.failed" : "run.active" : runStatus;
             LastNpcReactionKey = lastNpcReactionKey ?? string.Empty;
             ItemCount = itemCount;
         }
@@ -121,6 +129,10 @@ namespace HwigiTower.Run
         public int CurrentFloor { get; }
         public bool StairUnlocked { get; }
         public bool RunClear { get; }
+        public bool RunFailed { get; }
+        public bool RestartReady { get; }
+        public bool BossGateUnlocked { get; }
+        public string RunStatus { get; }
         public string LastNpcReactionKey { get; }
         public int ItemCount { get; }
     }

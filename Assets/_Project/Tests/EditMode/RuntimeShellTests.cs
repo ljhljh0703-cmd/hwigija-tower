@@ -649,6 +649,127 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void FloorTwoBossGate_UnlocksAsFinalCombatStep()
+        {
+            var floorOneEncounter = CreateRuntimeEncounter("ENC_FLOOR_ONE_CLEAR", CreateChoice("CHOICE_FLOOR_ONE_CLEAR", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", 1) }));
+            var floorTwoPrep = CreateRuntimeEncounter("ENC_FLOOR_TWO_PREP", CreateChoice("CHOICE_FLOOR_TWO_PREP", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGlitchLevel", 1) }));
+            var bossGate = CreateRuntimeEncounter("ENC_FLOOR_TWO_BOSS", CreateChoice("CHOICE_FLOOR_TWO_BOSS", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_FLOOR_TWO_BOSS", "ENEMY_FLOOR_TWO_BOSS", new[] { CreatePostCombatEffect("ModifyGold", 9) }) }));
+            var floorOneNode = CreateNode("node.floor.one", floorOneEncounter);
+            var floorTwoPrepNode = CreateNode("node.floor.two.prep", floorTwoPrep);
+            var bossNode = CreateNode("node.floor.two.boss", bossGate);
+            var state = new PrototypeRunState("run-boss-unlock", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachFloorRunPaths(new[]
+            {
+                CreateFloorPath(1, new PrototypeDemoRunStep(floorOneNode, floorOneEncounter)),
+                CreateFloorPath(2, new PrototypeDemoRunStep(floorTwoPrepNode, floorTwoPrep), new PrototypeDemoRunStep(bossNode, bossGate))
+            }, null);
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-unlock", 1001), floorOneNode.NodeId, floorOneEncounter, "CHOICE_FLOOR_ONE_CLEAR");
+            state.ResolveNextFloor();
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-unlock", 1001), floorTwoPrepNode.NodeId, floorTwoPrep, "CHOICE_FLOOR_TWO_PREP");
+
+            Assert.AreEqual(2, state.CurrentFloor);
+            Assert.IsTrue(state.BossGateUnlocked);
+            Assert.AreEqual("ENC_FLOOR_TWO_BOSS", state.NextDemoEncounterId);
+            Assert.IsTrue(state.CreateSnapshot().BossGateUnlocked);
+        }
+
+        [Test]
+        public void FloorTwoBossGate_VictoryClearsRunAndSavesReflection()
+        {
+            var floorOneEncounter = CreateRuntimeEncounter("ENC_FLOOR_ONE_CLEAR_BOSS", CreateChoice("CHOICE_FLOOR_ONE_CLEAR_BOSS", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", 1) }));
+            var floorTwoPrep = CreateRuntimeEncounter("ENC_FLOOR_TWO_PREP_BOSS", CreateChoice("CHOICE_FLOOR_TWO_PREP_BOSS", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGlitchLevel", 1) }));
+            var bossGate = CreateRuntimeEncounter("ENC_FLOOR_TWO_BOSS_CLEAR", CreateChoice("CHOICE_FLOOR_TWO_BOSS_CLEAR", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_FLOOR_TWO_BOSS_CLEAR", "ENEMY_FLOOR_TWO_BOSS_CLEAR", new[] { CreatePostCombatEffect("ModifyGold", 9) }) }));
+            var floorOneNode = CreateNode("node.floor.one.clear", floorOneEncounter);
+            var floorTwoPrepNode = CreateNode("node.floor.two.prep.clear", floorTwoPrep);
+            var bossNode = CreateNode("node.floor.two.boss.clear", bossGate);
+            var state = new PrototypeRunState("run-boss-clear", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachFloorRunPaths(new[]
+            {
+                CreateFloorPath(1, new PrototypeDemoRunStep(floorOneNode, floorOneEncounter)),
+                CreateFloorPath(2, new PrototypeDemoRunStep(floorTwoPrepNode, floorTwoPrep), new PrototypeDemoRunStep(bossNode, bossGate))
+            }, null);
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-clear", 1001), floorOneNode.NodeId, floorOneEncounter, "CHOICE_FLOOR_ONE_CLEAR_BOSS");
+            state.ResolveNextFloor();
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-clear", 1001), floorTwoPrepNode.NodeId, floorTwoPrep, "CHOICE_FLOOR_TWO_PREP_BOSS");
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-clear", 1001), bossNode.NodeId, bossGate, "CHOICE_FLOOR_TWO_BOSS_CLEAR");
+
+            Assert.IsTrue(state.RunClear);
+            Assert.IsTrue(state.RunCompleted);
+            Assert.IsTrue(state.RestartReady);
+            Assert.AreEqual("run.clear", state.RunStatus);
+            Assert.IsTrue(state.MemoryRepo.TryGetReflection("run-boss-clear", out _));
+        }
+
+        [Test]
+        public void CombatDefeat_WithoutRecallFailsRun()
+        {
+            var state = new PrototypeRunState("run-defeat", new GameFlowEventBus()) { AutoResolveCombat = false };
+            var encounter = CreateRuntimeEncounter("ENC_DEFEAT", CreateChoice("CHOICE_DEFEAT", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_DEFEAT", "ENEMY_DEFEAT", new EncounterPostCombatEffectRuntimeData[0], new[] { CreatePostCombatEffect("ModifyGlitchLevel", 5) }) }));
+
+            state.ModifyPlayerHp(-23);
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-defeat", 1001), "node.defeat", encounter, "CHOICE_DEFEAT");
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+
+            Assert.IsTrue(state.RunFailed);
+            Assert.IsTrue(state.RunCompleted);
+            Assert.IsTrue(state.RestartReady);
+            Assert.AreEqual("run.failed", state.RunStatus);
+            Assert.IsTrue(state.MemoryRepo.TryGetReflection("run-defeat", out _));
+        }
+
+        [Test]
+        public void CombatDefeat_WithRecallRevivesOnceAndContinues()
+        {
+            var state = new PrototypeRunState("run-recall-defeat", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AddAbilityRef("ABILITY_RECALL_ANCHOR");
+            var encounter = CreateRuntimeEncounter("ENC_RECALL_DEFEAT", CreateChoice("CHOICE_RECALL_DEFEAT", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_RECALL_DEFEAT", "ENEMY_RECALL_DEFEAT", new EncounterPostCombatEffectRuntimeData[0]) }));
+
+            state.ModifyPlayerHp(-23);
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-recall-defeat", 1001), "node.recall.defeat", encounter, "CHOICE_RECALL_DEFEAT");
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+
+            Assert.IsFalse(state.RunFailed);
+            Assert.IsFalse(state.RunCompleted);
+            Assert.IsTrue(state.IsInCombat);
+            Assert.Greater(state.PlayerHp, 0);
+            Assert.AreEqual("recall", state.LastCombatResultId);
+            Assert.IsTrue(state.HasFlag("FLAG_RECALL_ANCHOR_USED"));
+        }
+
+        [Test]
+        public void RestartRun_CreatesCleanStateAndPreservesReflectionRepo()
+        {
+            var controllerObject = new GameObject("PrototypeRoomController Test");
+            try
+            {
+                var controller = controllerObject.AddComponent<PrototypeRoomController>();
+                controller.Configure(null, null);
+                controller.BeginRun();
+                var firstRunId = controller.RunState.RunId;
+                controller.RunState.ModifyGold(20);
+                controller.RunState.ResolveRemnant("node.remnant.end");
+
+                Assert.IsTrue(controller.RunState.RestartReady);
+
+                var restart = controller.RestartRun();
+
+                Assert.AreEqual("run.restart", restart.NodeId);
+                Assert.AreNotEqual(firstRunId, controller.RunState.RunId);
+                Assert.AreEqual(firstRunId + ".restart.1", controller.RunState.RunId);
+                Assert.AreEqual(1, controller.RunState.CurrentFloor);
+                Assert.AreEqual(6, controller.RunState.Gold);
+                Assert.IsFalse(controller.RunState.RunCompleted);
+                Assert.IsTrue(controller.RunState.MemoryRepo.TryGetReflection(firstRunId, out _));
+            }
+            finally
+            {
+                Object.DestroyImmediate(controllerObject);
+            }
+        }
+
+        [Test]
         public void ItemAndAbilityEffects_ApplyToCombatLoop()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
@@ -1045,6 +1166,15 @@ namespace HwigiTower.Tests.EditMode
 
         private static EncounterEffectRuntimeData CreateCombatEffect(string combatId, string enemyRef, EncounterPostCombatEffectRuntimeData[] onVictoryEffects)
         {
+            return CreateCombatEffect(combatId, enemyRef, onVictoryEffects, new EncounterPostCombatEffectRuntimeData[0]);
+        }
+
+        private static EncounterEffectRuntimeData CreateCombatEffect(
+            string combatId,
+            string enemyRef,
+            EncounterPostCombatEffectRuntimeData[] onVictoryEffects,
+            EncounterPostCombatEffectRuntimeData[] onDefeatEffects)
+        {
             return new EncounterEffectRuntimeData
             {
                 kind = "StartCombat",
@@ -1054,7 +1184,7 @@ namespace HwigiTower.Tests.EditMode
                     seedKey = combatId,
                     enemyRefs = new[] { enemyRef },
                     onVictoryEffects = onVictoryEffects,
-                    onDefeatEffects = new EncounterPostCombatEffectRuntimeData[0]
+                    onDefeatEffects = onDefeatEffects
                 }
             };
         }

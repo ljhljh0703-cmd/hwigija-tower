@@ -273,6 +273,87 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PrototypeRoom_FloorTwoBossGateClearsRunAndRestarts()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            var shopNode = FindNode("node.shop");
+            var battleNode = FindNode("node.battle");
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+            Assert.IsNotNull(shopNode);
+            Assert.IsNotNull(battleNode);
+
+            controller.AutoResolveCombat = true;
+            controller.BeginRun();
+
+            controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_BUY_ITEM");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MORAL_CHOICE_01"), "CHOICE_MORAL_01_REFUSE");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01"), "CHOICE_MEMORY_01_UNLOCK");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_COMBAT_GATE_01"), "CHOICE_COMBAT_01_ENGAGE");
+
+            Assert.IsTrue(controller.RunState.StairUnlocked);
+            controller.ResolveNextFloor();
+            hud.ShowRunState(controller.GetSnapshot());
+
+            var floorTwoShop = controller.SelectEncounter(shopNode);
+            Assert.AreEqual("ENC_F02_SHOP_001", floorTwoShop.EncounterId);
+            controller.ResolveEncounterChoice(shopNode, floorTwoShop.Encounter, "CHOICE_F02_SHOP_LEAVE");
+            var floorTwoMoral = controller.SelectEncounter(battleNode);
+            Assert.AreEqual("ENC_F02_MORAL_CHOICE_001", floorTwoMoral.EncounterId);
+            controller.ResolveEncounterChoice(battleNode, floorTwoMoral.Encounter, "CHOICE_F02_MORAL_LEAVE");
+            hud.ShowRunState(controller.GetSnapshot());
+
+            Assert.IsTrue(controller.RunState.BossGateUnlocked);
+            StringAssert.Contains("Boss Gate", hud.RouteMessage);
+
+            controller.AutoResolveCombat = false;
+            var bossSelectionFromRoute = controller.SelectEncounter(battleNode);
+            Assert.AreEqual("ENC_COMBAT_GATE_02", bossSelectionFromRoute.EncounterId);
+            var bossEncounter = bossSelectionFromRoute.Encounter;
+            var bossSelection = new EncounterSelection(battleNode.Definition, bossEncounter);
+            hud.ShowChoices(bossEncounter, controller.BuildEncounterChoiceViews(bossSelection), choiceStableId =>
+            {
+                var resolution = controller.ResolveEncounterChoice(battleNode, bossEncounter, choiceStableId);
+                hud.ShowInteraction(battleNode, bossSelection, resolution);
+                hud.ShowRunState(controller.GetSnapshot());
+            });
+            FindChoiceButton(hud, "CHOICE_COMBAT_02_ENGAGE").onClick.Invoke();
+            yield return null;
+
+            Assert.IsTrue(controller.RunState.IsInCombat);
+            var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+            Assert.IsNotNull(attackButton);
+
+            var guard = 0;
+            while (controller.RunState.IsInCombat && guard < 12)
+            {
+                attackButton.onClick.Invoke();
+                yield return null;
+                guard++;
+            }
+
+            Assert.IsTrue(controller.RunState.RunClear);
+            Assert.IsTrue(controller.RunState.RestartReady);
+            StringAssert.Contains("Run clear", hud.RouteMessage);
+
+            var restartButton = GameObject.Find("Restart Run Button").GetComponent<Button>();
+            Assert.IsTrue(restartButton.gameObject.activeInHierarchy);
+            var firstRunId = controller.RunContext.RunId;
+            restartButton.onClick.Invoke();
+            yield return null;
+
+            Assert.AreEqual(firstRunId + ".restart.1", controller.RunState.RunId);
+            Assert.AreEqual(1, controller.RunState.CurrentFloor);
+            Assert.AreEqual(6, controller.RunState.Gold);
+            Assert.IsFalse(controller.RunState.RunCompleted);
+            StringAssert.Contains("Shop", hud.RouteMessage);
+        }
+
+        [UnityTest]
         public IEnumerator PrototypeRoom_CutsceneScaffoldDoesNotBlockRouteOrDuplicateTriggers()
         {
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);

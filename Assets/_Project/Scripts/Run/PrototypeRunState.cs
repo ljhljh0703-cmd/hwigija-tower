@@ -60,6 +60,8 @@ namespace HwigiTower.Run
         private readonly HashSet<string> _resolvedDemoSteps = new HashSet<string>();
         private bool _runCompleted;
         private bool _runClear;
+        private bool _runFailed;
+        private bool _restartReady;
         private bool _stairUnlocked;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
@@ -90,10 +92,15 @@ namespace HwigiTower.Run
         }
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus, LLMRuntimeSettings llmRuntimeSettings)
+            : this(runId, eventBus, llmRuntimeSettings, null)
+        {
+        }
+
+        public PrototypeRunState(string runId, GameFlowEventBus eventBus, LLMRuntimeSettings llmRuntimeSettings, INPCMemoryRepo memoryRepo)
         {
             RunId = runId ?? string.Empty;
             _eventBus = eventBus;
-            MemoryRepo = new InMemoryNpcMemoryRepo();
+            MemoryRepo = memoryRepo ?? new InMemoryNpcMemoryRepo();
             LLMProvider = LLMProviderFactory.Create(llmRuntimeSettings, MemoryRepo);
             _reflectionPipeline = new ReflectionPipeline(MemoryRepo, LLMProvider, eventBus);
             _synergyDetector = new SynergyDetector(eventBus, RunId);
@@ -113,7 +120,11 @@ namespace HwigiTower.Run
         public bool FloorComplete => _demoRunPath.Count > 0 && _resolvedDemoSteps.Count >= _demoRunPath.Count;
         public bool StairUnlocked => _stairUnlocked;
         public bool RunClear => _runClear;
-        public string DemoStatus => _runClear ? "run.clear" : _stairUnlocked ? "stair.unlocked" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
+        public bool RunFailed => _runFailed;
+        public bool RestartReady => _restartReady;
+        public bool BossGateUnlocked => IsCurrentBossGateUnlocked();
+        public string RunStatus => _runFailed ? "run.failed" : _runClear ? "run.clear" : _restartReady ? "run.restartReady" : "run.active";
+        public string DemoStatus => _runFailed ? "run.failed" : _runClear ? "run.clear" : _stairUnlocked ? "stair.unlocked" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
         public int DemoStepCount => _demoRunPath.Count;
         public int DemoResolvedStepCount => _resolvedDemoSteps.Count;
         public int CurrentFloor => _currentFloor;
@@ -175,6 +186,10 @@ namespace HwigiTower.Run
                 _currentFloor,
                 _stairUnlocked,
                 _runClear,
+                _runFailed,
+                _restartReady,
+                BossGateUnlocked,
+                RunStatus,
                 _lastNpcReactionKey,
                 CountOwnedItems());
         }
@@ -429,6 +444,8 @@ namespace HwigiTower.Run
             _currentFloor = 1;
             _stairUnlocked = false;
             _runClear = false;
+            _runFailed = false;
+            _restartReady = false;
 
             if (floorRunPaths != null)
             {
@@ -465,7 +482,7 @@ namespace HwigiTower.Run
 
         public PrototypeNodeResolution ResolveNextFloor()
         {
-            if (!CanAdvanceToNextFloor)
+            if (_runCompleted || !CanAdvanceToNextFloor)
             {
                 return new PrototypeNodeResolution("node.stair", string.Empty, "next floor unavailable", _runCompleted);
             }
@@ -519,7 +536,7 @@ namespace HwigiTower.Run
             if (player.IsDefeated)
             {
                 ApplyNpcTrigger("battle.defeat");
-                CompleteRun("defeat");
+                FailRun();
             }
             else if (enemy.IsDefeated)
             {
@@ -621,7 +638,7 @@ namespace HwigiTower.Run
             }
 
             NodesResolved++;
-            UpdateDemoProgression(nodeId, encounterId, resolution.Applied);
+            UpdateDemoProgression(nodeId, encounterId, ShouldAdvanceDemoProgression(encounter, choiceStableId, resolution.Applied));
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
             return new PrototypeNodeResolution(nodeId, payloadId, BuildChoiceResolutionMessage(resolution.Message), _runCompleted);
@@ -647,7 +664,7 @@ namespace HwigiTower.Run
             }
 
             NodesResolved++;
-            UpdateDemoProgression(nodeId, encounterId, resolution.Applied);
+            UpdateDemoProgression(nodeId, encounterId, ShouldAdvanceDemoProgression(encounter, choiceStableId, resolution.Applied));
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
             return new PrototypeNodeResolution(nodeId, payloadId, BuildChoiceResolutionMessage(resolution.Message), _runCompleted);
@@ -708,30 +725,33 @@ namespace HwigiTower.Run
                 BattlesWon++;
             }
 
+            var playerDefeated = _activeCombatPlayer.IsDefeated;
+            var enemyDefeated = _activeCombatEnemy.IsDefeated;
+            if (playerDefeated && !enemyDefeated && TryApplyRecallAnchor())
+            {
+                _lastCombatResultId = "recall";
+                _lastCombatRoundResult += " | recall anchor";
+                _lastCombatEnemyDefeated = false;
+                SetNpcReaction("NPC_REACT_RECALL_ANCHOR");
+                return;
+            }
+
             _playerHp = _activeCombatPlayer.Hp;
-            var resultId = _activeCombatEnemy.IsDefeated ? "victory" : "defeat";
+            var resultId = enemyDefeated ? "victory" : "defeat";
             _lastCombatResultId = resultId;
-            _lastCombatEnemyDefeated = _activeCombatEnemy.IsDefeated;
-            CapturePostCombatDeltas(_activeCombatEnemy.IsDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
+            _lastCombatEnemyDefeated = enemyDefeated;
+            CapturePostCombatDeltas(enemyDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
             
-            _activeCombatEffectApplier?.Invoke(this, _activeCombatEnemy.IsDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
+            _activeCombatEffectApplier?.Invoke(this, enemyDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatCompleted, RunId, _activeCombatNodeId, resultId));
 
-            if (_activeCombatPlayer.IsDefeated)
+            if (playerDefeated && !enemyDefeated)
             {
-                if (TryApplyRecallAnchor())
-                {
-                    _lastCombatResultId = "recall";
-                    _lastCombatRoundResult += " | recall anchor";
-                    SetNpcReaction("NPC_REACT_RECALL_ANCHOR");
-                    return;
-                }
-
                 ApplyNpcTrigger("battle.defeat");
                 SetNpcReaction("NPC_REACT_COMBAT_DEFEAT");
-                CompleteRun("defeat");
+                FailRun();
             }
-            else if (_activeCombatEnemy.IsDefeated)
+            else if (enemyDefeated)
             {
                 ApplyNpcTrigger("battle.victory");
                 SetNpcReaction("NPC_REACT_COMBAT_VICTORY");
@@ -990,15 +1010,40 @@ namespace HwigiTower.Run
             }
 
             _runCompleted = true;
+            _restartReady = true;
             var summary = $"cause={cause};nodes={NodesResolved};battles={BattlesWon}";
             _reflectionPipeline.TrySaveReflection(RunId, summary, out _);
             ApplyNpcTrigger("run.completed");
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.RunCompleted, RunId, RunId, cause));
         }
 
+        private void ClearRun()
+        {
+            if (_runCompleted)
+            {
+                return;
+            }
+
+            _runClear = true;
+            _runFailed = false;
+            CompleteRun("run.clear");
+        }
+
+        private void FailRun()
+        {
+            if (_runCompleted)
+            {
+                return;
+            }
+
+            _runFailed = true;
+            _runClear = false;
+            CompleteRun("run.failed");
+        }
+
         private void UpdateDemoProgression(string nodeId, string encounterId, bool applied)
         {
-            if (!applied || _demoRunPath.Count == 0)
+            if (!applied || _runCompleted || _demoRunPath.Count == 0)
             {
                 return;
             }
@@ -1023,10 +1068,46 @@ namespace HwigiTower.Run
                 }
                 else
                 {
-                    _runClear = true;
-                    CompleteRun("run.clear");
+                    ClearRun();
                 }
             }
+        }
+
+        private bool ShouldAdvanceDemoProgression(EncounterData encounter, string choiceStableId, bool applied)
+        {
+            if (!applied)
+            {
+                return false;
+            }
+
+            return !IsInCombat || AutoResolveCombat || !ChoiceStartsCombat(encounter, choiceStableId);
+        }
+
+        private static bool ChoiceStartsCombat(EncounterData encounter, string choiceStableId)
+        {
+            if (encounter == null || encounter.Choices == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < encounter.Choices.Length; i++)
+            {
+                var choice = encounter.Choices[i];
+                if (choice == null || choice.stableId != choiceStableId || choice.effects == null)
+                {
+                    continue;
+                }
+
+                for (var j = 0; j < choice.effects.Length; j++)
+                {
+                    if (choice.effects[j] != null && choice.effects[j].kind == "StartCombat")
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private string BuildChoiceResolutionMessage(string baseMessage)
@@ -1080,6 +1161,49 @@ namespace HwigiTower.Run
                 if (_floorRunPaths[i] != null && _floorRunPaths[i].Floor == floor && _floorRunPaths[i].Steps != null && _floorRunPaths[i].Steps.Count > 0)
                 {
                     return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsCurrentBossGateUnlocked()
+        {
+            if (_currentFloor < 2 || _runCompleted || _stairUnlocked || !TryGetNextDemoStep(out var next))
+            {
+                return false;
+            }
+
+            var lastIndex = _demoRunPath.Count - 1;
+            if (lastIndex < 0 || _demoRunPath[lastIndex] != next)
+            {
+                return false;
+            }
+
+            return HasStartCombatEffect(next.Encounter);
+        }
+
+        private static bool HasStartCombatEffect(EncounterData encounter)
+        {
+            if (encounter == null || encounter.Choices == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < encounter.Choices.Length; i++)
+            {
+                var choice = encounter.Choices[i];
+                if (choice == null || choice.effects == null)
+                {
+                    continue;
+                }
+
+                for (var j = 0; j < choice.effects.Length; j++)
+                {
+                    if (choice.effects[j] != null && choice.effects[j].kind == "StartCombat")
+                    {
+                        return true;
+                    }
                 }
             }
 
