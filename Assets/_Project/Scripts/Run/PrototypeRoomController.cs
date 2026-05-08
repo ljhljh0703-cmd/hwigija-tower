@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HwigiTower.Core;
 using HwigiTower.Combat;
 using HwigiTower.Encounters;
@@ -21,6 +22,7 @@ namespace HwigiTower.Run
         public PrototypeRunState RunState { get; private set; }
         public EncounterRuntimeCatalogData EncounterRuntimeCatalog => encounterRuntimeCatalog;
         private INPCMemoryRepo _persistentMemoryRepo;
+        private readonly HashSet<string> _persistentMemoryFragmentRefs = new HashSet<string>();
         private int _restartIndex;
         private string ActiveRunId => RunState == null ? RunContext.RunId : RunState.RunId;
         public bool AutoResolveCombat
@@ -80,6 +82,7 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution("run.restart", string.Empty, "restart unavailable", false);
             }
 
+            PreserveCurrentMemoryFragments();
             _restartIndex++;
             var nextRunId = RunContext.RunId + ".restart." + _restartIndex;
             StartRun(nextRunId);
@@ -95,6 +98,7 @@ namespace HwigiTower.Run
 
             RunState = new PrototypeRunState(runId, EventBus, null, _persistentMemoryRepo) { AutoResolveCombat = autoResolveCombat };
             RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
+            RestorePersistentMemoryFragments();
             if (roomDefinition == null)
             {
                 RunState.AttachDemoRunPath(null);
@@ -107,6 +111,35 @@ namespace HwigiTower.Run
             RunState.ModifyGold(6);
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, runId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, runId, RunContext.RunId, string.Empty));
+        }
+
+        private void PreserveCurrentMemoryFragments()
+        {
+            if (RunState == null)
+            {
+                return;
+            }
+
+            foreach (var memoryFragmentRef in RunState.MemoryFragmentRefs)
+            {
+                if (!string.IsNullOrEmpty(memoryFragmentRef))
+                {
+                    _persistentMemoryFragmentRefs.Add(memoryFragmentRef);
+                }
+            }
+        }
+
+        private void RestorePersistentMemoryFragments()
+        {
+            if (RunState == null || _persistentMemoryFragmentRefs.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var memoryFragmentRef in _persistentMemoryFragmentRefs)
+            {
+                RunState.UnlockMemoryFragmentRef(memoryFragmentRef);
+            }
         }
 
         public void NotifyNodeEntered(InteractableNode node)

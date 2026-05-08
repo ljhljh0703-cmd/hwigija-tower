@@ -32,6 +32,22 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-08 09:38 — Post-BossGate gameplay blocker cleanup
+- **Phase**: W2-1
+- **Done**:
+  - Floor 2 shop refs를 정식 stableId로 정리: `ITEM_FIELD_BANDAGE`, `ABILITY_RECALL_ANCHOR`
+  - catalog-backed unknown ability refs가 Skill을 활성화하지 않도록 보강
+  - restart 시 memory fragment refs / reflection repo / deterministic LLM cache를 보존하고 floor / hp / gold / combat / route / recall-anchor used flag는 reset하도록 고정
+  - failure result에 `Run failed` / `Restart available` 표시 추가
+  - 관련 EditMode / PlayMode coverage 추가
+- **Files**: 변경/추가 8개 (`Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset`, `Assets/_Project/Scripts/Encounters/EncounterRuntimeCatalogBuilder.cs`, `Assets/_Project/Scripts/Run/**`, `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `Assets/_Project/Tests/**`)
+- **GDD impact**: 없음
+- **Blockers**: 외부 Obsidian PROGRESS prepend는 승인/사용량 제한으로 미수행. repo 내부 PROGRESS에 기록.
+- **Next**: core loop 수동 플레이 체크 후 Android build smoke와 AI fallback/model artifact 연결 점검
+- **Agent**: Codex
+
+---
+
 ### 2026-05-06 23:20 — W2 vertical slice UI/asset/combat/cutscene spec 작성
 - **Phase**: W2-1
 - **Done**:

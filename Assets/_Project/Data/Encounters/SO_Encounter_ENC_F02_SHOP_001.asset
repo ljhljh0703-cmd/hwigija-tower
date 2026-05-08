@@ -86,7 +86,7 @@ MonoBehaviour:
       amount: 0
       flag:
       value: 0
-      itemRef: ITEM_PLACEHOLDER_FIELD_BANDAGE
+      itemRef: ITEM_FIELD_BANDAGE
       count: 1
       abilityRef:
       rewardBundleRef:
@@ -206,7 +206,7 @@ MonoBehaviour:
       value: 0
       itemRef:
       count: 0
-      abilityRef: ABILITY_PLACEHOLDER_SCOUT
+      abilityRef: ABILITY_RECALL_ANCHOR
       rewardBundleRef:
       memoryFragmentId:
       memoryFragmentTextKey:

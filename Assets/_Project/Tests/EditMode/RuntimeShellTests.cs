@@ -750,6 +750,47 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void FloorTwoShop_RefsResolveThroughCatalogAndGrantExpectedPurchases()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset");
+            Assert.IsNotNull(catalog);
+            Assert.IsNotNull(encounter);
+            Assert.IsTrue(catalog.TryGetItem("ITEM_FIELD_BANDAGE", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_RECALL_ANCHOR", out _));
+            Assert.AreEqual("ITEM_FIELD_BANDAGE", encounter.Choices[0].effects[1].itemRef);
+            Assert.AreEqual("ABILITY_RECALL_ANCHOR", encounter.Choices[1].effects[1].abilityRef);
+
+            var itemState = new PrototypeRunState("run-f2-shop-item", new GameFlowEventBus());
+            itemState.AttachEncounterCatalog(catalog);
+            itemState.ModifyGold(6);
+            var itemResult = itemState.ResolveEncounterChoice(new DeterministicRunContext("run-f2-shop-item", 1001), "node.f2.shop.item", encounter, "CHOICE_F02_SHOP_BUY_ITEM");
+            Assert.AreEqual("CHOICE_F02_SHOP_BUY_ITEM", itemResult.PayloadId);
+            Assert.AreEqual(0, itemState.Gold);
+            Assert.AreEqual(1, itemState.GetItemCount("ITEM_FIELD_BANDAGE"));
+
+            var abilityState = new PrototypeRunState("run-f2-shop-ability", new GameFlowEventBus());
+            abilityState.AttachEncounterCatalog(catalog);
+            abilityState.ModifyGold(12);
+            var abilityResult = abilityState.ResolveEncounterChoice(new DeterministicRunContext("run-f2-shop-ability", 1001), "node.f2.shop.ability", encounter, "CHOICE_F02_SHOP_BUY_ABILITY");
+            Assert.AreEqual("CHOICE_F02_SHOP_BUY_ABILITY", abilityResult.PayloadId);
+            Assert.AreEqual(0, abilityState.Gold);
+            Assert.IsTrue(abilityState.HasAbilityRef("ABILITY_RECALL_ANCHOR"));
+        }
+
+        [Test]
+        public void CatalogBackedAbilityGrant_RejectsUnknownRefs()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-unknown-ability", new GameFlowEventBus());
+            state.AttachEncounterCatalog(catalog);
+
+            Assert.IsFalse(state.AddAbilityRef("ABILITY_PLACEHOLDER_SCOUT"));
+            Assert.IsFalse(state.HasAbilityRef("ABILITY_PLACEHOLDER_SCOUT"));
+            Assert.AreEqual(0, state.CreateSnapshot().AbilityCount);
+        }
+
+        [Test]
         public void CombatDefeat_WithoutRecallFailsRun()
         {
             var state = new PrototypeRunState("run-defeat", new GameFlowEventBus()) { AutoResolveCombat = false };
@@ -792,9 +833,14 @@ namespace HwigiTower.Tests.EditMode
             try
             {
                 var controller = controllerObject.AddComponent<PrototypeRoomController>();
-                controller.Configure(null, null);
+                var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+                controller.Configure(null, catalog);
                 controller.BeginRun();
                 var firstRunId = controller.RunState.RunId;
+                var request = new LLMRequest(firstRunId, "restart cache prompt", "restart.policy");
+                controller.RunState.MemoryRepo.SaveCachedResponse(new LLMResponse(request.CacheKey, "cached"));
+                Assert.IsTrue(controller.RunState.UnlockMemoryFragmentRef("MEM_FRAGMENT_01"));
+                controller.RunState.SetFlag("FLAG_RECALL_ANCHOR_USED", true);
                 controller.RunState.ModifyGold(20);
                 controller.RunState.ResolveRemnant("node.remnant.end");
 
@@ -808,12 +854,44 @@ namespace HwigiTower.Tests.EditMode
                 Assert.AreEqual(1, controller.RunState.CurrentFloor);
                 Assert.AreEqual(6, controller.RunState.Gold);
                 Assert.IsFalse(controller.RunState.RunCompleted);
+                Assert.IsFalse(controller.RunState.HasFlag("FLAG_RECALL_ANCHOR_USED"));
+                Assert.IsTrue(controller.RunState.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
+                Assert.AreEqual(1, controller.GetSnapshot().MemoryFragmentCount);
                 Assert.IsTrue(controller.RunState.MemoryRepo.TryGetReflection(firstRunId, out _));
+                Assert.IsTrue(controller.RunState.MemoryRepo.TryGetCachedResponse(request.CacheKey, out var cached));
+                Assert.AreEqual("cached", cached.Text);
             }
             finally
             {
                 Object.DestroyImmediate(controllerObject);
             }
+        }
+
+        [Test]
+        public void RunFailed_BlocksFurtherNodeRewardsAndEffects()
+        {
+            var state = new PrototypeRunState("run-failed-blocks", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.ModifyPlayerHp(-23);
+            var lethal = CreateRuntimeEncounter(
+                "ENC_LETHAL_FAILURE",
+                CreateChoice(
+                    "CHOICE_LETHAL_FAILURE",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_LETHAL_FAILURE", "ENEMY_LETHAL_FAILURE", new EncounterPostCombatEffectRuntimeData[0]) }));
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-failed-blocks", 1001), "node.lethal", lethal, "CHOICE_LETHAL_FAILURE");
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            Assert.IsTrue(state.RunFailed);
+
+            var goldBefore = state.Gold;
+            var blocked = state.ResolveEncounterChoice(
+                new DeterministicRunContext("run-failed-blocks", 1001),
+                "node.after.failure",
+                CreateRuntimeEncounter("ENC_AFTER_FAILURE", CreateChoice("CHOICE_AFTER_FAILURE", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 99) })),
+                "CHOICE_AFTER_FAILURE");
+
+            Assert.IsTrue(blocked.RunCompleted);
+            Assert.AreEqual(goldBefore, state.Gold);
+            StringAssert.Contains("run already completed", blocked.Message);
         }
 
         [Test]
