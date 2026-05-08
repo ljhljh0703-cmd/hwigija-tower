@@ -384,7 +384,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(controller);
             Assert.IsNotNull(hud);
 
-            ReachBossGateClear(controller, hud, shopNode, battleNode);
+            yield return ReachBossGateClear(controller, hud, shopNode, battleNode);
             Assert.IsTrue(hud.EndingRestButtonVisible);
             GameObject.Find("Ending Button Rest").GetComponent<Button>().onClick.Invoke();
             yield return null;
@@ -393,7 +393,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(controller.RunState.RestartReady);
             Assert.IsFalse(hud.EndingRestButtonVisible);
             Assert.IsFalse(hud.EndingContinueButtonVisible);
-            Assert.IsFalse(GameObject.Find("Restart Run Button").activeInHierarchy);
+            var restartButton = GameObject.Find("Restart Run Button");
+            Assert.IsTrue(restartButton == null || !restartButton.activeInHierarchy);
             StringAssert.Contains("Ending rest", hud.RouteMessage);
 
             var blocked = controller.ResolveEncounterChoice(shopNode, controller.SelectEncounter(shopNode).Encounter, "CHOICE_SHOP_01_BUY_ITEM");
@@ -665,33 +666,41 @@ namespace HwigiTower.Tests.PlayMode
             }
         }
 
-        private static void ReachBossGateClear(Run.PrototypeRoomController controller, PrototypeHud hud, InteractableNode shopNode, InteractableNode battleNode)
+        private static IEnumerator ReachBossGateClear(Run.PrototypeRoomController controller, PrototypeHud hud, InteractableNode shopNode, InteractableNode battleNode)
         {
             controller.AutoResolveCombat = true;
             controller.BeginRun();
-            controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_LEAVE");
+            controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_BUY_ITEM");
             controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MORAL_CHOICE_01"), "CHOICE_MORAL_01_REFUSE");
             controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01"), "CHOICE_MEMORY_01_UNLOCK");
             controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_COMBAT_GATE_01"), "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
-            controller.ResolveEncounterChoice(shopNode, controller.SelectEncounter(shopNode).Encounter, "CHOICE_F02_SHOP_LEAVE");
+            controller.RunState.ModifyGold(12);
+            controller.ResolveEncounterChoice(shopNode, controller.SelectEncounter(shopNode).Encounter, "CHOICE_F02_SHOP_BUY_ITEM");
             controller.ResolveEncounterChoice(battleNode, controller.SelectEncounter(battleNode).Encounter, "CHOICE_F02_MORAL_LEAVE");
+            hud.ShowRunState(controller.GetSnapshot());
+            Assert.IsTrue(controller.RunState.BossGateUnlocked);
 
             controller.AutoResolveCombat = false;
-            var bossSelection = controller.SelectEncounter(battleNode);
-            hud.ShowChoices(bossSelection.Encounter, controller.BuildEncounterChoiceViews(bossSelection), choiceStableId =>
+            var bossSelectionFromRoute = controller.SelectEncounter(battleNode);
+            Assert.AreEqual("ENC_COMBAT_GATE_02", bossSelectionFromRoute.EncounterId);
+            var bossEncounter = bossSelectionFromRoute.Encounter;
+            var bossSelection = new EncounterSelection(battleNode.Definition, bossEncounter);
+            hud.ShowChoices(bossEncounter, controller.BuildEncounterChoiceViews(bossSelection), choiceStableId =>
             {
-                var resolution = controller.ResolveEncounterChoice(battleNode, bossSelection.Encounter, choiceStableId);
+                var resolution = controller.ResolveEncounterChoice(battleNode, bossEncounter, choiceStableId);
                 hud.ShowInteraction(battleNode, bossSelection, resolution);
                 hud.ShowRunState(controller.GetSnapshot());
             });
             FindChoiceButton(hud, "CHOICE_COMBAT_02_ENGAGE").onClick.Invoke();
+            yield return null;
 
             var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
             var guard = 0;
             while (controller.RunState.IsInCombat && guard < 12)
             {
                 attackButton.onClick.Invoke();
+                yield return null;
                 guard++;
             }
 
