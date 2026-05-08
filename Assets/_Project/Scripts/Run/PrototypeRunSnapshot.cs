@@ -45,7 +45,11 @@ namespace HwigiTower.Run
             bool bossGateUnlocked = false,
             string runStatus = "",
             string lastNpcReactionKey = "",
-            int itemCount = 0)
+            int itemCount = 0,
+            bool endingChoicePending = false,
+            bool endingRest = false,
+            bool endingContinue = false,
+            string endingChoiceId = "")
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -90,6 +94,10 @@ namespace HwigiTower.Run
             RunStatus = string.IsNullOrEmpty(runStatus) ? runClear ? "run.clear" : runFailed ? "run.failed" : "run.active" : runStatus;
             LastNpcReactionKey = lastNpcReactionKey ?? string.Empty;
             ItemCount = itemCount;
+            EndingChoicePending = endingChoicePending;
+            EndingRest = endingRest;
+            EndingContinue = endingContinue;
+            EndingChoiceId = endingChoiceId ?? string.Empty;
         }
 
         public string RunId { get; }
@@ -135,5 +143,9 @@ namespace HwigiTower.Run
         public string RunStatus { get; }
         public string LastNpcReactionKey { get; }
         public int ItemCount { get; }
+        public bool EndingChoicePending { get; }
+        public bool EndingRest { get; }
+        public bool EndingContinue { get; }
+        public string EndingChoiceId { get; }
     }
 }

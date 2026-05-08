@@ -340,11 +340,22 @@ namespace HwigiTower.Tests.PlayMode
             }
 
             Assert.IsTrue(controller.RunState.RunClear);
-            Assert.IsTrue(controller.RunState.RestartReady);
-            StringAssert.Contains("Run clear", hud.RouteMessage);
+            Assert.IsFalse(controller.RunState.RestartReady);
+            Assert.IsTrue(controller.RunState.EndingChoicePending);
+            Assert.IsTrue(hud.EndingRestButtonVisible);
+            Assert.IsTrue(hud.EndingContinueButtonVisible);
+            StringAssert.Contains("Choose ending", hud.RouteMessage);
             StringAssert.Contains("Run Clear", hud.RunStateMessage);
             Assert.AreEqual(0, hud.ChoiceButtonCount);
 
+            GameObject.Find("Ending Button Continue").GetComponent<Button>().onClick.Invoke();
+            yield return null;
+
+            Assert.IsTrue(controller.RunState.EndingContinue);
+            Assert.IsTrue(controller.RunState.RestartReady);
+            Assert.IsFalse(hud.EndingRestButtonVisible);
+            Assert.IsFalse(hud.EndingContinueButtonVisible);
+            StringAssert.Contains("Ending continue", hud.RouteMessage);
             var restartButton = GameObject.Find("Restart Run Button").GetComponent<Button>();
             Assert.IsTrue(restartButton.gameObject.activeInHierarchy);
             var firstRunId = controller.RunContext.RunId;
@@ -358,6 +369,35 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(1, controller.GetSnapshot().MemoryFragmentCount);
             Assert.IsFalse(controller.RunState.RunCompleted);
             StringAssert.Contains("Shop", hud.RouteMessage);
+        }
+
+        [UnityTest]
+        public IEnumerator PrototypeRoom_BossGateClearRestEndingLocksFinalState()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            var shopNode = FindNode("node.shop");
+            var battleNode = FindNode("node.battle");
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+
+            ReachBossGateClear(controller, hud, shopNode, battleNode);
+            Assert.IsTrue(hud.EndingRestButtonVisible);
+            GameObject.Find("Ending Button Rest").GetComponent<Button>().onClick.Invoke();
+            yield return null;
+
+            Assert.IsTrue(controller.RunState.EndingRest);
+            Assert.IsFalse(controller.RunState.RestartReady);
+            Assert.IsFalse(hud.EndingRestButtonVisible);
+            Assert.IsFalse(hud.EndingContinueButtonVisible);
+            Assert.IsFalse(GameObject.Find("Restart Run Button").activeInHierarchy);
+            StringAssert.Contains("Ending rest", hud.RouteMessage);
+
+            var blocked = controller.ResolveEncounterChoice(shopNode, controller.SelectEncounter(shopNode).Encounter, "CHOICE_SHOP_01_BUY_ITEM");
+            StringAssert.Contains("run already completed", blocked.Message);
         }
 
         [UnityTest]
@@ -623,6 +663,40 @@ namespace HwigiTower.Tests.PlayMode
                 CollectionAssert.Contains(events, GameFlowEventType.CombatStarted);
                 CollectionAssert.Contains(events, GameFlowEventType.CombatCompleted);
             }
+        }
+
+        private static void ReachBossGateClear(Run.PrototypeRoomController controller, PrototypeHud hud, InteractableNode shopNode, InteractableNode battleNode)
+        {
+            controller.AutoResolveCombat = true;
+            controller.BeginRun();
+            controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_LEAVE");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MORAL_CHOICE_01"), "CHOICE_MORAL_01_REFUSE");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01"), "CHOICE_MEMORY_01_UNLOCK");
+            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_COMBAT_GATE_01"), "CHOICE_COMBAT_01_ENGAGE");
+            controller.ResolveNextFloor();
+            controller.ResolveEncounterChoice(shopNode, controller.SelectEncounter(shopNode).Encounter, "CHOICE_F02_SHOP_LEAVE");
+            controller.ResolveEncounterChoice(battleNode, controller.SelectEncounter(battleNode).Encounter, "CHOICE_F02_MORAL_LEAVE");
+
+            controller.AutoResolveCombat = false;
+            var bossSelection = controller.SelectEncounter(battleNode);
+            hud.ShowChoices(bossSelection.Encounter, controller.BuildEncounterChoiceViews(bossSelection), choiceStableId =>
+            {
+                var resolution = controller.ResolveEncounterChoice(battleNode, bossSelection.Encounter, choiceStableId);
+                hud.ShowInteraction(battleNode, bossSelection, resolution);
+                hud.ShowRunState(controller.GetSnapshot());
+            });
+            FindChoiceButton(hud, "CHOICE_COMBAT_02_ENGAGE").onClick.Invoke();
+
+            var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+            var guard = 0;
+            while (controller.RunState.IsInCombat && guard < 12)
+            {
+                attackButton.onClick.Invoke();
+                guard++;
+            }
+
+            hud.ShowRunState(controller.GetSnapshot());
+            Assert.IsTrue(controller.RunState.RunClear);
         }
 
         private static EncounterData CreateEncounterFromJson(string json)
