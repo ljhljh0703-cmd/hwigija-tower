@@ -1729,7 +1729,7 @@ namespace HwigiTower.UI
 
         private static bool IsCombatEncounterId(string encounterId)
         {
-            return encounterId == "ENC_COMBAT_GATE_01" || encounterId == "ENC_COMBAT_GATE_02";
+            return encounterId == "ENC_COMBAT_GATE_01" || encounterId == "ENC_COMBAT_GATE_02" || encounterId == "ENC_COMBAT_GATE_03";
         }
 
         private static string ResolvePublicChoiceLabel(string choiceStableId, int index)
@@ -1754,6 +1754,8 @@ namespace HwigiTower.UI
                 "CHOICE_F02_MORAL_BARGAIN" => "Trade",
                 "CHOICE_COMBAT_02_ENGAGE" => "Engage",
                 "CHOICE_COMBAT_02_PREPARE" => "Prepare",
+                "CHOICE_COMBAT_03_ENGAGE" => "Engage",
+                "CHOICE_COMBAT_03_PREPARE" => "Prepare",
                 _ => "Option " + (index + 1)
             };
         }
@@ -1779,6 +1781,7 @@ namespace HwigiTower.UI
                 "ENC_F02_SHOP_001" => "Shop",
                 "ENC_F02_MORAL_CHOICE_001" => "Decision",
                 "ENC_COMBAT_GATE_02" => "Combat",
+                "ENC_COMBAT_GATE_03" => "Combat",
                 _ => encounter.Type == EncounterType.MoralChoice ? "Decision" :
                     encounter.Type == EncounterType.MemoryFragment ? "Memory" :
                     "Encounter"

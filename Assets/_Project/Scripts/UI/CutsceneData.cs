@@ -36,10 +36,17 @@ namespace HwigiTower.UI
     public sealed class CutsceneData : ScriptableObject
     {
         [SerializeField] private string cutsceneId = string.Empty;
+        [SerializeField] private string animationCutsceneId = string.Empty;
+        [SerializeField] private string animationAssetPath = string.Empty;
+        [SerializeField] private Sprite fallbackSprite;
         [SerializeField] private PrototypeCutsceneStep[] steps = new PrototypeCutsceneStep[0];
 
         public string CutsceneId => cutsceneId;
+        public string AnimationCutsceneId => animationCutsceneId;
+        public string AnimationAssetPath => animationAssetPath;
+        public Sprite FallbackSprite => fallbackSprite;
         public PrototypeCutsceneStep[] Steps => steps ?? new PrototypeCutsceneStep[0];
         public bool HasSteps => Steps.Length > 0;
+        public bool HasPlayableContent => HasSteps || fallbackSprite != null;
     }
 }

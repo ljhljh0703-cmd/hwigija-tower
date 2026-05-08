@@ -48,3 +48,27 @@ MonoBehaviour:
       encounter: {fileID: 11400000, guid: c9a759e22223f4e7ea64b6dd3dcef339, type: 2}
     - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
       encounter: {fileID: 11400000, guid: 6ebc14ef20bd94c808c15cd7c47a2e64, type: 2}
+  - floor: 3
+    steps:
+    - node: {fileID: 11400000, guid: 361ee713d307457ebd4a381ae5cd32a6, type: 2}
+      encounter: {fileID: 11400000, guid: 29b332967624e40d0acc0edb40cd96f1, type: 2}
+    - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+      encounter: {fileID: 11400000, guid: 7db297531ee1a4e5aa0a2fc0dfbb0658, type: 2}
+    - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+      encounter: {fileID: 11400000, guid: e93457fb0dbed49f4a8110c9d5f5f5c3, type: 2}
+  - floor: 4
+    steps:
+    - node: {fileID: 11400000, guid: 1f21543f9f4c4da18f3d6418b63289ee, type: 2}
+      encounter: {fileID: 11400000, guid: 45c44c185c4eb487586b80b75f49b911, type: 2}
+    - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+      encounter: {fileID: 11400000, guid: 4a443255050c24a479830c11b588fc66, type: 2}
+    - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+      encounter: {fileID: 11400000, guid: b42fdaa1edbfa4ccd89686a5b2fb64d4, type: 2}
+  - floor: 5
+    steps:
+    - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+      encounter: {fileID: 11400000, guid: d8e64f921bdc74eeea02b2bb00dfb730, type: 2}
+    - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+      encounter: {fileID: 11400000, guid: 3820f73f171d7497889d2708e1bffcb5, type: 2}
+    - node: {fileID: 11400000, guid: c3738f3b3ed84ef2bcf1c9e03762d781, type: 2}
+      encounter: {fileID: 11400000, guid: b7ea17d35b6bc4637894893a0a3c3a77, type: 2}
