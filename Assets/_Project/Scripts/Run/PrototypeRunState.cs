@@ -62,6 +62,9 @@ namespace HwigiTower.Run
         private bool _runClear;
         private bool _runFailed;
         private bool _restartReady;
+        private bool _endingRest;
+        private bool _endingContinue;
+        private string _endingChoiceId = string.Empty;
         private bool _stairUnlocked;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
@@ -122,9 +125,13 @@ namespace HwigiTower.Run
         public bool RunClear => _runClear;
         public bool RunFailed => _runFailed;
         public bool RestartReady => _restartReady;
+        public bool EndingChoicePending => _runClear && !_endingRest && !_endingContinue;
+        public bool EndingRest => _endingRest;
+        public bool EndingContinue => _endingContinue;
+        public string EndingChoiceId => _endingChoiceId;
         public bool BossGateUnlocked => IsCurrentBossGateUnlocked();
-        public string RunStatus => _runFailed ? "run.failed" : _runClear ? "run.clear" : _restartReady ? "run.restartReady" : "run.active";
-        public string DemoStatus => _runFailed ? "run.failed" : _runClear ? "run.clear" : _stairUnlocked ? "stair.unlocked" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
+        public string RunStatus => _endingRest ? "ending.rest" : _endingContinue ? "ending.continue" : _runFailed ? "run.failed" : _runClear ? "run.clear" : _restartReady ? "run.restartReady" : "run.active";
+        public string DemoStatus => _endingRest ? "ending.rest" : _endingContinue ? "ending.continue" : _runFailed ? "run.failed" : _runClear ? "run.clear" : _stairUnlocked ? "stair.unlocked" : _demoRunPath.Count == 0 ? "demo.unconfigured" : "demo.active";
         public int DemoStepCount => _demoRunPath.Count;
         public int DemoResolvedStepCount => _resolvedDemoSteps.Count;
         public int CurrentFloor => _currentFloor;
@@ -191,7 +198,11 @@ namespace HwigiTower.Run
                 BossGateUnlocked,
                 RunStatus,
                 _lastNpcReactionKey,
-                CountOwnedItems());
+                CountOwnedItems(),
+                EndingChoicePending,
+                _endingRest,
+                _endingContinue,
+                _endingChoiceId);
         }
 
         public string NextDemoNodeId
@@ -611,10 +622,45 @@ namespace HwigiTower.Run
             if (!_runCompleted)
             {
                 NodesResolved++;
-                CompleteRun("remnant");
+                CompleteRun("remnant", true);
             }
 
             return new PrototypeNodeResolution(nodeId, "run.completed", "run completed: reflection saved", true);
+        }
+
+        public PrototypeNodeResolution ResolveEndingChoice(string choiceStableId)
+        {
+            if (!_runClear)
+            {
+                return new PrototypeNodeResolution("ending.choice", string.Empty, "ending unavailable", _runCompleted);
+            }
+
+            if (!string.IsNullOrEmpty(_endingChoiceId))
+            {
+                return new PrototypeNodeResolution("ending.choice", _endingChoiceId, "ending already resolved: " + _endingChoiceId, true);
+            }
+
+            if (choiceStableId == "PLACEHOLDER_ENDING_REST")
+            {
+                _endingChoiceId = choiceStableId;
+                _endingRest = true;
+                _endingContinue = false;
+                _restartReady = false;
+                SetNpcReaction("NPC_REACT_ENDING_REST");
+                return new PrototypeNodeResolution("ending.choice", choiceStableId, "ending.rest | PLACEHOLDER_ENDING_REST", true);
+            }
+
+            if (choiceStableId == "PLACEHOLDER_ENDING_CONTINUE")
+            {
+                _endingChoiceId = choiceStableId;
+                _endingContinue = true;
+                _endingRest = false;
+                _restartReady = true;
+                SetNpcReaction("NPC_REACT_ENDING_CONTINUE");
+                return new PrototypeNodeResolution("ending.choice", choiceStableId, "ending.continue | PLACEHOLDER_ENDING_CONTINUE | run.restartReady", true);
+            }
+
+            return new PrototypeNodeResolution("ending.choice", string.Empty, "ending unavailable", _runCompleted);
         }
 
         public PrototypeNodeResolution ResolveGeneric(string nodeId, string payloadId, string message)
@@ -1012,7 +1058,7 @@ namespace HwigiTower.Run
             return true;
         }
 
-        private void CompleteRun(string cause)
+        private void CompleteRun(string cause, bool restartReady)
         {
             if (_runCompleted)
             {
@@ -1020,7 +1066,7 @@ namespace HwigiTower.Run
             }
 
             _runCompleted = true;
-            _restartReady = true;
+            _restartReady = restartReady;
             var summary = $"cause={cause};nodes={NodesResolved};battles={BattlesWon}";
             _reflectionPipeline.TrySaveReflection(RunId, summary, out _);
             ApplyNpcTrigger("run.completed");
@@ -1036,7 +1082,10 @@ namespace HwigiTower.Run
 
             _runClear = true;
             _runFailed = false;
-            CompleteRun("run.clear");
+            _endingRest = false;
+            _endingContinue = false;
+            _endingChoiceId = string.Empty;
+            CompleteRun("run.clear", false);
         }
 
         private void FailRun()
@@ -1048,7 +1097,10 @@ namespace HwigiTower.Run
 
             _runFailed = true;
             _runClear = false;
-            CompleteRun("run.failed");
+            _endingRest = false;
+            _endingContinue = false;
+            _endingChoiceId = string.Empty;
+            CompleteRun("run.failed", true);
         }
 
         private void UpdateDemoProgression(string nodeId, string encounterId, bool applied)

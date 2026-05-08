@@ -32,6 +32,23 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-08 10:29 — Ending choice flow implementation blocked on Unity licensing
+- **Phase**: W2-1
+- **Done**:
+  - BossGate victory 이후 `run.clear`에서 엔딩 선택 pending 상태로 멈추도록 런 상태를 확장
+  - `PLACEHOLDER_ENDING_REST` / `PLACEHOLDER_ENDING_CONTINUE` HUD 버튼과 1회 commit 정책 추가
+  - `ending.rest`는 최종 잠금, `ending.continue`는 restart-ready 루프로 분리
+  - restart 후 memory fragment / reflection repo / deterministic LLM cache 유지와 native model 없는 fallback 응답을 테스트 경로에 추가
+  - 구현 완료
+  - C# compile pass: generated C# csproj 기준 `HwigiTower.EditModeTests.csproj` / `HwigiTower.PlayModeTests.csproj` 컴파일 통과
+- **Files**: 변경/추가 7개 (`Assets/_Project/Scripts/Run/**`, `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `Assets/_Project/Tests/**`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음
+- **Blockers**: Unity tests blocked by license. Unity batchmode fresh EditMode/PlayMode 및 Android build smoke가 LicenseClient `Licensing initialization failed`로 실행 불가. 외부 Obsidian PROGRESS prepend 대신 repo 내부 PROGRESS에 기록.
+- **Next**: Unity Hub/Editor를 열어 라이선스 channel 복구 후 fresh EditMode, PlayMode, Android BuildScript.BuildAndroid 실행 및 통과 시 커밋
+- **Agent**: Codex
+
+---
+
 ### 2026-05-08 09:38 — Post-BossGate gameplay blocker cleanup
 - **Phase**: W2-1
 - **Done**:

@@ -257,11 +257,26 @@ namespace HwigiTower.Run
             return resolution;
         }
 
+        public PrototypeNodeResolution ResolveEndingChoice(string choiceStableId)
+        {
+            if (RunState == null)
+            {
+                return new PrototypeNodeResolution("ending.choice", string.Empty, "ending unavailable", false);
+            }
+
+            return RunState.ResolveEndingChoice(choiceStableId);
+        }
+
         public PrototypeNodeResolution ResolveCombatAction(CombatAction action)
         {
             if (RunState == null)
             {
                 return new PrototypeNodeResolution(string.Empty, string.Empty, "combat unavailable", false);
+            }
+
+            if (RunState.RunCompleted && !RunState.IsInCombat)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "run already completed", true);
             }
 
             var hpBefore = RunState.ActiveCombatPlayer?.Hp ?? RunState.PlayerHp;

@@ -726,9 +726,81 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(state.RunClear);
             Assert.IsTrue(state.RunCompleted);
-            Assert.IsTrue(state.RestartReady);
+            Assert.IsFalse(state.RestartReady);
+            Assert.IsTrue(state.EndingChoicePending);
             Assert.AreEqual("run.clear", state.RunStatus);
             Assert.IsTrue(state.MemoryRepo.TryGetReflection("run-boss-clear", out _));
+        }
+
+        [Test]
+        public void EndingChoice_RestLocksFinalStateAndBlocksFurtherInput()
+        {
+            var state = CreateClearedRun("run-ending-rest");
+            Assert.IsTrue(state.EndingChoicePending);
+
+            var ending = state.ResolveEndingChoice("PLACEHOLDER_ENDING_REST");
+            var blocked = state.ResolveEndingChoice("PLACEHOLDER_ENDING_CONTINUE");
+            var goldBefore = state.Gold;
+            var afterEnd = state.ResolveEncounterChoice(
+                new DeterministicRunContext("run-ending-rest", 1001),
+                "node.after.ending",
+                CreateRuntimeEncounter("ENC_AFTER_ENDING", CreateChoice("CHOICE_AFTER_ENDING", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 99) })),
+                "CHOICE_AFTER_ENDING");
+
+            Assert.AreEqual("PLACEHOLDER_ENDING_REST", ending.PayloadId);
+            Assert.AreEqual("PLACEHOLDER_ENDING_REST", blocked.PayloadId);
+            Assert.IsTrue(state.EndingRest);
+            Assert.IsFalse(state.EndingContinue);
+            Assert.IsFalse(state.RestartReady);
+            Assert.AreEqual("ending.rest", state.RunStatus);
+            Assert.AreEqual(goldBefore, state.Gold);
+            StringAssert.Contains("run already completed", afterEnd.Message);
+        }
+
+        [Test]
+        public void EndingChoice_ContinueEnablesRestartAndPreservesMemoryReflectionCache()
+        {
+            var controllerObject = new GameObject("PrototypeRoomController Ending Continue Test");
+            try
+            {
+                var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+                var controller = controllerObject.AddComponent<PrototypeRoomController>();
+                controller.Configure(null, catalog);
+                controller.BeginRun();
+                var firstRunId = controller.RunState.RunId;
+                var request = new LLMRequest(firstRunId, "ending continue cache prompt", "ending.policy");
+                controller.RunState.MemoryRepo.SaveCachedResponse(new LLMResponse(request.CacheKey, "cached-ending"));
+                Assert.IsTrue(controller.RunState.UnlockMemoryFragmentRef("MEM_FRAGMENT_01"));
+                var clearEncounter = CreateRuntimeEncounter(
+                    "ENC_ENDING_CONTINUE_CLEAR",
+                    CreateChoice("CHOICE_ENDING_CONTINUE_CLEAR", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 0) }));
+                var clearNode = CreateNode("node.ending.continue.clear", clearEncounter);
+                controller.RunState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(clearNode, clearEncounter) });
+                controller.RunState.ResolveEncounterChoice(new DeterministicRunContext(firstRunId, 1001), clearNode.NodeId, clearEncounter, "CHOICE_ENDING_CONTINUE_CLEAR");
+                controller.RunState.ResolveEndingChoice("PLACEHOLDER_ENDING_CONTINUE");
+
+                Assert.IsTrue(controller.RunState.EndingContinue);
+                Assert.IsTrue(controller.RunState.RestartReady);
+                Assert.AreEqual("ending.continue", controller.RunState.RunStatus);
+
+                controller.RestartRun();
+
+                Assert.AreEqual(firstRunId + ".restart.1", controller.RunState.RunId);
+                Assert.AreEqual(1, controller.RunState.CurrentFloor);
+                Assert.AreEqual(6, controller.RunState.Gold);
+                Assert.IsFalse(controller.RunState.RunCompleted);
+                Assert.IsTrue(controller.RunState.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
+                Assert.IsTrue(controller.RunState.MemoryRepo.TryGetReflection(firstRunId, out _));
+                Assert.IsTrue(controller.RunState.MemoryRepo.TryGetCachedResponse(request.CacheKey, out var cached));
+                Assert.AreEqual("cached-ending", cached.Text);
+                var fallbackRequest = new LLMRequest(controller.RunState.RunId, "ending continue fallback prompt", "ending.policy");
+                Assert.IsTrue(controller.RunState.LLMProvider.TryComplete(fallbackRequest, out var fallbackResponse));
+                Assert.AreEqual(fallbackRequest.CacheKey, fallbackResponse.CacheKey);
+            }
+            finally
+            {
+                Object.DestroyImmediate(controllerObject);
+            }
         }
 
         [Test]
@@ -1335,6 +1407,21 @@ namespace HwigiTower.Tests.EditMode
                 new PrototypeDemoRunStep(firstNode, firstEncounter),
                 new PrototypeDemoRunStep(secondNode, secondEncounter)
             });
+            return state;
+        }
+
+        private static PrototypeRunState CreateClearedRun(string runId)
+        {
+            var encounter = CreateRuntimeEncounter(
+                "ENC_CLEAR_FOR_ENDING",
+                CreateChoice(
+                    "CHOICE_CLEAR_FOR_ENDING",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateEffect("ModifyAffinity", 1) }));
+            var node = CreateNode("node.clear.for.ending", encounter);
+            var state = new PrototypeRunState(runId, new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
+            state.ResolveEncounterChoice(new DeterministicRunContext(runId, 1001), node.NodeId, encounter, "CHOICE_CLEAR_FOR_ENDING");
             return state;
         }
 

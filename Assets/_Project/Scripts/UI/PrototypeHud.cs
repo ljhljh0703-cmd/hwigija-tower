@@ -36,6 +36,8 @@ namespace HwigiTower.UI
         [SerializeField] private Button skillButton;
         [SerializeField] private Button nextFloorButton;
         [SerializeField] private Button restartButton;
+        [SerializeField] private Button endingRestButton;
+        [SerializeField] private Button endingContinueButton;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<string> _demoRouteLabels = new List<string>();
@@ -54,6 +56,8 @@ namespace HwigiTower.UI
         public string CombatMessage => combatText == null ? string.Empty : combatText.text;
         public bool CombatPanelVisible => combatPanel != null && combatPanel.gameObject.activeSelf;
         public bool PortraitVisible => npcPortraitImage != null && npcPortraitImage.gameObject.activeSelf;
+        public bool EndingRestButtonVisible => endingRestButton != null && endingRestButton.gameObject.activeSelf;
+        public bool EndingContinueButtonVisible => endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
         public bool RawDebugTextVisible => showRawDebugText;
         public bool HasPresentationData => presentationData != null;
 
@@ -285,7 +289,11 @@ namespace HwigiTower.UI
             }
             else
             {
-                var status = snapshot.RunClear ? " | Run Clear" : snapshot.RunFailed ? " | Run Failed" : string.Empty;
+                var status = snapshot.EndingRest ? " | Ending Rest" :
+                    snapshot.EndingContinue ? " | Ending Continue" :
+                    snapshot.RunClear ? " | Run Clear" :
+                    snapshot.RunFailed ? " | Run Failed" :
+                    string.Empty;
                 runStateText.text =
                     $"Floor {snapshot.CurrentFloor}{status} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | Mental {snapshot.Mental} | Gold {snapshot.Gold}\n" +
                     $"Glitch {snapshot.GlitchLevel} | Affinity {snapshot.Affinity} | Ability {snapshot.AbilityCount} | Item {snapshot.ItemCount}";
@@ -298,6 +306,7 @@ namespace HwigiTower.UI
 
             UpdateNextFloorButton(snapshot);
             UpdateRestartButton(snapshot);
+            UpdateEndingButtons(snapshot);
             UpdatePresentationState(snapshot);
             UpdateRouteIndicator(snapshot);
             UpdateMemoryAndCombatPanel(snapshot);
@@ -783,6 +792,76 @@ namespace HwigiTower.UI
             restartButton.interactable = restartButton.gameObject.activeSelf && _roomController != null;
         }
 
+        private void EnsureEndingButtons()
+        {
+            if (endingRestButton == null)
+            {
+                endingRestButton = CreateEndingButton("Ending Button Rest", "PLACEHOLDER_ENDING_REST", new Vector2(-170f, 218f), ResolveEndingRest);
+            }
+
+            if (endingContinueButton == null)
+            {
+                endingContinueButton = CreateEndingButton("Ending Button Continue", "PLACEHOLDER_ENDING_CONTINUE", new Vector2(170f, 218f), ResolveEndingContinue);
+            }
+        }
+
+        private Button CreateEndingButton(string name, string labelText, Vector2 anchoredPosition, UnityEngine.Events.UnityAction action)
+        {
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(transform, false);
+
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0f);
+            rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = new Vector2(300f, 76f);
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.18f, 0.22f, 0.26f, 0.96f);
+
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(action);
+
+            var labelObject = new GameObject("Label");
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            var labelRect = labelObject.AddComponent<RectTransform>();
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(10f, 4f);
+            labelRect.offsetMax = new Vector2(-10f, -4f);
+
+            var label = labelObject.AddComponent<Text>();
+            label.font = ResolveFont();
+            label.fontSize = 18;
+            label.alignment = TextAnchor.MiddleCenter;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 10;
+            label.resizeTextMaxSize = 18;
+            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.text = labelText;
+            buttonObject.SetActive(false);
+            return button;
+        }
+
+        private void UpdateEndingButtons(PrototypeRunSnapshot snapshot)
+        {
+            EnsureEndingButtons();
+            var visible = snapshot.EndingChoicePending && !snapshot.IsInCombat;
+            if (endingRestButton != null)
+            {
+                endingRestButton.gameObject.SetActive(visible);
+                endingRestButton.interactable = visible && _roomController != null;
+            }
+
+            if (endingContinueButton != null)
+            {
+                endingContinueButton.gameObject.SetActive(visible);
+                endingContinueButton.interactable = visible && _roomController != null;
+            }
+        }
+
         private void ResolveNextFloor()
         {
             if (_roomController == null)
@@ -805,6 +884,29 @@ namespace HwigiTower.UI
             }
 
             var resolution = _roomController.RestartRun();
+            ShowResult(resolution);
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void ResolveEndingRest()
+        {
+            ResolveEndingChoice("PLACEHOLDER_ENDING_REST");
+        }
+
+        private void ResolveEndingContinue()
+        {
+            ResolveEndingChoice("PLACEHOLDER_ENDING_CONTINUE");
+        }
+
+        private void ResolveEndingChoice(string choiceStableId)
+        {
+            if (_roomController == null)
+            {
+                ShowResultMessage("ending unavailable");
+                return;
+            }
+
+            var resolution = _roomController.ResolveEndingChoice(choiceStableId);
             ShowResult(resolution);
             ShowRunState(_roomController.GetSnapshot());
         }
@@ -935,7 +1037,17 @@ namespace HwigiTower.UI
 
             if (snapshot.RunClear)
             {
-                return "Progress\nRun clear";
+                if (snapshot.EndingRest)
+                {
+                    return "Progress\nEnding rest";
+                }
+
+                if (snapshot.EndingContinue)
+                {
+                    return "Progress\nEnding continue";
+                }
+
+                return "Progress\nRun clear | Choose ending";
             }
 
             if (snapshot.RunFailed)
@@ -967,7 +1079,12 @@ namespace HwigiTower.UI
                 return "Combat in progress";
             }
 
-            return snapshot.RunClear ? "Run clear" : snapshot.RunFailed ? "Run failed" : snapshot.StairUnlocked ? "Stair" : "Ready";
+            return snapshot.EndingRest ? "Ending rest" :
+                snapshot.EndingContinue ? "Ending continue" :
+                snapshot.RunClear ? "Run clear" :
+                snapshot.RunFailed ? "Run failed" :
+                snapshot.StairUnlocked ? "Stair" :
+                "Ready";
         }
 
         private void UpdateMemoryAndCombatPanel(PrototypeRunSnapshot snapshot)
@@ -1100,7 +1217,19 @@ namespace HwigiTower.UI
                 return;
             }
 
-            demoCompleteText.text = showRawDebugText ? "run.clear\nRestart Ready" : "Run Clear";
+            if (snapshot.EndingRest)
+            {
+                demoCompleteText.text = showRawDebugText ? "ending.rest" : "Ending Rest";
+                return;
+            }
+
+            if (snapshot.EndingContinue)
+            {
+                demoCompleteText.text = showRawDebugText ? "ending.continue\nRestart Ready" : "Ending Continue";
+                return;
+            }
+
+            demoCompleteText.text = showRawDebugText ? "run.clear\nChoose Ending" : "Run Clear";
         }
 
         private void UpdateResultVisibility(PrototypeRunSnapshot snapshot)
@@ -1252,6 +1381,16 @@ namespace HwigiTower.UI
             if (message.Contains("run.clear"))
             {
                 summary += "\nRun clear";
+            }
+
+            if (message.Contains("ending.rest"))
+            {
+                summary += "\nEnding rest";
+            }
+
+            if (message.Contains("ending.continue"))
+            {
+                summary += "\nEnding continue";
             }
 
             if (message.Contains("run.failed"))
