@@ -22,7 +22,7 @@ namespace HwigiTower.UI
         {
             gameObject.SetActive(true);
             EnsureView();
-            if (cutscene == null || !cutscene.HasSteps)
+            if (cutscene == null || !cutscene.HasPlayableContent)
             {
                 Hide();
                 return;
@@ -63,6 +63,20 @@ namespace HwigiTower.UI
         private IEnumerator PlayRoutine(CutsceneData cutscene)
         {
             var steps = cutscene.Steps;
+            if (steps.Length == 0 && cutscene.FallbackSprite != null)
+            {
+                image.sprite = cutscene.FallbackSprite;
+                image.preserveAspect = true;
+                image.gameObject.SetActive(true);
+                frame.gameObject.SetActive(true);
+                text.text = string.Empty;
+                yield return FadeTo(1f, 0.15f);
+                yield return new WaitForSeconds(0.75f);
+                yield return FadeTo(0f, 0.15f);
+                Hide();
+                yield break;
+            }
+
             for (var i = 0; i < steps.Length; i++)
             {
                 var step = steps[i];

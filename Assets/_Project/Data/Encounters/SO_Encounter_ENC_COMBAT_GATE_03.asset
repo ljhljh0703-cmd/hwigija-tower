@@ -56,11 +56,11 @@ MonoBehaviour:
         sourceHash: sha256:8888888888888888888888888888888888888888888888888888888888888888
         floor: 5
         enemyRefs:
-        - ENEMY_COLLAPSE_ECHO
+        - BOSS_APEX_02
         npcStage: S4_COLLAPSE
         onVictoryEffects:
         - kind: ModifyGold
-          amount: 11
+          amount: 30
           flag:
           value: 0
           itemRef:
@@ -73,7 +73,7 @@ MonoBehaviour:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyGlitchLevel
-          amount: -2
+          amount: -8
           flag:
           value: 0
           itemRef:
@@ -86,7 +86,7 @@ MonoBehaviour:
           targetEncounterId:
           targetNodeId:
         - kind: ModifyAffinity
-          amount: 2
+          amount: 6
           flag:
           value: 0
           itemRef:
@@ -100,7 +100,7 @@ MonoBehaviour:
           targetNodeId:
         - kind: SetFlag
           amount: 0
-          flag: FLAG_COMBAT_GATE_03_VICTORY
+          flag: FLAG_FINAL_BOSS_VICTORY
           value: 1
           itemRef:
           count: 0

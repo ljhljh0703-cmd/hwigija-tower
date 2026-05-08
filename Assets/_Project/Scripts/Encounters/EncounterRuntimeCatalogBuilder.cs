@@ -35,6 +35,7 @@ namespace HwigiTower.Encounters
     {
         public const string CatalogPath = "Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset";
         public const string PrototypeBossGateEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset";
+        public const string PrototypeFinalBossEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset";
         public const string PrototypeFloorTwoShopEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset";
 
         private static readonly string[] ItemIds =
@@ -61,7 +62,8 @@ namespace HwigiTower.Encounters
             "ENEMY_COLLAPSE_ECHO",
             "ENEMY_EMPTY_ARMOR",
             "ENEMY_FRACTURE_HOUND",
-            "BOSS_GATE_01"
+            "BOSS_GATE_01",
+            "BOSS_APEX_02"
         };
 
         private static readonly string[] MemoryFragmentIds =
@@ -162,6 +164,14 @@ namespace HwigiTower.Encounters
                 EditorUtility.SetDirty(floorTwoShop);
                 result?.AddAssetPath(PrototypeFloorTwoShopEncounterPath);
             }
+
+            var finalBoss = AssetDatabase.LoadAssetAtPath<EncounterData>(PrototypeFinalBossEncounterPath);
+            if (finalBoss != null)
+            {
+                ApplyPrototypeFinalBossOverride(finalBoss);
+                EditorUtility.SetDirty(finalBoss);
+                result?.AddAssetPath(PrototypeFinalBossEncounterPath);
+            }
         }
 
         private static T EnsureAsset<T>(string path, EncounterRuntimeCatalogBuildResult result)
@@ -215,13 +225,13 @@ namespace HwigiTower.Encounters
         {
             var serialized = new SerializedObject(enemy);
             serialized.FindProperty("id").stringValue = stableId;
-            serialized.FindProperty("hp").intValue = stableId == "BOSS_GATE_01" ? 28 : 12;
-            serialized.FindProperty("attack").intValue = stableId == "BOSS_GATE_01" ? 4 : 3;
-            serialized.FindProperty("patternId").stringValue = stableId == "BOSS_GATE_01" ? "PATTERN_ELITE" : "PATTERN_PLACEHOLDER";
-            serialized.FindProperty("goldReward").intValue = stableId == "BOSS_GATE_01" ? 16 : 0;
-            serialized.FindProperty("xpReward").intValue = stableId == "BOSS_GATE_01" ? 50 : 0;
-            serialized.FindProperty("glitchDelta").intValue = stableId == "BOSS_GATE_01" ? -4 : 0;
-            serialized.FindProperty("affinityDelta").intValue = stableId == "BOSS_GATE_01" ? 4 : 0;
+            serialized.FindProperty("hp").intValue = stableId == "BOSS_GATE_01" ? 28 : stableId == "BOSS_APEX_02" ? 30 : 12;
+            serialized.FindProperty("attack").intValue = stableId == "BOSS_GATE_01" ? 4 : stableId == "BOSS_APEX_02" ? 4 : 3;
+            serialized.FindProperty("patternId").stringValue = stableId == "BOSS_GATE_01" || stableId == "BOSS_APEX_02" ? "PATTERN_ELITE" : "PATTERN_PLACEHOLDER";
+            serialized.FindProperty("goldReward").intValue = stableId == "BOSS_GATE_01" ? 16 : stableId == "BOSS_APEX_02" ? 30 : 0;
+            serialized.FindProperty("xpReward").intValue = stableId == "BOSS_GATE_01" ? 50 : stableId == "BOSS_APEX_02" ? 100 : 0;
+            serialized.FindProperty("glitchDelta").intValue = stableId == "BOSS_GATE_01" ? -4 : stableId == "BOSS_APEX_02" ? -8 : 0;
+            serialized.FindProperty("affinityDelta").intValue = stableId == "BOSS_GATE_01" ? 4 : stableId == "BOSS_APEX_02" ? 6 : 0;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(enemy);
         }
@@ -249,6 +259,32 @@ namespace HwigiTower.Encounters
             handoff.FindPropertyRelative("floor").intValue = 2;
             SetStringArray(handoff.FindPropertyRelative("enemyRefs"), new[] { "BOSS_GATE_01" });
             SetBossGatePostCombatEffects(handoff.FindPropertyRelative("onVictoryEffects"));
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ApplyPrototypeFinalBossOverride(EncounterData encounter)
+        {
+            var serialized = new SerializedObject(encounter);
+            serialized.FindProperty("floor").intValue = 5;
+
+            var choices = serialized.FindProperty("choices");
+            if (choices.arraySize == 0)
+            {
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                return;
+            }
+
+            var effects = choices.GetArrayElementAtIndex(0).FindPropertyRelative("effects");
+            if (effects.arraySize == 0)
+            {
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                return;
+            }
+
+            var handoff = effects.GetArrayElementAtIndex(0).FindPropertyRelative("combatHandoff");
+            handoff.FindPropertyRelative("floor").intValue = 5;
+            SetStringArray(handoff.FindPropertyRelative("enemyRefs"), new[] { "BOSS_APEX_02" });
+            SetFinalBossPostCombatEffects(handoff.FindPropertyRelative("onVictoryEffects"));
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -299,6 +335,19 @@ namespace HwigiTower.Encounters
             SetPostCombatEffect(property.GetArrayElementAtIndex(2), "ModifyAffinity", 4);
         }
 
+        private static void SetFinalBossPostCombatEffects(SerializedProperty property)
+        {
+            if (property.arraySize < 4)
+            {
+                property.arraySize = 4;
+            }
+
+            SetPostCombatEffect(property.GetArrayElementAtIndex(0), "ModifyGold", 30);
+            SetPostCombatEffect(property.GetArrayElementAtIndex(1), "ModifyGlitchLevel", -8);
+            SetPostCombatEffect(property.GetArrayElementAtIndex(2), "ModifyAffinity", 6);
+            SetPostCombatFlag(property.GetArrayElementAtIndex(3), "FLAG_FINAL_BOSS_VICTORY");
+        }
+
         private static void SetPostCombatEffect(SerializedProperty element, string kind, int amount)
         {
             element.FindPropertyRelative("kind").stringValue = kind;
@@ -314,6 +363,13 @@ namespace HwigiTower.Encounters
             element.FindPropertyRelative("npcStage").stringValue = string.Empty;
             element.FindPropertyRelative("targetEncounterId").stringValue = string.Empty;
             element.FindPropertyRelative("targetNodeId").stringValue = string.Empty;
+        }
+
+        private static void SetPostCombatFlag(SerializedProperty element, string flag)
+        {
+            SetPostCombatEffect(element, "SetFlag", 0);
+            element.FindPropertyRelative("flag").stringValue = flag;
+            element.FindPropertyRelative("value").boolValue = true;
         }
 
         private static void ApplyRewardBundle(RewardBundleData rewardBundle, string stableId)

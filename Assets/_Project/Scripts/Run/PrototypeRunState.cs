@@ -1085,6 +1085,7 @@ namespace HwigiTower.Run
             _endingRest = false;
             _endingContinue = false;
             _endingChoiceId = string.Empty;
+            SetNpcReaction("NPC_REACT_RUN_CLEAR");
             CompleteRun("run.clear", false);
         }
 
@@ -1100,6 +1101,7 @@ namespace HwigiTower.Run
             _endingRest = false;
             _endingContinue = false;
             _endingChoiceId = string.Empty;
+            SetNpcReaction("NPC_REACT_RUN_FAILED");
             CompleteRun("run.failed", true);
         }
 

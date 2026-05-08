@@ -9,6 +9,7 @@ using HwigiTower.Items;
 using HwigiTower.LLM;
 using HwigiTower.NPC;
 using HwigiTower.Run;
+using HwigiTower.UI;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -701,6 +702,193 @@ namespace HwigiTower.Tests.EditMode
             Assert.GreaterOrEqual(boss.Attack, 3);
             Assert.LessOrEqual(boss.Attack, 5);
             Assert.GreaterOrEqual(boss.GoldReward, 12);
+        }
+
+        [Test]
+        public void PrototypeRoomDefinition_FloorOneToFiveRouteOrderIsDeterministic()
+        {
+            var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            Assert.IsNotNull(room);
+
+            CollectionAssert.AreEqual(new[] { "ENC_SHOP_01", "ENC_MORAL_CHOICE_01", "ENC_MEMORY_FRAGMENT_01", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(1)));
+            CollectionAssert.AreEqual(new[] { "ENC_F02_SHOP_001", "ENC_F02_MORAL_CHOICE_001", "ENC_COMBAT_GATE_02" }, RouteEncounterIds(room.GetRunPathForFloor(2)));
+            CollectionAssert.AreEqual(new[] { "ENC_SHOP_02", "ENC_MORAL_CHOICE_02", "ENC_MEMORY_FRAGMENT_02" }, RouteEncounterIds(room.GetRunPathForFloor(3)));
+            CollectionAssert.AreEqual(new[] { "ENC_REST_01", "ENC_MORAL_CHOICE_03", "ENC_MEMORY_FRAGMENT_03" }, RouteEncounterIds(room.GetRunPathForFloor(4)));
+            CollectionAssert.AreEqual(new[] { "ENC_MEMORY_FRAGMENT_04", "ENC_MEMORY_FRAGMENT_05", "ENC_COMBAT_GATE_03" }, RouteEncounterIds(room.GetRunPathForFloor(5)));
+        }
+
+        [Test]
+        public void FloorTwoBossGateOverride_DoesNotLeakIntoFloorThreeOrFinalBoss()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            var floorTwoBossGate = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset");
+            var finalBossGate = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset");
+
+            Assert.IsNotNull(catalog);
+            Assert.IsNotNull(room);
+            Assert.IsNotNull(floorTwoBossGate);
+            Assert.IsNotNull(finalBossGate);
+            Assert.IsTrue(catalog.TryGetEnemy("BOSS_GATE_01", out _));
+            Assert.IsTrue(catalog.TryGetEnemy("BOSS_APEX_02", out _));
+            Assert.AreEqual("BOSS_GATE_01", floorTwoBossGate.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
+            Assert.AreEqual("BOSS_APEX_02", finalBossGate.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
+            Assert.AreNotEqual("BOSS_GATE_01", finalBossGate.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
+            Assert.IsFalse(RouteEncounterIds(room.GetRunPathForFloor(3)).Contains("ENC_COMBAT_GATE_02"));
+        }
+
+        [Test]
+        public void FinalBoss_BossApexBalanceSupportsVerticalSliceClear()
+        {
+            var boss = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_BOSS_APEX_02.asset");
+            Assert.IsNotNull(boss);
+            Assert.AreEqual("BOSS_APEX_02", boss.Id);
+            Assert.GreaterOrEqual(boss.Hp, 28);
+            Assert.LessOrEqual(boss.Hp, 36);
+            Assert.GreaterOrEqual(boss.Attack, 4);
+            Assert.LessOrEqual(boss.Attack, 5);
+            Assert.GreaterOrEqual(boss.GoldReward, 24);
+            Assert.LessOrEqual(boss.GoldReward, 40);
+        }
+
+        [Test]
+        public void FinalBossVictory_OpensEndingChoiceOnce()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            var state = CreateConfiguredRouteState("run-final-boss-clear", room, catalog);
+            state.ModifyGold(100);
+            state.AddItemRef("ITEM_FIELD_BANDAGE", 8);
+            state.AddAbilityRef("ABILITY_SCOUT");
+
+            ResolveFullRouteToFinalBoss(state);
+
+            Assert.IsTrue(state.RunClear);
+            Assert.IsTrue(state.EndingChoicePending);
+            Assert.AreEqual("BOSS_APEX_02", state.LastCombatEnemyId);
+            Assert.AreEqual("NPC_REACT_RUN_CLEAR", state.LastNpcReactionKey);
+
+            var rest = state.ResolveEndingChoice("PLACEHOLDER_ENDING_REST");
+            var duplicate = state.ResolveEndingChoice("PLACEHOLDER_ENDING_CONTINUE");
+
+            Assert.AreEqual("PLACEHOLDER_ENDING_REST", rest.PayloadId);
+            Assert.AreEqual("PLACEHOLDER_ENDING_REST", duplicate.PayloadId);
+            Assert.AreEqual("ending.rest", state.RunStatus);
+            Assert.AreEqual("NPC_REACT_ENDING_REST", state.LastNpcReactionKey);
+        }
+
+        [Test]
+        public void FinalBossDefeat_WithRecallAnchorRevivesOnceThenCanFail()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var finalBossGate = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset");
+            var bossNode = CreateNode("node.final.boss.recall", finalBossGate);
+            var state = new PrototypeRunState("run-final-boss-recall", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AddAbilityRef("ABILITY_RECALL_ANCHOR");
+            state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(bossNode, finalBossGate) });
+            state.ModifyPlayerHp(-23);
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-final-boss-recall", 1001), bossNode.NodeId, finalBossGate, "CHOICE_COMBAT_03_ENGAGE");
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+
+            Assert.IsTrue(state.IsInCombat);
+            Assert.IsFalse(state.RunCompleted);
+            Assert.AreEqual("recall", state.LastCombatResultId);
+            Assert.IsTrue(state.HasFlag("FLAG_RECALL_ANCHOR_USED"));
+            Assert.AreEqual("NPC_REACT_RECALL_ANCHOR", state.LastNpcReactionKey);
+
+            var guard = 0;
+            while (state.IsInCombat && guard < 4)
+            {
+                state.ResolveCombatRoundInteractive(CombatAction.Attack);
+                guard++;
+            }
+
+            Assert.IsTrue(state.RunFailed);
+            Assert.AreEqual("run.failed", state.RunStatus);
+            Assert.AreEqual("NPC_REACT_RUN_FAILED", state.LastNpcReactionKey);
+        }
+
+        [Test]
+        public void RunAndEndingStates_HaveSafeFallbackReactionKeys()
+        {
+            var clearState = CreateClearedRun("run-reaction-clear");
+            Assert.AreEqual("NPC_REACT_RUN_CLEAR", clearState.LastNpcReactionKey);
+
+            var rest = clearState.ResolveEndingChoice("PLACEHOLDER_ENDING_REST");
+            Assert.AreEqual("PLACEHOLDER_ENDING_REST", rest.PayloadId);
+            Assert.AreEqual("NPC_REACT_ENDING_REST", clearState.LastNpcReactionKey);
+
+            var continueState = CreateClearedRun("run-reaction-continue");
+            continueState.ResolveEndingChoice("PLACEHOLDER_ENDING_CONTINUE");
+            Assert.AreEqual("NPC_REACT_ENDING_CONTINUE", continueState.LastNpcReactionKey);
+
+            var failedState = new PrototypeRunState("run-reaction-failed", new GameFlowEventBus()) { AutoResolveCombat = false };
+            failedState.ModifyPlayerHp(-23);
+            var lethal = CreateRuntimeEncounter(
+                "ENC_REACTION_FAILURE",
+                CreateChoice("CHOICE_REACTION_FAILURE", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_REACTION_FAILURE", "ENEMY_REACTION_FAILURE", new EncounterPostCombatEffectRuntimeData[0]) }));
+            failedState.ResolveEncounterChoice(new DeterministicRunContext("run-reaction-failed", 1001), "node.reaction.failure", lethal, "CHOICE_REACTION_FAILURE");
+            failedState.ResolveCombatRoundInteractive(CombatAction.Attack);
+            Assert.AreEqual("NPC_REACT_RUN_FAILED", failedState.LastNpcReactionKey);
+        }
+
+        [Test]
+        public void SpineCutsceneScaffold_FoldersAndReadmesExistWithoutExports()
+        {
+            var cutsceneIds = new[]
+            {
+                "CUT_MEMORY_03_FRACTURE",
+                "CUT_FINAL_BOSS_REVEAL",
+                "CUT_ENDING_CHOICE",
+                "CUT_ENDING_REST",
+                "CUT_ENDING_CONTINUE"
+            };
+
+            Assert.IsTrue(File.Exists("Assets/_Project/Art/SpineSource/_README.md"));
+            Assert.IsTrue(File.Exists("Assets/_Project/Spine/_README.md"));
+            Assert.IsTrue(File.Exists("Assets/_Project/Data/Cutscenes/Spine/_README.md"));
+
+            for (var i = 0; i < cutsceneIds.Length; i++)
+            {
+                Assert.IsTrue(Directory.Exists("Assets/_Project/Art/SpineSource/" + cutsceneIds[i]));
+                Assert.IsTrue(Directory.Exists("Assets/_Project/Spine/" + cutsceneIds[i]));
+            }
+        }
+
+        [Test]
+        public void CutsceneData_SpineSlotsAreDependencyFreeAndFallbackSafe()
+        {
+            var data = ScriptableObject.CreateInstance<CutsceneData>();
+            try
+            {
+                var serialized = new SerializedObject(data);
+                Assert.IsNotNull(serialized.FindProperty("animationCutsceneId"));
+                Assert.IsNotNull(serialized.FindProperty("animationAssetPath"));
+                Assert.IsNotNull(serialized.FindProperty("fallbackSprite"));
+                Assert.IsFalse(data.HasPlayableContent);
+
+                var texture = new Texture2D(2, 2);
+                var sprite = Sprite.Create(texture, new Rect(0f, 0f, 2f, 2f), Vector2.one * 0.5f);
+                serialized.FindProperty("fallbackSprite").objectReferenceValue = sprite;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+
+                Assert.IsFalse(data.HasSteps);
+                Assert.IsTrue(data.HasPlayableContent);
+                Assert.AreSame(sprite, data.FallbackSprite);
+
+                var cutsceneDataSource = File.ReadAllText("Assets/_Project/Scripts/UI/CutsceneData.cs");
+                var playerSource = File.ReadAllText("Assets/_Project/Scripts/UI/PrototypeCutscenePlayer.cs");
+                Assert.IsFalse(cutsceneDataSource.Contains("using Spine"));
+                Assert.IsFalse(cutsceneDataSource.Contains("Spine."));
+                Assert.IsFalse(playerSource.Contains("using Spine"));
+                Assert.IsFalse(playerSource.Contains("Spine."));
+            }
+            finally
+            {
+                Object.DestroyImmediate(data);
+            }
         }
 
         [Test]
@@ -1423,6 +1611,63 @@ namespace HwigiTower.Tests.EditMode
             state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
             state.ResolveEncounterChoice(new DeterministicRunContext(runId, 1001), node.NodeId, encounter, "CHOICE_CLEAR_FOR_ENDING");
             return state;
+        }
+
+        private static PrototypeRunState CreateConfiguredRouteState(string runId, PrototypeRoomDefinition room, EncounterRuntimeCatalogData catalog)
+        {
+            Assert.IsNotNull(room);
+            Assert.IsNotNull(catalog);
+            var state = new PrototypeRunState(runId, new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachEncounterCatalog(catalog);
+            state.AttachFloorRunPaths(room.FloorRunPaths, room.DemoRunPath);
+            return state;
+        }
+
+        private static void ResolveFullRouteToFinalBoss(PrototypeRunState state)
+        {
+            ResolveRouteChoice(state, "ENC_SHOP_01", "CHOICE_SHOP_01_LEAVE");
+            ResolveRouteChoice(state, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
+            ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_01", "CHOICE_MEMORY_01_UNLOCK");
+            ResolveRouteChoice(state, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            Assert.IsTrue(state.StairUnlocked);
+            state.ResolveNextFloor();
+
+            ResolveRouteChoice(state, "ENC_F02_SHOP_001", "CHOICE_F02_SHOP_BUY_ITEM");
+            ResolveRouteChoice(state, "ENC_F02_MORAL_CHOICE_001", "CHOICE_F02_MORAL_LEAVE");
+            ResolveRouteChoice(state, "ENC_COMBAT_GATE_02", "CHOICE_COMBAT_02_ENGAGE");
+            Assert.IsTrue(state.StairUnlocked);
+            state.ResolveNextFloor();
+
+            ResolveRouteChoice(state, "ENC_SHOP_02", "CHOICE_SHOP_02_BUY_ABILITY");
+            ResolveRouteChoice(state, "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
+            ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
+            Assert.IsTrue(state.StairUnlocked);
+            state.ResolveNextFloor();
+
+            ResolveRouteChoice(state, "ENC_REST_01", "CHOICE_REST_01_REST");
+            ResolveRouteChoice(state, "ENC_MORAL_CHOICE_03", "CHOICE_MORAL_03_REFUSE");
+            ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
+            Assert.IsTrue(state.StairUnlocked);
+            state.ResolveNextFloor();
+
+            ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_04", "CHOICE_MEMORY_04_UNLOCK");
+            ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
+            Assert.AreEqual(5, state.CurrentFloor);
+            ResolveRouteChoice(state, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
+        }
+
+        private static void ResolveRouteChoice(PrototypeRunState state, string expectedEncounterId, string choiceStableId)
+        {
+            Assert.IsTrue(state.TryGetNextDemoStep(out var step), "Expected a route step for " + expectedEncounterId);
+            Assert.AreEqual(expectedEncounterId, step.EncounterId);
+            var resolution = state.ResolveEncounterChoice(new DeterministicRunContext(state.RunId, 1001), step.NodeId, step.Encounter, choiceStableId);
+            Assert.AreEqual(choiceStableId, resolution.PayloadId);
+        }
+
+        private static string[] RouteEncounterIds(IReadOnlyList<PrototypeDemoRunStep> steps)
+        {
+            Assert.IsNotNull(steps);
+            return steps.Select(step => step == null ? string.Empty : step.EncounterId).ToArray();
         }
 
         private static PrototypeFloorRunPath CreateFloorPath(int floor, params PrototypeDemoRunStep[] steps)

@@ -32,6 +32,22 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-08 18:17 — Floor 1-5 final boss route and Spine intake scaffold
+- **Phase**: W2-1
+- **Done**:
+  - PrototypeRoom deterministic route를 Floor 1→5까지 확장하고 Floor 5 `ENC_COMBAT_GATE_03`에 `BOSS_APEX_02`를 연결
+  - Floor 2 BossGate는 Floor 3 unlock으로 유지하고 final boss victory가 기존 ending choice flow로 진입하도록 PlayMode smoke 갱신
+  - `BOSS_APEX_02`를 30 HP / 4 ATK / reward 30 gold 기준으로 세로 slice 클리어 가능한 밸런스로 조정
+  - run clear / failed / ending fallback reaction key coverage를 보강
+  - Spine runtime 미설치 상태에서 안전한 `SpineSource`, exported `Spine`, cutscene data folder와 `CutsceneData` fallback slots를 추가
+- **Files**: 변경/추가 51개 (주요: `SO_Room_Prototype.asset`, `SO_Encounter_ENC_COMBAT_GATE_03.asset`, `BOSS_APEX_02`, `CutsceneData.cs`, `PrototypeRoomSmokeTests.cs`, `Assets/_Project/Spine/**`)
+- **GDD impact**: 없음
+- **Blockers**: Android build smoke는 `Android build target is not installed in this Unity Editor.`로 APK 생성 불가
+- **Next**: Android Build Support 설치 후 BuildScript.BuildAndroid 재실행, 이후 실기 smoke와 final boss route 수동 플레이 QA
+- **Agent**: Codex
+
+---
+
 ### 2026-05-08 10:29 — Ending choice flow implementation blocked on Unity licensing
 - **Phase**: W2-1
 - **Done**:
