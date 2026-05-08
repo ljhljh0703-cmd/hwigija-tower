@@ -35,6 +35,7 @@ namespace HwigiTower.Encounters
     {
         public const string CatalogPath = "Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset";
         public const string PrototypeBossGateEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset";
+        public const string PrototypeFloorTwoShopEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset";
 
         private static readonly string[] ItemIds =
         {
@@ -147,14 +148,20 @@ namespace HwigiTower.Encounters
         public static void ApplyPrototypeRuntimeOverrides(EncounterRuntimeCatalogBuildResult result = null)
         {
             var bossGate = AssetDatabase.LoadAssetAtPath<EncounterData>(PrototypeBossGateEncounterPath);
-            if (bossGate == null)
+            if (bossGate != null)
             {
-                return;
+                ApplyPrototypeBossGateOverride(bossGate);
+                EditorUtility.SetDirty(bossGate);
+                result?.AddAssetPath(PrototypeBossGateEncounterPath);
             }
 
-            ApplyPrototypeBossGateOverride(bossGate);
-            EditorUtility.SetDirty(bossGate);
-            result?.AddAssetPath(PrototypeBossGateEncounterPath);
+            var floorTwoShop = AssetDatabase.LoadAssetAtPath<EncounterData>(PrototypeFloorTwoShopEncounterPath);
+            if (floorTwoShop != null)
+            {
+                ApplyPrototypeFloorTwoShopOverride(floorTwoShop);
+                EditorUtility.SetDirty(floorTwoShop);
+                result?.AddAssetPath(PrototypeFloorTwoShopEncounterPath);
+            }
         }
 
         private static T EnsureAsset<T>(string path, EncounterRuntimeCatalogBuildResult result)
@@ -243,6 +250,41 @@ namespace HwigiTower.Encounters
             SetStringArray(handoff.FindPropertyRelative("enemyRefs"), new[] { "BOSS_GATE_01" });
             SetBossGatePostCombatEffects(handoff.FindPropertyRelative("onVictoryEffects"));
             serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ApplyPrototypeFloorTwoShopOverride(EncounterData encounter)
+        {
+            var serialized = new SerializedObject(encounter);
+            var choices = serialized.FindProperty("choices");
+            for (var i = 0; i < choices.arraySize; i++)
+            {
+                var choice = choices.GetArrayElementAtIndex(i);
+                var stableId = choice.FindPropertyRelative("stableId").stringValue;
+                var effects = choice.FindPropertyRelative("effects");
+                if (stableId == "CHOICE_F02_SHOP_BUY_ITEM")
+                {
+                    SetEffectRef(effects, "AddItem", "itemRef", "ITEM_FIELD_BANDAGE");
+                }
+                else if (stableId == "CHOICE_F02_SHOP_BUY_ABILITY")
+                {
+                    SetEffectRef(effects, "AddAbility", "abilityRef", "ABILITY_RECALL_ANCHOR");
+                }
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetEffectRef(SerializedProperty effects, string kind, string propertyName, string stableId)
+        {
+            for (var i = 0; i < effects.arraySize; i++)
+            {
+                var effect = effects.GetArrayElementAtIndex(i);
+                if (effect.FindPropertyRelative("kind").stringValue == kind)
+                {
+                    effect.FindPropertyRelative(propertyName).stringValue = stableId;
+                    return;
+                }
+            }
         }
 
         private static void SetBossGatePostCombatEffects(SerializedProperty property)

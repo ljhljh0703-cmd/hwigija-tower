@@ -295,14 +295,24 @@ namespace HwigiTower.Run
 
         public bool AddAbilityRef(string abilityRef)
         {
-            if (string.IsNullOrEmpty(abilityRef) || !_abilityRefs.Add(abilityRef))
+            if (string.IsNullOrEmpty(abilityRef) || _abilityRefs.Contains(abilityRef))
             {
                 return false;
             }
 
-            if (EncounterCatalog != null && EncounterCatalog.TryGetAbility(abilityRef, out var ability))
+            if (EncounterCatalog != null)
             {
+                if (!EncounterCatalog.TryGetAbility(abilityRef, out var ability) || ability == null)
+                {
+                    return false;
+                }
+
+                _abilityRefs.Add(abilityRef);
                 Abilities.Add(ability);
+            }
+            else
+            {
+                _abilityRefs.Add(abilityRef);
             }
 
             RecalculatePlayerStats();

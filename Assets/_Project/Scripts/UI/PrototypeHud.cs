@@ -1254,6 +1254,16 @@ namespace HwigiTower.UI
                 summary += "\nRun clear";
             }
 
+            if (message.Contains("run.failed"))
+            {
+                summary += "\nRun failed";
+            }
+
+            if (message.Contains("run.restartReady"))
+            {
+                summary += "\nRestart available";
+            }
+
             return summary == "Result" ? "Result\n-" : summary;
         }
 

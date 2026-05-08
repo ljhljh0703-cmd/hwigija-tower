@@ -301,7 +301,10 @@ namespace HwigiTower.Tests.PlayMode
 
             var floorTwoShop = controller.SelectEncounter(shopNode);
             Assert.AreEqual("ENC_F02_SHOP_001", floorTwoShop.EncounterId);
-            controller.ResolveEncounterChoice(shopNode, floorTwoShop.Encounter, "CHOICE_F02_SHOP_LEAVE");
+            controller.RunState.ModifyGold(12);
+            var bandageBeforeFloorTwoShop = controller.RunState.GetItemCount("ITEM_FIELD_BANDAGE");
+            controller.ResolveEncounterChoice(shopNode, floorTwoShop.Encounter, "CHOICE_F02_SHOP_BUY_ITEM");
+            Assert.AreEqual(bandageBeforeFloorTwoShop + 1, controller.RunState.GetItemCount("ITEM_FIELD_BANDAGE"));
             var floorTwoMoral = controller.SelectEncounter(battleNode);
             Assert.AreEqual("ENC_F02_MORAL_CHOICE_001", floorTwoMoral.EncounterId);
             controller.ResolveEncounterChoice(battleNode, floorTwoMoral.Encounter, "CHOICE_F02_MORAL_LEAVE");
@@ -351,6 +354,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(firstRunId + ".restart.1", controller.RunState.RunId);
             Assert.AreEqual(1, controller.RunState.CurrentFloor);
             Assert.AreEqual(6, controller.RunState.Gold);
+            Assert.IsTrue(controller.RunState.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
+            Assert.AreEqual(1, controller.GetSnapshot().MemoryFragmentCount);
             Assert.IsFalse(controller.RunState.RunCompleted);
             StringAssert.Contains("Shop", hud.RouteMessage);
         }
@@ -410,6 +415,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(0, hud.ChoiceButtonCount);
             StringAssert.Contains("Run failed", hud.RouteMessage);
             StringAssert.Contains("Run Failed", hud.RunStateMessage);
+            StringAssert.Contains("Run failed", hud.ResultMessage);
+            StringAssert.Contains("Restart available", hud.ResultMessage);
 
             var restartButton = GameObject.Find("Restart Run Button").GetComponent<Button>();
             Assert.IsTrue(restartButton.gameObject.activeInHierarchy);
@@ -419,6 +426,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(1, controller.RunState.CurrentFloor);
             Assert.AreEqual(6, controller.RunState.Gold);
             Assert.AreEqual(controller.RunState.PlayerMaxHp, controller.RunState.PlayerHp);
+            Assert.IsTrue(controller.RunState.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
+            Assert.AreEqual(1, controller.GetSnapshot().MemoryFragmentCount);
             Assert.IsFalse(controller.RunState.RunCompleted);
         }
 

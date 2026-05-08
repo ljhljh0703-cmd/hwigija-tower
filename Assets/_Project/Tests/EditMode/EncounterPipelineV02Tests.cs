@@ -191,6 +191,9 @@ namespace HwigiTower.Tests.EditMode
             Assert.NotNull(AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset"));
             var bossGate = AssetDatabase.LoadAssetAtPath<EncounterData>(EncounterRuntimeCatalogBuilder.PrototypeBossGateEncounterPath);
             Assert.AreEqual("BOSS_GATE_01", bossGate.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
+            var floorTwoShop = AssetDatabase.LoadAssetAtPath<EncounterData>(EncounterRuntimeCatalogBuilder.PrototypeFloorTwoShopEncounterPath);
+            Assert.AreEqual("ITEM_FIELD_BANDAGE", floorTwoShop.Choices[0].effects[1].itemRef);
+            Assert.AreEqual("ABILITY_RECALL_ANCHOR", floorTwoShop.Choices[1].effects[1].abilityRef);
         }
 
         [Test]
