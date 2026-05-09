@@ -45,11 +45,21 @@ namespace HwigiTower.Core
 
         private void Update()
         {
+            if (_inputSource == null)
+            {
+                RebuildInputSource();
+            }
+
             _latestInput = _inputSource.Read();
         }
 
         private void FixedUpdate()
         {
+            if (_rigidbody == null)
+            {
+                _rigidbody = GetComponent<Rigidbody2D>();
+            }
+
             var speed = movementProfile == null ? 4f : movementProfile.MoveSpeed;
             _rigidbody.linearVelocity = _latestInput.Move * speed;
         }

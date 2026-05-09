@@ -5,6 +5,7 @@ using HwigiTower.Encounters;
 using HwigiTower.Run;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
@@ -109,6 +110,11 @@ namespace HwigiTower.UI
             ClearChoices();
         }
 
+        private void Update()
+        {
+            HandleManualShortcuts();
+        }
+
         public void Configure(Text focus, Text interaction, Text runState = null, Text result = null)
         {
             focusText = focus;
@@ -130,6 +136,89 @@ namespace HwigiTower.UI
 
             ApplyPortrait();
             ClearChoices();
+        }
+
+        private void HandleManualShortcuts()
+        {
+            var keyboard = Keyboard.current;
+            if (keyboard == null)
+            {
+                return;
+            }
+
+            if (routeActionButton != null && routeActionButton.gameObject.activeSelf && routeActionButton.interactable &&
+                (keyboard.enterKey.wasPressedThisFrame || keyboard.nKey.wasPressedThisFrame))
+            {
+                OpenCurrentRouteStep();
+                return;
+            }
+
+            if (nextFloorButton != null && nextFloorButton.gameObject.activeSelf && nextFloorButton.interactable &&
+                (keyboard.enterKey.wasPressedThisFrame || keyboard.nKey.wasPressedThisFrame))
+            {
+                ResolveNextFloor();
+                return;
+            }
+
+            if (endingRestButton != null && endingRestButton.gameObject.activeSelf && endingRestButton.interactable &&
+                keyboard.digit1Key.wasPressedThisFrame)
+            {
+                ResolveEndingRest();
+                return;
+            }
+
+            if (endingContinueButton != null && endingContinueButton.gameObject.activeSelf && endingContinueButton.interactable &&
+                keyboard.digit2Key.wasPressedThisFrame)
+            {
+                ResolveEndingContinue();
+                return;
+            }
+
+            if (_choiceButtons.Count > 0)
+            {
+                TryInvokeChoiceShortcut(keyboard);
+                return;
+            }
+
+            if (combatPanel != null && combatPanel.gameObject.activeSelf)
+            {
+                if (keyboard.aKey.wasPressedThisFrame && attackButton != null && attackButton.interactable)
+                {
+                    ResolveCombatAction(CombatAction.Attack);
+                    return;
+                }
+
+                if (keyboard.dKey.wasPressedThisFrame && defendButton != null && defendButton.interactable)
+                {
+                    ResolveCombatAction(CombatAction.Defend);
+                    return;
+                }
+
+                if (keyboard.sKey.wasPressedThisFrame && skillButton != null && skillButton.interactable)
+                {
+                    ResolveCombatAction(CombatAction.Skill);
+                }
+            }
+        }
+
+        private void TryInvokeChoiceShortcut(Keyboard keyboard)
+        {
+            var index =
+                keyboard.digit1Key.wasPressedThisFrame ? 0 :
+                keyboard.digit2Key.wasPressedThisFrame ? 1 :
+                keyboard.digit3Key.wasPressedThisFrame ? 2 :
+                keyboard.digit4Key.wasPressedThisFrame ? 3 :
+                -1;
+            if (index < 0 || index >= _choiceButtons.Count)
+            {
+                return;
+            }
+
+            var button = _choiceButtons[index];
+            if (button != null && button.gameObject.activeSelf && button.interactable)
+            {
+                button.onClick.Invoke();
+            }
         }
 
         public void ConfigureDemoRoute(IReadOnlyList<PrototypeDemoRunStep> demoRunPath)
@@ -311,6 +400,7 @@ namespace HwigiTower.UI
                 ClearChoices();
             }
 
+            EnsureEventSystem();
             UpdateNextFloorButton(snapshot);
             UpdateRouteActionButton(snapshot);
             UpdateRestartButton(snapshot);

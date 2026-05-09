@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-09 16:27 — Manual completion route QA fixes
+- **Phase**: W2-2
+- **Done**:
+  - `69d9936`을 `origin/Proto`에 push하고 원격 HEAD 확인
+  - Mac Editor `PrototypeRoom`에서 시작 직후 HUD/`진행` 버튼이 보이지 않거나 입력되지 않는 P0 확인
+  - 씬 시작 시 run/HUD를 자동 초기화하고 HUD 버튼용 EventSystem을 보장
+  - Mac Editor용 키보드 fallback과 route-action full completion PlayMode smoke 추가
+- **Files**: 변경/추가 5개 (PlayerMovementController.cs, PrototypeRoomController.cs, PrototypeHud.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: Codex macOS 입력 자동화로 실제 마우스 클릭 완주는 안정 재현하지 못함. 동일 UI onClick route는 PlayMode에서 Floor 1→5→ending.continue까지 검증.
+- **Next**: 사람이 직접 Editor에서 마우스/키보드로 완주 확인 후 Android 실기 smoke 진행
+- **Agent**: Codex
+
 ### 2026-05-09 14:17 — Mac Editor playability route entry pass
 - **Phase**: W2-2
 - **Done**:
