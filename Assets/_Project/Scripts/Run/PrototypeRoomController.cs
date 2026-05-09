@@ -194,6 +194,21 @@ namespace HwigiTower.Run
             return new EncounterSelector().Select(RunContext, node.Definition);
         }
 
+        public EncounterSelection SelectCurrentRouteEncounter()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (RunState == null || RunState.RunCompleted || !RunState.TryGetNextDemoStep(out var step))
+            {
+                return new EncounterSelection(null, null);
+            }
+
+            return new EncounterSelection(step.Node, step.Encounter);
+        }
+
         public PrototypeEncounterChoiceView[] BuildEncounterChoiceViews(EncounterSelection selection)
         {
             if (RunState == null)
@@ -225,6 +240,46 @@ namespace HwigiTower.Run
             }
 
             return RunState.TryGetResolvedEncounterChoice(selection.Node.NodeId, selection.EncounterId, out choiceStableId);
+        }
+
+        public PrototypeNodeResolution ResolveCurrentRouteChoice(EncounterSelection selection, string choiceStableId)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (RunState == null || RunState.RunCompleted)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "run already completed", true);
+            }
+
+            if (!selection.HasEncounter || selection.Node == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", false);
+            }
+
+            return RunState.ResolveEncounterChoice(CreateActiveContext(), selection.Node.NodeId, selection.Encounter, choiceStableId);
+        }
+
+        public PrototypeNodeResolution ResolveCurrentRouteNode(EncounterSelection selection)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (RunState == null || RunState.RunCompleted)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "run already completed", true);
+            }
+
+            if (selection.Node == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", false);
+            }
+
+            return ResolveNodeDefinition(selection.Node, selection);
         }
 
         public PrototypeNodeResolution ResolveEncounterChoice(InteractableNode node, EncounterData encounter, string choiceStableId)
@@ -350,6 +405,22 @@ namespace HwigiTower.Run
                 ? selection.Encounter.Enemy
                 : definition.FallbackEnemy;
 
+            var resolution = ResolveNodeDefinition(definition, selection, enemy);
+            NotifyNodeResolved(node, resolution.PayloadId);
+            return resolution;
+        }
+
+        private PrototypeNodeResolution ResolveNodeDefinition(PrototypeNodeDefinition definition, EncounterSelection selection)
+        {
+            var enemy = selection.HasEncounter && selection.Encounter.Enemy != null
+                ? selection.Encounter.Enemy
+                : definition.FallbackEnemy;
+            return ResolveNodeDefinition(definition, selection, enemy);
+        }
+
+        private PrototypeNodeResolution ResolveNodeDefinition(PrototypeNodeDefinition definition, EncounterSelection selection, EnemyData enemy)
+        {
+            var encounterId = selection.EncounterId;
             PrototypeNodeResolution resolution;
             if (HasEncounterChoices(selection))
             {
@@ -380,7 +451,6 @@ namespace HwigiTower.Run
                     break;
             }
 
-            NotifyNodeResolved(node, resolution.PayloadId);
             return resolution;
         }
 
