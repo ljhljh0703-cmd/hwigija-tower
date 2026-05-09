@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-09 12:00 — Player-facing gameplay loop polish
+- **Phase**: W2-2
+- **Done**:
+  - 기본 HUD/route/result/combat 표시에서 raw stableId/textKey 노출을 줄이고 public play label을 적용
+  - 선택 버튼에 구매 비용, 획득, 메모리 해금, 전투 시작, 골드 부족 등 consequence hint를 표시
+  - result panel과 combat feedback을 HP/Gold/Mental/Glitch/Affinity/획득/진행 상태 중심으로 압축
+  - Floor 1→5, final boss, ending choice smoke가 public label 기준으로 통과하도록 PlayMode 갱신
+- **Files**: 변경/추가 5개 (PrototypeEncounterRuntimeResolver.cs, PrototypeHud.cs, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: Android APK build artifact는 존재하나 ADB 연결 기기 없음으로 실기 smoke 미수행
+- **Next**: 실제 Android 기기 연결 후 install/run smoke 및 터치/세로 화면 확인
+- **Agent**: Codex
+
 ### 2026-05-08 18:17 — Floor 1-5 final boss route and Spine intake scaffold
 - **Phase**: W2-1
 - **Done**:

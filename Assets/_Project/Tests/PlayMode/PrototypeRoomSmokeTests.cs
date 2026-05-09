@@ -90,7 +90,7 @@ namespace HwigiTower.Tests.PlayMode
             controller.BeginRun();
             hud.SetRawDebugTextVisible(true);
             hud.ShowRunState(controller.GetSnapshot());
-            StringAssert.Contains("[current] Shop", hud.RouteMessage);
+            StringAssert.Contains("[current] 상점", hud.RouteMessage);
 
             var shopEncounter = FindEncounter(shopNode, "ENC_SHOP_01");
             var shopSelection = new EncounterSelection(shopNode.Definition, shopEncounter);
@@ -227,7 +227,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.IsTrue(hud.CombatPanelVisible);
-            StringAssert.Contains("Combat", hud.CombatMessage);
+            StringAssert.Contains("전투", hud.CombatMessage);
             StringAssert.Contains("Enemy HP", hud.CombatMessage);
             StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
             Assert.IsFalse(GameObject.Find("Demo Complete Text") != null && GameObject.Find("Demo Complete Text").activeInHierarchy);
@@ -238,11 +238,15 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(attackButton);
             Assert.IsNotNull(defendButton);
             Assert.IsNotNull(skillButton);
+            StringAssert.Contains("공격", ReadButtonText(attackButton));
+            StringAssert.Contains("방어", ReadButtonText(defendButton));
+            StringAssert.Contains("기술 없음", ReadButtonText(skillButton));
             Assert.IsFalse(skillButton.interactable);
 
             attackButton.onClick.Invoke();
             yield return null;
             Assert.Less(controller.GetSnapshot().EnemyHp, beforeEnemyHp);
+            StringAssert.Contains("공격: 피해", hud.CombatMessage);
 
             var hpBeforeDefend = controller.GetSnapshot().PlayerHp;
             defendButton.onClick.Invoke();
@@ -261,7 +265,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(controller.RunState.IsInCombat);
             Assert.AreEqual("stair.unlocked", controller.RunState.DemoStatus);
             Assert.IsTrue(controller.RunState.StairUnlocked);
-            StringAssert.Contains("Stair unlocked", hud.ResultMessage);
+            StringAssert.Contains("Next floor ready", hud.ResultMessage);
             Assert.IsFalse(hud.CombatPanelVisible);
             Assert.IsFalse(GameObject.Find("Demo Complete Text") != null && GameObject.Find("Demo Complete Text").activeInHierarchy);
             var nextFloorButton = GameObject.Find("Next Floor Button").GetComponent<Button>();
@@ -346,7 +350,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsTrue(controller.RunState.StairUnlocked);
             Assert.IsFalse(hud.EndingRestButtonVisible);
             Assert.IsFalse(hud.EndingContinueButtonVisible);
-            StringAssert.Contains("Stair", hud.RouteMessage);
+            StringAssert.Contains("다음 층 가능", hud.RouteMessage);
             Assert.AreEqual(0, hud.ChoiceButtonCount);
 
             var nextFloorButton = GameObject.Find("Next Floor Button").GetComponent<Button>();
@@ -386,7 +390,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(hud.EndingContinueButtonVisible);
             var restartButton = GameObject.Find("Restart Run Button");
             Assert.IsTrue(restartButton == null || !restartButton.activeInHierarchy);
-            StringAssert.Contains("Ending rest", hud.RouteMessage);
+            StringAssert.Contains("ending.rest", hud.RouteMessage);
 
             var blocked = controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_BUY_ITEM");
             StringAssert.Contains("run already completed", blocked.Message);
@@ -417,7 +421,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsTrue(controller.RunState.EndingRest);
             Assert.IsFalse(controller.RunState.RestartReady);
-            StringAssert.Contains("Ending rest", hud.RouteMessage);
+            StringAssert.Contains("ending.rest", hud.RouteMessage);
 
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
             yield return null;
@@ -433,7 +437,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsTrue(controller.RunState.EndingContinue);
             Assert.IsTrue(controller.RunState.RestartReady);
-            StringAssert.Contains("Ending continue", hud.RouteMessage);
+            StringAssert.Contains("ending.continue", hud.RouteMessage);
         }
 
         [UnityTest]
@@ -489,7 +493,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsTrue(controller.RunState.RestartReady);
             Assert.IsFalse(hud.CombatPanelVisible);
             Assert.AreEqual(0, hud.ChoiceButtonCount);
-            StringAssert.Contains("Run failed", hud.RouteMessage);
+            StringAssert.Contains("run.failed", hud.RouteMessage);
             StringAssert.Contains("Run Failed", hud.RunStateMessage);
             StringAssert.Contains("Run failed", hud.ResultMessage);
             StringAssert.Contains("Restart available", hud.ResultMessage);
@@ -589,7 +593,7 @@ namespace HwigiTower.Tests.PlayMode
             hud.ShowRunState(controller.GetSnapshot());
             hud.ShowRunState(controller.GetSnapshot());
             Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
-            StringAssert.Contains("Combat", hud.RouteMessage);
+            StringAssert.Contains("전투", hud.RouteMessage);
             StringAssert.DoesNotContain("[current]", hud.RouteMessage);
 
             var combatEncounter = FindEncounter(battleNode, "ENC_COMBAT_GATE_01");
@@ -616,7 +620,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(controller.RunState.IsInCombat);
             Assert.AreEqual("stair.unlocked", controller.RunState.DemoStatus);
             Assert.IsFalse(hud.CombatPanelVisible);
-            StringAssert.Contains("Stair", hud.RouteMessage);
+            StringAssert.Contains("다음 층 가능", hud.RouteMessage);
             Assert.AreEqual(1, Object.FindObjectsByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
             Assert.IsTrue(Object.FindFirstObjectByType<PrototypeCutscenePlayer>(FindObjectsInactive.Include).IsPlaying);
         }
@@ -637,7 +641,7 @@ namespace HwigiTower.Tests.PlayMode
 
             controller.BeginRun();
             hud.ShowRunState(controller.GetSnapshot());
-            StringAssert.Contains("Shop", hud.RouteMessage);
+            StringAssert.Contains("상점", hud.RouteMessage);
             StringAssert.DoesNotContain("[current]", hud.RouteMessage);
             StringAssert.DoesNotContain("MoralChoice", hud.RouteMessage);
             StringAssert.DoesNotContain("MemoryFragment", hud.RouteMessage);
@@ -651,9 +655,15 @@ namespace HwigiTower.Tests.PlayMode
             var button = hud.GetChoiceButton(0);
             Assert.IsNotNull(button);
             var label = ReadButtonText(button);
+            StringAssert.Contains("구매", label);
+            StringAssert.Contains("Gold -5", label);
+            StringAssert.Contains("ITEM_FIELD_BANDAGE", label);
             StringAssert.DoesNotContain("Choice 1", label);
             StringAssert.DoesNotContain("CHOICE_", label);
             StringAssert.DoesNotContain("PLACEHOLDER_", label);
+
+            var lockedLabel = ReadButtonText(hud.GetChoiceButton(1));
+            StringAssert.Contains("Unavailable: Gold 부족", lockedLabel);
         }
 
         [UnityTest]
