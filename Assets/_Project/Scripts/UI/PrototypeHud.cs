@@ -460,6 +460,7 @@ namespace HwigiTower.UI
             label.resizeTextMaxSize = 24;
             label.supportRichText = false;
             label.lineSpacing = 0.92f;
+            label.raycastTarget = false;
             label.color = view.Enabled
                 ? new Color(0.88f, 0.92f, 0.94f, 1f)
                 : new Color(0.58f, 0.62f, 0.66f, 1f);
@@ -873,6 +874,7 @@ namespace HwigiTower.UI
             label.resizeTextForBestFit = true;
             label.resizeTextMinSize = 14;
             label.resizeTextMaxSize = 24;
+            label.raycastTarget = false;
             label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
             label.text = "진행";
             buttonObject.SetActive(false);
@@ -1155,6 +1157,7 @@ namespace HwigiTower.UI
             text.resizeTextMinSize = 13;
             text.resizeTextMaxSize = fontSize;
             text.supportRichText = false;
+            text.raycastTarget = false;
             text.color = color;
             return text;
         }
@@ -1169,6 +1172,7 @@ namespace HwigiTower.UI
             var label = button.GetComponentInChildren<Text>();
             if (label != null)
             {
+                label.raycastTarget = false;
                 label.text = labelText;
             }
         }
@@ -2327,14 +2331,19 @@ namespace HwigiTower.UI
 
         private static void EnsureEventSystem()
         {
-            if (EventSystem.current != null)
+            var eventSystem = EventSystem.current;
+            if (eventSystem == null)
             {
-                return;
+                var eventSystemObject = new GameObject("EventSystem");
+                eventSystem = eventSystemObject.AddComponent<EventSystem>();
             }
 
-            var eventSystemObject = new GameObject("EventSystem");
-            eventSystemObject.AddComponent<EventSystem>();
-            var inputModule = eventSystemObject.AddComponent<InputSystemUIInputModule>();
+            var inputModule = eventSystem.GetComponent<InputSystemUIInputModule>();
+            if (inputModule == null)
+            {
+                inputModule = eventSystem.gameObject.AddComponent<InputSystemUIInputModule>();
+            }
+
             inputModule.AssignDefaultActions();
         }
     }
