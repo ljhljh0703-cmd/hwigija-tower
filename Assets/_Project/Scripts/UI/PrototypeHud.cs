@@ -512,6 +512,7 @@ namespace HwigiTower.UI
             text.resizeTextMinSize = 13;
             text.resizeTextMaxSize = fontSize;
             text.supportRichText = false;
+            text.raycastTarget = false;
         }
 
         private void EnsureChoiceContainer()

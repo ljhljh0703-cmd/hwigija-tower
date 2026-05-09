@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-09 18:30 — Mac Editor hands-on input QA blocker
+- **Phase**: W2-2
+- **Done**:
+  - `4455d95`를 `origin/Proto`에 push하고 원격 HEAD 확인
+  - Mac Editor `PrototypeRoom` PlayMode에서 `진행` 버튼 표시까지 확인
+  - Computer Use 기반 실제 GameView 클릭/키 입력으로는 Floor 1 choice open이 안정 재현되지 않는 blocker 확인
+  - 씬에 직렬화된 HUD Text도 raycast를 차단하도록 보강해 버튼 클릭 가로채기 가능성을 제거
+  - fresh EditMode/PlayMode로 route, presentation asset binding, ending smoke 회귀 확인
+- **Files**: 변경/추가 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: Codex Computer Use 입력이 Unity GameView에 안정 전달되지 않아 사람 손플레이 Floor 1→5→ending.rest/continue 완료는 미확정. 사용자 직접 입력 확인 필요.
+- **Next**: 사용자가 Editor에서 `진행` 버튼 또는 Enter/N, 1-4, A/D/S, ending 1/2로 직접 완주 확인
+- **Agent**: Codex
+
 ### 2026-05-09 17:49 — Late-route presentation asset binding
 - **Phase**: W2-2
 - **Done**:
