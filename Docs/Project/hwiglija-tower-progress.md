@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-09 17:22 — Hands-on completion input blocker fix
+- **Phase**: W2-2
+- **Done**:
+  - `a61e86e`을 `origin/Proto`에 push하고 원격 HEAD 확인
+  - Mac Editor `PrototypeRoom` Play 진입 후 `진행` 버튼이 표시되지만 실제 클릭/키 입력이 안정적으로 route open으로 이어지지 않는 P0 확인
+  - 기존 EventSystem이 있을 때도 `InputSystemUIInputModule`을 보장하고 HUD 비상호작용 텍스트 raycast를 차단
+  - fresh EditMode/PlayMode로 기존 Floor 1→5 route와 ending smoke 회귀 확인
+- **Files**: 변경/추가 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: 실제 사람 손플레이 Floor 1→5→ending.rest/continue 최종 확인은 사용자 입력으로 남음. Codex UI 자동화는 Unity GameView 클릭 재현성이 낮음.
+- **Next**: 사용자가 Editor에서 `진행`/1-4/A-D-S/ending 1-2 키로 직접 완주 확인 후, 동일 경로를 Android 실기 smoke로 진행
+- **Agent**: Codex
+
 ### 2026-05-09 16:27 — Manual completion route QA fixes
 - **Phase**: W2-2
 - **Done**:
