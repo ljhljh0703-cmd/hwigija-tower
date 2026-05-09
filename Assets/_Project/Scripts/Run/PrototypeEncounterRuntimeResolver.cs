@@ -6,17 +6,23 @@ namespace HwigiTower.Run
     public readonly struct PrototypeEncounterChoiceView
     {
         public PrototypeEncounterChoiceView(string choiceStableId, bool visible, bool enabled, string reasonTextKey)
-            : this(choiceStableId, string.Empty, visible, enabled, reasonTextKey)
+            : this(choiceStableId, string.Empty, visible, enabled, reasonTextKey, string.Empty)
         {
         }
 
         public PrototypeEncounterChoiceView(string choiceStableId, string textKey, bool visible, bool enabled, string reasonTextKey)
+            : this(choiceStableId, textKey, visible, enabled, reasonTextKey, string.Empty)
+        {
+        }
+
+        public PrototypeEncounterChoiceView(string choiceStableId, string textKey, bool visible, bool enabled, string reasonTextKey, string hintText)
         {
             ChoiceStableId = choiceStableId ?? string.Empty;
             TextKey = textKey ?? string.Empty;
             Visible = visible;
             Enabled = enabled;
             ReasonTextKey = reasonTextKey ?? string.Empty;
+            HintText = hintText ?? string.Empty;
         }
 
         public string ChoiceStableId { get; }
@@ -24,6 +30,7 @@ namespace HwigiTower.Run
         public bool Visible { get; }
         public bool Enabled { get; }
         public string ReasonTextKey { get; }
+        public string HintText { get; }
     }
 
     public readonly struct PrototypeEncounterChoiceResolution
@@ -112,10 +119,100 @@ namespace HwigiTower.Run
                     choices[i].textKey,
                     !hidden,
                     met,
-                    met ? string.Empty : choices[i].unavailableReasonTextKey);
+                    met ? string.Empty : choices[i].unavailableReasonTextKey,
+                    BuildChoiceHint(choices[i], met));
             }
 
             return views;
+        }
+
+        private static string BuildChoiceHint(EncounterChoiceRuntimeData choice, bool requirementsMet)
+        {
+            if (choice == null)
+            {
+                return string.Empty;
+            }
+
+            if (!requirementsMet)
+            {
+                var reason = BuildUnavailableReason(choice);
+                return string.IsNullOrEmpty(reason) ? "Unavailable" : "Unavailable: " + reason;
+            }
+
+            var summary = string.Empty;
+            var effects = choice.effects ?? new EncounterEffectRuntimeData[0];
+            for (var i = 0; i < effects.Length; i++)
+            {
+                AppendSummary(ref summary, DescribeEffectForChoiceHint(effects[i]));
+            }
+
+            return summary;
+        }
+
+        private static string BuildUnavailableReason(EncounterChoiceRuntimeData choice)
+        {
+            var requirements = choice.requirements ?? new EncounterRequirementRuntimeData[0];
+            for (var i = 0; i < requirements.Length; i++)
+            {
+                var requirement = requirements[i];
+                if (requirement == null)
+                {
+                    continue;
+                }
+
+                if (requirement.kind == "StatAtLeast" && requirement.stat == "gold")
+                {
+                    return "Gold 부족";
+                }
+
+                if (requirement.kind == "HasItem")
+                {
+                    return "Item 필요";
+                }
+
+                if (requirement.kind == "HasAbility")
+                {
+                    return "Ability 필요";
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string DescribeEffectForChoiceHint(EncounterEffectRuntimeData effect)
+        {
+            if (effect == null)
+            {
+                return string.Empty;
+            }
+
+            switch (effect.kind)
+            {
+                case "ModifyHp":
+                    return FormatDelta("HP", effect.amount);
+                case "ModifyMental":
+                    return FormatDelta("Mental", effect.amount);
+                case "ModifyGold":
+                    return FormatDelta("Gold", effect.amount);
+                case "ModifyGlitchLevel":
+                    return FormatDelta("Glitch", effect.amount);
+                case "ModifyAffinity":
+                    return FormatDelta("Affinity", effect.amount);
+                case "AddItem":
+                    return string.IsNullOrEmpty(effect.itemRef) ? "Item" : effect.itemRef;
+                case "RemoveItem":
+                    return string.IsNullOrEmpty(effect.itemRef) ? "Item -" + System.Math.Max(1, effect.count) : effect.itemRef + " -" + System.Math.Max(1, effect.count);
+                case "AddAbility":
+                    return string.IsNullOrEmpty(effect.abilityRef) ? "Ability" : effect.abilityRef;
+                case "GrantRewardBundle":
+                    return string.IsNullOrEmpty(effect.rewardBundleRef) ? "Reward" : effect.rewardBundleRef;
+                case "UnlockMemoryFragment":
+                    return "Memory unlock";
+                case "StartCombat":
+                    return "Combat start";
+                default:
+                    return string.Empty;
+            }
         }
 
         private static EncounterChoiceRuntimeData SelectChoice(PrototypeRunState state, EncounterData encounter, string choiceStableId)
