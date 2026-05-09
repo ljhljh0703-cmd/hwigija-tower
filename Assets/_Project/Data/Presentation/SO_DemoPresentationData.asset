@@ -66,3 +66,81 @@ MonoBehaviour:
     memoryFragmentCutscene: {fileID: 0}
     combatStartCutscene: {fileID: 11400000, guid: 677268a230d34f898538b2d4366c4e41, type: 2}
     demoCompleteCutscene: {fileID: 11400000, guid: e436d1041ade4e8298c9eee52c4ae2fd, type: 2}
+  - encounterStableId: ENC_SHOP_02
+    displayName: Shop
+    backgroundSprite: {fileID: 21300000, guid: 2673fa7f9936d4383b8d9fb694bfd615, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_SHOP_02_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_SHOP_02_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_COMBAT_GATE_02
+    displayName: Boss Gate
+    backgroundSprite: {fileID: 21300000, guid: dc026561195a64ace934931c2ed5c285, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_COMBAT_GATE_02_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_COMBAT_GATE_02_BODY
+    mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
+    enemySprite: {fileID: 21300000, guid: 462f4f17b32ee409791916c3ac5e95c2, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 11400000, guid: 677268a230d34f898538b2d4366c4e41, type: 2}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_MEMORY_FRAGMENT_03
+    displayName: Memory
+    backgroundSprite: {fileID: 21300000, guid: 366cf39e224d2491cbd35d954f774e75, type: 3}
+    titleTextKey: PLACEHOLDER_MEM_FRAGMENT_03_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_MEMORY_FRAGMENT_03_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_MEMORY_FRAGMENT_05
+    displayName: Memory
+    backgroundSprite: {fileID: 21300000, guid: 366cf39e224d2491cbd35d954f774e75, type: 3}
+    titleTextKey: PLACEHOLDER_MEM_FRAGMENT_05_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_MEMORY_FRAGMENT_05_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 21300000, guid: b2461193620384d28b68690c54be9bc9, type: 3}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_COMBAT_GATE_03
+    displayName: Final Boss
+    backgroundSprite: {fileID: 21300000, guid: 32908a031fe974384ad19d8dd6e3c0cb, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_COMBAT_GATE_03_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_COMBAT_GATE_03_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 8f91b8d98a3bb47c992b364f57a41a74, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 11400000, guid: 677268a230d34f898538b2d4366c4e41, type: 2}
+    demoCompleteCutscene: {fileID: 11400000, guid: e436d1041ade4e8298c9eee52c4ae2fd, type: 2}
+  - encounterStableId: run.clear
+    displayName: Ending
+    backgroundSprite: {fileID: 21300000, guid: e806dd29dd2234dfc99708dc3b67689e, type: 3}
+    titleTextKey: PLACEHOLDER_ENDING_CHOICE_TITLE
+    bodyTextKey: PLACEHOLDER_ENDING_CHOICE_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: e436d1041ade4e8298c9eee52c4ae2fd, type: 2}

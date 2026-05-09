@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-09 17:49 — Late-route presentation asset binding
+- **Phase**: W2-2
+- **Done**:
+  - 후반부 신규 background/portrait/enemy art를 `SO_DemoPresentationData` 슬롯에 연결
+  - `ENC_COMBAT_GATE_01/02/03`, `ENC_SHOP_02`, `ENC_MEMORY_FRAGMENT_03/05`, `run.clear` presentation slot 검증 추가
+  - run clear/ending choice 상태에서 `ending_choice_bg`를 표시하는 fallback hook 추가
+  - PlayMode에서 fracture hound, collapse echo, final boss, ending background 적용을 smoke로 고정
+- **Files**: 변경/추가 21개 (Art PNG/meta, SO_DemoPresentationData.asset, PrototypeHud.cs, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs)
+- **GDD impact**: 없음
+- **Blockers**: 실제 Android 기기 화면에서 신규 후반부 아트 가독성/성능은 아직 미검증
+- **Next**: Editor 손플레이로 Floor 1→5 presentation 확인 후 Android 실기 smoke
+- **Agent**: Codex
+
 ### 2026-05-09 17:22 — Hands-on completion input blocker fix
 - **Phase**: W2-2
 - **Done**:
