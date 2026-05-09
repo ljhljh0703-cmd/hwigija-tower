@@ -45,6 +45,16 @@ namespace HwigiTower.Run
             ApplyDemoNodeDebugLabelVisibility();
         }
 
+        private void Start()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            hud?.ShowRunState(GetSnapshot());
+        }
+
         public void SetDemoNodeDebugLabelsVisible(bool visible)
         {
             showDemoNodeDebugLabels = visible;
