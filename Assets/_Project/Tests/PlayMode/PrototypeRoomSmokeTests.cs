@@ -642,6 +642,13 @@ namespace HwigiTower.Tests.PlayMode
             controller.BeginRun();
             hud.ShowRunState(controller.GetSnapshot());
             StringAssert.Contains("상점", hud.RouteMessage);
+            Assert.IsTrue(hud.RouteActionButtonVisible);
+            Assert.IsNotNull(hud.GetRouteActionButton());
+            hud.GetRouteActionButton().onClick.Invoke();
+            Assert.AreEqual(3, hud.ChoiceButtonCount);
+            Assert.IsFalse(hud.RouteActionButtonVisible);
+            hud.ClearChoices();
+            hud.ShowRunState(controller.GetSnapshot());
             StringAssert.DoesNotContain("[current]", hud.RouteMessage);
             StringAssert.DoesNotContain("MoralChoice", hud.RouteMessage);
             StringAssert.DoesNotContain("MemoryFragment", hud.RouteMessage);

@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-09 14:17 — Mac Editor playability route entry pass
+- **Phase**: W2-2
+- **Done**:
+  - `bb19e20`을 `origin/Proto`에 push하고 원격 HEAD 확인
+  - Mac Unity Editor에서 `PrototypeRoom`을 열어 PlayMode 수동 진입성 확인
+  - 노드 이동/충돌 방식만으로는 선택형 진행 진입점이 약한 P0를 확인하고 HUD `진행` 버튼 추가
+  - `진행` 버튼이 현재 route encounter choice를 열고, choices 표시 중에는 숨도록 PlayMode smoke 고정
+- **Files**: 변경/추가 4개 (PrototypeRoomController.cs, PrototypeHud.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: Mac Editor에서 자동화 입력으로 Floor 1→ending 전체 수동 완주는 재현하지 못함. 전체 route는 fresh PlayMode로 검증.
+- **Next**: Android 실기 전, Editor에서 사람이 직접 마우스/터치로 `진행` 버튼 기반 Floor 1→ending 완주 확인
+- **Agent**: Codex
+
 ### 2026-05-09 12:00 — Player-facing gameplay loop polish
 - **Phase**: W2-2
 - **Done**:

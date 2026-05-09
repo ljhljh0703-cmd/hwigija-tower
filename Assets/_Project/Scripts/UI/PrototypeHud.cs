@@ -34,6 +34,7 @@ namespace HwigiTower.UI
         [SerializeField] private Button attackButton;
         [SerializeField] private Button defendButton;
         [SerializeField] private Button skillButton;
+        [SerializeField] private Button routeActionButton;
         [SerializeField] private Button nextFloorButton;
         [SerializeField] private Button restartButton;
         [SerializeField] private Button endingRestButton;
@@ -56,6 +57,7 @@ namespace HwigiTower.UI
         public string CombatMessage => combatText == null ? string.Empty : combatText.text;
         public bool CombatPanelVisible => combatPanel != null && combatPanel.gameObject.activeSelf;
         public bool PortraitVisible => npcPortraitImage != null && npcPortraitImage.gameObject.activeSelf;
+        public bool RouteActionButtonVisible => routeActionButton != null && routeActionButton.gameObject.activeSelf;
         public bool EndingRestButtonVisible => endingRestButton != null && endingRestButton.gameObject.activeSelf;
         public bool EndingContinueButtonVisible => endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
         public bool RawDebugTextVisible => showRawDebugText;
@@ -160,6 +162,11 @@ namespace HwigiTower.UI
         public Button GetChoiceButton(int index)
         {
             return index >= 0 && index < _choiceButtons.Count ? _choiceButtons[index] : null;
+        }
+
+        public Button GetRouteActionButton()
+        {
+            return routeActionButton;
         }
 
         public void ShowChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
@@ -305,6 +312,7 @@ namespace HwigiTower.UI
             }
 
             UpdateNextFloorButton(snapshot);
+            UpdateRouteActionButton(snapshot);
             UpdateRestartButton(snapshot);
             UpdateEndingButtons(snapshot);
             UpdatePresentationState(snapshot);
@@ -736,6 +744,69 @@ namespace HwigiTower.UI
             nextFloorButton.interactable = nextFloorButton.gameObject.activeSelf && _roomController != null;
         }
 
+        private void EnsureRouteActionButton()
+        {
+            if (routeActionButton != null)
+            {
+                return;
+            }
+
+            var buttonObject = new GameObject("Route Action Button");
+            buttonObject.transform.SetParent(transform, false);
+
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.28f, 0f);
+            rect.anchorMax = new Vector2(0.72f, 0f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, 218f);
+            rect.sizeDelta = new Vector2(0f, 76f);
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.18f, 0.23f, 0.27f, 0.96f);
+
+            routeActionButton = buttonObject.AddComponent<Button>();
+            routeActionButton.targetGraphic = image;
+            routeActionButton.onClick.AddListener(OpenCurrentRouteStep);
+
+            var labelObject = new GameObject("Label");
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            var labelRect = labelObject.AddComponent<RectTransform>();
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(12f, 4f);
+            labelRect.offsetMax = new Vector2(-12f, -4f);
+
+            var label = labelObject.AddComponent<Text>();
+            label.font = ResolveFont();
+            label.fontSize = 24;
+            label.alignment = TextAnchor.MiddleCenter;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 14;
+            label.resizeTextMaxSize = 24;
+            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.text = "진행";
+            buttonObject.SetActive(false);
+        }
+
+        private void UpdateRouteActionButton(PrototypeRunSnapshot snapshot)
+        {
+            EnsureRouteActionButton();
+            if (routeActionButton == null)
+            {
+                return;
+            }
+
+            var visible = _roomController != null &&
+                !snapshot.IsInCombat &&
+                !snapshot.RunCompleted &&
+                !snapshot.StairUnlocked &&
+                !string.IsNullOrEmpty(snapshot.NextDemoEncounterId) &&
+                _choiceButtons.Count == 0;
+            SetButtonLabel(routeActionButton, showRawDebugText ? "Open route step" : "진행");
+            routeActionButton.gameObject.SetActive(visible);
+            routeActionButton.interactable = visible;
+        }
+
         private void EnsureRestartButton()
         {
             if (restartButton != null)
@@ -874,6 +945,65 @@ namespace HwigiTower.UI
 
             var resolution = _roomController.ResolveNextFloor();
             ShowResult(resolution);
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void OpenCurrentRouteStep()
+        {
+            if (_roomController == null)
+            {
+                ShowResultMessage("route unavailable");
+                return;
+            }
+
+            var snapshot = _roomController.GetSnapshot();
+            if (snapshot.StairUnlocked && !snapshot.RunCompleted)
+            {
+                ResolveNextFloor();
+                return;
+            }
+
+            if (snapshot.RunCompleted || snapshot.IsInCombat)
+            {
+                ShowRunState(snapshot);
+                return;
+            }
+
+            var selection = _roomController.SelectCurrentRouteEncounter();
+            if (!selection.HasEncounter)
+            {
+                ShowResultMessage(showRawDebugText ? "route unavailable" : "진행 없음");
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
+            if (_roomController.TryGetResolvedEncounterChoice(selection, out var resolvedChoiceStableId))
+            {
+                var resolution = new PrototypeNodeResolution(
+                    selection.Node == null ? string.Empty : selection.Node.NodeId,
+                    resolvedChoiceStableId,
+                    "already resolved: " + resolvedChoiceStableId,
+                    false);
+                ShowResult(resolution);
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
+            if (_roomController.HasEncounterChoices(selection))
+            {
+                var views = _roomController.BuildEncounterChoiceViews(selection);
+                ShowChoices(selection.Encounter, views, choiceStableId =>
+                {
+                    var resolution = _roomController.ResolveCurrentRouteChoice(selection, choiceStableId);
+                    ShowResult(resolution);
+                    ShowRunState(_roomController.GetSnapshot());
+                });
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
+            var nodeResolution = _roomController.ResolveCurrentRouteNode(selection);
+            ShowResult(nodeResolution);
             ShowRunState(_roomController.GetSnapshot());
         }
 
