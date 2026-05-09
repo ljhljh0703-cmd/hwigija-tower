@@ -227,6 +227,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.IsTrue(hud.CombatPanelVisible);
+            Assert.AreEqual("enemy_fracture_hound_demo", hud.CurrentCombatEnemySpriteName);
             StringAssert.Contains("전투", hud.CombatMessage);
             StringAssert.Contains("Enemy HP", hud.CombatMessage);
             StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
@@ -332,6 +333,7 @@ namespace HwigiTower.Tests.PlayMode
             yield return null;
 
             Assert.IsTrue(controller.RunState.IsInCombat);
+            Assert.AreEqual("enemy_collapse_echo", hud.CurrentCombatEnemySpriteName);
             var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
             Assert.IsNotNull(attackButton);
 
@@ -484,6 +486,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(5, controller.RunState.CurrentFloor);
             Assert.AreEqual("BOSS_APEX_02", controller.RunState.LastCombatEnemyId);
             Assert.IsTrue(controller.RunState.EndingChoicePending);
+            Assert.AreEqual("ending_choice_bg", hud.CurrentBackgroundSpriteName);
             Assert.IsTrue(hud.EndingRestButtonVisible);
             Assert.IsTrue(hud.EndingContinueButtonVisible);
             Assert.IsFalse(hud.RouteActionButtonVisible);
@@ -866,6 +869,9 @@ namespace HwigiTower.Tests.PlayMode
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.AreEqual("BOSS_APEX_02", controller.RunState.LastCombatEnemyId);
+            Assert.AreEqual("enc_combat_gate_03_bg", hud.CurrentBackgroundSpriteName);
+            Assert.AreEqual("enemy_boss_apex_02", hud.CurrentCombatEnemySpriteName);
+            Assert.AreEqual("char_mataios_bust_s3_s4", hud.CurrentPortraitSpriteName);
 
             var skillButton = GameObject.Find("Combat Button Skill").GetComponent<Button>();
             var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
@@ -890,6 +896,7 @@ namespace HwigiTower.Tests.PlayMode
             hud.ShowRunState(controller.GetSnapshot());
             Assert.IsTrue(controller.RunState.RunClear);
             Assert.IsTrue(controller.RunState.EndingChoicePending);
+            Assert.AreEqual("ending_choice_bg", hud.CurrentBackgroundSpriteName);
         }
 
         private static IEnumerator ResolveRouteChoice(Run.PrototypeRoomController controller, PrototypeHud hud, InteractableNode node, string expectedEncounterId, string choiceStableId)

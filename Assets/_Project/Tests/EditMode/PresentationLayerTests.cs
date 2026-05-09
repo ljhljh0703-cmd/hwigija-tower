@@ -30,6 +30,21 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void DemoPresentationData_BindsLateRouteSprites()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+
+            Assert.IsNotNull(data);
+            AssertSlotSprites(data, "ENC_COMBAT_GATE_01", null, "enemy_fracture_hound_demo", null, null);
+            AssertSlotSprites(data, "ENC_COMBAT_GATE_02", null, "enemy_collapse_echo", null, null);
+            AssertSlotSprites(data, "ENC_COMBAT_GATE_03", "enc_combat_gate_03_bg", "enemy_boss_apex_02", "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "ENC_SHOP_02", "enc_shop_02_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "ENC_MEMORY_FRAGMENT_03", "enc_memory_fragment_03_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "ENC_MEMORY_FRAGMENT_05", "enc_memory_fragment_03_bg", null, "char_mataios_bust_s3_s4", "enc_memory_fragment_05_art");
+            AssertSlotSprites(data, "run.clear", "ending_choice_bg", null, "char_mataios_bust_s3_s4", null);
+        }
+
+        [Test]
         public void CutsceneData_EmptyStepsIsSafeScaffold()
         {
             var cutscene = ScriptableObject.CreateInstance<CutsceneData>();
@@ -222,6 +237,40 @@ namespace HwigiTower.Tests.EditMode
             var text = textObject.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             return text;
+        }
+
+        private static void AssertSlotSprites(
+            DemoPresentationData data,
+            string stableId,
+            string background,
+            string enemy,
+            string portrait,
+            string memory)
+        {
+            Assert.IsTrue(data.TryGetSlot(stableId, out var slot), stableId);
+            if (background != null)
+            {
+                Assert.IsNotNull(slot.BackgroundSprite, stableId);
+                Assert.AreEqual(background, slot.BackgroundSprite.name);
+            }
+
+            if (enemy != null)
+            {
+                Assert.IsNotNull(slot.EnemySprite, stableId);
+                Assert.AreEqual(enemy, slot.EnemySprite.name);
+            }
+
+            if (portrait != null)
+            {
+                Assert.IsNotNull(slot.MataiosPortrait, stableId);
+                Assert.AreEqual(portrait, slot.MataiosPortrait.name);
+            }
+
+            if (memory != null)
+            {
+                Assert.IsNotNull(slot.MemoryFragmentSprite, stableId);
+                Assert.AreEqual(memory, slot.MemoryFragmentSprite.name);
+            }
         }
     }
 }

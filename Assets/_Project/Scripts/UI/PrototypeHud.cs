@@ -63,6 +63,9 @@ namespace HwigiTower.UI
         public bool EndingContinueButtonVisible => endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
         public bool RawDebugTextVisible => showRawDebugText;
         public bool HasPresentationData => presentationData != null;
+        public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
+        public string CurrentCombatEnemySpriteName => combatEnemyImage != null && combatEnemyImage.sprite != null ? combatEnemyImage.sprite.name : string.Empty;
+        public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
 
         public void BindRoomController(PrototypeRoomController controller)
         {
@@ -1925,7 +1928,7 @@ namespace HwigiTower.UI
             var encounterId = snapshot.IsInCombat ? ResolveCombatEncounterId() : snapshot.NextDemoEncounterId;
             if (string.IsNullOrEmpty(encounterId) && snapshot.RunClear)
             {
-                encounterId = ResolveDemoCompleteCutsceneEncounterId(snapshot);
+                encounterId = presentationData.TryGetSlot("run.clear", out _) ? "run.clear" : ResolveDemoCompleteCutsceneEncounterId(snapshot);
             }
 
             return presentationData.TryGetSlot(encounterId, out var slot) ? slot : null;
