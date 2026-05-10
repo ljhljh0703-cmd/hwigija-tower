@@ -130,13 +130,13 @@ namespace HwigiTower.Run
                     !hidden,
                     met,
                     met ? string.Empty : choices[i].unavailableReasonTextKey,
-                    BuildChoiceHint(choices[i], met));
+                    BuildChoiceHint(encounter, choices[i], met));
             }
 
             return views;
         }
 
-        private static string BuildChoiceHint(EncounterChoiceRuntimeData choice, bool requirementsMet)
+        private static string BuildChoiceHint(EncounterData encounter, EncounterChoiceRuntimeData choice, bool requirementsMet)
         {
             if (choice == null)
             {
@@ -149,6 +149,11 @@ namespace HwigiTower.Run
                 return string.IsNullOrEmpty(reason) ? "Unavailable" : "Unavailable: " + reason;
             }
 
+            if (encounter != null && encounter.Id == "EVT_F01_JAR_ROOM")
+            {
+                return BuildJarRoomChoiceHint(choice.stableId);
+            }
+
             var summary = string.Empty;
             var effects = choice.effects ?? new EncounterEffectRuntimeData[0];
             for (var i = 0; i < effects.Length; i++)
@@ -157,6 +162,17 @@ namespace HwigiTower.Run
             }
 
             return summary;
+        }
+
+        private static string BuildJarRoomChoiceHint(string choiceStableId)
+        {
+            return choiceStableId switch
+            {
+                "CHOICE_EVT_F01_JAR_PATTERNED" => "80%: 골드 획득\n20%: 엘리트 전투",
+                "CHOICE_EVT_F01_JAR_PLAIN" => "HP 회복\nMental 회복",
+                "CHOICE_EVT_F01_JAR_CRACKED" => "다음 3회 전투 피해 증가",
+                _ => string.Empty
+            };
         }
 
         private static string BuildUnavailableReason(EncounterChoiceRuntimeData choice)

@@ -1876,6 +1876,26 @@ namespace HwigiTower.UI
                 return "행동: " + PublicCombatActionName(token.Substring("action ".Length).Trim());
             }
 
+            if (token.StartsWith("jar outcome: Gold +8", StringComparison.Ordinal))
+            {
+                return "골드 획득: Gold +8";
+            }
+
+            if (token.StartsWith("jar outcome: elite combat", StringComparison.Ordinal))
+            {
+                return "엘리트 전투 발생";
+            }
+
+            if (token.StartsWith("jar outcome: HP +5", StringComparison.Ordinal))
+            {
+                return "HP +5";
+            }
+
+            if (token.StartsWith("jar outcome: next 3 combat damage buff", StringComparison.Ordinal))
+            {
+                return "다음 3회 전투 피해 증가";
+            }
+
             return string.Empty;
         }
 
@@ -2325,6 +2345,21 @@ namespace HwigiTower.UI
         {
             if (!string.IsNullOrEmpty(choiceStableId))
             {
+                if (choiceStableId == "CHOICE_EVT_F01_JAR_PATTERNED")
+                {
+                    return "신기한 문양이 각인된 항아리";
+                }
+
+                if (choiceStableId == "CHOICE_EVT_F01_JAR_PLAIN")
+                {
+                    return "평범한 항아리";
+                }
+
+                if (choiceStableId == "CHOICE_EVT_F01_JAR_CRACKED")
+                {
+                    return "금 간 항아리";
+                }
+
                 if (choiceStableId.Contains("_BUY_", StringComparison.Ordinal))
                 {
                     return "구매";
