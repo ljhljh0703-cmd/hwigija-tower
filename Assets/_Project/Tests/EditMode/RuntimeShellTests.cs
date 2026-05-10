@@ -912,6 +912,18 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(File.Exists("Assets/_Project/Spine/_README.md"));
             Assert.IsTrue(File.Exists("Assets/_Project/Data/Cutscenes/Spine/_README.md"));
 
+            var sourceReadme = File.ReadAllText("Assets/_Project/Art/SpineSource/_README.md");
+            StringAssert.Contains("2000x2000", sourceReadme);
+            StringAssert.Contains("spine_<cutscene_id>_source_2000.png", sourceReadme);
+
+            var exportReadme = File.ReadAllText("Assets/_Project/Spine/_README.md");
+            StringAssert.Contains("spine_<cutscene_id>.json", exportReadme);
+            StringAssert.Contains("spine_<cutscene_id>.atlas.txt", exportReadme);
+
+            var dataReadme = File.ReadAllText("Assets/_Project/Data/Cutscenes/Spine/_README.md");
+            StringAssert.Contains("SO_CutsceneSpine_<CUTSCENE_ID>.asset", dataReadme);
+            StringAssert.Contains("fallbackSprite", dataReadme);
+
             for (var i = 0; i < cutsceneIds.Length; i++)
             {
                 Assert.IsTrue(Directory.Exists("Assets/_Project/Art/SpineSource/" + cutsceneIds[i]));
@@ -951,6 +963,38 @@ namespace HwigiTower.Tests.EditMode
             {
                 Object.DestroyImmediate(data);
             }
+        }
+
+        [Test]
+        public void SpineCutscenePlaceholderBindings_UseFallbackSpritesAndAnimationPaths()
+        {
+            AssertSpineCutsceneBinding("CUT_MEMORY_03_FRACTURE", "spine_cut_memory_03_fracture.json");
+            AssertSpineCutsceneBinding("CUT_FINAL_BOSS_REVEAL", "spine_cut_final_boss_reveal.json");
+            AssertSpineCutsceneBinding("CUT_ENDING_CHOICE", "spine_cut_ending_choice.json");
+
+            var presentation = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            Assert.IsNotNull(presentation);
+            Assert.IsTrue(presentation.TryGetCutscene("ENC_MEMORY_FRAGMENT_03", PrototypeCutsceneTrigger.MemoryFragmentUnlock, out var memoryCutscene));
+            Assert.AreEqual("CUT_MEMORY_03_FRACTURE", memoryCutscene.CutsceneId);
+            Assert.IsTrue(presentation.TryGetCutscene("ENC_COMBAT_GATE_03", PrototypeCutsceneTrigger.CombatGateStart, out var finalBossCutscene));
+            Assert.AreEqual("CUT_FINAL_BOSS_REVEAL", finalBossCutscene.CutsceneId);
+            Assert.IsTrue(presentation.TryGetCutscene("run.clear", PrototypeCutsceneTrigger.DemoComplete, out var endingCutscene));
+            Assert.AreEqual("CUT_ENDING_CHOICE", endingCutscene.CutsceneId);
+        }
+
+        private static void AssertSpineCutsceneBinding(string cutsceneId, string exportName)
+        {
+            var path = "Assets/_Project/Data/Cutscenes/Spine/SO_CutsceneSpine_" + cutsceneId + ".asset";
+            var data = AssetDatabase.LoadAssetAtPath<CutsceneData>(path);
+
+            Assert.IsNotNull(data, path);
+            Assert.AreEqual(cutsceneId, data.CutsceneId);
+            Assert.AreEqual(cutsceneId, data.AnimationCutsceneId);
+            StringAssert.Contains("Assets/_Project/Spine/" + cutsceneId + "/", data.AnimationAssetPath);
+            StringAssert.Contains(exportName, data.AnimationAssetPath);
+            Assert.IsNotNull(data.FallbackSprite);
+            Assert.IsTrue(data.HasPlayableContent);
+            Assert.IsTrue(data.HasSteps);
         }
 
         [Test]

@@ -2,6 +2,12 @@
 
 This folder is for authoring-source files only. Do not place runtime Spine exports here.
 
+## Source size
+
+- Source canvases should be `2000x2000`.
+- Keep the character/action centered with enough transparent padding for future camera movement.
+- Commit only approved lightweight sources. Large PSD/checkpoint/source files need asset policy approval first.
+
 ## Cutscene folders
 
 - `CUT_MEMORY_03_FRACTURE/`

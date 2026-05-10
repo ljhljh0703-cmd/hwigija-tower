@@ -102,7 +102,7 @@ MonoBehaviour:
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}
-    memoryFragmentCutscene: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 11400000, guid: 7f1677a6a8ce4c04a2c60231382f8c01, type: 2}
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_MEMORY_FRAGMENT_05
@@ -129,7 +129,7 @@ MonoBehaviour:
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}
     memoryFragmentCutscene: {fileID: 0}
-    combatStartCutscene: {fileID: 11400000, guid: 677268a230d34f898538b2d4366c4e41, type: 2}
+    combatStartCutscene: {fileID: 11400000, guid: b74e40fc8ef94f6e98acac267dff00fe, type: 2}
     demoCompleteCutscene: {fileID: 11400000, guid: e436d1041ade4e8298c9eee52c4ae2fd, type: 2}
   - encounterStableId: run.clear
     displayName: Ending
@@ -143,4 +143,4 @@ MonoBehaviour:
     bgmCue: {fileID: 0}
     memoryFragmentCutscene: {fileID: 0}
     combatStartCutscene: {fileID: 0}
-    demoCompleteCutscene: {fileID: 11400000, guid: e436d1041ade4e8298c9eee52c4ae2fd, type: 2}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
