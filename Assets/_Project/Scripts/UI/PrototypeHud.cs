@@ -40,11 +40,21 @@ namespace HwigiTower.UI
         [SerializeField] private Button restartButton;
         [SerializeField] private Button endingRestButton;
         [SerializeField] private Button endingContinueButton;
+        [SerializeField] private RectTransform restInteractionPanel;
+        [SerializeField] private Text restResponseText;
+        [SerializeField] private InputField restInputField;
+        [SerializeField] private Button restAskMoodButton;
+        [SerializeField] private Button restTrainButton;
+        [SerializeField] private Button restRecoverButton;
+        [SerializeField] private Button restSubmitButton;
+        [SerializeField] private Button restContinueButton;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<string> _demoRouteLabels = new List<string>();
         private readonly List<string> _demoRouteEncounterIds = new List<string>();
         private PrototypeRoomController _roomController;
+        private EncounterSelection _pendingRestSelection;
+        private string _pendingRestActionId = string.Empty;
         private string _lastMemoryCutsceneKey = string.Empty;
         private string _lastCombatCutsceneKey = string.Empty;
         private string _lastDemoCompleteCutsceneKey = string.Empty;
@@ -61,6 +71,8 @@ namespace HwigiTower.UI
         public bool RouteActionButtonVisible => routeActionButton != null && routeActionButton.gameObject.activeSelf;
         public bool EndingRestButtonVisible => endingRestButton != null && endingRestButton.gameObject.activeSelf;
         public bool EndingContinueButtonVisible => endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
+        public bool RestInteractionPanelVisible => restInteractionPanel != null && restInteractionPanel.gameObject.activeSelf;
+        public string RestResponseMessage => restResponseText == null ? string.Empty : restResponseText.text;
         public bool RawDebugTextVisible => showRawDebugText;
         public bool HasPresentationData => presentationData != null;
         public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
@@ -147,6 +159,23 @@ namespace HwigiTower.UI
             if (keyboard == null)
             {
                 return;
+            }
+
+            if (restInteractionPanel != null && restInteractionPanel.gameObject.activeSelf)
+            {
+                if (restContinueButton != null && restContinueButton.gameObject.activeSelf && restContinueButton.interactable &&
+                    (keyboard.enterKey.wasPressedThisFrame || keyboard.nKey.wasPressedThisFrame))
+                {
+                    ContinueAfterRestInteraction();
+                    return;
+                }
+
+                if (restSubmitButton != null && restSubmitButton.gameObject.activeSelf && restSubmitButton.interactable &&
+                    keyboard.enterKey.wasPressedThisFrame)
+                {
+                    SubmitRestInteraction();
+                    return;
+                }
             }
 
             if (routeActionButton != null && routeActionButton.gameObject.activeSelf && routeActionButton.interactable &&
@@ -261,9 +290,40 @@ namespace HwigiTower.UI
             return routeActionButton;
         }
 
+        public Button GetRestActionButton(string actionId)
+        {
+            switch (actionId)
+            {
+                case "rest.ask_mood":
+                    return restAskMoodButton;
+                case "rest.train":
+                    return restTrainButton;
+                case "rest.recover":
+                    return restRecoverButton;
+                default:
+                    return null;
+            }
+        }
+
+        public InputField GetRestInputField()
+        {
+            return restInputField;
+        }
+
+        public Button GetRestSubmitButton()
+        {
+            return restSubmitButton;
+        }
+
+        public Button GetRestContinueButton()
+        {
+            return restContinueButton;
+        }
+
         public void ShowChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
         {
             ClearChoices();
+            HideRestInteractionPanel();
             EnsureEventSystem();
             EnsureChoiceContainer();
 
@@ -311,6 +371,7 @@ namespace HwigiTower.UI
         public void ShowMapChoices(PrototypeFloorMapNodeView[] nodes, Action<string> onNodeSelected)
         {
             ClearChoices();
+            HideRestInteractionPanel();
             EnsureEventSystem();
             EnsureChoiceContainer();
             if (choiceContainer == null || nodes == null)
@@ -568,6 +629,250 @@ namespace HwigiTower.UI
             choiceContainer.pivot = new Vector2(0.5f, 0f);
             choiceContainer.sizeDelta = new Vector2(0f, 408f);
             choiceContainer.anchoredPosition = new Vector2(0f, 52f);
+        }
+
+        private void ShowRestInteraction(EncounterSelection selection)
+        {
+            ClearChoices();
+            EnsureRestInteractionPanel();
+            ApplyPresentationSlot(selection.EncounterId);
+            _pendingRestSelection = selection;
+            _pendingRestActionId = string.Empty;
+            if (restInputField != null)
+            {
+                restInputField.text = string.Empty;
+                restInputField.interactable = true;
+            }
+
+            if (restResponseText != null)
+            {
+                restResponseText.text = "행동을 선택하세요";
+            }
+
+            SetRestActionButtonsInteractable(true);
+            if (restSubmitButton != null)
+            {
+                restSubmitButton.gameObject.SetActive(true);
+                restSubmitButton.interactable = false;
+            }
+
+            if (restContinueButton != null)
+            {
+                restContinueButton.gameObject.SetActive(false);
+            }
+
+            if (interactionText != null)
+            {
+                interactionText.text = showRawDebugText ? "rest interaction: " + selection.EncounterId : "휴식";
+            }
+
+            if (restInteractionPanel != null)
+            {
+                restInteractionPanel.gameObject.SetActive(true);
+            }
+
+            ShowResultMessage(string.Empty);
+        }
+
+        private void EnsureRestInteractionPanel()
+        {
+            if (restInteractionPanel != null)
+            {
+                return;
+            }
+
+            EnsureEventSystem();
+            var panelObject = new GameObject("Rest Interaction Panel");
+            panelObject.transform.SetParent(transform, false);
+
+            restInteractionPanel = panelObject.AddComponent<RectTransform>();
+            restInteractionPanel.anchorMin = new Vector2(0.08f, 0f);
+            restInteractionPanel.anchorMax = new Vector2(0.92f, 0f);
+            restInteractionPanel.pivot = new Vector2(0.5f, 0f);
+            restInteractionPanel.anchoredPosition = new Vector2(0f, 54f);
+            restInteractionPanel.sizeDelta = new Vector2(0f, 560f);
+
+            var image = panelObject.AddComponent<Image>();
+            image.color = new Color(0.055f, 0.065f, 0.08f, 0.96f);
+
+            var title = CreateHudText("Rest Interaction Title", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-36f, 56f), 34, TextAnchor.MiddleCenter, new Color(0.92f, 0.96f, 0.94f, 1f));
+            title.transform.SetParent(panelObject.transform, false);
+            title.text = "휴식";
+
+            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", "기분을 묻는다", new Vector2(0.17f, 0.75f), "rest.ask_mood");
+            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", "훈련을 진행한다", new Vector2(0.50f, 0.75f), "rest.train");
+            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", "휴식을 취한다", new Vector2(0.83f, 0.75f), "rest.recover");
+
+            restInputField = CreateRestInputField(panelObject.transform);
+            restSubmitButton = CreateRestButton(panelObject.transform, "Rest Submit Button", "전달", new Vector2(0.22f, 0.20f), new Vector2(0.44f, 0.31f));
+            restSubmitButton.onClick.AddListener(SubmitRestInteraction);
+            restContinueButton = CreateRestButton(panelObject.transform, "Rest Continue Button", "계속", new Vector2(0.56f, 0.20f), new Vector2(0.78f, 0.31f));
+            restContinueButton.onClick.AddListener(ContinueAfterRestInteraction);
+            restContinueButton.gameObject.SetActive(false);
+
+            restResponseText = CreateHudText("Rest Response Text", new Vector2(0.06f, 0.34f), new Vector2(0.94f, 0.52f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 25, TextAnchor.MiddleCenter, new Color(0.88f, 0.93f, 0.92f, 1f));
+            restResponseText.transform.SetParent(panelObject.transform, false);
+            restResponseText.text = "행동을 선택하세요";
+            restInteractionPanel.gameObject.SetActive(false);
+        }
+
+        private Button CreateRestActionButton(Transform parent, string name, string label, Vector2 center, string actionId)
+        {
+            var button = CreateRestButton(parent, name, label, new Vector2(center.x - 0.15f, center.y - 0.07f), new Vector2(center.x + 0.15f, center.y + 0.07f));
+            button.onClick.AddListener(() => SelectRestAction(actionId));
+            return button;
+        }
+
+        private Button CreateRestButton(Transform parent, string name, string label, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.12f, 0.16f, 0.19f, 0.98f);
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+
+            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 24, TextAnchor.MiddleCenter, new Color(0.90f, 0.94f, 0.95f, 1f));
+            text.transform.SetParent(buttonObject.transform, false);
+            text.text = label;
+            return button;
+        }
+
+        private InputField CreateRestInputField(Transform parent)
+        {
+            var inputObject = new GameObject("Rest Utterance Input");
+            inputObject.transform.SetParent(parent, false);
+            var rect = inputObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.06f, 0.55f);
+            rect.anchorMax = new Vector2(0.94f, 0.68f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            var image = inputObject.AddComponent<Image>();
+            image.color = new Color(0.90f, 0.94f, 0.94f, 0.96f);
+            var input = inputObject.AddComponent<InputField>();
+            input.targetGraphic = image;
+
+            var text = CreateHudText("Rest Input Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 24, TextAnchor.MiddleLeft, new Color(0.08f, 0.10f, 0.12f, 1f));
+            text.transform.SetParent(inputObject.transform, false);
+            text.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
+            text.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
+            input.textComponent = text;
+
+            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 22, TextAnchor.MiddleLeft, new Color(0.38f, 0.42f, 0.45f, 1f));
+            placeholder.transform.SetParent(inputObject.transform, false);
+            placeholder.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
+            placeholder.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
+            placeholder.text = "마타이오스에게 전할 말을 입력";
+            input.placeholder = placeholder;
+            return input;
+        }
+
+        private void SelectRestAction(string actionId)
+        {
+            _pendingRestActionId = actionId;
+            if (restSubmitButton != null)
+            {
+                restSubmitButton.interactable = true;
+            }
+
+            if (restResponseText != null)
+            {
+                restResponseText.text = actionId == "rest.recover" ? "입력 없이도 쉴 수 있습니다" : "말을 입력한 뒤 전달하세요";
+            }
+        }
+
+        private void SubmitRestInteraction()
+        {
+            if (_roomController == null || string.IsNullOrEmpty(_pendingRestActionId))
+            {
+                if (restResponseText != null)
+                {
+                    restResponseText.text = "행동을 먼저 선택하세요";
+                }
+                return;
+            }
+
+            var utterance = restInputField == null ? string.Empty : restInputField.text;
+            var resolution = _roomController.ResolveCurrentRouteRestInteraction(_pendingRestSelection, _pendingRestActionId, utterance);
+            if (resolution.Message.Contains("input required", StringComparison.Ordinal))
+            {
+                if (restResponseText != null)
+                {
+                    restResponseText.text = "말을 입력해야 합니다";
+                }
+                ShowResult(resolution);
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
+            SetRestActionButtonsInteractable(false);
+            if (restInputField != null)
+            {
+                restInputField.interactable = false;
+            }
+
+            if (restSubmitButton != null)
+            {
+                restSubmitButton.interactable = false;
+                restSubmitButton.gameObject.SetActive(false);
+            }
+
+            if (restContinueButton != null)
+            {
+                restContinueButton.gameObject.SetActive(true);
+                restContinueButton.interactable = true;
+            }
+
+            if (restResponseText != null)
+            {
+                var response = _roomController.RunState == null ? string.Empty : _roomController.RunState.LastMataiosResponse;
+                restResponseText.text = string.IsNullOrEmpty(response) ? "응답 준비 완료" : response;
+            }
+
+            ShowResult(resolution);
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void ContinueAfterRestInteraction()
+        {
+            HideRestInteractionPanel();
+            if (_roomController != null)
+            {
+                ShowRunState(_roomController.GetSnapshot());
+            }
+        }
+
+        private void HideRestInteractionPanel()
+        {
+            if (restInteractionPanel != null)
+            {
+                restInteractionPanel.gameObject.SetActive(false);
+            }
+        }
+
+        private void SetRestActionButtonsInteractable(bool interactable)
+        {
+            if (restAskMoodButton != null)
+            {
+                restAskMoodButton.interactable = interactable;
+            }
+
+            if (restTrainButton != null)
+            {
+                restTrainButton.interactable = interactable;
+            }
+
+            if (restRecoverButton != null)
+            {
+                restRecoverButton.interactable = interactable;
+            }
         }
 
         private void EnsureResultText()
@@ -936,7 +1241,8 @@ namespace HwigiTower.UI
                 !snapshot.RunCompleted &&
                 !snapshot.StairUnlocked &&
                 !string.IsNullOrEmpty(snapshot.NextDemoEncounterId) &&
-                _choiceButtons.Count == 0;
+                _choiceButtons.Count == 0 &&
+                !RestInteractionPanelVisible;
             SetButtonLabel(routeActionButton, showRawDebugText ? "Open route step" : "진행");
             routeActionButton.gameObject.SetActive(visible);
             routeActionButton.interactable = visible;
@@ -1145,6 +1451,13 @@ namespace HwigiTower.UI
                     "already resolved: " + resolvedChoiceStableId,
                     false);
                 ShowResult(resolution);
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
+            if (selection.Encounter != null && selection.Encounter.Type == EncounterType.Rest)
+            {
+                ShowRestInteraction(selection);
                 ShowRunState(_roomController.GetSnapshot());
                 return;
             }
@@ -1820,6 +2133,26 @@ namespace HwigiTower.UI
             }
 
             if (token.StartsWith("Glitch ", StringComparison.Ordinal))
+            {
+                return string.Empty;
+            }
+
+            if (token.Contains("HP restored", StringComparison.Ordinal))
+            {
+                return "HP 회복";
+            }
+
+            if (token.Contains("training buff +1 next combat", StringComparison.Ordinal))
+            {
+                return "다음 전투 피해 +1";
+            }
+
+            if (token.Contains("Mataios response ready", StringComparison.Ordinal))
+            {
+                return "마타이오스 응답";
+            }
+
+            if (token.StartsWith("rest ", StringComparison.Ordinal))
             {
                 return string.Empty;
             }

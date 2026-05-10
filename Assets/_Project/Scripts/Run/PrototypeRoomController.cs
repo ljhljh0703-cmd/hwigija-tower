@@ -303,6 +303,26 @@ namespace HwigiTower.Run
             return RunState.ResolveEncounterChoice(CreateActiveContext(), selection.Node.NodeId, selection.Encounter, choiceStableId);
         }
 
+        public PrototypeNodeResolution ResolveCurrentRouteRestInteraction(EncounterSelection selection, string actionId, string utterance)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (RunState == null || RunState.RunCompleted)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "run already completed", true);
+            }
+
+            if (!selection.HasEncounter || selection.Node == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", false);
+            }
+
+            return RunState.ResolveRestInteraction(selection.Node.NodeId, selection.EncounterId, actionId, utterance);
+        }
+
         public PrototypeNodeResolution ResolveCurrentRouteNode(EncounterSelection selection)
         {
             if (RunState == null)

@@ -1423,6 +1423,86 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void RestInteraction_AskMoodRequiresInputAndCommitsOnce()
+        {
+            var state = new PrototypeRunState("run-rest-ask", new GameFlowEventBus());
+
+            var rejected = state.ResolveRestInteraction("node.rest", "ENC_REST_01", "rest.ask_mood", string.Empty);
+            Assert.AreEqual(0, state.Affinity);
+            StringAssert.Contains("input required", rejected.Message);
+
+            state.ResolveRestInteraction("node.rest", "ENC_REST_01", "rest.ask_mood", "괜찮아?");
+            Assert.AreEqual(2, state.Affinity);
+            Assert.IsTrue(state.HasFlag("MATAIOS_HINT_S1_01"));
+            Assert.AreEqual("괜찮아?", state.LastRestUtterance);
+            Assert.IsFalse(string.IsNullOrEmpty(state.LastMataiosResponse));
+            Assert.IsTrue(state.MemoryRepo.GetRecentReflections(4).Any(reflection => reflection.Summary.Contains("괜찮아?")));
+
+            var duplicate = state.ResolveRestInteraction("node.rest", "ENC_REST_01", "rest.ask_mood", "다시");
+            Assert.AreEqual(2, state.Affinity);
+            StringAssert.Contains("already resolved", duplicate.Message);
+        }
+
+        [Test]
+        public void RestInteraction_TrainBuffAppliesOnceAndDoesNotStack()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-rest-train", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+
+            var rejected = state.ResolveRestInteraction("node.rest", "ENC_REST_01", "rest.train", string.Empty);
+            StringAssert.Contains("input required", rejected.Message);
+
+            state.ResolveRestInteraction("node.rest", "ENC_REST_01", "rest.train", "검을 맞춰 보자");
+            Assert.IsTrue(state.TrainingBuffActive);
+            state.ResolveRestInteraction("node.rest", "ENC_REST_01", "rest.train", "한 번 더");
+            Assert.IsTrue(state.TrainingBuffActive);
+
+            var encounter = CreateRuntimeEncounter(
+                "ENC_TRAIN_COMBAT",
+                CreateChoice(
+                    "CHOICE_TRAIN_COMBAT",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_TRAIN", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-rest-train", 1001), "node.combat", encounter, "CHOICE_TRAIN_COMBAT");
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+
+            Assert.IsFalse(state.TrainingBuffActive);
+            StringAssert.Contains("training +1", state.CreateSnapshot().LastCombatRoundResult);
+
+            var restarted = new PrototypeRunState("run-rest-train.restart", new GameFlowEventBus(), null, state.MemoryRepo);
+            Assert.IsFalse(restarted.TrainingBuffActive);
+        }
+
+        [Test]
+        public void RestInteraction_RecoverAllowsEmptyInputAndHidesGlitchFromNormalSummary()
+        {
+            var state = new PrototypeRunState("run-rest-recover", new GameFlowEventBus());
+            state.ModifyPlayerHp(-10);
+            state.ModifyGlitchLevel(8);
+            var hpBefore = state.PlayerHp;
+
+            var applied = state.ResolveRestInteraction("node.rest", "ENC_REST_01", "rest.recover", string.Empty);
+            Assert.Greater(state.PlayerHp, hpBefore);
+            Assert.AreEqual(5, state.GlitchLevel);
+            StringAssert.Contains("Glitch -3", applied.Message);
+
+            var hudObject = new GameObject("HUD");
+            try
+            {
+                var hud = hudObject.AddComponent<PrototypeHud>();
+                hud.SetRawDebugTextVisible(false);
+                hud.ShowResult(applied);
+                StringAssert.DoesNotContain("Glitch", hud.ResultMessage);
+            }
+            finally
+            {
+                Object.DestroyImmediate(hudObject);
+            }
+        }
+
+        [Test]
         public void DemoProgression_OrderIsReproducibleForSameSeed()
         {
             var shop = CreateRuntimeEncounter("ENC_SHOP_DEMO_ORDER", CreateChoice("CHOICE_SHOP_ORDER", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 1) }));
