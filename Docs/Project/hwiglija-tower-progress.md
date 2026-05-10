@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 13:35 — Spine-ready cutscene pipeline prep
+- **Phase**: W2-2
+- **Done**:
+  - 2000x2000 cutscene source convention과 Spine export naming을 README에 고정
+  - Spine runtime 없이 동작하는 `CutsceneData` placeholder SO 3종을 추가
+  - memory fracture, final boss reveal, ending choice presentation slot을 fallback sprite 기반 cutscene으로 바인딩
+  - Spine namespace/package 미설치 상태 compile과 EditMode/PlayMode smoke를 검증
+- **Files**: 변경/추가 11개 (SpineSource/Data Cutscenes README, SO_CutsceneSpine_*, SO_DemoPresentationData, RuntimeShellTests.cs)
+- **GDD impact**: 없음
+- **Next**: Spine runtime 설치 승인 전까지는 fallback sprite 컷신만 사용하고, 다음 단계에서 2000x2000 source export 파일 수급 후 import setting 검증
+- **Agent**: Codex
+
 ### 2026-05-10 13:26 — Combat readability and decision feedback
 - **Phase**: W2-2
 - **Done**:
