@@ -34,13 +34,27 @@ namespace HwigiTower.UI
         public CutsceneData DemoCompleteCutscene => demoCompleteCutscene;
     }
 
+    [System.Serializable]
+    public sealed class DemoMerchantPresentationSlot
+    {
+        [SerializeField, Min(1)] private int floor = 1;
+        [SerializeField] private string stateKey = string.Empty;
+        [SerializeField] private Sprite merchantSprite;
+
+        public int Floor => floor < 1 ? 1 : floor;
+        public string StateKey => stateKey;
+        public Sprite MerchantSprite => merchantSprite;
+    }
+
     [CreateAssetMenu(menuName = "Hwigi Tower/Prototype/Demo Presentation Data", fileName = "SO_DemoPresentationData")]
     public sealed class DemoPresentationData : ScriptableObject
     {
         [SerializeField] private Sprite defaultMataiosPortrait;
+        [SerializeField] private DemoMerchantPresentationSlot[] merchantSlots = new DemoMerchantPresentationSlot[0];
         [SerializeField] private DemoPresentationSlot[] slots = new DemoPresentationSlot[0];
 
         public Sprite DefaultMataiosPortrait => defaultMataiosPortrait;
+        public DemoMerchantPresentationSlot[] MerchantSlots => merchantSlots ?? new DemoMerchantPresentationSlot[0];
         public DemoPresentationSlot[] Slots => slots ?? new DemoPresentationSlot[0];
 
         public bool TryGetSlot(string encounterStableId, out DemoPresentationSlot slot)

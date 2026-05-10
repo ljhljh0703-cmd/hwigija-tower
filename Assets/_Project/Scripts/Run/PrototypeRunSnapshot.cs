@@ -49,7 +49,9 @@ namespace HwigiTower.Run
             bool endingChoicePending = false,
             bool endingRest = false,
             bool endingContinue = false,
-            string endingChoiceId = "")
+            string endingChoiceId = "",
+            PrototypeFloorMapNodeView[] floorMapNodes = null,
+            string selectedMapNodeId = "")
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -98,6 +100,8 @@ namespace HwigiTower.Run
             EndingRest = endingRest;
             EndingContinue = endingContinue;
             EndingChoiceId = endingChoiceId ?? string.Empty;
+            FloorMapNodes = floorMapNodes ?? new PrototypeFloorMapNodeView[0];
+            SelectedMapNodeId = selectedMapNodeId ?? string.Empty;
         }
 
         public string RunId { get; }
@@ -147,5 +151,9 @@ namespace HwigiTower.Run
         public bool EndingRest { get; }
         public bool EndingContinue { get; }
         public string EndingChoiceId { get; }
+        public PrototypeFloorMapNodeView[] FloorMapNodes { get; }
+        public string SelectedMapNodeId { get; }
+        public bool HasFloorMap => FloorMapNodes.Length > 0;
+        public bool HasSelectedMapNode => !string.IsNullOrEmpty(SelectedMapNodeId);
     }
 }

@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6458b62def0be452b9583eb5e23472c0, type: 3}
-  m_Name: SO_Node_Shop
+  m_Name: SO_Node_Event
   m_EditorClassIdentifier: 
-  nodeId: node.shop
-  kind: 3
-  displayName: "\uC0C1\uC810"
-  placeholderOutcome: "\uC0C1\uC810"
+  nodeId: node.event
+  kind: 1
+  displayName: "\uC774\uBCA4\uD2B8"
+  placeholderOutcome: "\uC774\uBCA4\uD2B8"
   possibleEncounters:
-  - {fileID: 11400000, guid: ff39a529854a5432d94a3dd9b33505b5, type: 2}
+  - {fileID: 11400000, guid: 6f6754d6df26484b9dc0f01c6439d12a, type: 2}
   fallbackEnemy: {fileID: 0}
-  grantedAbility: {fileID: 11400000, guid: 1acbd827c2af040d8bfdf793bd938216, type: 2}
+  grantedAbility: {fileID: 0}
   trackedSynergies:
   - {fileID: 11400000, guid: fb55be6d20d2d4941821b5f56355f4cb, type: 2}
   - {fileID: 11400000, guid: 5392e895f6aa3463ab5f0a16264b0833, type: 2}

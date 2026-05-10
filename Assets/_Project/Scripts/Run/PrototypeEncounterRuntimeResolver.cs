@@ -73,6 +73,16 @@ namespace HwigiTower.Run
                 return new PrototypeEncounterChoiceResolution(choice.stableId, false, "choice failed: requirements not met");
             }
 
+            if (encounter.Id == "EVT_F01_JAR_ROOM")
+            {
+                return state.ResolveJarRoomChoice(context, nodeId, choice.stableId);
+            }
+
+            if (encounter.Type == EncounterType.Rest && choice.stableId.Contains("_REST"))
+            {
+                return state.ResolveRestChoice(choice.stableId);
+            }
+
             var visibleChoices = BuildVisibleChoiceSummary(state, encounter);
             var applied = 0;
             var ignored = 0;

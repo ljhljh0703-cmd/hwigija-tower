@@ -216,6 +216,37 @@ namespace HwigiTower.Run
                 return new EncounterSelection(null, null);
             }
 
+            var selectable = RunState.GetSelectableMapNodeViews();
+            if (selectable.Length == 1 && RunState.TrySelectMapNode(selectable[0].MapNodeId, out var selectedStep))
+            {
+                step = selectedStep;
+            }
+
+            return new EncounterSelection(step.Node, step.Encounter);
+        }
+
+        public PrototypeFloorMapNodeView[] GetSelectableMapNodes()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            return RunState == null ? new PrototypeFloorMapNodeView[0] : RunState.GetSelectableMapNodeViews();
+        }
+
+        public EncounterSelection SelectMapNode(string mapNodeId)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (RunState == null || RunState.RunCompleted || !RunState.TrySelectMapNode(mapNodeId, out var step))
+            {
+                return new EncounterSelection(null, null);
+            }
+
             return new EncounterSelection(step.Node, step.Encounter);
         }
 

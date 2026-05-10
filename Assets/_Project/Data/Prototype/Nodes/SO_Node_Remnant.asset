@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SO_Node_Remnant
   m_EditorClassIdentifier: 
   nodeId: node.remnant
-  kind: 3
+  kind: 5
   displayName: "\uC794\uC7AC"
   placeholderOutcome: "\uC794\uC7AC"
   possibleEncounters: []

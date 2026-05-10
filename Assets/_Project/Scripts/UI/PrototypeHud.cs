@@ -308,6 +308,43 @@ namespace HwigiTower.UI
             _choiceButtons.Clear();
         }
 
+        public void ShowMapChoices(PrototypeFloorMapNodeView[] nodes, Action<string> onNodeSelected)
+        {
+            ClearChoices();
+            EnsureEventSystem();
+            EnsureChoiceContainer();
+            if (choiceContainer == null || nodes == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                var node = nodes[i];
+                if (!node.Selectable)
+                {
+                    continue;
+                }
+
+                var view = new PrototypeEncounterChoiceView(
+                    node.MapNodeId,
+                    ResolveMapNodeLabel(node.Type),
+                    true,
+                    true,
+                    string.Empty,
+                    ResolveMapNodeHint(node.Type));
+                var button = CreateChoiceButton(view, onNodeSelected);
+                _choiceButtons.Add(button);
+            }
+
+            if (interactionText != null)
+            {
+                interactionText.text = showRawDebugText ? "map node selection" : "갈림길 선택";
+            }
+
+            ShowResultMessage(showRawDebugText ? "select map node" : "갈 수 있는 노드를 선택하세요");
+        }
+
         public void ShowFocus(InteractableNode node)
         {
             if (focusText == null)
@@ -395,7 +432,7 @@ namespace HwigiTower.UI
                     string.Empty;
                 runStateText.text =
                     $"Floor {snapshot.CurrentFloor}{status} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | Mental {snapshot.Mental} | Gold {snapshot.Gold}\n" +
-                    $"Glitch {snapshot.GlitchLevel} | Affinity {snapshot.Affinity} | Ability {snapshot.AbilityCount} | Item {snapshot.ItemCount}";
+                    $"Affinity {snapshot.Affinity} | Ability {snapshot.AbilityCount} | Item {snapshot.ItemCount}";
             }
 
             if (snapshot.RunCompleted)
@@ -1069,7 +1106,30 @@ namespace HwigiTower.UI
                 return;
             }
 
+            var selectableMapNodes = _roomController.GetSelectableMapNodes();
+            if (!snapshot.HasSelectedMapNode && selectableMapNodes.Length > 1)
+            {
+                ShowMapChoices(selectableMapNodes, mapNodeId =>
+                {
+                    var selected = _roomController.SelectMapNode(mapNodeId);
+                    OpenSelectedRouteStep(selected);
+                });
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
             var selection = _roomController.SelectCurrentRouteEncounter();
+            OpenSelectedRouteStep(selection);
+        }
+
+        private void OpenSelectedRouteStep(EncounterSelection selection)
+        {
+            if (_roomController == null)
+            {
+                ShowResultMessage("route unavailable");
+                return;
+            }
+
             if (!selection.HasEncounter)
             {
                 ShowResultMessage(showRawDebugText ? "route unavailable" : "진행 없음");
@@ -1313,12 +1373,52 @@ namespace HwigiTower.UI
                 return "목표\nFloor " + snapshot.CurrentFloor + " | 보스 관문\n승리하면 다음 단계가 열립니다";
             }
 
+            if (snapshot.HasFloorMap)
+            {
+                return BuildPublicMapSummary(snapshot);
+            }
+
             var label = currentIndex >= 0 && currentIndex < _demoRouteLabels.Count
                 ? _demoRouteLabels[currentIndex]
                 : ResolvePublicDemoStatus(snapshot);
             var step = Mathf.Clamp(currentIndex + 1, 1, Mathf.Max(1, _demoRouteLabels.Count));
             var remaining = Mathf.Max(0, _demoRouteLabels.Count - step);
             return "목표\nFloor " + snapshot.CurrentFloor + " | 현재: " + label + "\n진행 버튼으로 선택지를 엽니다 | 남은 단계 " + remaining;
+        }
+
+        private static string BuildPublicMapSummary(PrototypeRunSnapshot snapshot)
+        {
+            var selectable = 0;
+            var completed = 0;
+            var activeLayer = 0;
+            var bossVisible = false;
+            for (var i = 0; i < snapshot.FloorMapNodes.Length; i++)
+            {
+                var node = snapshot.FloorMapNodes[i];
+                if (node.Selectable)
+                {
+                    selectable++;
+                    activeLayer = node.Layer;
+                }
+
+                if (node.Completed)
+                {
+                    completed++;
+                }
+
+                if (node.Type == PrototypeFloorMapNodeType.Boss)
+                {
+                    bossVisible = true;
+                }
+            }
+
+            var objective = snapshot.HasSelectedMapNode
+                ? "선택한 노드 해결"
+                : selectable > 1
+                    ? "갈림길 선택"
+                    : "다음 노드 진행";
+            var boss = bossVisible ? " | 보스 목적지 표시" : string.Empty;
+            return "지도\nFloor " + snapshot.CurrentFloor + " | " + objective + boss + "\nLayer " + activeLayer + " | 완료 " + completed + "/" + snapshot.FloorMapNodes.Length;
         }
 
         private static string ResolvePublicDemoStatus(PrototypeRunSnapshot snapshot)
@@ -1497,7 +1597,9 @@ namespace HwigiTower.UI
         {
             var label = showRawDebugText
                 ? (string.IsNullOrEmpty(view.TextKey) ? view.ChoiceStableId : view.TextKey)
-                : ResolvePublicChoiceLabel(view.ChoiceStableId, index);
+                : view.ChoiceStableId.StartsWith("floor.", StringComparison.Ordinal) && !string.IsNullOrEmpty(view.TextKey)
+                    ? view.TextKey
+                    : ResolvePublicChoiceLabel(view.ChoiceStableId, index);
             if (!view.Enabled)
             {
                 label += showRawDebugText && !string.IsNullOrEmpty(view.ReasonTextKey)
@@ -1510,6 +1612,32 @@ namespace HwigiTower.UI
             }
 
             return label;
+        }
+
+        private static string ResolveMapNodeLabel(PrototypeFloorMapNodeType type)
+        {
+            return type switch
+            {
+                PrototypeFloorMapNodeType.Combat => "전투",
+                PrototypeFloorMapNodeType.Event => "이벤트",
+                PrototypeFloorMapNodeType.Rest => "휴식",
+                PrototypeFloorMapNodeType.Shop => "상점",
+                PrototypeFloorMapNodeType.Boss => "보스",
+                _ => "노드"
+            };
+        }
+
+        private static string ResolveMapNodeHint(PrototypeFloorMapNodeType type)
+        {
+            return type switch
+            {
+                PrototypeFloorMapNodeType.Combat => "전투 보상 또는 피해",
+                PrototypeFloorMapNodeType.Event => "결과는 선택 후 공개",
+                PrototypeFloorMapNodeType.Rest => "HP 회복 / 내부 불안 감소",
+                PrototypeFloorMapNodeType.Shop => "보스 전 준비",
+                PrototypeFloorMapNodeType.Boss => "승리하면 층 클리어",
+                _ => "선택 후 공개"
+            };
         }
 
         private string BuildRouteLabel(PrototypeDemoRunStep step, bool includeRawIds)
@@ -1683,10 +1811,14 @@ namespace HwigiTower.UI
             if (token.StartsWith("HP ", StringComparison.Ordinal) ||
                 token.StartsWith("Gold ", StringComparison.Ordinal) ||
                 token.StartsWith("Mental ", StringComparison.Ordinal) ||
-                token.StartsWith("Glitch ", StringComparison.Ordinal) ||
                 token.StartsWith("Affinity ", StringComparison.Ordinal))
             {
                 return IsNoOpDelta(token.Substring(token.IndexOf(' ') + 1)) ? string.Empty : token;
+            }
+
+            if (token.StartsWith("Glitch ", StringComparison.Ordinal))
+            {
+                return string.Empty;
             }
 
             if (token.StartsWith("gold reward ", StringComparison.Ordinal))
@@ -1696,7 +1828,7 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("glitch ", StringComparison.Ordinal))
             {
-                return "Glitch " + token.Substring("glitch ".Length).Trim();
+                return string.Empty;
             }
 
             if (token.StartsWith("affinity ", StringComparison.Ordinal))
