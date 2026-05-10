@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 21:26 — Branching map PlayMode smoke coverage restored
+- **Phase**: W2-2
+- **Done**:
+  - `e1d2d2f` / `7d2ba7b`를 `origin/Proto`에 push해 branching map과 event probability 변경을 보존
+  - 제거된 선형 route 직접 주입 PlayMode smoke 9개를 삭제하고 branching map route-action 기반 active smoke로 교체
+  - jar probability hint, interactive combat node, rest resolution, shop-before-boss, floor boss clear, final boss ending rest/continue 경로를 PlayMode에서 검증
+  - PlayMode ignored count를 9에서 0으로 복구
+- **Files**: 변경/추가 2개 (PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: branching map 테스트는 복구됐으므로 다음은 실제 수동 플레이 기준 map UI/선택지 가독성 보강
+- **Agent**: Codex
+
 ### 2026-05-10 20:54 — Event probability hints for jar room
 - **Phase**: W2-2
 - **Done**:
