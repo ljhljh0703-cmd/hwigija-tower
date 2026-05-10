@@ -246,7 +246,7 @@ namespace HwigiTower.UI
 
             if (_demoRouteLabels.Count > 0)
             {
-                _demoRouteLabels.Add("Run clear");
+                _demoRouteLabels.Add("클리어");
                 _demoRouteEncounterIds.Add("demo.complete");
             }
         }
@@ -388,10 +388,10 @@ namespace HwigiTower.UI
             }
             else
             {
-                var status = snapshot.EndingRest ? " | Ending Rest" :
-                    snapshot.EndingContinue ? " | Ending Continue" :
-                    snapshot.RunClear ? " | Run Clear" :
-                    snapshot.RunFailed ? " | Run Failed" :
+                var status = snapshot.EndingRest ? " | 안식" :
+                    snapshot.EndingContinue ? " | 동행 계속" :
+                    snapshot.RunClear ? " | 클리어" :
+                    snapshot.RunFailed ? " | 실패" :
                     string.Empty;
                 runStateText.text =
                     $"Floor {snapshot.CurrentFloor}{status} | HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp} | Mental {snapshot.Mental} | Gold {snapshot.Gold}\n" +
@@ -1280,37 +1280,37 @@ namespace HwigiTower.UI
         {
             if (snapshot.IsInCombat)
             {
-                return "진행\nFloor " + snapshot.CurrentFloor + " | 전투 중";
+                return "목표\nFloor " + snapshot.CurrentFloor + " | 전투 중\n공격/방어로 적 HP를 줄이세요";
             }
 
             if (snapshot.RunClear)
             {
                 if (snapshot.EndingRest)
                 {
-                    return "진행\nending.rest";
+                    return "목표\n안식 선택 완료";
                 }
 
                 if (snapshot.EndingContinue)
                 {
-                    return "진행\nending.continue";
+                    return "목표\n동행 계속 선택\n재시작 가능";
                 }
 
-                return "진행\nrun.clear | 엔딩 선택";
+                return "목표\n탑 정상\n안식 또는 동행 계속을 선택하세요";
             }
 
             if (snapshot.RunFailed)
             {
-                return "진행\nrun.failed";
+                return "목표\n실패\n재시작 가능";
             }
 
             if (snapshot.StairUnlocked)
             {
-                return "진행\nFloor " + snapshot.CurrentFloor + " clear | 다음 층 가능";
+                return "목표\nFloor " + snapshot.CurrentFloor + " 완료\n다음 층으로 올라가세요";
             }
 
             if (snapshot.BossGateUnlocked)
             {
-                return "진행\nFloor " + snapshot.CurrentFloor + " | Boss Gate";
+                return "목표\nFloor " + snapshot.CurrentFloor + " | 보스 관문\n승리하면 다음 단계가 열립니다";
             }
 
             var label = currentIndex >= 0 && currentIndex < _demoRouteLabels.Count
@@ -1318,7 +1318,7 @@ namespace HwigiTower.UI
                 : ResolvePublicDemoStatus(snapshot);
             var step = Mathf.Clamp(currentIndex + 1, 1, Mathf.Max(1, _demoRouteLabels.Count));
             var remaining = Mathf.Max(0, _demoRouteLabels.Count - step);
-            return "진행\nFloor " + snapshot.CurrentFloor + " | " + label + " | 남은 단계 " + remaining;
+            return "목표\nFloor " + snapshot.CurrentFloor + " | 현재: " + label + "\n진행 버튼으로 선택지를 엽니다 | 남은 단계 " + remaining;
         }
 
         private static string ResolvePublicDemoStatus(PrototypeRunSnapshot snapshot)
@@ -1328,10 +1328,10 @@ namespace HwigiTower.UI
                 return "전투 중";
             }
 
-            return snapshot.EndingRest ? "ending.rest" :
-                snapshot.EndingContinue ? "ending.continue" :
-                snapshot.RunClear ? "run.clear" :
-                snapshot.RunFailed ? "run.failed" :
+            return snapshot.EndingRest ? "안식 선택 완료" :
+                snapshot.EndingContinue ? "동행 계속 선택" :
+                snapshot.RunClear ? "엔딩 선택" :
+                snapshot.RunFailed ? "실패" :
                 snapshot.StairUnlocked ? "다음 층 가능" :
                 "준비";
         }
@@ -1463,23 +1463,23 @@ namespace HwigiTower.UI
             demoCompleteText.gameObject.SetActive((snapshot.RunClear || snapshot.RunFailed) && !snapshot.IsInCombat);
             if (snapshot.RunFailed)
             {
-                demoCompleteText.text = showRawDebugText ? "run.failed\nRestart Ready" : "Run failed\nRestart available";
+                demoCompleteText.text = showRawDebugText ? "run.failed\nRestart Ready" : "실패\n재시작 가능";
                 return;
             }
 
             if (snapshot.EndingRest)
             {
-                demoCompleteText.text = showRawDebugText ? "ending.rest" : "ending.rest";
+                demoCompleteText.text = showRawDebugText ? "ending.rest" : "안식 선택 완료";
                 return;
             }
 
             if (snapshot.EndingContinue)
             {
-                demoCompleteText.text = showRawDebugText ? "ending.continue\nRestart Ready" : "ending.continue\nRestart available";
+                demoCompleteText.text = showRawDebugText ? "ending.continue\nRestart Ready" : "동행 계속\n재시작 가능";
                 return;
             }
 
-            demoCompleteText.text = showRawDebugText ? "run.clear\nChoose Ending" : "run.clear\n엔딩 선택";
+            demoCompleteText.text = showRawDebugText ? "run.clear\nChoose Ending" : "클리어\n엔딩 선택";
         }
 
         private void UpdateResultVisibility(PrototypeRunSnapshot snapshot)
@@ -1501,11 +1501,11 @@ namespace HwigiTower.UI
             {
                 label += showRawDebugText && !string.IsNullOrEmpty(view.ReasonTextKey)
                     ? "\n" + view.ReasonTextKey
-                    : "\n" + (string.IsNullOrEmpty(view.HintText) ? "Unavailable" : view.HintText);
+                    : "\n" + (string.IsNullOrEmpty(view.HintText) ? "선택 불가" : NormalizePublicHint(view.HintText));
             }
             else if (!showRawDebugText && !string.IsNullOrEmpty(view.HintText))
             {
-                label += "\n" + view.HintText;
+                label += "\n" + NormalizePublicHint(view.HintText);
             }
 
             return label;
@@ -1592,59 +1592,59 @@ namespace HwigiTower.UI
 
             if (message.Contains("combat started"))
             {
-                AppendResultLine(ref summary, "Combat start");
+                AppendResultLine(ref summary, "전투 시작");
             }
 
             if (message.Contains("enemyDefeated True", StringComparison.Ordinal) || message.Contains("victory", StringComparison.OrdinalIgnoreCase))
             {
-                AppendResultLine(ref summary, "Victory");
+                AppendResultLine(ref summary, "승리");
             }
             else if (message.Contains("defeat", StringComparison.OrdinalIgnoreCase))
             {
-                AppendResultLine(ref summary, "Defeat");
+                AppendResultLine(ref summary, "패배");
             }
 
             if (message.Contains("enemyDefeated True", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "Enemy defeated");
+                AppendResultLine(ref summary, "적 처치");
             }
 
             if (message.Contains("already resolved:", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "Already resolved");
+                AppendResultLine(ref summary, "이미 해결됨");
             }
 
             if (message.Contains("stair unlocked", StringComparison.OrdinalIgnoreCase))
             {
-                AppendResultLine(ref summary, "Next floor ready");
+                AppendResultLine(ref summary, "다음 층 준비");
             }
 
             AppendFloorProgressionLine(ref summary, message);
 
             if (message.Contains("run.clear", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "Final boss defeated");
-                AppendResultLine(ref summary, "Ending choice ready");
+                AppendResultLine(ref summary, "최종 보스 격파");
+                AppendResultLine(ref summary, "엔딩 선택 가능");
             }
 
             if (message.Contains("ending.rest", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "ending.rest");
+                AppendResultLine(ref summary, "안식 선택 완료");
             }
 
             if (message.Contains("ending.continue", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "ending.continue");
+                AppendResultLine(ref summary, "동행 계속 선택");
             }
 
             if (message.Contains("run.failed", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "Run failed");
+                AppendResultLine(ref summary, "실패");
             }
 
             if (message.Contains("run.restartReady", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "Restart available");
+                AppendResultLine(ref summary, "재시작 가능");
             }
 
             return summary == "결과" ? "결과\n-" : summary;
@@ -1705,42 +1705,42 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("playerDamage ", StringComparison.Ordinal))
             {
-                return "Damage " + token.Substring("playerDamage ".Length).Trim();
+                return "적 피해 " + token.Substring("playerDamage ".Length).Trim();
             }
 
             if (token.StartsWith("enemyDamage ", StringComparison.Ordinal))
             {
-                return "Enemy damage " + token.Substring("enemyDamage ".Length).Trim();
+                return "받은 피해 " + token.Substring("enemyDamage ".Length).Trim();
             }
 
             if (token.StartsWith("combo ", StringComparison.Ordinal))
             {
-                return "Combo " + token.Substring("combo ".Length).Trim();
+                return "콤보 피해 " + token.Substring("combo ".Length).Trim();
             }
 
             if (token.StartsWith("item ", StringComparison.Ordinal))
             {
-                return NormalizeRefDelta(token.Substring("item ".Length).Trim());
+                return "아이템 획득: " + NormalizeRefDelta(token.Substring("item ".Length).Trim());
             }
 
             if (token.StartsWith("ability ", StringComparison.Ordinal))
             {
-                return token.Substring("ability ".Length).Trim() + " acquired";
+                return "능력 획득: " + NormalizeRefDelta(token.Substring("ability ".Length).Trim());
             }
 
             if (token.StartsWith("reward ", StringComparison.Ordinal))
             {
-                return "Reward " + token.Substring("reward ".Length).Trim();
+                return "보상: " + NormalizeRefDelta(token.Substring("reward ".Length).Trim());
             }
 
             if (token.StartsWith("memory unlocked ", StringComparison.Ordinal))
             {
-                return token.Substring("memory unlocked ".Length).Trim() + " unlocked";
+                return "기억 파편 해금";
             }
 
             if (token.StartsWith("action ", StringComparison.Ordinal))
             {
-                return "Action " + token.Substring("action ".Length).Trim();
+                return "행동: " + PublicCombatActionName(token.Substring("action ".Length).Trim());
             }
 
             return string.Empty;
@@ -1753,7 +1753,14 @@ namespace HwigiTower.UI
                 return string.Empty;
             }
 
-            return value;
+            var parts = value.Split(' ');
+            if (parts.Length == 0)
+            {
+                return value;
+            }
+
+            var label = PublicRefName(parts[0]);
+            return parts.Length > 1 ? label + " " + parts[1] : label;
         }
 
         private static string ExtractHpChange(string message)
@@ -1801,7 +1808,7 @@ namespace HwigiTower.UI
             var end = message.IndexOf(" entered", start, StringComparison.Ordinal);
             if (end > start)
             {
-                AppendResultLine(ref summary, "Floor " + message.Substring(start, end - start).Trim() + " entered");
+                AppendResultLine(ref summary, "Floor " + message.Substring(start, end - start).Trim() + " 진입");
             }
         }
 
@@ -1830,24 +1837,24 @@ namespace HwigiTower.UI
 
             if (snapshot.LastCombatEnemyDefeated)
             {
-                return "victory";
+                return "승리";
             }
 
-            return string.IsNullOrEmpty(snapshot.LastCombatResultId) ? "-" : snapshot.LastCombatResultId;
+            return string.IsNullOrEmpty(snapshot.LastCombatResultId) ? "-" : PublicCombatResultName(snapshot.LastCombatResultId);
         }
 
         private static string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
             var text =
                 "전투\n" +
-                "Enemy HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "\n" +
-                "Player HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
-                "Round " + snapshot.CombatRound + "\n" +
+                "적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "\n" +
+                "내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
+                "라운드 " + snapshot.CombatRound + "\n" +
                 BuildCombatFeedback(snapshot.LastCombatRoundResult) + "\n" +
-                (snapshot.AbilityCount > 0 ? "Skill ready" : "Skill unavailable: Ability 필요");
+                (snapshot.AbilityCount > 0 ? "기술 사용 가능" : "기술 불가: 능력 필요");
             if (snapshot.LastCombatComboDamage > 0)
             {
-                text += "\nCombo " + snapshot.LastCombatComboDamage;
+                text += "\n콤보 피해 " + snapshot.LastCombatComboDamage;
             }
 
             return text;
@@ -1857,12 +1864,12 @@ namespace HwigiTower.UI
         {
             if (string.IsNullOrEmpty(roundResult))
             {
-                return "Ready";
+                return "전투 준비";
             }
 
             if (roundResult.Contains("ready", StringComparison.OrdinalIgnoreCase))
             {
-                return "Ready";
+                return "전투 준비";
             }
 
             if (roundResult.Contains("Defend", StringComparison.Ordinal))
@@ -1880,7 +1887,7 @@ namespace HwigiTower.UI
                 return "기술: 추가 공격" + ExtractRoundNumber(roundResult, "playerDamage ");
             }
 
-            return "Round resolved";
+            return "라운드 처리";
         }
 
         private static string ExtractRoundNumber(string source, string token)
@@ -1919,7 +1926,7 @@ namespace HwigiTower.UI
             ApplyPresentationSlot(slot);
             if (interactionText != null && !showRawDebugText && snapshot.RunClear && !snapshot.IsInCombat)
             {
-                interactionText.text = "Run clear";
+                interactionText.text = snapshot.EndingChoicePending ? "엔딩 선택" : "클리어";
             }
         }
 
@@ -2249,10 +2256,11 @@ namespace HwigiTower.UI
                 "ENC_COMBAT_GATE_01" => "전투",
                 "ENC_F02_SHOP_001" => "상점",
                 "ENC_F02_MORAL_CHOICE_001" => "선택",
-                "ENC_COMBAT_GATE_02" => "Boss Gate",
-                "ENC_COMBAT_GATE_03" => "Final Boss",
+                "ENC_COMBAT_GATE_02" => "보스 관문",
+                "ENC_COMBAT_GATE_03" => "최종 보스",
                 _ => encounter.Type == EncounterType.MoralChoice ? "선택" :
                     encounter.Type == EncounterType.MemoryFragment ? "기억 파편" :
+                    encounter.Type == EncounterType.Shop ? "상점" :
                     "조우"
             };
         }
@@ -2266,35 +2274,124 @@ namespace HwigiTower.UI
 
             if (reactionKey.Contains("SHOP", StringComparison.OrdinalIgnoreCase))
             {
-                return "shop.response";
+                return "상점 반응";
             }
 
             if (reactionKey.Contains("MORAL", StringComparison.OrdinalIgnoreCase))
             {
-                return "choice.response";
+                return "선택 반응";
             }
 
             if (reactionKey.Contains("MEMORY", StringComparison.OrdinalIgnoreCase))
             {
-                return "memory.response";
+                return "기억 반응";
             }
 
             if (reactionKey.Contains("COMBAT", StringComparison.OrdinalIgnoreCase) || reactionKey.Contains("BATTLE", StringComparison.OrdinalIgnoreCase))
             {
-                return "combat.response";
+                return "전투 반응";
             }
 
             if (reactionKey.Contains("FLOOR", StringComparison.OrdinalIgnoreCase) || reactionKey.Contains("STAIR", StringComparison.OrdinalIgnoreCase))
             {
-                return "floor.response";
+                return "층 이동 반응";
             }
 
             if (reactionKey.Contains("RECALL", StringComparison.OrdinalIgnoreCase))
             {
-                return "recall.response";
+                return "회상 반응";
             }
 
-            return "fallback.response";
+            return "동행자 반응";
+        }
+
+        private static string NormalizePublicHint(string hint)
+        {
+            if (string.IsNullOrEmpty(hint))
+            {
+                return string.Empty;
+            }
+
+            var normalized = hint
+                .Replace("Unavailable:", "선택 불가:", StringComparison.Ordinal)
+                .Replace("Combat start", "전투 시작", StringComparison.Ordinal)
+                .Replace("Memory unlock", "기억 파편 해금", StringComparison.Ordinal)
+                .Replace("Ability 필요", "능력 필요", StringComparison.Ordinal);
+
+            return ReplacePublicRefs(normalized);
+        }
+
+        private static string ReplacePublicRefs(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            return value
+                .Replace("ITEM_FIELD_BANDAGE", PublicRefName("ITEM_FIELD_BANDAGE"), StringComparison.Ordinal)
+                .Replace("ITEM_LANTERN_OIL", PublicRefName("ITEM_LANTERN_OIL"), StringComparison.Ordinal)
+                .Replace("ITEM_TORN_CHARM", PublicRefName("ITEM_TORN_CHARM"), StringComparison.Ordinal)
+                .Replace("ABILITY_SCOUT", PublicRefName("ABILITY_SCOUT"), StringComparison.Ordinal)
+                .Replace("ABILITY_RECALL_ANCHOR", PublicRefName("ABILITY_RECALL_ANCHOR"), StringComparison.Ordinal)
+                .Replace("REWARD_CACHE_SMALL", PublicRefName("REWARD_CACHE_SMALL"), StringComparison.Ordinal)
+                .Replace("REWARD_CACHE_MEMORY", PublicRefName("REWARD_CACHE_MEMORY"), StringComparison.Ordinal);
+        }
+
+        private static string PublicRefName(string reference)
+        {
+            if (string.IsNullOrEmpty(reference))
+            {
+                return string.Empty;
+            }
+
+            return reference switch
+            {
+                "ITEM_FIELD_BANDAGE" => "붕대",
+                "ITEM_LANTERN_OIL" => "등유",
+                "ITEM_TORN_CHARM" => "찢어진 부적",
+                "ABILITY_SCOUT" => "정찰",
+                "ABILITY_RECALL_ANCHOR" => "회상 닻",
+                "REWARD_CACHE_SMALL" => "작은 보급품",
+                "REWARD_CACHE_MEMORY" => "기억 보급품",
+                _ => LooksLikeInternalLabel(reference) || reference.Contains("_", StringComparison.Ordinal) ? "획득물" : reference
+            };
+        }
+
+        private static string PublicCombatActionName(string action)
+        {
+            return action switch
+            {
+                "Attack" => "공격",
+                "Defend" => "방어",
+                "Skill" => "기술",
+                _ => action
+            };
+        }
+
+        private static string PublicCombatResultName(string resultId)
+        {
+            if (string.IsNullOrEmpty(resultId))
+            {
+                return "-";
+            }
+
+            if (resultId.Contains("victory", StringComparison.OrdinalIgnoreCase))
+            {
+                return "승리";
+            }
+
+            if (resultId.Contains("defeat", StringComparison.OrdinalIgnoreCase))
+            {
+                return "패배";
+            }
+
+            if (resultId.Contains("recall", StringComparison.OrdinalIgnoreCase))
+            {
+                return "회상 개입";
+            }
+
+            return resultId.Contains("_", StringComparison.Ordinal) ? "처리됨" : resultId;
         }
 
         private static bool LooksLikeInternalLabel(string value)
@@ -2304,6 +2401,8 @@ namespace HwigiTower.UI
                    value == "CombatGate" ||
                    value == "DemoComplete" ||
                    value == "Shop" ||
+                   value == "Boss Gate" ||
+                   value == "Final Boss" ||
                    value == "Decision" ||
                    value == "Memory" ||
                    value == "Combat";
