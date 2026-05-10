@@ -56,6 +56,19 @@ MonoBehaviour:
     memoryFragmentCutscene: {fileID: 0}
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: EVT_F01_JAR_ROOM
+    displayName: Event
+    backgroundSprite: {fileID: 21300000, guid: 411854104b1ea4962bc64ef606bcd04f, type: 3}
+    titleTextKey: PLACEHOLDER_EVT_F01_JAR_ROOM_TITLE
+    bodyTextKey: PLACEHOLDER_EVT_F01_JAR_ROOM_BODY
+    mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_MEMORY_FRAGMENT_01
     displayName: Memory
     backgroundSprite: {fileID: 21300000, guid: 64bb8f8e97cfc4c138a4b3614e14587a, type: 3}
@@ -147,6 +160,45 @@ MonoBehaviour:
     memoryFragmentCutscene: {fileID: 0}
     combatStartCutscene: {fileID: 11400000, guid: b74e40fc8ef94f6e98acac267dff00fe, type: 2}
     demoCompleteCutscene: {fileID: 11400000, guid: e436d1041ade4e8298c9eee52c4ae2fd, type: 2}
+  - encounterStableId: ENEMY_EMPTY_ARMOR
+    displayName: Enemy
+    backgroundSprite: {fileID: 0}
+    titleTextKey: PLACEHOLDER_ENEMY_EMPTY_ARMOR_TITLE
+    bodyTextKey: PLACEHOLDER_ENEMY_EMPTY_ARMOR_BODY
+    mataiosPortrait: {fileID: 0}
+    enemySprite: {fileID: 21300000, guid: 1682fdadf38f54d28ad1221259180769, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENEMY_SHADE_03
+    displayName: Enemy
+    backgroundSprite: {fileID: 0}
+    titleTextKey: PLACEHOLDER_ENEMY_SHADE_03_TITLE
+    bodyTextKey: PLACEHOLDER_ENEMY_SHADE_03_BODY
+    mataiosPortrait: {fileID: 0}
+    enemySprite: {fileID: 21300000, guid: aded02627b8d84e8cb003d5a4ce1a2c1, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENEMY_WRAITH_04
+    displayName: Enemy
+    backgroundSprite: {fileID: 0}
+    titleTextKey: PLACEHOLDER_ENEMY_WRAITH_04_TITLE
+    bodyTextKey: PLACEHOLDER_ENEMY_WRAITH_04_BODY
+    mataiosPortrait: {fileID: 0}
+    enemySprite: {fileID: 21300000, guid: b06bb49a636a44b53bd7bae698f9dfae, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
   - encounterStableId: run.clear
     displayName: Ending
     backgroundSprite: {fileID: 21300000, guid: e806dd29dd2234dfc99708dc3b67689e, type: 3}

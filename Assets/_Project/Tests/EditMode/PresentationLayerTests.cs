@@ -38,9 +38,13 @@ namespace HwigiTower.Tests.EditMode
             AssertSlotSprites(data, "ENC_COMBAT_GATE_01", null, "enemy_fracture_hound_demo", null, null);
             AssertSlotSprites(data, "ENC_COMBAT_GATE_02", null, "enemy_collapse_echo", null, null);
             AssertSlotSprites(data, "ENC_COMBAT_GATE_03", "enc_combat_gate_03_bg", "enemy_boss_apex_02", "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "EVT_F01_JAR_ROOM", "evt_f01_jar_room_bg", null, "char_mataios_bust_s0_s2", null);
             AssertSlotSprites(data, "ENC_SHOP_02", "enc_shop_02_bg", null, "char_mataios_bust_s3_s4", null);
             AssertSlotSprites(data, "ENC_MEMORY_FRAGMENT_03", "enc_memory_fragment_03_bg", null, "char_mataios_bust_s3_s4", null);
             AssertSlotSprites(data, "ENC_MEMORY_FRAGMENT_05", "enc_memory_fragment_03_bg", null, "char_mataios_bust_s3_s4", "enc_memory_fragment_05_art");
+            AssertSlotSprites(data, "ENEMY_EMPTY_ARMOR", null, "enemy_empty_armor", null, null);
+            AssertSlotSprites(data, "ENEMY_SHADE_03", null, "enemy_shade_03", null, null);
+            AssertSlotSprites(data, "ENEMY_WRAITH_04", null, "enemy_wraith_04", null, null);
             AssertSlotSprites(data, "run.clear", "ending_choice_bg", null, "char_mataios_bust_s3_s4", null);
         }
 
@@ -160,6 +164,49 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("공격: 적 피해 6", hud.CombatMessage);
             StringAssert.Contains("정찰 기술: 추가 공격", hud.CombatMessage);
             StringAssert.DoesNotContain("ENC_COMBAT_GATE_03", hud.RouteMessage);
+        }
+
+        [Test]
+        public void Hud_CombatVisualsCanUseEnemySpecificPresentationSlot()
+        {
+            var hud = CreateHud(out _);
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            var node = CreateNode("node.battle");
+            var encounter = CreateEncounter("ENC_COMBAT_GATE_01", EncounterType.Battle);
+            Assert.IsNotNull(data);
+
+            hud.SetPresentationData(data);
+            hud.ConfigureDemoRoute(new[] { new PrototypeDemoRunStep(node, encounter) });
+            var snapshot = new PrototypeRunSnapshot(
+                "run-ui",
+                17,
+                20,
+                5,
+                0,
+                8,
+                2,
+                1,
+                0,
+                0,
+                1,
+                false,
+                "demo.active",
+                "node.battle",
+                "ENC_COMBAT_GATE_01",
+                4,
+                2,
+                lastCombatId: "COMBAT_TEST",
+                lastCombatEnemyId: "ENEMY_SHADE_03",
+                currentFloor: 3,
+                isInCombat: true,
+                enemyHp: 12,
+                enemyMaxHp: 18,
+                combatRound: 1,
+                lastCombatRoundResult: "round 1 | action Attack | playerDamage 4 | enemyDamage 2");
+
+            hud.ShowRunState(snapshot);
+
+            Assert.AreEqual("enemy_shade_03", hud.CurrentCombatEnemySpriteName);
         }
 
         private static EncounterData CreateChoiceEncounter()

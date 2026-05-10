@@ -1523,9 +1523,12 @@ namespace HwigiTower.UI
         private void UpdateCombatVisuals(PrototypeRunSnapshot snapshot)
         {
             var slot = ResolveCurrentPresentationSlot(snapshot);
+            var enemySlot = ResolveEnemyPresentationSlot(snapshot.LastCombatEnemyId);
             if (combatEnemyImage != null)
             {
-                combatEnemyImage.sprite = slot == null ? null : slot.EnemySprite;
+                combatEnemyImage.sprite = enemySlot != null && enemySlot.EnemySprite != null
+                    ? enemySlot.EnemySprite
+                    : slot == null ? null : slot.EnemySprite;
                 combatEnemyImage.gameObject.SetActive(combatEnemyImage.sprite != null);
             }
 
@@ -2134,6 +2137,16 @@ namespace HwigiTower.UI
             }
 
             return presentationData.TryGetSlot(encounterId, out var slot) ? slot : null;
+        }
+
+        private DemoPresentationSlot ResolveEnemyPresentationSlot(string enemyStableId)
+        {
+            if (presentationData == null || string.IsNullOrEmpty(enemyStableId))
+            {
+                return null;
+            }
+
+            return presentationData.TryGetSlot(enemyStableId, out var slot) ? slot : null;
         }
 
         private void ApplyPresentationSlot(string encounterStableId)
