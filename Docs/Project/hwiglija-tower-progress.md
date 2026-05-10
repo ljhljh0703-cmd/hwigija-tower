@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 20:54 — Event probability hints for jar room
+- **Phase**: W2-2
+- **Done**:
+  - `EVT_F01_JAR_ROOM` 선택지에 normal mode 확률 힌트를 추가해 patterned jar가 80% gold / 20% elite combat을 선택 전 표시
+  - 항아리 선택지 public label을 stableId 대신 플레이어용 이름으로 표시하도록 HUD 정규화 추가
+  - 선택 후 jar outcome 결과를 player-facing result summary로 변환하고 Glitch/raw choice id 노출을 차단
+  - EditMode 테스트로 확률 힌트, 공개 UI 라벨, 결과 요약을 고정
+- **Files**: 변경/추가 5개 (PrototypeEncounterRuntimeResolver.cs, PrototypeHud.cs, PresentationLayerTests.cs, RuntimeShellTests.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: PlayMode는 6 passed / 9 ignored 상태 유지. ignored 9개는 기존 branching map 전환 후 남은 선형 route smoke 재작성 과제.
+- **Next**: branching map 전용 PlayMode smoke를 추가해 ignored 9개를 active pass로 복구하고, Floor 2+ event probability distortion 정책은 별도 설계 결정 후 구현
+- **Agent**: Codex
+
 ### 2026-05-10 18:28 — Branching floor map and jar event nodes
 - **Phase**: W2-2
 - **Done**:

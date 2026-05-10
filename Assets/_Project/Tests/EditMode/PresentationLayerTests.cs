@@ -72,6 +72,27 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void JarRoomChoices_ShowProbabilityHintsInPublicUi()
+        {
+            var jar = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_JAR_ROOM.asset");
+            Assert.IsNotNull(jar);
+            var state = new PrototypeRunState("run-ui-jar", new GameFlowEventBus());
+            var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, jar);
+            var hud = CreateHud(out _);
+
+            hud.ShowChoices(jar, views, _ => { });
+
+            Assert.AreEqual(3, hud.ChoiceButtonCount);
+            var patterned = hud.GetChoiceButton(0).GetComponentInChildren<Text>();
+            Assert.IsNotNull(patterned);
+            StringAssert.Contains("신기한 문양이 각인된 항아리", patterned.text);
+            StringAssert.Contains("80%: 골드 획득", patterned.text);
+            StringAssert.Contains("20%: 엘리트 전투", patterned.text);
+            StringAssert.DoesNotContain("CHOICE_EVT_F01_JAR_PATTERNED", patterned.text);
+            StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", patterned.text);
+        }
+
+        [Test]
         public void Hud_ResultSummaryShowsPlayerFacingDeltas()
         {
             var hud = CreateHud(out var result);
@@ -85,6 +106,19 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.DoesNotContain("choice applied", result.text);
             StringAssert.DoesNotContain("ITEM_FIELD_BANDAGE", result.text);
             StringAssert.DoesNotContain("MEM_FRAGMENT_03", result.text);
+        }
+
+        [Test]
+        public void Hud_ResultSummaryShowsJarOutcomeWithoutDebugIds()
+        {
+            var hud = CreateHud(out var result);
+
+            hud.ShowResultMessage("choice applied: CHOICE_EVT_F01_JAR_PATTERNED; effects=1; ignored=0 | jar outcome: Gold +8 | Glitch -2");
+
+            StringAssert.Contains("골드 획득: Gold +8", result.text);
+            StringAssert.DoesNotContain("CHOICE_EVT_F01_JAR_PATTERNED", result.text);
+            StringAssert.DoesNotContain("jar outcome", result.text);
+            StringAssert.DoesNotContain("Glitch", result.text);
         }
 
         [Test]

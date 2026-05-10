@@ -772,6 +772,13 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsNotNull(jar);
             Assert.IsNotNull(node);
 
+            var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(new PrototypeRunState("run-jar-views", new GameFlowEventBus()), jar);
+            Assert.AreEqual(3, views.Length);
+            StringAssert.Contains("80%: 골드 획득", views[0].HintText);
+            StringAssert.Contains("20%: 엘리트 전투", views[0].HintText);
+            StringAssert.Contains("HP 회복", views[1].HintText);
+            StringAssert.Contains("다음 3회 전투 피해 증가", views[2].HintText);
+
             var goldState = new PrototypeRunState("run-jar-gold", new GameFlowEventBus()) { AutoResolveCombat = true };
             goldState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, jar) });
             var patterned = goldState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-gold", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_PATTERNED");
