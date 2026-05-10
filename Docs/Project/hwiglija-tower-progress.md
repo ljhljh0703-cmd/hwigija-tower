@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 21:36 — Branching map event and enemy art binding
+- **Phase**: W2-2
+- **Done**:
+  - `EVT_F01_JAR_ROOM` presentation slot에 jar room background를 바인딩
+  - `ENEMY_EMPTY_ARMOR`, `ENEMY_SHADE_03`, `ENEMY_WRAITH_04` enemy-specific presentation slots를 추가
+  - combat enemy visual이 encounter background를 유지하면서 enemy stableId slot sprite를 우선 사용할 수 있도록 HUD override를 추가
+  - 신규 art import meta를 single sprite mode로 정리하고 EditMode asset binding 테스트를 추가
+- **Files**: 변경/추가 12개 (SO_DemoPresentationData.asset, PrototypeHud.cs, PresentationLayerTests.cs, Art/Encounters, Art/Enemies)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: Mac Editor에서 branching map event/combat 화면을 직접 확인하고 Floor 3-4 enemy가 실제 route enemy로 쓰일지 디자인 결정 후 combat handoff data를 별도 조정
+- **Agent**: Codex
+
 ### 2026-05-10 21:26 — Branching map PlayMode smoke coverage restored
 - **Phase**: W2-2
 - **Done**:
