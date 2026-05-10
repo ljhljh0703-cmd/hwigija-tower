@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 18:28 — Branching floor map and jar event nodes
+- **Phase**: W2-2
+- **Done**:
+  - Floor 1-5 deterministic branching map state를 추가하고 Combat/Event/Rest/Shop/Boss node type을 HUD 선택 흐름에 연결
+  - 모든 floor path가 branch layer에서 pre-boss Shop으로 수렴한 뒤 Boss로 이어지도록 `SO_Room_Prototype` route를 갱신
+  - `EVT_F01_JAR_ROOM` event script 문서와 runtime SO를 추가하고 patterned/plain/cracked jar deterministic outcome을 구현
+  - Rest choice가 HP 회복, 내부 Glitch 감소, NPC fallback reaction을 적용하도록 runtime resolver에 연결하고 normal HUD에서 Glitch 노출을 숨김
+  - floor별 merchant presentation hook을 `DemoPresentationData`에 추가하고 EditMode/PlayMode smoke를 branching map 기준으로 갱신
+- **Files**: 변경/추가 22개 (PrototypeFloorMap.cs, PrototypeRunState.cs, PrototypeHud.cs, SO_Room_Prototype.asset, EVT_F01_JAR_ROOM, Docs/Content/EventScripts/**)
+- **GDD impact**: 없음 (GDD §7.0 OQ-012 결정 범위 내 구현)
+- **Blockers**: PlayMode는 6 passed / 9 ignored 상태. ignored 9개는 제거된 선형 route 직접 주입 smoke라 branching map 전용 smoke로 재작성 필요.
+- **Next**: PlayMode 선형 smoke를 ignored 상태로 두지 말고 branching map 경로별 shop/rest/combat/failure/ending smoke로 분해해 15/15 active pass로 복구
+- **Agent**: Codex
+
 ### 2026-05-10 13:35 — Spine-ready cutscene pipeline prep
 - **Phase**: W2-2
 - **Done**:

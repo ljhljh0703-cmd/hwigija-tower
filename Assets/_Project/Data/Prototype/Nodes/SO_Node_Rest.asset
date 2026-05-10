@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SO_Node_Rest
   m_EditorClassIdentifier: 
   nodeId: node.rest
-  kind: 1
+  kind: 2
   displayName: "\uD734\uC2DD"
   placeholderOutcome: "\uD734\uC2DD"
   possibleEncounters: []

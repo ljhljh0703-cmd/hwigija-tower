@@ -670,6 +670,7 @@ namespace HwigiTower.Tests.EditMode
             state.ResolveEncounterChoice(new DeterministicRunContext("run-boss-unlock", 1001), floorTwoPrepNode.NodeId, floorTwoPrep, "CHOICE_FLOOR_TWO_PREP");
 
             Assert.AreEqual(2, state.CurrentFloor);
+            SelectFirstMapNodeOfType(state, PrototypeFloorMapNodeType.Boss);
             Assert.IsTrue(state.BossGateUnlocked);
             Assert.AreEqual("ENC_FLOOR_TWO_BOSS", state.NextDemoEncounterId);
             Assert.IsTrue(state.CreateSnapshot().BossGateUnlocked);
@@ -710,11 +711,96 @@ namespace HwigiTower.Tests.EditMode
             var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
             Assert.IsNotNull(room);
 
-            CollectionAssert.AreEqual(new[] { "ENC_SHOP_01", "ENC_MORAL_CHOICE_01", "ENC_MEMORY_FRAGMENT_01", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(1)));
-            CollectionAssert.AreEqual(new[] { "ENC_F02_SHOP_001", "ENC_F02_MORAL_CHOICE_001", "ENC_COMBAT_GATE_02" }, RouteEncounterIds(room.GetRunPathForFloor(2)));
-            CollectionAssert.AreEqual(new[] { "ENC_SHOP_02", "ENC_MORAL_CHOICE_02", "ENC_MEMORY_FRAGMENT_02" }, RouteEncounterIds(room.GetRunPathForFloor(3)));
-            CollectionAssert.AreEqual(new[] { "ENC_REST_01", "ENC_MORAL_CHOICE_03", "ENC_MEMORY_FRAGMENT_03" }, RouteEncounterIds(room.GetRunPathForFloor(4)));
-            CollectionAssert.AreEqual(new[] { "ENC_MEMORY_FRAGMENT_04", "ENC_MEMORY_FRAGMENT_05", "ENC_COMBAT_GATE_03" }, RouteEncounterIds(room.GetRunPathForFloor(5)));
+            CollectionAssert.AreEqual(new[] { "ENC_SHOP_01", "EVT_F01_JAR_ROOM", "ENC_REST_01", "ENC_MORAL_CHOICE_01", "ENC_MEMORY_FRAGMENT_01", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(1)));
+            CollectionAssert.AreEqual(new[] { "ENC_F02_SHOP_001", "ENC_REST_02", "ENC_F02_MORAL_CHOICE_001", "ENC_COMBAT_GATE_02" }, RouteEncounterIds(room.GetRunPathForFloor(2)));
+            CollectionAssert.AreEqual(new[] { "ENC_SHOP_02", "ENC_REST_03", "ENC_MORAL_CHOICE_02", "ENC_MEMORY_FRAGMENT_02", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(3)));
+            CollectionAssert.AreEqual(new[] { "ENC_REST_01", "ENC_MORAL_CHOICE_03", "ENC_SHOP_02", "ENC_MEMORY_FRAGMENT_03", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(4)));
+            CollectionAssert.AreEqual(new[] { "ENC_MEMORY_FRAGMENT_04", "ENC_MEMORY_FRAGMENT_05", "ENC_REST_05", "ENC_SHOP_02", "ENC_COMBAT_GATE_03" }, RouteEncounterIds(room.GetRunPathForFloor(5)));
+        }
+
+        [Test]
+        public void BranchingFloorMap_IsDeterministicAndConvergesThroughShopToBoss()
+        {
+            var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            Assert.IsNotNull(room);
+
+            for (var floor = 1; floor <= 5; floor++)
+            {
+                var first = new PrototypeRunState("run-map-a-" + floor, new GameFlowEventBus()) { AutoResolveCombat = true };
+                var second = new PrototypeRunState("run-map-b-" + floor, new GameFlowEventBus()) { AutoResolveCombat = true };
+                first.AttachDemoRunPath(room.GetRunPathForFloor(floor));
+                second.AttachDemoRunPath(room.GetRunPathForFloor(floor));
+
+                var nodes = first.CreateSnapshot().FloorMapNodes;
+                Assert.IsTrue(first.CreateSnapshot().HasFloorMap);
+                Assert.IsTrue(second.CreateSnapshot().HasFloorMap);
+                CollectionAssert.AreEqual(
+                    nodes.Select(node => node.MapNodeId).ToArray(),
+                    second.CreateSnapshot().FloorMapNodes.Select(node => node.MapNodeId).ToArray());
+                Assert.GreaterOrEqual(nodes.Count(node => node.Selectable), 1);
+                Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Shop));
+                Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Boss));
+                Assert.AreEqual(4, nodes.Single(node => node.Type == PrototypeFloorMapNodeType.Shop).Layer);
+                Assert.AreEqual(5, nodes.Single(node => node.Type == PrototypeFloorMapNodeType.Boss).Layer);
+            }
+        }
+
+        [Test]
+        public void RestNode_RestoresHpAndReducesInternalGlitch()
+        {
+            var rest = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_01.asset");
+            var node = AssetDatabase.LoadAssetAtPath<PrototypeNodeDefinition>("Assets/_Project/Data/Prototype/Nodes/SO_Node_Rest.asset");
+            var state = new PrototypeRunState("run-rest-map", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.ModifyPlayerHp(-8);
+            state.ModifyGlitchLevel(7);
+
+            var hpBefore = state.PlayerHp;
+            var glitchBefore = state.GlitchLevel;
+            var resolution = state.ResolveEncounterChoice(new DeterministicRunContext("run-rest-map", 1001), node.NodeId, rest, "CHOICE_REST_01_REST");
+
+            Assert.Greater(state.PlayerHp, hpBefore);
+            Assert.Less(state.GlitchLevel, glitchBefore);
+            Assert.AreEqual("NPC_REACT_REST", state.LastNpcReactionKey);
+            StringAssert.Contains("Glitch -3", resolution.Message);
+        }
+
+        [Test]
+        public void JarRoomEvent_ResolvesDeterministicOutcomesWithoutRuntimeJson()
+        {
+            var jar = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_JAR_ROOM.asset");
+            var node = AssetDatabase.LoadAssetAtPath<PrototypeNodeDefinition>("Assets/_Project/Data/Prototype/Nodes/SO_Node_Event.asset");
+            Assert.IsNotNull(jar);
+            Assert.IsNotNull(node);
+
+            var goldState = new PrototypeRunState("run-jar-gold", new GameFlowEventBus()) { AutoResolveCombat = true };
+            goldState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, jar) });
+            var patterned = goldState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-gold", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_PATTERNED");
+            Assert.AreEqual("CHOICE_EVT_F01_JAR_PATTERNED", patterned.PayloadId);
+            Assert.IsTrue(patterned.Message.Contains("Gold +8") || patterned.Message.Contains("elite combat"));
+
+            var plainState = new PrototypeRunState("run-jar-plain", new GameFlowEventBus()) { AutoResolveCombat = true };
+            plainState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, jar) });
+            plainState.ModifyPlayerHp(-8);
+            plainState.ModifyMental(-6);
+            var hpBefore = plainState.PlayerHp;
+            var mentalBefore = plainState.Mental;
+            plainState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-plain", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_PLAIN");
+            Assert.Greater(plainState.PlayerHp, hpBefore);
+            Assert.Greater(plainState.Mental, mentalBefore);
+
+            var buffState = new PrototypeRunState("run-jar-buff", new GameFlowEventBus()) { AutoResolveCombat = true };
+            buffState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, jar) });
+            buffState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-buff", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_CRACKED");
+            Assert.IsTrue(buffState.HasFlag("FLAG_CRACKED_JAR_DAMAGE_BUFF"));
+        }
+
+        [Test]
+        public void PresentationData_HasFloorMerchantHooks()
+        {
+            var presentation = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            Assert.IsNotNull(presentation);
+            Assert.AreEqual(5, presentation.MerchantSlots.Count(slot => slot.Floor >= 1 && slot.Floor <= 5));
+            Assert.IsTrue(presentation.MerchantSlots.All(slot => !string.IsNullOrEmpty(slot.StateKey)));
         }
 
         [Test]
@@ -1731,43 +1817,67 @@ namespace HwigiTower.Tests.EditMode
 
         private static void ResolveFullRouteToFinalBoss(PrototypeRunState state)
         {
-            ResolveRouteChoice(state, "ENC_SHOP_01", "CHOICE_SHOP_01_LEAVE");
+            ResolveRouteChoice(state, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
             ResolveRouteChoice(state, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
-            ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_01", "CHOICE_MEMORY_01_UNLOCK");
+            ResolveRouteChoice(state, "ENC_SHOP_01", "CHOICE_SHOP_01_LEAVE");
             ResolveRouteChoice(state, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             Assert.IsTrue(state.StairUnlocked);
             state.ResolveNextFloor();
 
-            ResolveRouteChoice(state, "ENC_F02_SHOP_001", "CHOICE_F02_SHOP_BUY_ITEM");
             ResolveRouteChoice(state, "ENC_F02_MORAL_CHOICE_001", "CHOICE_F02_MORAL_LEAVE");
+            ResolveRouteChoice(state, "ENC_F02_SHOP_001", "CHOICE_F02_SHOP_BUY_ITEM");
             ResolveRouteChoice(state, "ENC_COMBAT_GATE_02", "CHOICE_COMBAT_02_ENGAGE");
             Assert.IsTrue(state.StairUnlocked);
             state.ResolveNextFloor();
 
-            ResolveRouteChoice(state, "ENC_SHOP_02", "CHOICE_SHOP_02_BUY_ABILITY");
             ResolveRouteChoice(state, "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
             ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
+            ResolveRouteChoice(state, "ENC_SHOP_02", "CHOICE_SHOP_02_BUY_ABILITY");
+            ResolveRouteChoice(state, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             Assert.IsTrue(state.StairUnlocked);
             state.ResolveNextFloor();
 
             ResolveRouteChoice(state, "ENC_REST_01", "CHOICE_REST_01_REST");
-            ResolveRouteChoice(state, "ENC_MORAL_CHOICE_03", "CHOICE_MORAL_03_REFUSE");
             ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
+            ResolveRouteChoice(state, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
+            ResolveRouteChoice(state, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             Assert.IsTrue(state.StairUnlocked);
             state.ResolveNextFloor();
 
-            ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_04", "CHOICE_MEMORY_04_UNLOCK");
             ResolveRouteChoice(state, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
+            ResolveRouteChoice(state, "ENC_REST_05", "CHOICE_REST_05_REST");
+            ResolveRouteChoice(state, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
             Assert.AreEqual(5, state.CurrentFloor);
             ResolveRouteChoice(state, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
         }
 
         private static void ResolveRouteChoice(PrototypeRunState state, string expectedEncounterId, string choiceStableId)
         {
+            SelectMapNodeForEncounter(state, expectedEncounterId);
             Assert.IsTrue(state.TryGetNextDemoStep(out var step), "Expected a route step for " + expectedEncounterId);
             Assert.AreEqual(expectedEncounterId, step.EncounterId);
             var resolution = state.ResolveEncounterChoice(new DeterministicRunContext(state.RunId, 1001), step.NodeId, step.Encounter, choiceStableId);
             Assert.AreEqual(choiceStableId, resolution.PayloadId);
+        }
+
+        private static void SelectMapNodeForEncounter(PrototypeRunState state, string expectedEncounterId)
+        {
+            var selectable = state.GetSelectableMapNodeViews();
+            if (selectable.Length == 0)
+            {
+                return;
+            }
+
+            var match = selectable.FirstOrDefault(node => node.MapNodeId.EndsWith("." + expectedEncounterId));
+            Assert.IsFalse(string.IsNullOrEmpty(match.MapNodeId), "Expected selectable map node for " + expectedEncounterId);
+            Assert.IsTrue(state.TrySelectMapNode(match.MapNodeId, out _), "Expected map selection for " + expectedEncounterId);
+        }
+
+        private static void SelectFirstMapNodeOfType(PrototypeRunState state, PrototypeFloorMapNodeType type)
+        {
+            var match = state.GetSelectableMapNodeViews().FirstOrDefault(node => node.Type == type);
+            Assert.IsFalse(string.IsNullOrEmpty(match.MapNodeId), "Expected selectable map node type " + type);
+            Assert.IsTrue(state.TrySelectMapNode(match.MapNodeId, out _), "Expected selectable map node type " + type);
         }
 
         private static string[] RouteEncounterIds(IReadOnlyList<PrototypeDemoRunStep> steps)

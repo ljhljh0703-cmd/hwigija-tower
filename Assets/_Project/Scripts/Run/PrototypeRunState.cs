@@ -57,6 +57,7 @@ namespace HwigiTower.Run
         private readonly Dictionary<string, string> _resolvedEncounterChoices = new Dictionary<string, string>();
         private readonly List<PrototypeDemoRunStep> _demoRunPath = new List<PrototypeDemoRunStep>();
         private readonly List<PrototypeFloorRunPath> _floorRunPaths = new List<PrototypeFloorRunPath>();
+        private readonly List<PrototypeFloorMapNode> _floorMapNodes = new List<PrototypeFloorMapNode>();
         private readonly HashSet<string> _resolvedDemoSteps = new HashSet<string>();
         private bool _runCompleted;
         private bool _runClear;
@@ -65,6 +66,7 @@ namespace HwigiTower.Run
         private bool _endingRest;
         private bool _endingContinue;
         private string _endingChoiceId = string.Empty;
+        private string _selectedMapNodeId = string.Empty;
         private bool _stairUnlocked;
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
@@ -87,6 +89,7 @@ namespace HwigiTower.Run
         private int _lastCombatAffinityDelta;
         private bool _lastCombatEnemyDefeated;
         private int _lastCombatComboDamage;
+        private int _crackedJarBuffCombats;
         private string _lastNpcReactionKey = string.Empty;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
@@ -120,7 +123,7 @@ namespace HwigiTower.Run
         public int BattlesWon { get; private set; }
         public bool RunCompleted => _runCompleted;
         public bool DemoComplete => _runClear;
-        public bool FloorComplete => _demoRunPath.Count > 0 && _resolvedDemoSteps.Count >= _demoRunPath.Count;
+        public bool FloorComplete => _floorMapNodes.Count > 0 ? IsFloorMapComplete() : _demoRunPath.Count > 0 && _resolvedDemoSteps.Count >= _demoRunPath.Count;
         public bool StairUnlocked => _stairUnlocked;
         public bool RunClear => _runClear;
         public bool RunFailed => _runFailed;
@@ -202,7 +205,9 @@ namespace HwigiTower.Run
                 EndingChoicePending,
                 _endingRest,
                 _endingContinue,
-                _endingChoiceId);
+                _endingChoiceId,
+                BuildMapNodeViews(),
+                _selectedMapNodeId);
         }
 
         public string NextDemoNodeId
@@ -443,6 +448,8 @@ namespace HwigiTower.Run
         {
             _demoRunPath.Clear();
             _resolvedDemoSteps.Clear();
+            _floorMapNodes.Clear();
+            _selectedMapNodeId = string.Empty;
 
             if (demoRunPath == null)
             {
@@ -457,6 +464,8 @@ namespace HwigiTower.Run
                     _demoRunPath.Add(step);
                 }
             }
+
+            PrototypeFloorMapBuilder.Build(_currentFloor, _demoRunPath, _floorMapNodes);
         }
 
         public void AttachFloorRunPaths(IReadOnlyList<PrototypeFloorRunPath> floorRunPaths, IReadOnlyList<PrototypeDemoRunStep> fallbackFloorOnePath)
@@ -485,6 +494,21 @@ namespace HwigiTower.Run
 
         public bool TryGetNextDemoStep(out PrototypeDemoRunStep step)
         {
+            if (_floorMapNodes.Count > 0)
+            {
+                if (TryGetSelectedMapNode(out var selectedNode))
+                {
+                    step = selectedNode.Step;
+                    return step != null && step.IsValid;
+                }
+
+                if (TryGetFirstSelectableMapNode(out var selectableNode))
+                {
+                    step = selectableNode.Step;
+                    return step != null && step.IsValid;
+                }
+            }
+
             for (var i = 0; i < _demoRunPath.Count; i++)
             {
                 var candidate = _demoRunPath[i];
@@ -496,6 +520,40 @@ namespace HwigiTower.Run
             }
 
             step = null;
+            return false;
+        }
+
+        public PrototypeFloorMapNodeView[] GetSelectableMapNodeViews()
+        {
+            var views = new List<PrototypeFloorMapNodeView>();
+            var activeLayer = GetActiveMapLayer();
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (IsMapNodeSelectable(node, activeLayer))
+                {
+                    views.Add(ToMapNodeView(node, true, false));
+                }
+            }
+
+            return views.ToArray();
+        }
+
+        public bool TrySelectMapNode(string mapNodeId, out PrototypeDemoRunStep step)
+        {
+            step = null;
+            var activeLayer = GetActiveMapLayer();
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node != null && node.MapNodeId == mapNodeId && IsMapNodeSelectable(node, activeLayer))
+                {
+                    _selectedMapNodeId = node.MapNodeId;
+                    step = node.Step;
+                    return step != null && step.IsValid;
+                }
+            }
+
             return false;
         }
 
@@ -512,6 +570,7 @@ namespace HwigiTower.Run
             _currentFloor++;
             _stairUnlocked = false;
             _resolvedDemoSteps.Clear();
+            _selectedMapNodeId = string.Empty;
             AttachDemoRunPath(GetFloorRunPath(_currentFloor, null));
             SaveFloorReflection(completedFloor);
             SetNpcReaction("NPC_REACT_FLOOR_" + _currentFloor);
@@ -577,10 +636,68 @@ namespace HwigiTower.Run
 
             NodesResolved++;
             _playerHp = _playerMaxHp;
+            ModifyGlitchLevel(-3);
             var recall = _reflectionPipeline.LoadRecallPrompt(RunId, 3);
             ApplyNpcTrigger("rest.recall");
+            SetNpcReaction("NPC_REACT_REST");
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, "rest"));
-            return new PrototypeNodeResolution(nodeId, "recall", recall, false);
+            return new PrototypeNodeResolution(nodeId, "recall", "rest complete: HP restored | Glitch -3 | " + recall, false);
+        }
+
+        public PrototypeEncounterChoiceResolution ResolveJarRoomChoice(DeterministicRunContext context, string nodeId, string choiceStableId)
+        {
+            if (_runCompleted)
+            {
+                return new PrototypeEncounterChoiceResolution(choiceStableId, false, "run already completed");
+            }
+
+            if (choiceStableId == "CHOICE_EVT_F01_JAR_PATTERNED")
+            {
+                var random = context.CreateRandom("EVT_F01_JAR_ROOM.patterned");
+                if (random.Range(0, 100) < 80)
+                {
+                    ModifyGold(8);
+                    SetNpcReaction("NPC_REACT_EVENT_JAR_GOLD");
+                    return new PrototypeEncounterChoiceResolution(choiceStableId, true, "jar outcome: Gold +8");
+                }
+
+                ResolveBattle(context, nodeId, "EVT_F01_JAR_ROOM_ELITE", null, null);
+                SetNpcReaction("NPC_REACT_EVENT_JAR_ELITE");
+                return new PrototypeEncounterChoiceResolution(choiceStableId, true, "jar outcome: elite combat");
+            }
+
+            if (choiceStableId == "CHOICE_EVT_F01_JAR_PLAIN")
+            {
+                _playerHp = System.Math.Min(_playerMaxHp, _playerHp + 5);
+                ModifyMental(5);
+                SetNpcReaction("NPC_REACT_EVENT_JAR_REST");
+                return new PrototypeEncounterChoiceResolution(choiceStableId, true, "jar outcome: HP +5 | Mental +5");
+            }
+
+            if (choiceStableId == "CHOICE_EVT_F01_JAR_CRACKED")
+            {
+                _crackedJarBuffCombats = 3;
+                SetFlag("FLAG_CRACKED_JAR_DAMAGE_BUFF", true);
+                SetNpcReaction("NPC_REACT_EVENT_JAR_BUFF");
+                return new PrototypeEncounterChoiceResolution(choiceStableId, true, "jar outcome: next 3 combat damage buff");
+            }
+
+            return new PrototypeEncounterChoiceResolution(choiceStableId, false, "jar outcome unavailable");
+        }
+
+        public PrototypeEncounterChoiceResolution ResolveRestChoice(string choiceStableId)
+        {
+            if (_runCompleted)
+            {
+                return new PrototypeEncounterChoiceResolution(choiceStableId, false, "run already completed");
+            }
+
+            _playerHp = System.Math.Min(_playerMaxHp, _playerHp + 6);
+            ModifyGlitchLevel(-3);
+            var recall = _reflectionPipeline.LoadRecallPrompt(RunId, 3);
+            ApplyNpcTrigger("rest.recall");
+            SetNpcReaction("NPC_REACT_REST");
+            return new PrototypeEncounterChoiceResolution(choiceStableId, true, "rest complete: HP restored | Glitch -3 | " + recall);
         }
 
         public PrototypeNodeResolution ResolveShop(string nodeId, AbilityData grantedAbility, IReadOnlyList<SynergyData> trackedSynergies)
@@ -677,7 +794,8 @@ namespace HwigiTower.Run
         public PrototypeNodeResolution ResolveEncounterChoice(string nodeId, EncounterData encounter, string choiceStableId)
         {
             var encounterId = encounter == null ? string.Empty : encounter.Id;
-            if (TryGetResolvedEncounterChoice(nodeId, encounterId, out var resolvedChoiceStableId))
+            var resolvedNodeId = GetResolvedChoiceNodeId(nodeId);
+            if (TryGetResolvedEncounterChoice(resolvedNodeId, encounterId, out var resolvedChoiceStableId))
             {
                 return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", _runCompleted);
             }
@@ -690,7 +808,7 @@ namespace HwigiTower.Run
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, new DeterministicRunContext(RunId, 0), nodeId);
             if (resolution.Applied)
             {
-                MarkEncounterChoiceResolved(nodeId, encounterId, resolution.ChoiceStableId);
+                MarkEncounterChoiceResolved(resolvedNodeId, encounterId, resolution.ChoiceStableId);
             }
 
             NodesResolved++;
@@ -703,7 +821,8 @@ namespace HwigiTower.Run
         public PrototypeNodeResolution ResolveEncounterChoice(DeterministicRunContext context, string nodeId, EncounterData encounter, string choiceStableId)
         {
             var encounterId = encounter == null ? string.Empty : encounter.Id;
-            if (TryGetResolvedEncounterChoice(nodeId, encounterId, out var resolvedChoiceStableId))
+            var resolvedNodeId = GetResolvedChoiceNodeId(nodeId);
+            if (TryGetResolvedEncounterChoice(resolvedNodeId, encounterId, out var resolvedChoiceStableId))
             {
                 return new PrototypeNodeResolution(nodeId, resolvedChoiceStableId, $"already resolved: {resolvedChoiceStableId}", _runCompleted);
             }
@@ -716,7 +835,7 @@ namespace HwigiTower.Run
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, context, nodeId);
             if (resolution.Applied)
             {
-                MarkEncounterChoiceResolved(nodeId, encounterId, resolution.ChoiceStableId);
+                MarkEncounterChoiceResolved(resolvedNodeId, encounterId, resolution.ChoiceStableId);
             }
 
             NodesResolved++;
@@ -756,6 +875,18 @@ namespace HwigiTower.Run
             var secondAction = action == CombatAction.Skill && HasPlayableSkill() ? (CombatAction?)CombatAction.Attack : null;
             var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action, secondAction);
             _combatRound++;
+            var crackedJarBonus = 0;
+            if (_crackedJarBuffCombats > 0 && result.PlayerDamage > 0 && !_activeCombatEnemy.IsDefeated)
+            {
+                crackedJarBonus = 2;
+                _activeCombatEnemy.ApplyDamage(crackedJarBonus);
+                _crackedJarBuffCombats--;
+                if (_crackedJarBuffCombats <= 0)
+                {
+                    SetFlag("FLAG_CRACKED_JAR_DAMAGE_BUFF", false);
+                }
+            }
+
             _lastCombatComboDamage = result.ComboDamage;
             _lastCombatRoundResult =
                 "round " + _combatRound +
@@ -764,6 +895,7 @@ namespace HwigiTower.Run
                 " | enemyDamage " + result.EnemyDamage +
                 " | enemyHp " + enemyHpBefore + "->" + _activeCombatEnemy.Hp +
                 " | playerHp " + playerHpBefore + "->" + _activeCombatPlayer.Hp +
+                (crackedJarBonus > 0 ? " | cracked jar +" + crackedJarBonus : string.Empty) +
                 (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty);
 
             if (action == CombatAction.Skill)
@@ -791,7 +923,7 @@ namespace HwigiTower.Run
                 }
             }
 
-            if (result.IsComplete)
+            if (result.IsComplete || _activeCombatEnemy.IsDefeated || _activeCombatPlayer.IsDefeated)
             {
                 FinalizeCombat();
             }
@@ -1149,6 +1281,7 @@ namespace HwigiTower.Run
                 if (BuildResolvedEncounterKey(step.NodeId, step.EncounterId) == key)
                 {
                     _resolvedDemoSteps.Add(key);
+                    MarkSelectedMapNodeCompleted(key);
                     break;
                 }
             }
@@ -1263,18 +1396,169 @@ namespace HwigiTower.Run
 
         private bool IsCurrentBossGateUnlocked()
         {
-            if (_currentFloor < 2 || _runCompleted || _stairUnlocked || !TryGetNextDemoStep(out var next))
+            if (_runCompleted || _stairUnlocked || !TryGetNextDemoStep(out var next))
             {
                 return false;
             }
 
-            var lastIndex = _demoRunPath.Count - 1;
-            if (lastIndex < 0 || _demoRunPath[lastIndex] != next)
+            if (_floorMapNodes.Count > 0)
             {
+                if (TryGetSelectedMapNode(out var selected))
+                {
+                    return selected.Type == PrototypeFloorMapNodeType.Boss;
+                }
+
                 return false;
             }
 
             return HasStartCombatEffect(next.Encounter);
+        }
+
+        private bool TryGetSelectedMapNode(out PrototypeFloorMapNode node)
+        {
+            node = null;
+            if (string.IsNullOrEmpty(_selectedMapNodeId))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                if (_floorMapNodes[i] != null && _floorMapNodes[i].MapNodeId == _selectedMapNodeId && !_floorMapNodes[i].Completed && !_floorMapNodes[i].Skipped)
+                {
+                    node = _floorMapNodes[i];
+                    return true;
+                }
+            }
+
+            _selectedMapNodeId = string.Empty;
+            return false;
+        }
+
+        private string GetResolvedChoiceNodeId(string nodeId)
+        {
+            return _floorMapNodes.Count > 0 && !string.IsNullOrEmpty(_selectedMapNodeId)
+                ? _selectedMapNodeId
+                : nodeId;
+        }
+
+        private bool TryGetFirstSelectableMapNode(out PrototypeFloorMapNode node)
+        {
+            node = null;
+            var activeLayer = GetActiveMapLayer();
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                if (IsMapNodeSelectable(_floorMapNodes[i], activeLayer))
+                {
+                    node = _floorMapNodes[i];
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private int GetActiveMapLayer()
+        {
+            var activeLayer = int.MaxValue;
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node != null && !node.Completed && !node.Skipped && node.Layer < activeLayer)
+                {
+                    activeLayer = node.Layer;
+                }
+            }
+
+            return activeLayer == int.MaxValue ? 0 : activeLayer;
+        }
+
+        private bool IsMapNodeSelectable(PrototypeFloorMapNode node, int activeLayer)
+        {
+            return node != null && node.IsValid && !node.Completed && !node.Skipped && node.Layer == activeLayer && string.IsNullOrEmpty(_selectedMapNodeId);
+        }
+
+        private void MarkSelectedMapNodeCompleted(string resolvedKey)
+        {
+            PrototypeFloorMapNode completedNode = null;
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node == null)
+                {
+                    continue;
+                }
+
+                var selectedMatches = string.IsNullOrEmpty(_selectedMapNodeId) || node.MapNodeId == _selectedMapNodeId;
+                if (selectedMatches && BuildResolvedEncounterKey(node.Step.NodeId, node.Step.EncounterId) == resolvedKey)
+                {
+                    node.Completed = true;
+                    completedNode = node;
+                    break;
+                }
+            }
+
+            if (completedNode != null)
+            {
+                for (var i = 0; i < _floorMapNodes.Count; i++)
+                {
+                    var node = _floorMapNodes[i];
+                    if (node != null && node.Layer == completedNode.Layer && node.MapNodeId != completedNode.MapNodeId && !node.Completed)
+                    {
+                        node.Skipped = true;
+                    }
+                }
+            }
+
+            _selectedMapNodeId = string.Empty;
+        }
+
+        private bool IsFloorMapComplete()
+        {
+            var hasBoss = false;
+            var bossComplete = false;
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node == null)
+                {
+                    continue;
+                }
+
+                if (!node.Completed && !node.Skipped)
+                {
+                    return false;
+                }
+
+                if (node.Type == PrototypeFloorMapNodeType.Boss)
+                {
+                    hasBoss = true;
+                    bossComplete = node.Completed;
+                }
+            }
+
+            return hasBoss && bossComplete;
+        }
+
+        private PrototypeFloorMapNodeView[] BuildMapNodeViews()
+        {
+            var views = new PrototypeFloorMapNodeView[_floorMapNodes.Count];
+            var activeLayer = GetActiveMapLayer();
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                var locked = node == null || node.Skipped || (activeLayer > 0 && node.Layer > activeLayer);
+                views[i] = ToMapNodeView(node, IsMapNodeSelectable(node, activeLayer), locked);
+            }
+
+            return views;
+        }
+
+        private static PrototypeFloorMapNodeView ToMapNodeView(PrototypeFloorMapNode node, bool selectable, bool locked)
+        {
+            return node == null
+                ? default
+                : new PrototypeFloorMapNodeView(node.MapNodeId, node.Type, node.Floor, node.Layer, node.Index, selectable, node.Completed, locked);
         }
 
         private static bool HasStartCombatEffect(EncounterData encounter)
