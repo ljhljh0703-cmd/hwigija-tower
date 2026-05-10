@@ -425,13 +425,13 @@ namespace HwigiTower.UI
             rect.anchorMin = new Vector2(0f, 1f);
             rect.anchorMax = new Vector2(1f, 1f);
             rect.pivot = new Vector2(0.5f, 1f);
-            rect.sizeDelta = new Vector2(0f, 96f);
-            rect.anchoredPosition = new Vector2(0f, -_choiceButtons.Count * 108f);
+            rect.sizeDelta = new Vector2(0f, 118f);
+            rect.anchoredPosition = new Vector2(0f, -_choiceButtons.Count * 130f);
 
             var image = buttonObject.AddComponent<Image>();
             image.color = view.Enabled
-                ? new Color(0.16f, 0.19f, 0.23f, 0.96f)
-                : new Color(0.09f, 0.10f, 0.12f, 0.78f);
+                ? new Color(0.12f, 0.16f, 0.19f, 0.98f)
+                : new Color(0.06f, 0.07f, 0.08f, 0.84f);
 
             var button = buttonObject.AddComponent<Button>();
             button.interactable = view.Enabled;
@@ -454,15 +454,15 @@ namespace HwigiTower.UI
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 24;
+            label.fontSize = 30;
             label.alignment = TextAnchor.MiddleCenter;
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
             label.verticalOverflow = VerticalWrapMode.Truncate;
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 16;
-            label.resizeTextMaxSize = 24;
+            label.resizeTextMinSize = 22;
+            label.resizeTextMaxSize = 30;
             label.supportRichText = false;
-            label.lineSpacing = 0.92f;
+            label.lineSpacing = 1f;
             label.raycastTarget = false;
             label.color = view.Enabled
                 ? new Color(0.88f, 0.92f, 0.94f, 1f)
@@ -481,10 +481,10 @@ namespace HwigiTower.UI
 
         private void NormalizeLayout()
         {
-            ApplyTextRect(focusText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(0f, 44f), 26, TextAnchor.UpperCenter);
-            ApplyTextRect(interactionText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -72f), new Vector2(0f, 48f), 22, TextAnchor.UpperCenter);
-            ApplyTextRect(runStateText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -126f), new Vector2(0f, 168f), 20, TextAnchor.UpperCenter);
-            ApplyTextRect(resultText, new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 438f), new Vector2(0f, 132f), 22, TextAnchor.MiddleCenter);
+            ApplyTextRect(focusText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(0f, 48f), 30, TextAnchor.UpperCenter);
+            ApplyTextRect(interactionText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(0f, 58f), 28, TextAnchor.UpperCenter);
+            ApplyTextRect(runStateText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -148f), new Vector2(0f, 184f), 24, TextAnchor.UpperCenter);
+            ApplyTextRect(resultText, new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 470f), new Vector2(0f, 172f), 28, TextAnchor.MiddleCenter);
         }
 
         private static void ApplyTextRect(Text text, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size, int fontSize, TextAnchor alignment)
@@ -509,7 +509,7 @@ namespace HwigiTower.UI
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Truncate;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 13;
+            text.resizeTextMinSize = Mathf.Max(18, fontSize - 8);
             text.resizeTextMaxSize = fontSize;
             text.supportRichText = false;
             text.raycastTarget = false;
@@ -529,8 +529,8 @@ namespace HwigiTower.UI
             choiceContainer.anchorMin = new Vector2(0.08f, 0f);
             choiceContainer.anchorMax = new Vector2(0.92f, 0f);
             choiceContainer.pivot = new Vector2(0.5f, 0f);
-            choiceContainer.sizeDelta = new Vector2(0f, 324f);
-            choiceContainer.anchoredPosition = new Vector2(0f, 72f);
+            choiceContainer.sizeDelta = new Vector2(0f, 408f);
+            choiceContainer.anchoredPosition = new Vector2(0f, 52f);
         }
 
         private void EnsureResultText()
@@ -547,20 +547,20 @@ namespace HwigiTower.UI
             rect.anchorMin = new Vector2(0.08f, 0f);
             rect.anchorMax = new Vector2(0.92f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
-            rect.sizeDelta = new Vector2(0f, 86f);
-            rect.anchoredPosition = new Vector2(0f, 420f);
+            rect.sizeDelta = new Vector2(0f, 132f);
+            rect.anchoredPosition = new Vector2(0f, 470f);
 
             resultText = resultObject.AddComponent<Text>();
             resultText.font = ResolveFont();
-            resultText.fontSize = 22;
+            resultText.fontSize = 28;
             resultText.alignment = TextAnchor.MiddleCenter;
             resultText.horizontalOverflow = HorizontalWrapMode.Wrap;
             resultText.verticalOverflow = VerticalWrapMode.Truncate;
             resultText.resizeTextForBestFit = true;
-            resultText.resizeTextMinSize = 14;
-            resultText.resizeTextMaxSize = 22;
+            resultText.resizeTextMinSize = 20;
+            resultText.resizeTextMaxSize = 28;
             resultText.supportRichText = false;
-            resultText.color = new Color(0.72f, 0.78f, 0.82f, 1f);
+            resultText.color = new Color(0.88f, 0.93f, 0.95f, 1f);
             NormalizeLayout();
         }
 
@@ -571,7 +571,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            routeText = CreateHudText("Demo Route Text", new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -300f), new Vector2(0f, 82f), 20, TextAnchor.UpperCenter, new Color(0.70f, 0.76f, 0.82f, 1f));
+            routeText = CreateHudText("Demo Route Text", new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -330f), new Vector2(0f, 112f), 28, TextAnchor.UpperCenter, new Color(0.88f, 0.94f, 0.98f, 1f));
         }
 
         private void EnsureMemoryText()
@@ -581,7 +581,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            memoryText = CreateHudText("Memory Combat Text", new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 584f), new Vector2(0f, 112f), 20, TextAnchor.MiddleCenter, new Color(0.66f, 0.73f, 0.78f, 1f));
+            memoryText = CreateHudText("Memory Combat Text", new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 650f), new Vector2(0f, 132f), 24, TextAnchor.MiddleCenter, new Color(0.82f, 0.89f, 0.92f, 1f));
         }
 
         private void EnsureDemoCompleteText()
@@ -591,7 +591,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            demoCompleteText = CreateHudText("Demo Complete Text", new Vector2(0.12f, 0.5f), new Vector2(0.88f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(0f, 120f), 32, TextAnchor.MiddleCenter, new Color(0.88f, 0.92f, 0.78f, 1f));
+            demoCompleteText = CreateHudText("Demo Complete Text", new Vector2(0.12f, 0.5f), new Vector2(0.88f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(0f, 150f), 42, TextAnchor.MiddleCenter, new Color(0.94f, 0.98f, 0.82f, 1f));
         }
 
         private void ApplyPortrait()
@@ -667,24 +667,24 @@ namespace HwigiTower.UI
             combatPanel.anchorMin = new Vector2(0.34f, 0f);
             combatPanel.anchorMax = new Vector2(0.94f, 0f);
             combatPanel.pivot = new Vector2(0.5f, 0f);
-            combatPanel.anchoredPosition = new Vector2(0f, 728f);
-            combatPanel.sizeDelta = new Vector2(0f, 310f);
+            combatPanel.anchoredPosition = new Vector2(0f, 705f);
+            combatPanel.sizeDelta = new Vector2(0f, 380f);
 
             var image = panelObject.AddComponent<Image>();
-            image.color = new Color(0.08f, 0.10f, 0.12f, 0.88f);
+            image.color = new Color(0.05f, 0.065f, 0.08f, 0.94f);
 
             combatEnemyImage = CreateCombatImage(panelObject.transform, "Combat Enemy Image", new Vector2(0.02f, 0.36f), new Vector2(0.30f, 0.92f));
-            combatText = CreateHudText("Combat Status Text", new Vector2(0.33f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(-24f, 122f), 20, TextAnchor.UpperLeft, new Color(0.78f, 0.84f, 0.86f, 1f));
+            combatText = CreateHudText("Combat Status Text", new Vector2(0.33f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -14f), new Vector2(-24f, 172f), 28, TextAnchor.UpperLeft, new Color(0.90f, 0.95f, 0.96f, 1f));
             combatText.transform.SetParent(panelObject.transform, false);
             var combatTextRect = combatText.GetComponent<RectTransform>();
             combatTextRect.anchorMin = new Vector2(0.33f, 1f);
             combatTextRect.anchorMax = new Vector2(1f, 1f);
             combatTextRect.pivot = new Vector2(0.5f, 1f);
-            combatTextRect.anchoredPosition = new Vector2(0f, -12f);
-            combatTextRect.sizeDelta = new Vector2(-24f, 122f);
+            combatTextRect.anchoredPosition = new Vector2(0f, -14f);
+            combatTextRect.sizeDelta = new Vector2(-24f, 172f);
 
-            enemyHpFill = CreateHpBar(panelObject.transform, "Enemy HP Bar", new Vector2(0.34f, 0.53f), new Vector2(0.94f, 0.60f), new Color(0.76f, 0.22f, 0.22f, 1f));
-            playerHpFill = CreateHpBar(panelObject.transform, "Player HP Bar", new Vector2(0.34f, 0.40f), new Vector2(0.94f, 0.47f), new Color(0.28f, 0.68f, 0.46f, 1f));
+            enemyHpFill = CreateHpBar(panelObject.transform, "Enemy HP Bar", new Vector2(0.34f, 0.47f), new Vector2(0.94f, 0.55f), new Color(0.84f, 0.24f, 0.24f, 1f));
+            playerHpFill = CreateHpBar(panelObject.transform, "Player HP Bar", new Vector2(0.34f, 0.34f), new Vector2(0.94f, 0.42f), new Color(0.30f, 0.78f, 0.50f, 1f));
 
             attackButton = CreateCombatButton(panelObject.transform, "Combat Button Attack", "공격", new Vector2(0.17f, 0f), CombatAction.Attack);
             defendButton = CreateCombatButton(panelObject.transform, "Combat Button Defend", "방어", new Vector2(0.50f, 0f), CombatAction.Defend);
@@ -753,11 +753,11 @@ namespace HwigiTower.UI
             rect.anchorMin = anchor;
             rect.anchorMax = anchor;
             rect.pivot = new Vector2(0.5f, 0f);
-            rect.anchoredPosition = new Vector2(0f, 18f);
-            rect.sizeDelta = new Vector2(150f, 64f);
+            rect.anchoredPosition = new Vector2(0f, 20f);
+            rect.sizeDelta = new Vector2(170f, 82f);
 
             var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.18f, 0.22f, 0.26f, 0.96f);
+            image.color = new Color(0.13f, 0.18f, 0.22f, 0.98f);
 
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
@@ -773,12 +773,13 @@ namespace HwigiTower.UI
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 22;
+            label.fontSize = 30;
             label.alignment = TextAnchor.MiddleCenter;
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 14;
-            label.resizeTextMaxSize = 22;
-            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.resizeTextMinSize = 22;
+            label.resizeTextMaxSize = 30;
+            label.raycastTarget = false;
+            label.color = new Color(0.94f, 0.97f, 0.98f, 1f);
             label.text = labelText;
             return button;
         }
@@ -798,10 +799,10 @@ namespace HwigiTower.UI
             rect.anchorMax = new Vector2(0.72f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
             rect.anchoredPosition = new Vector2(0f, 218f);
-            rect.sizeDelta = new Vector2(0f, 76f);
+            rect.sizeDelta = new Vector2(0f, 104f);
 
             var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.20f, 0.24f, 0.28f, 0.96f);
+            image.color = new Color(0.12f, 0.17f, 0.21f, 0.98f);
 
             nextFloorButton = buttonObject.AddComponent<Button>();
             nextFloorButton.targetGraphic = image;
@@ -812,17 +813,18 @@ namespace HwigiTower.UI
             var labelRect = labelObject.AddComponent<RectTransform>();
             labelRect.anchorMin = Vector2.zero;
             labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = new Vector2(12f, 4f);
-            labelRect.offsetMax = new Vector2(-12f, -4f);
+            labelRect.offsetMin = new Vector2(16f, 8f);
+            labelRect.offsetMax = new Vector2(-16f, -8f);
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 24;
+            label.fontSize = 32;
             label.alignment = TextAnchor.MiddleCenter;
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 14;
-            label.resizeTextMaxSize = 24;
-            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.resizeTextMinSize = 24;
+            label.resizeTextMaxSize = 32;
+            label.raycastTarget = false;
+            label.color = new Color(0.95f, 0.98f, 0.99f, 1f);
             label.text = "다음 층";
             buttonObject.SetActive(false);
         }
@@ -854,10 +856,10 @@ namespace HwigiTower.UI
             rect.anchorMax = new Vector2(0.72f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
             rect.anchoredPosition = new Vector2(0f, 218f);
-            rect.sizeDelta = new Vector2(0f, 76f);
+            rect.sizeDelta = new Vector2(0f, 104f);
 
             var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.18f, 0.23f, 0.27f, 0.96f);
+            image.color = new Color(0.10f, 0.16f, 0.20f, 0.98f);
 
             routeActionButton = buttonObject.AddComponent<Button>();
             routeActionButton.targetGraphic = image;
@@ -868,18 +870,18 @@ namespace HwigiTower.UI
             var labelRect = labelObject.AddComponent<RectTransform>();
             labelRect.anchorMin = Vector2.zero;
             labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = new Vector2(12f, 4f);
-            labelRect.offsetMax = new Vector2(-12f, -4f);
+            labelRect.offsetMin = new Vector2(16f, 8f);
+            labelRect.offsetMax = new Vector2(-16f, -8f);
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 24;
+            label.fontSize = 32;
             label.alignment = TextAnchor.MiddleCenter;
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 14;
-            label.resizeTextMaxSize = 24;
+            label.resizeTextMinSize = 24;
+            label.resizeTextMaxSize = 32;
             label.raycastTarget = false;
-            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.color = new Color(0.95f, 0.98f, 0.99f, 1f);
             label.text = "진행";
             buttonObject.SetActive(false);
         }
@@ -918,10 +920,10 @@ namespace HwigiTower.UI
             rect.anchorMax = new Vector2(0.72f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
             rect.anchoredPosition = new Vector2(0f, 218f);
-            rect.sizeDelta = new Vector2(0f, 76f);
+            rect.sizeDelta = new Vector2(0f, 104f);
 
             var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.20f, 0.24f, 0.28f, 0.96f);
+            image.color = new Color(0.12f, 0.17f, 0.21f, 0.98f);
 
             restartButton = buttonObject.AddComponent<Button>();
             restartButton.targetGraphic = image;
@@ -932,17 +934,18 @@ namespace HwigiTower.UI
             var labelRect = labelObject.AddComponent<RectTransform>();
             labelRect.anchorMin = Vector2.zero;
             labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = new Vector2(12f, 4f);
-            labelRect.offsetMax = new Vector2(-12f, -4f);
+            labelRect.offsetMin = new Vector2(16f, 8f);
+            labelRect.offsetMax = new Vector2(-16f, -8f);
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 24;
+            label.fontSize = 32;
             label.alignment = TextAnchor.MiddleCenter;
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 14;
-            label.resizeTextMaxSize = 24;
-            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.resizeTextMinSize = 24;
+            label.resizeTextMaxSize = 32;
+            label.raycastTarget = false;
+            label.color = new Color(0.95f, 0.98f, 0.99f, 1f);
             label.text = "다시 시작";
             buttonObject.SetActive(false);
         }
@@ -963,12 +966,12 @@ namespace HwigiTower.UI
         {
             if (endingRestButton == null)
             {
-                endingRestButton = CreateEndingButton("Ending Button Rest", showRawDebugText ? "PLACEHOLDER_ENDING_REST" : "안식", new Vector2(-170f, 218f), ResolveEndingRest);
+                endingRestButton = CreateEndingButton("Ending Button Rest", showRawDebugText ? "PLACEHOLDER_ENDING_REST" : "안식", new Vector2(-205f, 218f), ResolveEndingRest);
             }
 
             if (endingContinueButton == null)
             {
-                endingContinueButton = CreateEndingButton("Ending Button Continue", showRawDebugText ? "PLACEHOLDER_ENDING_CONTINUE" : "동행 계속", new Vector2(170f, 218f), ResolveEndingContinue);
+                endingContinueButton = CreateEndingButton("Ending Button Continue", showRawDebugText ? "PLACEHOLDER_ENDING_CONTINUE" : "동행 계속", new Vector2(205f, 218f), ResolveEndingContinue);
             }
         }
 
@@ -982,10 +985,10 @@ namespace HwigiTower.UI
             rect.anchorMax = new Vector2(0.5f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
             rect.anchoredPosition = anchoredPosition;
-            rect.sizeDelta = new Vector2(300f, 76f);
+            rect.sizeDelta = new Vector2(370f, 104f);
 
             var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.18f, 0.22f, 0.26f, 0.96f);
+            image.color = new Color(0.11f, 0.15f, 0.19f, 0.98f);
 
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
@@ -996,17 +999,18 @@ namespace HwigiTower.UI
             var labelRect = labelObject.AddComponent<RectTransform>();
             labelRect.anchorMin = Vector2.zero;
             labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = new Vector2(10f, 4f);
-            labelRect.offsetMax = new Vector2(-10f, -4f);
+            labelRect.offsetMin = new Vector2(16f, 8f);
+            labelRect.offsetMax = new Vector2(-16f, -8f);
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 18;
+            label.fontSize = 30;
             label.alignment = TextAnchor.MiddleCenter;
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 10;
-            label.resizeTextMaxSize = 18;
-            label.color = new Color(0.88f, 0.92f, 0.94f, 1f);
+            label.resizeTextMinSize = 22;
+            label.resizeTextMaxSize = 30;
+            label.raycastTarget = false;
+            label.color = new Color(0.95f, 0.98f, 0.99f, 1f);
             label.text = labelText;
             buttonObject.SetActive(false);
             return button;
@@ -1158,7 +1162,7 @@ namespace HwigiTower.UI
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Truncate;
             text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 13;
+            text.resizeTextMinSize = Mathf.Max(18, fontSize - 8);
             text.resizeTextMaxSize = fontSize;
             text.supportRichText = false;
             text.raycastTarget = false;

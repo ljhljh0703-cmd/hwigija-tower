@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 11:30 — Hands-on HUD readability blocker polish
+- **Phase**: W2-2
+- **Done**:
+  - 사용자 손플레이 QA에서 전투/보스 도달/ending.continue는 확인됐지만 ending.rest와 UI 식별성은 미확정 blocker로 기록
+  - `PrototypeHud`의 기본 플레이 UI 텍스트, 선택지, 진행/다음층/재시작/엔딩 버튼, 전투 패널 크기와 대비를 상향
+  - 공통 HUD text best-fit 하한을 올려 public UI가 지나치게 작은 글씨로 축소되지 않도록 조정
+  - fresh EditMode/PlayMode로 Floor 1→5 route 및 ending smoke 회귀 확인
+- **Files**: 변경/추가 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: ending.rest는 아직 사용자 손플레이로 미확인. 실제 Mac Editor 화면에서 새 가독성 패스 체감 확인 필요.
+- **Next**: Unity Editor에서 ending.rest까지 직접 확인하고, 남은 UI 조악함은 Screen Layer v2로 별도 정리
+- **Agent**: Codex
+
 ### 2026-05-09 18:30 — Mac Editor hands-on input QA blocker
 - **Phase**: W2-2
 - **Done**:
