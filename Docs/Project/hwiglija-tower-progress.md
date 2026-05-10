@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 22:07 — Mataios rest interaction flow
+- **Phase**: W2-2
+- **Done**:
+  - branching map Rest node를 HP 회복 즉시 처리에서 Mataios interaction panel 흐름으로 전환
+  - `rest.ask_mood`, `rest.train`, `rest.recover` action을 deterministic LLM/fallback 호출, temporary response, 1회 commit guard에 연결
+  - Ask Mood affinity/utterance reflection, Train next-combat damage +1 one-shot buff, Recover HP restore/internal Glitch decrease를 구현
+  - normal HUD에서 Glitch/raw provider/cache internals를 숨기고 Rest input/submit/continue UI와 PlayMode smoke를 추가
+  - Rest interaction template/content docs 4개를 추가
+- **Files**: 변경/추가 10개 (PrototypeRunState.cs, PrototypeHud.cs, PrototypeRoomController.cs, RuntimeShellTests.cs, PrototypeRoomSmokeTests.cs, Docs/Content/RestInteractions/**, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: Mac Editor 수동 QA에서 Rest input UX, mobile keyboard focus, Mataios temporary response replacement points를 확인
+- **Agent**: Codex
+
 ### 2026-05-10 21:36 — Branching map event and enemy art binding
 - **Phase**: W2-2
 - **Done**:

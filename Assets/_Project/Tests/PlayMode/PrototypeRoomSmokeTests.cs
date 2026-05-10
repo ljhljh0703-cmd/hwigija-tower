@@ -163,9 +163,11 @@ namespace HwigiTower.Tests.PlayMode
             hud.ShowRunState(controller.GetSnapshot());
             controller.RunState.ModifyPlayerHp(-8);
             var hpBeforeRest = controller.RunState.PlayerHp;
-            yield return ResolveRouteChoice(controller, hud, restNode, "ENC_REST_01", "CHOICE_REST_01_REST");
+            yield return ResolveRouteActionRest(hud, "ENC_REST_01", "rest.recover", string.Empty);
 
             Assert.Greater(controller.RunState.PlayerHp, hpBeforeRest);
+            Assert.IsFalse(hud.RestInteractionPanelVisible);
+            StringAssert.Contains("임시 응답", hud.RestResponseMessage);
             StringAssert.DoesNotContain("Glitch", hud.RunStateMessage);
             StringAssert.DoesNotContain("Glitch", hud.ResultMessage);
         }
@@ -261,14 +263,14 @@ namespace HwigiTower.Tests.PlayMode
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return ResolveNextFloorButton(hud);
 
-            yield return ResolveRouteActionChoice(hud, "ENC_REST_01", "CHOICE_REST_01_REST");
+            yield return ResolveRouteActionRest(hud, "ENC_REST_01", "rest.train", "다음 싸움을 준비하자");
             yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
             yield return ResolveRouteActionChoice(hud, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return ResolveNextFloorButton(hud);
 
             yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
-            yield return ResolveRouteActionChoice(hud, "ENC_REST_05", "CHOICE_REST_05_REST");
+            yield return ResolveRouteActionRest(hud, "ENC_REST_05", "rest.recover", string.Empty);
             yield return ResolveRouteActionChoice(hud, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
             hud.ShowRunState(controller.GetSnapshot());
@@ -495,6 +497,43 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(button, "Missing " + choiceStableId + " among " + DescribeChoiceButtons(hud));
             Assert.IsTrue(button.interactable, "Disabled " + choiceStableId + " among " + DescribeChoiceButtons(hud));
             button.onClick.Invoke();
+            yield return null;
+        }
+
+        private static IEnumerator ResolveRouteActionRest(PrototypeHud hud, string expectedEncounterId, string actionId, string utterance)
+        {
+            Assert.IsTrue(hud.RouteActionButtonVisible, "Route action should be visible before " + expectedEncounterId);
+            hud.GetRouteActionButton().onClick.Invoke();
+            yield return null;
+
+            var mapButton = FindMapChoiceButton(hud, expectedEncounterId);
+            if (mapButton != null)
+            {
+                mapButton.onClick.Invoke();
+                yield return null;
+            }
+
+            Assert.IsTrue(hud.RestInteractionPanelVisible, "Rest interaction panel should open for " + expectedEncounterId);
+            var actionButton = hud.GetRestActionButton(actionId);
+            Assert.IsNotNull(actionButton);
+            Assert.IsTrue(actionButton.interactable);
+            actionButton.onClick.Invoke();
+            yield return null;
+
+            var input = hud.GetRestInputField();
+            Assert.IsNotNull(input);
+            input.text = utterance;
+            var submit = hud.GetRestSubmitButton();
+            Assert.IsNotNull(submit);
+            Assert.IsTrue(submit.interactable);
+            submit.onClick.Invoke();
+            yield return null;
+
+            StringAssert.Contains("임시 응답", hud.RestResponseMessage);
+            var continueButton = hud.GetRestContinueButton();
+            Assert.IsNotNull(continueButton);
+            Assert.IsTrue(continueButton.gameObject.activeInHierarchy);
+            continueButton.onClick.Invoke();
             yield return null;
         }
 

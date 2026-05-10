@@ -90,6 +90,11 @@ namespace HwigiTower.Run
         private bool _lastCombatEnemyDefeated;
         private int _lastCombatComboDamage;
         private int _crackedJarBuffCombats;
+        private bool _trainingBuffActive;
+        private string _pendingRestNodeId = string.Empty;
+        private string _selectedRestActionId = string.Empty;
+        private string _lastRestUtterance = string.Empty;
+        private string _lastMataiosResponse = string.Empty;
         private string _lastNpcReactionKey = string.Empty;
 
         public PrototypeRunState(string runId, GameFlowEventBus eventBus)
@@ -155,6 +160,11 @@ namespace HwigiTower.Run
         public string LastCombatEnemyId => _lastCombatEnemyId;
         public string LastCombatResultId => _lastCombatResultId;
         public string LastNpcReactionKey => _lastNpcReactionKey;
+        public bool TrainingBuffActive => _trainingBuffActive;
+        public string PendingRestNodeId => _pendingRestNodeId;
+        public string SelectedRestActionId => _selectedRestActionId;
+        public string LastRestUtterance => _lastRestUtterance;
+        public string LastMataiosResponse => _lastMataiosResponse;
 
         public PrototypeRunSnapshot CreateSnapshot()
         {
@@ -700,6 +710,52 @@ namespace HwigiTower.Run
             return new PrototypeEncounterChoiceResolution(choiceStableId, true, "rest complete: HP restored | Glitch -3 | " + recall);
         }
 
+        public PrototypeNodeResolution ResolveRestInteraction(string nodeId, string encounterId, string actionId, string utterance)
+        {
+            var resolvedNodeId = GetResolvedChoiceNodeId(nodeId);
+            if (TryGetResolvedEncounterChoice(resolvedNodeId, encounterId, out var resolvedActionId))
+            {
+                return new PrototypeNodeResolution(nodeId, resolvedActionId, "already resolved: " + resolvedActionId, _runCompleted);
+            }
+
+            if (_runCompleted)
+            {
+                return new PrototypeNodeResolution(nodeId, encounterId, "run already completed", true);
+            }
+
+            var normalizedActionId = NormalizeRestActionId(actionId);
+            if (string.IsNullOrEmpty(normalizedActionId))
+            {
+                return new PrototypeNodeResolution(nodeId, encounterId, "rest action unavailable", false);
+            }
+
+            var normalizedUtterance = utterance == null ? string.Empty : utterance.Trim();
+            if (RestActionRequiresInput(normalizedActionId) && string.IsNullOrEmpty(normalizedUtterance))
+            {
+                _pendingRestNodeId = nodeId ?? string.Empty;
+                _selectedRestActionId = normalizedActionId;
+                return new PrototypeNodeResolution(nodeId, normalizedActionId, "input required", false);
+            }
+
+            _pendingRestNodeId = nodeId ?? string.Empty;
+            _selectedRestActionId = normalizedActionId;
+            _lastRestUtterance = normalizedUtterance;
+            var promptProfileId = normalizedActionId;
+            var prompt = "profile=" + promptProfileId + "\naction=" + normalizedActionId + "\nplayer=" + normalizedUtterance;
+            var request = new LLMRequest(RunId, prompt, promptProfileId);
+            LLMProvider.TryComplete(request, out _);
+            _lastMataiosResponse = BuildTemporaryRestResponse(normalizedActionId);
+
+            var message = ApplyRestInteractionEffect(normalizedActionId);
+            MarkEncounterChoiceResolved(resolvedNodeId, encounterId, normalizedActionId);
+            NodesResolved++;
+            UpdateDemoProgression(nodeId, encounterId, true);
+            MemoryRepo.SaveReflection(new RunReflection(RunId + ".rest." + NodesResolved, request.CacheKey.PromptHash, BuildRestReflectionSummary(normalizedActionId, normalizedUtterance)));
+            SetNpcReaction("NPC_REACT_REST");
+            _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, normalizedActionId));
+            return new PrototypeNodeResolution(nodeId, normalizedActionId, message + " | Mataios response ready", _runCompleted);
+        }
+
         public PrototypeNodeResolution ResolveShop(string nodeId, AbilityData grantedAbility, IReadOnlyList<SynergyData> trackedSynergies)
         {
             if (_runCompleted)
@@ -887,6 +943,15 @@ namespace HwigiTower.Run
                 }
             }
 
+            var trainingBonus = 0;
+            if (_trainingBuffActive && result.PlayerDamage > 0)
+            {
+                trainingBonus = 1;
+                _activeCombatEnemy.ApplyDamage(trainingBonus);
+                _trainingBuffActive = false;
+                SetFlag("MATAIOS_TRAINING_BUFF_ACTIVE", false);
+            }
+
             _lastCombatComboDamage = result.ComboDamage;
             _lastCombatRoundResult =
                 "round " + _combatRound +
@@ -896,6 +961,7 @@ namespace HwigiTower.Run
                 " | enemyHp " + enemyHpBefore + "->" + _activeCombatEnemy.Hp +
                 " | playerHp " + playerHpBefore + "->" + _activeCombatPlayer.Hp +
                 (crackedJarBonus > 0 ? " | cracked jar +" + crackedJarBonus : string.Empty) +
+                (trainingBonus > 0 ? " | training +" + trainingBonus : string.Empty) +
                 (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty);
 
             if (action == CombatAction.Skill)
@@ -1126,6 +1192,73 @@ namespace HwigiTower.Run
             }
 
             return total;
+        }
+
+        private string ApplyRestInteractionEffect(string actionId)
+        {
+            if (actionId == "rest.ask_mood")
+            {
+                ModifyAffinity(2);
+                SetFlag("MATAIOS_HINT_S1_01", true);
+                ApplyNpcTrigger("rest.ask_mood");
+                return "rest ask mood complete | Affinity +2";
+            }
+
+            if (actionId == "rest.train")
+            {
+                _trainingBuffActive = true;
+                SetFlag("MATAIOS_TRAINING_BUFF_ACTIVE", true);
+                ApplyNpcTrigger("rest.train");
+                return "rest training complete | training buff +1 next combat";
+            }
+
+            _playerHp = _playerMaxHp;
+            ModifyGlitchLevel(-3);
+            ApplyNpcTrigger("rest.recover");
+            return "rest recover complete | HP restored | Glitch -3";
+        }
+
+        private static string NormalizeRestActionId(string actionId)
+        {
+            if (string.IsNullOrEmpty(actionId))
+            {
+                return string.Empty;
+            }
+
+            switch (actionId)
+            {
+                case "rest.ask_mood":
+                case "rest.train":
+                case "rest.recover":
+                    return actionId;
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static bool RestActionRequiresInput(string actionId)
+        {
+            return actionId == "rest.ask_mood" || actionId == "rest.train";
+        }
+
+        private static string BuildTemporaryRestResponse(string actionId)
+        {
+            switch (actionId)
+            {
+                case "rest.ask_mood":
+                    return "임시 응답: 상태를 확인했다.";
+                case "rest.train":
+                    return "임시 응답: 다음 전투를 준비했다.";
+                case "rest.recover":
+                    return "임시 응답: 잠시 호흡을 고른다.";
+                default:
+                    return "임시 응답";
+            }
+        }
+
+        private static string BuildRestReflectionSummary(string actionId, string utterance)
+        {
+            return "restAction=" + actionId + ";utterance=" + (utterance ?? string.Empty);
         }
 
         private void ApplyRewardBundle(HwigiTower.Rewards.RewardBundleData rewardBundle)
