@@ -253,7 +253,7 @@ namespace HwigiTower.Tests.PlayMode
             attackButton.onClick.Invoke();
             yield return null;
             Assert.Less(controller.GetSnapshot().EnemyHp, beforeEnemyHp);
-            StringAssert.Contains("공격: 피해", hud.CombatMessage);
+            StringAssert.Contains("공격: 적 피해", hud.CombatMessage);
 
             var hpBeforeDefend = controller.GetSnapshot().PlayerHp;
             defendButton.onClick.Invoke();
@@ -890,6 +890,13 @@ namespace HwigiTower.Tests.PlayMode
                 yield return null;
                 waitForCombatInput++;
             }
+
+            Assert.IsTrue(skillButton.interactable);
+            StringAssert.Contains("정찰 기술", ReadButtonText(skillButton));
+            skillButton.onClick.Invoke();
+            yield return null;
+            StringAssert.Contains("정찰 기술", hud.CombatMessage);
+            StringAssert.Contains("콤보 피해", hud.CombatMessage);
 
             var guard = 0;
             while (controller.RunState.IsInCombat && guard < 20)

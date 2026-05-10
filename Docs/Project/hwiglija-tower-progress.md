@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 13:26 — Combat readability and decision feedback
+- **Phase**: W2-2
+- **Done**:
+  - Attack/Defend/Skill 라운드 결과에 적/플레이어 HP 변화, 선택 행동, 방어/정찰/콤보 결과를 명시
+  - Skill을 `ABILITY_SCOUT` 전용 의미 선택지로 고정하고 미보유 시 버튼/피드백에서 정찰 필요를 표시
+  - Bandage 전투 시작 회복과 Recall Anchor 1회 개입 가능성을 combat panel에 노출
+  - final boss prepared-player 3-6턴 승리 sanity와 Scout skill/Recall smoke를 테스트로 보강
+- **Files**: 변경/추가 7개 (PrototypeRunState.cs, PrototypeRoomController.cs, PrototypeHud.cs, combat 관련 테스트, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Next**: Mac Editor 손플레이에서 Attack/Defend/Scout Skill 선택 이유가 실제로 읽히는지 확인하고, 필요하면 전투 패널 레이아웃을 Screen Layer v2로 분리
+- **Agent**: Codex
+
 ### 2026-05-10 12:25 — Player-facing vertical slice flow polish
 - **Phase**: W2-2
 - **Done**:

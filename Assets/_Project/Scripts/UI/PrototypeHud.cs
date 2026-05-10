@@ -1414,8 +1414,9 @@ namespace HwigiTower.UI
 
             if (skillButton != null)
             {
-                skillButton.interactable = canAct && snapshot.AbilityCount > 0;
-                SetButtonLabel(skillButton, snapshot.AbilityCount > 0 ? "기술" : "기술 없음");
+                var scoutSkillReady = HasScoutSkill(snapshot);
+                skillButton.interactable = canAct && scoutSkillReady;
+                SetButtonLabel(skillButton, scoutSkillReady ? "정찰 기술" : "기술 없음");
             }
         }
 
@@ -1843,7 +1844,7 @@ namespace HwigiTower.UI
             return string.IsNullOrEmpty(snapshot.LastCombatResultId) ? "-" : PublicCombatResultName(snapshot.LastCombatResultId);
         }
 
-        private static string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
+        private string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
             var text =
                 "전투\n" +
@@ -1851,10 +1852,20 @@ namespace HwigiTower.UI
                 "내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
                 "라운드 " + snapshot.CombatRound + "\n" +
                 BuildCombatFeedback(snapshot.LastCombatRoundResult) + "\n" +
-                (snapshot.AbilityCount > 0 ? "기술 사용 가능" : "기술 불가: 능력 필요");
+                (HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" : "기술 불가: 정찰 필요");
             if (snapshot.LastCombatComboDamage > 0)
             {
                 text += "\n콤보 피해 " + snapshot.LastCombatComboDamage;
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("bandage ", StringComparison.Ordinal))
+            {
+                text += "\n붕대: HP 회복 " + ExtractRoundNumber(snapshot.LastCombatRoundResult, "bandage ");
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("recall ready", StringComparison.Ordinal))
+            {
+                text += "\n회상 닻: 패배 1회 방지";
             }
 
             return text;
@@ -1867,27 +1878,54 @@ namespace HwigiTower.UI
                 return "전투 준비";
             }
 
+            if (roundResult.Contains("skill unavailable", StringComparison.Ordinal))
+            {
+                return "기술 불가: 정찰 필요";
+            }
+
+            if (roundResult.Contains("recall anchor", StringComparison.Ordinal))
+            {
+                return "회상 닻: HP 회복 후 전투 지속";
+            }
+
             if (roundResult.Contains("ready", StringComparison.OrdinalIgnoreCase))
             {
-                return "전투 준비";
+                var ready = "전투 준비";
+                if (roundResult.Contains("scout ", StringComparison.Ordinal))
+                {
+                    ready += " | 정찰 공격 +" + ExtractRoundNumber(roundResult, "scout +").Trim();
+                }
+
+                return ready;
             }
 
             if (roundResult.Contains("Defend", StringComparison.Ordinal))
             {
-                return "방어: 피해 감소" + ExtractRoundNumber(roundResult, "enemyDamage ");
+                return "방어: 받은 피해 " + ExtractRoundNumber(roundResult, "enemyDamage ").Trim() + " | 피해 절반 감소";
             }
 
             if (roundResult.Contains("Attack", StringComparison.Ordinal))
             {
-                return "공격: 피해" + ExtractRoundNumber(roundResult, "playerDamage ");
+                return "공격: 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim();
             }
 
             if (roundResult.Contains("Skill", StringComparison.Ordinal))
             {
-                return "기술: 추가 공격" + ExtractRoundNumber(roundResult, "playerDamage ");
+                return "정찰 기술: 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim() +
+                    " + 추가 " + ExtractRoundNumber(roundResult, "combo ").Trim();
             }
 
             return "라운드 처리";
+        }
+
+        private bool HasScoutSkill(PrototypeRunSnapshot snapshot)
+        {
+            if (_roomController != null && _roomController.RunState != null)
+            {
+                return _roomController.RunState.HasAbilityRef("ABILITY_SCOUT");
+            }
+
+            return snapshot.AbilityCount > 0;
         }
 
         private static string ExtractRoundNumber(string source, string token)

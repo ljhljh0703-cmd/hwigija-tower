@@ -123,8 +123,8 @@ namespace HwigiTower.Tests.EditMode
 
             StringAssert.Contains("Floor 5", hud.RouteMessage);
             StringAssert.Contains("전투 중", hud.RouteMessage);
-            StringAssert.Contains("공격: 피해 6", hud.CombatMessage);
-            StringAssert.Contains("기술 사용 가능", hud.CombatMessage);
+            StringAssert.Contains("공격: 적 피해 6", hud.CombatMessage);
+            StringAssert.Contains("정찰 기술: 추가 공격", hud.CombatMessage);
             StringAssert.DoesNotContain("ENC_COMBAT_GATE_03", hud.RouteMessage);
         }
 
