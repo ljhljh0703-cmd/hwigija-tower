@@ -79,10 +79,12 @@ namespace HwigiTower.Tests.EditMode
             hud.ShowResultMessage("choice applied: CHOICE_SHOP_01_BUY_ITEM; effects=2; ignored=0 | Gold -5, item ITEM_FIELD_BANDAGE +1 | memory unlocked MEM_FRAGMENT_03 | stair unlocked");
 
             StringAssert.Contains("Gold -5", result.text);
-            StringAssert.Contains("ITEM_FIELD_BANDAGE +1", result.text);
-            StringAssert.Contains("MEM_FRAGMENT_03 unlocked", result.text);
-            StringAssert.Contains("Next floor ready", result.text);
+            StringAssert.Contains("아이템 획득: 붕대 +1", result.text);
+            StringAssert.Contains("기억 파편 해금", result.text);
+            StringAssert.Contains("다음 층 준비", result.text);
             StringAssert.DoesNotContain("choice applied", result.text);
+            StringAssert.DoesNotContain("ITEM_FIELD_BANDAGE", result.text);
+            StringAssert.DoesNotContain("MEM_FRAGMENT_03", result.text);
         }
 
         [Test]
@@ -122,7 +124,7 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("Floor 5", hud.RouteMessage);
             StringAssert.Contains("전투 중", hud.RouteMessage);
             StringAssert.Contains("공격: 피해 6", hud.CombatMessage);
-            StringAssert.Contains("Skill ready", hud.CombatMessage);
+            StringAssert.Contains("기술 사용 가능", hud.CombatMessage);
             StringAssert.DoesNotContain("ENC_COMBAT_GATE_03", hud.RouteMessage);
         }
 

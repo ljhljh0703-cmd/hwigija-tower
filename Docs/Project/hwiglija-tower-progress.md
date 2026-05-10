@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-10 12:25 — Player-facing vertical slice flow polish
+- **Phase**: W2-2
+- **Done**:
+  - normal mode route/result/combat/end-state labels에서 raw stableId/debug-like 문구 노출을 줄이고 debug toggle은 유지
+  - Floor 목표 표시를 현재 층, 현재 조우, 다음 행동 이유 중심으로 재작성
+  - shop/item/ability/memory/combat/floor/end 결과 요약을 player-facing 시스템 문구로 정리
+  - PlayMode smoke 기대값을 normal-mode public UI 기준으로 갱신
+- **Files**: 변경/추가 4개 (PrototypeHud.cs, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Next**: Mac Editor에서 초회 플레이어 관점으로 Floor 1→5→ending.rest/continue를 다시 손플레이하고, 남은 화면 조악함은 Screen Layer v2에서 레이아웃/타이포 구조로 분리
+- **Agent**: Codex
+
 ### 2026-05-10 11:30 — Hands-on HUD readability blocker polish
 - **Phase**: W2-2
 - **Done**:
