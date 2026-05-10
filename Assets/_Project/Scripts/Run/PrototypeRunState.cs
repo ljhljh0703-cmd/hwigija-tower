@@ -745,6 +745,14 @@ namespace HwigiTower.Run
                 return new CombatRoundResult(0, 0, _activeCombatPlayer?.IsDefeated ?? true, _activeCombatEnemy?.IsDefeated ?? true);
             }
 
+            if (action == CombatAction.Skill && !HasPlayableSkill())
+            {
+                _lastCombatRoundResult = "round " + _combatRound + " | action Skill | skill unavailable | scout required";
+                return new CombatRoundResult(0, 0, false, false);
+            }
+
+            var enemyHpBefore = _activeCombatEnemy.Hp;
+            var playerHpBefore = _activeCombatPlayer.Hp;
             var secondAction = action == CombatAction.Skill && HasPlayableSkill() ? (CombatAction?)CombatAction.Attack : null;
             var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action, secondAction);
             _combatRound++;
@@ -754,7 +762,24 @@ namespace HwigiTower.Run
                 " | action " + action +
                 " | playerDamage " + result.PlayerDamage +
                 " | enemyDamage " + result.EnemyDamage +
+                " | enemyHp " + enemyHpBefore + "->" + _activeCombatEnemy.Hp +
+                " | playerHp " + playerHpBefore + "->" + _activeCombatPlayer.Hp +
                 (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty);
+
+            if (action == CombatAction.Skill)
+            {
+                _lastCombatRoundResult += " | scout skill";
+            }
+
+            if (action == CombatAction.Defend)
+            {
+                _lastCombatRoundResult += " | defended";
+            }
+
+            if (HasAbilityRef("ABILITY_RECALL_ANCHOR") && !HasFlag("FLAG_RECALL_ANCHOR_USED"))
+            {
+                _lastCombatRoundResult += " | recall ready";
+            }
 
             if (action == CombatAction.Defend)
             {
@@ -846,8 +871,9 @@ namespace HwigiTower.Run
             }
 
             RecalculatePlayerStats();
+            var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData());
             var player = new CombatantState("player", _playerMaxHp, _playerAttack, _playerHp);
-            var combatStartRestore = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData()).CombatStartHpRestore;
+            var combatStartRestore = modifiers.CombatStartHpRestore;
             if (combatStartRestore > 0)
             {
                 player.RestoreHp(combatStartRestore);
@@ -865,7 +891,11 @@ namespace HwigiTower.Run
             _lastCombatId = combatId;
             _lastCombatEnemyId = enemy.Id;
             _lastCombatResultId = "started";
-            _lastCombatRoundResult = "round 0 | ready";
+            _lastCombatRoundResult = "round 0 | ready" +
+                (combatStartRestore > 0 ? " | bandage " + combatStartRestore : string.Empty) +
+                (modifiers.PlayerMaxHpBonus > 0 ? " | maxHp +" + modifiers.PlayerMaxHpBonus : string.Empty) +
+                (HasAbilityRef("ABILITY_SCOUT") ? " | scout +" + modifiers.PlayerAttackBonus : string.Empty) +
+                (HasAbilityRef("ABILITY_RECALL_ANCHOR") && !HasFlag("FLAG_RECALL_ANCHOR_USED") ? " | recall ready" : string.Empty);
             _combatRound = 0;
             _lastCombatGoldReward = 0;
             _lastCombatGlitchDelta = 0;
@@ -1040,7 +1070,7 @@ namespace HwigiTower.Run
 
         private bool HasPlayableSkill()
         {
-            return Abilities.Abilities.Count > 0 || _abilityRefs.Count > 0;
+            return HasAbilityRef("ABILITY_SCOUT");
         }
 
         private bool TryApplyRecallAnchor()

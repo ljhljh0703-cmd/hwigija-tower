@@ -350,6 +350,7 @@ namespace HwigiTower.Run
             var message =
                 "combat " + snapshot.LastCombatResultId +
                 " | round " + snapshot.CombatRound +
+                " | action " + action +
                 " | player HP " + hpBefore + " -> " + snapshot.PlayerHp +
                 " | enemy " + snapshot.LastCombatEnemyId + " " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp +
                 " | playerDamage " + round.PlayerDamage +

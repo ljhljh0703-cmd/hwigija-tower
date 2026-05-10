@@ -752,6 +752,68 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void CombatSkill_RequiresScoutAndCreatesReadableCombo()
+        {
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset");
+            var node = CreateNode("node.skill.readable", encounter);
+            var withoutScout = new PrototypeRunState("run-skill-without-scout", new GameFlowEventBus()) { AutoResolveCombat = false };
+            withoutScout.AttachEncounterCatalog(EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog);
+            withoutScout.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
+            withoutScout.ResolveEncounterChoice(new DeterministicRunContext("run-skill-without-scout", 1001), node.NodeId, encounter, "CHOICE_COMBAT_03_ENGAGE");
+
+            var blocked = withoutScout.ResolveCombatRoundInteractive(CombatAction.Skill);
+
+            Assert.AreEqual(0, blocked.PlayerDamage);
+            Assert.AreEqual(0, blocked.ComboDamage);
+            StringAssert.Contains("skill unavailable", withoutScout.CreateSnapshot().LastCombatRoundResult);
+
+            var withScout = new PrototypeRunState("run-skill-with-scout", new GameFlowEventBus()) { AutoResolveCombat = false };
+            withScout.AttachEncounterCatalog(EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog);
+            withScout.AddAbilityRef("ABILITY_SCOUT");
+            withScout.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
+            withScout.ResolveEncounterChoice(new DeterministicRunContext("run-skill-with-scout", 1001), node.NodeId, encounter, "CHOICE_COMBAT_03_ENGAGE");
+
+            var skill = withScout.ResolveCombatRoundInteractive(CombatAction.Skill);
+
+            Assert.Greater(skill.PlayerDamage, 0);
+            Assert.Greater(skill.ComboDamage, 0);
+            StringAssert.Contains("scout skill", withScout.CreateSnapshot().LastCombatRoundResult);
+        }
+
+        [Test]
+        public void FinalBoss_PreparedPlayerWinsInThreeToSixMeaningfulTurns()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset");
+            var node = CreateNode("node.final.boss.balance", encounter);
+            var state = new PrototypeRunState("run-final-boss-balance", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AddItemRef("ITEM_FIELD_BANDAGE", 2);
+            state.AddAbilityRef("ABILITY_SCOUT");
+            state.AddAbilityRef("ABILITY_RECALL_ANCHOR");
+            state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
+            state.ModifyPlayerHp(-8);
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-final-boss-balance", 1001), node.NodeId, encounter, "CHOICE_COMBAT_03_ENGAGE");
+            StringAssert.Contains("bandage", state.CreateSnapshot().LastCombatRoundResult);
+            StringAssert.Contains("scout", state.CreateSnapshot().LastCombatRoundResult);
+            StringAssert.Contains("recall ready", state.CreateSnapshot().LastCombatRoundResult);
+
+            var turns = 0;
+            while (state.IsInCombat && turns < 6)
+            {
+                state.ResolveCombatRoundInteractive(turns == 0 ? CombatAction.Skill : CombatAction.Attack);
+                turns++;
+            }
+
+            Assert.IsFalse(state.IsInCombat);
+            Assert.IsTrue(state.RunClear);
+            Assert.IsTrue(state.EndingChoicePending);
+            Assert.GreaterOrEqual(turns, 3);
+            Assert.LessOrEqual(turns, 6);
+        }
+
+        [Test]
         public void FinalBossVictory_OpensEndingChoiceOnce()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
