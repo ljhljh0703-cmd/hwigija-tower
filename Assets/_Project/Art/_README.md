@@ -12,7 +12,7 @@ Place visual source imports here before wiring them into scenes or prefabs.
 - `VFX/`: sprite sheets or source textures for visual effects.
 
 Keep generated/source files named by role first, then variant:
-`char_mataios_bust_s0_s2`, `enc_shop_01_bg`, `enemy_fracture_hound_demo`.
+`char_mataios_bust_s0_s2`, `enc_shop_01_bg`, `enemy_fracture_hound`.
 
 Current W2 demo intake slots:
 
@@ -23,4 +23,4 @@ Current W2 demo intake slots:
 - `Encounters/enc_combat_gate_01_bg.png`
 - `Encounters/demo_complete_bg.png`
 - `Characters/char_mataios_bust_s0_s2.png`
-- `Enemies/enemy_fracture_hound_demo.png`
+- `Enemies/enemy_fracture_hound.png`

@@ -13,7 +13,7 @@ This document is a handoff index only. It does not define final lore or final en
 | 1 | ENEMY_SLIME_POOL_01 | 슬라임 무리 | elite | 층 1 엘리트 생물형 적 | enemy_slime_pool_01.png | ready | jar elite fallback에도 사용 가능 |
 | 1 | ENEMY_WILD_BEAST_PACK_01 | 야생 짐승 무리 | elite | 층 1 엘리트 야수형 적 | enemy_wild_beast_pack_01.png | ready | jar elite fallback에도 사용 가능 |
 | 1 | ENEMY_STATUE_01 | 움직이는 석상 | boss | Floor 1 boss placeholder | enemy_statue_01.png | ready | floor boss slot |
-| 2 | ENEMY_FRACTURE_HOUND | 변이된 들짐승 | normal | 균열에 오염된 야수 | enemy_fracture_hound_demo.png | ready | existing mapping |
+| 2 | ENEMY_FRACTURE_HOUND | 변이된 들짐승 | normal | 늑대 강화 / 변이된 들짐승 | enemy_fracture_hound.png | ready | renamed art mapping; stableId unchanged |
 | 2 | ENEMY_MANEATER_PLANT_01 | 식인 식물 | normal | 층 2 식물형 적 | enemy_maneater_plant_01.png | ready | 신규 placeholder EnemyData |
 | 2 | ENEMY_MERCENARY_MELEE_01 | 용병 검수 | normal | 근거리 용병 | enemy_mercenary_melee_01.png | ready | 신규 placeholder EnemyData |
 | 2 | ENEMY_MERCENARY_RANGED_01 | 용병 사수 | normal | 원거리 용병 | enemy_mercenary_ranged_01.png | ready | 신규 placeholder EnemyData |
@@ -32,6 +32,7 @@ This document is a handoff index only. It does not define final lore or final en
 | 5 | ENEMY_MANEATER_JUNGLE_01 | 밀림 식인수 | normal | 고층 식물형 적 | enemy_maneater_jungle_01.png | ready | 신규 placeholder EnemyData |
 | 5 | ENEMY_HOMUNCULUS_01 | 호문쿨루스 | normal | 조형 생명체 | enemy_homunculus_01.png | ready | 신규 placeholder EnemyData |
 | 5 | ENEMY_COLLAPSE_ECHO | 스펙터 | elite | 고층 스펙터 elite reuse | enemy_collapse_echo.png | ready | existing mapping reused |
+| 5 | ENEMY_LAMPLIGHTER_01 | 점등인 | elite | final floor elite, separate from final boss | enemy_lamplighter_01.png | ready | 신규 placeholder EnemyData; not mapped to BOSS_APEX_02 |
 | 5 | BOSS_APEX_02 | 최종 보스 | boss | final boss | enemy_boss_apex_02.png | ready | existing final boss data preserved |
 
 ## Missing Art

@@ -865,6 +865,7 @@ namespace HwigiTower.Tests.EditMode
                 "ENEMY_WRAITH_04",
                 "ENEMY_MANEATER_JUNGLE_01",
                 "ENEMY_HOMUNCULUS_01",
+                "ENEMY_LAMPLIGHTER_01",
                 "BOSS_APEX_02"
             };
 
@@ -883,6 +884,11 @@ namespace HwigiTower.Tests.EditMode
                 AssertPoolRefsResolve(catalog, pool.EliteEnemyRefs);
                 AssertPoolRefsResolve(catalog, pool.BossEnemyRefs);
             }
+
+            Assert.IsTrue(catalog.FloorEnemyPools.TryGetPool(5, out var floorFivePool));
+            CollectionAssert.Contains(floorFivePool.EliteEnemyRefs, "ENEMY_LAMPLIGHTER_01");
+            Assert.IsTrue(catalog.TryGetEnemy("BOSS_APEX_02", out var finalBoss));
+            Assert.AreEqual("BOSS_APEX_02", finalBoss.Id);
         }
 
         [Test]

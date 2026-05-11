@@ -204,6 +204,27 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PrototypeRoom_FloorFiveEliteAndFinalBossPoolsResolve()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(controller.EncounterRuntimeCatalog);
+            Assert.IsNotNull(controller.EncounterRuntimeCatalog.FloorEnemyPools);
+            Assert.IsTrue(controller.EncounterRuntimeCatalog.FloorEnemyPools.TryGetPool(5, out var floorFivePool));
+
+            CollectionAssert.Contains(floorFivePool.EliteEnemyRefs, "ENEMY_LAMPLIGHTER_01");
+            CollectionAssert.Contains(floorFivePool.BossEnemyRefs, "BOSS_APEX_02");
+            CollectionAssert.DoesNotContain(floorFivePool.BossEnemyRefs, "ENEMY_LAMPLIGHTER_01");
+            Assert.IsTrue(controller.EncounterRuntimeCatalog.TryGetEnemy("ENEMY_LAMPLIGHTER_01", out var lamplighter));
+            Assert.IsTrue(controller.EncounterRuntimeCatalog.TryGetEnemy("BOSS_APEX_02", out var finalBoss));
+            Assert.AreEqual("ENEMY_LAMPLIGHTER_01", lamplighter.Id);
+            Assert.AreEqual("BOSS_APEX_02", finalBoss.Id);
+        }
+
+        [UnityTest]
         public IEnumerator PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap()
         {
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);

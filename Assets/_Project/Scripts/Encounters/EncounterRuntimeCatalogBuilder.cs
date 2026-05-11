@@ -67,6 +67,7 @@ namespace HwigiTower.Encounters
             "ENEMY_FRACTURE_HOUND",
             "ENEMY_HOMUNCULUS_01",
             "ENEMY_IRON_MAIDEN_01",
+            "ENEMY_LAMPLIGHTER_01",
             "ENEMY_LIVING_ARMOR_LIGHT_01",
             "ENEMY_LIVING_TOMBSTONE_01",
             "ENEMY_MANEATER_JUNGLE_01",
@@ -280,6 +281,7 @@ namespace HwigiTower.Encounters
                 case "ENEMY_WRAITH_04":
                     return 12;
                 case "ENEMY_COLLAPSE_ECHO":
+                case "ENEMY_LAMPLIGHTER_01":
                     return 26;
                 case "ENEMY_STATUE_01":
                     return 20;
@@ -353,8 +355,9 @@ namespace HwigiTower.Encounters
             return IsBoss(stableId) ||
                    stableId == "ENEMY_IRON_MAIDEN_01" ||
                    stableId == "ENEMY_MERCENARY_CAPTAIN_SAGAN_01" ||
-                   stableId == "ENEMY_SHADE_03" ||
-                   stableId == "ENEMY_SLIME_POOL_01" ||
+                stableId == "ENEMY_SHADE_03" ||
+                stableId == "ENEMY_LAMPLIGHTER_01" ||
+                stableId == "ENEMY_SLIME_POOL_01" ||
                    stableId == "ENEMY_WILD_BEAST_PACK_01";
         }
 
