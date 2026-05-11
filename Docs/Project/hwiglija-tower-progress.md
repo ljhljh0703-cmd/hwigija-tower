@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-11 22:08 — Screen Layer v2 readability polish
+- **Phase**: W2-2
+- **Done**:
+  - Mac Editor visual QA를 시도했으나 Computer Use Unity 접근 timeout/화면 캡처 privacy 제한으로 직접 GameView 조작은 수행하지 못함
+  - 코드 리뷰 기준 P0 overlap risk를 줄이기 위해 result panel을 action/rest 영역 밖 우측 상단으로 이동
+  - Rest interaction panel, action buttons, input field, response text 크기를 키우고 Rest 입력 중 result panel을 숨기도록 수정
+  - 임시 TestRunner entrypoint로 fresh EditMode/PlayMode 결과를 확보한 뒤 임시 파일과 ProjectSettings 부작용을 제거
+- **Files**: 변경 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: Codex tooling으로 Unity GameView 직접 시각 QA 불가. 실제 1080x1920 손플레이 확인은 사용자/Editor 수동 QA 필요.
+- **Next**: 실제 Game View 1080x1920에서 Floor map, Rest input, Combat, Ending 화면을 손으로 확인하고 남은 폰트/터치 P0만 조정
+- **Agent**: Codex
+
 ### 2026-05-11 18:10 — Screen Layer v2 gameplay layout
 - **Phase**: W2-2
 - **Done**:

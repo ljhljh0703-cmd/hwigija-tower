@@ -554,7 +554,7 @@ namespace HwigiTower.UI
             SetLayerVisible(nodeMapLayer, snapshot.HasFloorMap && !snapshot.IsInCombat && !snapshot.RunCompleted && _choiceButtons.Count > 0);
             SetLayerVisible(npcReactionLayer, !snapshot.IsInCombat && !snapshot.EndingChoicePending);
             SetLayerVisible(actionLayer, !snapshot.IsInCombat && !snapshot.RunCompleted);
-            SetLayerVisible(resultLayer, !snapshot.IsInCombat && resultText != null && resultText.gameObject.activeSelf);
+            SetLayerVisible(resultLayer, !snapshot.IsInCombat && !RestInteractionPanelVisible && resultText != null && resultText.gameObject.activeSelf);
             SetLayerVisible(endingLayer, snapshot.EndingChoicePending && !snapshot.IsInCombat);
         }
 
@@ -708,7 +708,7 @@ namespace HwigiTower.UI
             nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 52f), new Vector2(0f, 430f), new Color(0.035f, 0.045f, 0.055f, 0.78f), false);
             npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer NPC Reaction", new Vector2(0.04f, 0f), new Vector2(0.96f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 492f), new Vector2(0f, 168f), new Color(0.035f, 0.045f, 0.055f, 0.72f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 52f), new Vector2(0f, 430f), new Color(0.02f, 0.025f, 0.03f, 0.36f), false);
-            resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 450f), new Vector2(0f, 200f), new Color(0.035f, 0.045f, 0.055f, 0.82f), false);
+            resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.34f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 650f), new Vector2(0f, 190f), new Color(0.035f, 0.045f, 0.055f, 0.82f), false);
             endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 185f), new Vector2(0f, 200f), new Color(0.06f, 0.055f, 0.04f, 0.82f), false);
         }
 
@@ -751,7 +751,7 @@ namespace HwigiTower.UI
             ApplyTextRect(focusText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(0f, 48f), 30, TextAnchor.UpperCenter);
             ApplyTextRect(interactionText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(0f, 58f), 28, TextAnchor.UpperCenter);
             ApplyTextRect(runStateText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -148f), new Vector2(0f, 184f), 24, TextAnchor.UpperCenter);
-            ApplyTextRect(resultText, new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 470f), new Vector2(0f, 172f), 28, TextAnchor.MiddleCenter);
+            ApplyTextRect(resultText, new Vector2(0.34f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 650f), new Vector2(0f, 170f), 30, TextAnchor.MiddleCenter);
         }
 
         private static void ApplyTextRect(Text text, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size, int fontSize, TextAnchor alignment)
@@ -864,7 +864,7 @@ namespace HwigiTower.UI
             restInteractionPanel.anchorMax = new Vector2(0.92f, 0f);
             restInteractionPanel.pivot = new Vector2(0.5f, 0f);
             restInteractionPanel.anchoredPosition = new Vector2(0f, 54f);
-            restInteractionPanel.sizeDelta = new Vector2(0f, 560f);
+            restInteractionPanel.sizeDelta = new Vector2(0f, 620f);
 
             var image = panelObject.AddComponent<Image>();
             image.color = new Color(0.055f, 0.065f, 0.08f, 0.96f);
@@ -873,9 +873,9 @@ namespace HwigiTower.UI
             title.transform.SetParent(panelObject.transform, false);
             title.text = "휴식";
 
-            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", "기분을 묻는다", new Vector2(0.17f, 0.75f), "rest.ask_mood");
-            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", "훈련을 진행한다", new Vector2(0.50f, 0.75f), "rest.train");
-            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", "휴식을 취한다", new Vector2(0.83f, 0.75f), "rest.recover");
+            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", "기분을 묻는다", new Vector2(0.17f, 0.76f), "rest.ask_mood");
+            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", "훈련을 진행한다", new Vector2(0.50f, 0.76f), "rest.train");
+            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", "휴식을 취한다", new Vector2(0.83f, 0.76f), "rest.recover");
 
             restInputField = CreateRestInputField(panelObject.transform);
             restSubmitButton = CreateRestButton(panelObject.transform, "Rest Submit Button", "전달", new Vector2(0.22f, 0.20f), new Vector2(0.44f, 0.31f));
@@ -884,7 +884,7 @@ namespace HwigiTower.UI
             restContinueButton.onClick.AddListener(ContinueAfterRestInteraction);
             restContinueButton.gameObject.SetActive(false);
 
-            restResponseText = CreateHudText("Rest Response Text", new Vector2(0.06f, 0.34f), new Vector2(0.94f, 0.52f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 25, TextAnchor.MiddleCenter, new Color(0.88f, 0.93f, 0.92f, 1f));
+            restResponseText = CreateHudText("Rest Response Text", new Vector2(0.06f, 0.34f), new Vector2(0.94f, 0.52f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 28, TextAnchor.MiddleCenter, new Color(0.88f, 0.93f, 0.92f, 1f));
             restResponseText.transform.SetParent(panelObject.transform, false);
             restResponseText.text = "행동을 선택하세요";
             restInteractionPanel.gameObject.SetActive(false);
@@ -892,7 +892,7 @@ namespace HwigiTower.UI
 
         private Button CreateRestActionButton(Transform parent, string name, string label, Vector2 center, string actionId)
         {
-            var button = CreateRestButton(parent, name, label, new Vector2(center.x - 0.15f, center.y - 0.07f), new Vector2(center.x + 0.15f, center.y + 0.07f));
+            var button = CreateRestButton(parent, name, label, new Vector2(center.x - 0.15f, center.y - 0.075f), new Vector2(center.x + 0.15f, center.y + 0.075f));
             button.onClick.AddListener(() => SelectRestAction(actionId));
             return button;
         }
@@ -912,7 +912,7 @@ namespace HwigiTower.UI
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
 
-            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 24, TextAnchor.MiddleCenter, new Color(0.90f, 0.94f, 0.95f, 1f));
+            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 27, TextAnchor.MiddleCenter, new Color(0.90f, 0.94f, 0.95f, 1f));
             text.transform.SetParent(buttonObject.transform, false);
             text.text = label;
             return button;
@@ -924,7 +924,7 @@ namespace HwigiTower.UI
             inputObject.transform.SetParent(parent, false);
             var rect = inputObject.AddComponent<RectTransform>();
             rect.anchorMin = new Vector2(0.06f, 0.55f);
-            rect.anchorMax = new Vector2(0.94f, 0.68f);
+            rect.anchorMax = new Vector2(0.94f, 0.69f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -933,13 +933,13 @@ namespace HwigiTower.UI
             var input = inputObject.AddComponent<InputField>();
             input.targetGraphic = image;
 
-            var text = CreateHudText("Rest Input Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 24, TextAnchor.MiddleLeft, new Color(0.08f, 0.10f, 0.12f, 1f));
+            var text = CreateHudText("Rest Input Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 28, TextAnchor.MiddleLeft, new Color(0.08f, 0.10f, 0.12f, 1f));
             text.transform.SetParent(inputObject.transform, false);
             text.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
             text.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
             input.textComponent = text;
 
-            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 22, TextAnchor.MiddleLeft, new Color(0.38f, 0.42f, 0.45f, 1f));
+            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 26, TextAnchor.MiddleLeft, new Color(0.38f, 0.42f, 0.45f, 1f));
             placeholder.transform.SetParent(inputObject.transform, false);
             placeholder.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
             placeholder.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
@@ -1060,21 +1060,21 @@ namespace HwigiTower.UI
             resultObject.transform.SetParent(transform, false);
 
             var rect = resultObject.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.08f, 0f);
-            rect.anchorMax = new Vector2(0.92f, 0f);
+            rect.anchorMin = new Vector2(0.34f, 0f);
+            rect.anchorMax = new Vector2(0.94f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
-            rect.sizeDelta = new Vector2(0f, 132f);
-            rect.anchoredPosition = new Vector2(0f, 470f);
+            rect.sizeDelta = new Vector2(0f, 170f);
+            rect.anchoredPosition = new Vector2(0f, 650f);
 
             resultText = resultObject.AddComponent<Text>();
             resultText.font = ResolveFont();
-            resultText.fontSize = 28;
+            resultText.fontSize = 30;
             resultText.alignment = TextAnchor.MiddleCenter;
             resultText.horizontalOverflow = HorizontalWrapMode.Wrap;
             resultText.verticalOverflow = VerticalWrapMode.Truncate;
             resultText.resizeTextForBestFit = true;
-            resultText.resizeTextMinSize = 20;
-            resultText.resizeTextMaxSize = 28;
+            resultText.resizeTextMinSize = 22;
+            resultText.resizeTextMaxSize = 30;
             resultText.supportRichText = false;
             resultText.color = new Color(0.88f, 0.93f, 0.95f, 1f);
             NormalizeLayout();
@@ -2080,7 +2080,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            resultText.gameObject.SetActive(!snapshot.IsInCombat);
+            resultText.gameObject.SetActive(!snapshot.IsInCombat && !RestInteractionPanelVisible);
         }
 
         private string BuildChoiceLabel(PrototypeEncounterChoiceView view, int index)
