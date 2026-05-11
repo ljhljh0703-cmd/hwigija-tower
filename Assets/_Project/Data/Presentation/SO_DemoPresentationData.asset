@@ -29,6 +29,17 @@ MonoBehaviour:
   - floor: 5
     stateKey: MERCHANT_FLOOR_05
     merchantSprite: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+  nodeIconSlots:
+  - nodeType: 0
+    icon: {fileID: 21300000, guid: d64fd7a9ef3d44a68bcb60679a3db878, type: 3}
+  - nodeType: 1
+    icon: {fileID: 21300000, guid: 24786721795ce450f91f7674e4b58e85, type: 3}
+  - nodeType: 2
+    icon: {fileID: 21300000, guid: fe56896c2e4774bfeb1acf6a2ac8d385, type: 3}
+  - nodeType: 3
+    icon: {fileID: 21300000, guid: e5a960ec0860e4232b89161a86650bf0, type: 3}
+  - nodeType: 4
+    icon: {fileID: 21300000, guid: 259460dde131f4cafa26bf074b3df49c, type: 3}
   slots:
   - encounterStableId: ENC_SHOP_01
     displayName: Shop

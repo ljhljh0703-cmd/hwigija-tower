@@ -48,8 +48,17 @@ namespace HwigiTower.UI
         [SerializeField] private Button restRecoverButton;
         [SerializeField] private Button restSubmitButton;
         [SerializeField] private Button restContinueButton;
+        [SerializeField] private RectTransform topStatusLayer;
+        [SerializeField] private RectTransform objectiveLayer;
+        [SerializeField] private RectTransform visualLayer;
+        [SerializeField] private RectTransform nodeMapLayer;
+        [SerializeField] private RectTransform npcReactionLayer;
+        [SerializeField] private RectTransform actionLayer;
+        [SerializeField] private RectTransform resultLayer;
+        [SerializeField] private RectTransform endingLayer;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
+        private readonly List<Image> _mapNodeIconImages = new List<Image>();
         private readonly List<string> _demoRouteLabels = new List<string>();
         private readonly List<string> _demoRouteEncounterIds = new List<string>();
         private PrototypeRoomController _roomController;
@@ -78,6 +87,24 @@ namespace HwigiTower.UI
         public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
         public string CurrentCombatEnemySpriteName => combatEnemyImage != null && combatEnemyImage.sprite != null ? combatEnemyImage.sprite.name : string.Empty;
         public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
+        public bool HasScreenLayerPanels => topStatusLayer != null && objectiveLayer != null && visualLayer != null && nodeMapLayer != null && npcReactionLayer != null && actionLayer != null && resultLayer != null && endingLayer != null;
+        public string CurrentMapNodeIconNames
+        {
+            get
+            {
+                var names = new List<string>();
+                for (var i = 0; i < _mapNodeIconImages.Count; i++)
+                {
+                    var icon = _mapNodeIconImages[i];
+                    if (icon != null && icon.sprite != null)
+                    {
+                        names.Add(icon.sprite.name);
+                    }
+                }
+
+                return string.Join("|", names);
+            }
+        }
 
         public void BindRoomController(PrototypeRoomController controller)
         {
@@ -108,6 +135,7 @@ namespace HwigiTower.UI
 
         private void Awake()
         {
+            EnsureScreenLayers();
             NormalizeLayout();
             ShowFocus(null);
             if (interactionText != null)
@@ -324,6 +352,10 @@ namespace HwigiTower.UI
         {
             ClearChoices();
             HideRestInteractionPanel();
+            EnsureScreenLayers();
+            SetLayerVisible(actionLayer, true);
+            SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(resultLayer, false);
             EnsureEventSystem();
             EnsureChoiceContainer();
 
@@ -366,12 +398,17 @@ namespace HwigiTower.UI
             }
 
             _choiceButtons.Clear();
+            _mapNodeIconImages.Clear();
         }
 
         public void ShowMapChoices(PrototypeFloorMapNodeView[] nodes, Action<string> onNodeSelected)
         {
             ClearChoices();
             HideRestInteractionPanel();
+            EnsureScreenLayers();
+            SetLayerVisible(nodeMapLayer, true);
+            SetLayerVisible(actionLayer, false);
+            SetLayerVisible(resultLayer, true);
             EnsureEventSystem();
             EnsureChoiceContainer();
             if (choiceContainer == null || nodes == null)
@@ -387,23 +424,16 @@ namespace HwigiTower.UI
                     continue;
                 }
 
-                var view = new PrototypeEncounterChoiceView(
-                    node.MapNodeId,
-                    ResolveMapNodeLabel(node.Type),
-                    true,
-                    true,
-                    string.Empty,
-                    ResolveMapNodeHint(node.Type));
-                var button = CreateChoiceButton(view, onNodeSelected);
+                var button = CreateMapNodeButton(node, onNodeSelected);
                 _choiceButtons.Add(button);
             }
 
             if (interactionText != null)
             {
-                interactionText.text = showRawDebugText ? "map node selection" : "갈림길 선택";
+                interactionText.text = showRawDebugText ? "map node selection" : "지도";
             }
 
-            ShowResultMessage(showRawDebugText ? "select map node" : "갈 수 있는 노드를 선택하세요");
+            ShowResultMessage(showRawDebugText ? "select map node" : "아이콘을 보고 다음 노드를 선택하세요");
         }
 
         public void ShowFocus(InteractableNode node)
@@ -502,6 +532,7 @@ namespace HwigiTower.UI
             }
 
             EnsureEventSystem();
+            UpdateScreenLayers(snapshot);
             UpdateNextFloorButton(snapshot);
             UpdateRouteActionButton(snapshot);
             UpdateRestartButton(snapshot);
@@ -512,6 +543,19 @@ namespace HwigiTower.UI
             UpdateResultVisibility(snapshot);
             UpdateDemoCompletePanel(snapshot);
             UpdateCutsceneTriggers(snapshot);
+        }
+
+        private void UpdateScreenLayers(PrototypeRunSnapshot snapshot)
+        {
+            EnsureScreenLayers();
+            SetLayerVisible(topStatusLayer, true);
+            SetLayerVisible(objectiveLayer, true);
+            SetLayerVisible(visualLayer, !snapshot.IsInCombat);
+            SetLayerVisible(nodeMapLayer, snapshot.HasFloorMap && !snapshot.IsInCombat && !snapshot.RunCompleted && _choiceButtons.Count > 0);
+            SetLayerVisible(npcReactionLayer, !snapshot.IsInCombat && !snapshot.EndingChoicePending);
+            SetLayerVisible(actionLayer, !snapshot.IsInCombat && !snapshot.RunCompleted);
+            SetLayerVisible(resultLayer, !snapshot.IsInCombat && resultText != null && resultText.gameObject.activeSelf);
+            SetLayerVisible(endingLayer, snapshot.EndingChoicePending && !snapshot.IsInCombat);
         }
 
         private Button CreateChoiceButton(PrototypeEncounterChoiceView view, Action<string> onChoiceSelected)
@@ -577,8 +621,133 @@ namespace HwigiTower.UI
             return button;
         }
 
+        private Button CreateMapNodeButton(PrototypeFloorMapNodeView node, Action<string> onNodeSelected)
+        {
+            var view = new PrototypeEncounterChoiceView(
+                node.MapNodeId,
+                ResolveMapNodeLabel(node.Type),
+                true,
+                node.Selectable,
+                string.Empty,
+                BuildMapNodeHint(node));
+            var button = CreateChoiceButton(view, onNodeSelected);
+            button.name = "Map Node Button " + node.MapNodeId;
+
+            var image = button.targetGraphic as Image;
+            if (image != null)
+            {
+                image.color = ResolveMapNodeTint(node);
+            }
+
+            var label = button.GetComponentInChildren<Text>();
+            if (label != null)
+            {
+                var labelRect = label.GetComponent<RectTransform>();
+                labelRect.offsetMin = new Vector2(108f, 8f);
+                label.alignment = TextAnchor.MiddleLeft;
+            }
+
+            var iconObject = new GameObject("Node Icon");
+            iconObject.transform.SetParent(button.transform, false);
+            var iconRect = iconObject.AddComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0f, 0.5f);
+            iconRect.anchorMax = new Vector2(0f, 0.5f);
+            iconRect.pivot = new Vector2(0f, 0.5f);
+            iconRect.anchoredPosition = new Vector2(20f, 0f);
+            iconRect.sizeDelta = new Vector2(76f, 76f);
+
+            var icon = iconObject.AddComponent<Image>();
+            icon.sprite = ResolveNodeIcon(node.Type);
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            icon.color = node.Completed
+                ? new Color(0.56f, 0.72f, 0.66f, 0.74f)
+                : node.Locked
+                    ? new Color(0.45f, 0.48f, 0.52f, 0.58f)
+                    : Color.white;
+            _mapNodeIconImages.Add(icon);
+
+            return button;
+        }
+
+        private Sprite ResolveNodeIcon(PrototypeFloorMapNodeType type)
+        {
+            return presentationData != null && presentationData.TryGetNodeIcon(type, out var icon) ? icon : null;
+        }
+
+        private static Color ResolveMapNodeTint(PrototypeFloorMapNodeView node)
+        {
+            if (node.Completed)
+            {
+                return new Color(0.08f, 0.16f, 0.13f, 0.92f);
+            }
+
+            if (node.Locked || !node.Selectable)
+            {
+                return new Color(0.055f, 0.06f, 0.07f, 0.76f);
+            }
+
+            return node.Type == PrototypeFloorMapNodeType.Boss
+                ? new Color(0.24f, 0.09f, 0.10f, 0.98f)
+                : node.Type == PrototypeFloorMapNodeType.Shop
+                    ? new Color(0.15f, 0.13f, 0.08f, 0.98f)
+                    : new Color(0.11f, 0.15f, 0.18f, 0.98f);
+        }
+
+        private static string BuildMapNodeHint(PrototypeFloorMapNodeView node)
+        {
+            var state = node.Completed ? "완료" : node.Locked ? "잠김" : node.Selectable ? "선택 가능" : "대기";
+            return "Layer " + node.Layer + " | " + state + " | " + ResolveMapNodeHint(node.Type);
+        }
+
+        private void EnsureScreenLayers()
+        {
+            topStatusLayer = EnsureLayerPanel(topStatusLayer, "Screen Layer Top Status", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(0f, 218f), new Color(0.025f, 0.032f, 0.04f, 0.74f), false);
+            objectiveLayer = EnsureLayerPanel(objectiveLayer, "Screen Layer Objective", new Vector2(0.04f, 1f), new Vector2(0.96f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -238f), new Vector2(0f, 132f), new Color(0.05f, 0.07f, 0.09f, 0.70f), false);
+            visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.44f), new Vector2(0.96f, 0.78f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.26f), false);
+            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 52f), new Vector2(0f, 430f), new Color(0.035f, 0.045f, 0.055f, 0.78f), false);
+            npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer NPC Reaction", new Vector2(0.04f, 0f), new Vector2(0.96f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 492f), new Vector2(0f, 168f), new Color(0.035f, 0.045f, 0.055f, 0.72f), false);
+            actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 52f), new Vector2(0f, 430f), new Color(0.02f, 0.025f, 0.03f, 0.36f), false);
+            resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0f), new Vector2(0.94f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 450f), new Vector2(0f, 200f), new Color(0.035f, 0.045f, 0.055f, 0.82f), false);
+            endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 185f), new Vector2(0f, 200f), new Color(0.06f, 0.055f, 0.04f, 0.82f), false);
+        }
+
+        private RectTransform EnsureLayerPanel(RectTransform layer, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size, Color color, bool active)
+        {
+            if (layer != null)
+            {
+                return layer;
+            }
+
+            var layerObject = new GameObject(name);
+            layerObject.transform.SetParent(transform, false);
+            layerObject.transform.SetAsFirstSibling();
+
+            var rect = layerObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.pivot = pivot;
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
+
+            var image = layerObject.AddComponent<Image>();
+            image.color = color;
+            image.raycastTarget = false;
+            layerObject.SetActive(active);
+            return rect;
+        }
+
+        private static void SetLayerVisible(RectTransform layer, bool visible)
+        {
+            if (layer != null)
+            {
+                layer.gameObject.SetActive(visible);
+            }
+        }
+
         private void NormalizeLayout()
         {
+            EnsureScreenLayers();
             ApplyTextRect(focusText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(0f, 48f), 30, TextAnchor.UpperCenter);
             ApplyTextRect(interactionText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(0f, 58f), 28, TextAnchor.UpperCenter);
             ApplyTextRect(runStateText, new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -148f), new Vector2(0f, 184f), 24, TextAnchor.UpperCenter);
@@ -635,6 +804,11 @@ namespace HwigiTower.UI
         {
             ClearChoices();
             EnsureRestInteractionPanel();
+            EnsureScreenLayers();
+            SetLayerVisible(actionLayer, false);
+            SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(npcReactionLayer, true);
+            SetLayerVisible(resultLayer, true);
             ApplyPresentationSlot(selection.EncounterId);
             _pendingRestSelection = selection;
             _pendingRestActionId = string.Empty;
@@ -2336,6 +2510,7 @@ namespace HwigiTower.UI
         {
             var text =
                 "전투\n" +
+                "상대: " + PublicEnemyName(snapshot.LastCombatEnemyId) + "\n" +
                 "적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "\n" +
                 "내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
                 "라운드 " + snapshot.CombatRound + "\n" +
@@ -2344,6 +2519,11 @@ namespace HwigiTower.UI
             if (snapshot.LastCombatComboDamage > 0)
             {
                 text += "\n콤보 피해 " + snapshot.LastCombatComboDamage;
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("training +", StringComparison.Ordinal))
+            {
+                text += "\n훈련 보너스: 피해 +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "training +").Trim();
             }
 
             if (snapshot.LastCombatRoundResult.Contains("bandage ", StringComparison.Ordinal))
@@ -2906,6 +3086,31 @@ namespace HwigiTower.UI
                 "REWARD_CACHE_SMALL" => "작은 보급품",
                 "REWARD_CACHE_MEMORY" => "기억 보급품",
                 _ => LooksLikeInternalLabel(reference) || reference.Contains("_", StringComparison.Ordinal) ? "획득물" : reference
+            };
+        }
+
+        private static string PublicEnemyName(string enemyId)
+        {
+            if (string.IsNullOrEmpty(enemyId))
+            {
+                return "적";
+            }
+
+            return enemyId switch
+            {
+                "ENEMY_BANDIT_MELEE_01" => "도적",
+                "ENEMY_BANDIT_RANGED_01" => "원거리 도적",
+                "ENEMY_SLIME_01" => "슬라임",
+                "ENEMY_SKELETON_01" => "해골",
+                "ENEMY_WILD_BEAST_01" => "들짐승",
+                "ENEMY_EMPTY_ARMOR" => "리빙 아머",
+                "ENEMY_SHADE_03" => "그림자",
+                "ENEMY_WRAITH_04" => "망령",
+                "ENEMY_FRACTURE_HOUND" => "변이된 들짐승",
+                "ENEMY_LAMPLIGHTER_01" => "점등인",
+                "BOSS_GATE_01" => "층 보스",
+                "BOSS_APEX_02" => "최종 보스",
+                _ => "적"
             };
         }
 

@@ -59,6 +59,19 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void DemoPresentationData_BindsNodeIcons()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+
+            Assert.IsNotNull(data);
+            AssertNodeIcon(data, PrototypeFloorMapNodeType.Combat, "node_combat");
+            AssertNodeIcon(data, PrototypeFloorMapNodeType.Event, "node_event");
+            AssertNodeIcon(data, PrototypeFloorMapNodeType.Rest, "node_rest");
+            AssertNodeIcon(data, PrototypeFloorMapNodeType.Shop, "node_shop");
+            AssertNodeIcon(data, PrototypeFloorMapNodeType.Boss, "node_boss");
+        }
+
+        [Test]
         public void CutsceneData_EmptyStepsIsSafeScaffold()
         {
             var cutscene = ScriptableObject.CreateInstance<CutsceneData>();
@@ -104,6 +117,35 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("20%: 엘리트 전투", patterned.text);
             StringAssert.DoesNotContain("CHOICE_EVT_F01_JAR_PATTERNED", patterned.text);
             StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", patterned.text);
+        }
+
+        [Test]
+        public void Hud_MapScreenShowsNodeIconsAndHidesRawIds()
+        {
+            var hud = CreateHud(out var result);
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            hud.SetPresentationData(data);
+            var nodes = new[]
+            {
+                new PrototypeFloorMapNodeView("floor1.layer1.event.EVT_F01_JAR_ROOM", PrototypeFloorMapNodeType.Event, 1, 1, 0, true, false, false),
+                new PrototypeFloorMapNodeView("floor1.layer1.combat.ENC_COMBAT_GATE_01", PrototypeFloorMapNodeType.Combat, 1, 1, 1, true, false, false),
+                new PrototypeFloorMapNodeView("floor1.layer4.shop.ENC_SHOP_01", PrototypeFloorMapNodeType.Shop, 1, 4, 0, true, false, false),
+                new PrototypeFloorMapNodeView("floor1.layer5.boss.ENC_COMBAT_GATE_01", PrototypeFloorMapNodeType.Boss, 1, 5, 0, true, false, false)
+            };
+
+            hud.ShowMapChoices(nodes, _ => { });
+
+            Assert.IsTrue(hud.HasScreenLayerPanels);
+            StringAssert.Contains("node_event", hud.CurrentMapNodeIconNames);
+            StringAssert.Contains("node_combat", hud.CurrentMapNodeIconNames);
+            StringAssert.Contains("node_shop", hud.CurrentMapNodeIconNames);
+            StringAssert.Contains("node_boss", hud.CurrentMapNodeIconNames);
+            Assert.AreEqual(4, hud.ChoiceButtonCount);
+            StringAssert.Contains("결과", result.text);
+            var first = hud.GetChoiceButton(0).GetComponentInChildren<Text>();
+            Assert.IsNotNull(first);
+            StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", first.text);
+            StringAssert.DoesNotContain("floor1.layer1", first.text);
         }
 
         [Test]
@@ -364,6 +406,13 @@ namespace HwigiTower.Tests.EditMode
                 Assert.IsNotNull(slot.MemoryFragmentSprite, stableId);
                 Assert.AreEqual(memory, slot.MemoryFragmentSprite.name);
             }
+        }
+
+        private static void AssertNodeIcon(DemoPresentationData data, PrototypeFloorMapNodeType type, string spriteName)
+        {
+            Assert.IsTrue(data.TryGetNodeIcon(type, out var icon), type.ToString());
+            Assert.IsNotNull(icon, type.ToString());
+            Assert.AreEqual(spriteName, icon.name);
         }
     }
 }
