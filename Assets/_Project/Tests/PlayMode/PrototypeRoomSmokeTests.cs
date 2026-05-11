@@ -88,6 +88,9 @@ namespace HwigiTower.Tests.PlayMode
             hud.GetRouteActionButton().onClick.Invoke();
             yield return null;
 
+            Assert.IsTrue(hud.HasScreenLayerPanels);
+            StringAssert.Contains("node_event", hud.CurrentMapNodeIconNames);
+            StringAssert.Contains("node_rest", hud.CurrentMapNodeIconNames);
             Assert.GreaterOrEqual(hud.ChoiceButtonCount, 2);
             var eventButton = FindMapChoiceButton(hud, "EVT_F01_JAR_ROOM");
             Assert.IsNotNull(eventButton, DescribeChoiceButtons(hud));
@@ -126,6 +129,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual("ENEMY_STATUE_01", controller.RunState.LastCombatEnemyId);
             Assert.IsTrue(hud.CombatPanelVisible);
             StringAssert.Contains("전투", hud.CombatMessage);
+            StringAssert.Contains("상대:", hud.CombatMessage);
             StringAssert.Contains("적 HP", hud.CombatMessage);
             StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
         }
@@ -168,6 +172,7 @@ namespace HwigiTower.Tests.PlayMode
 
             Assert.Greater(controller.RunState.PlayerHp, hpBeforeRest);
             Assert.IsFalse(hud.RestInteractionPanelVisible);
+            Assert.IsTrue(hud.HasScreenLayerPanels);
             StringAssert.Contains("임시 응답", hud.RestResponseMessage);
             StringAssert.DoesNotContain("Glitch", hud.RunStateMessage);
             StringAssert.DoesNotContain("Glitch", hud.ResultMessage);

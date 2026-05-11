@@ -1,3 +1,4 @@
+using HwigiTower.Run;
 using UnityEngine;
 
 namespace HwigiTower.UI
@@ -46,16 +47,44 @@ namespace HwigiTower.UI
         public Sprite MerchantSprite => merchantSprite;
     }
 
+    [System.Serializable]
+    public sealed class DemoNodeIconSlot
+    {
+        [SerializeField] private PrototypeFloorMapNodeType nodeType;
+        [SerializeField] private Sprite icon;
+
+        public PrototypeFloorMapNodeType NodeType => nodeType;
+        public Sprite Icon => icon;
+    }
+
     [CreateAssetMenu(menuName = "Hwigi Tower/Prototype/Demo Presentation Data", fileName = "SO_DemoPresentationData")]
     public sealed class DemoPresentationData : ScriptableObject
     {
         [SerializeField] private Sprite defaultMataiosPortrait;
         [SerializeField] private DemoMerchantPresentationSlot[] merchantSlots = new DemoMerchantPresentationSlot[0];
+        [SerializeField] private DemoNodeIconSlot[] nodeIconSlots = new DemoNodeIconSlot[0];
         [SerializeField] private DemoPresentationSlot[] slots = new DemoPresentationSlot[0];
 
         public Sprite DefaultMataiosPortrait => defaultMataiosPortrait;
         public DemoMerchantPresentationSlot[] MerchantSlots => merchantSlots ?? new DemoMerchantPresentationSlot[0];
+        public DemoNodeIconSlot[] NodeIconSlots => nodeIconSlots ?? new DemoNodeIconSlot[0];
         public DemoPresentationSlot[] Slots => slots ?? new DemoPresentationSlot[0];
+
+        public bool TryGetNodeIcon(PrototypeFloorMapNodeType nodeType, out Sprite icon)
+        {
+            var source = NodeIconSlots;
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (source[i] != null && source[i].NodeType == nodeType && source[i].Icon != null)
+                {
+                    icon = source[i].Icon;
+                    return true;
+                }
+            }
+
+            icon = null;
+            return false;
+        }
 
         public bool TryGetSlot(string encounterStableId, out DemoPresentationSlot slot)
         {

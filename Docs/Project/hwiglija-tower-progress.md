@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-11 18:10 — Screen Layer v2 gameplay layout
+- **Phase**: W2-2
+- **Done**:
+  - `DemoPresentationData`에 node type별 icon slot을 추가하고 Combat/Event/Rest/Shop/Boss node art를 `SO_DemoPresentationData`에 바인딩
+  - `PrototypeHud`에 top/objective/visual/map/NPC/action/result/ending screen layer 패널을 분리하고 map node 버튼에 icon/state tint를 표시
+  - normal mode combat presentation에 public enemy name, training bonus, recall/bandage feedback을 보강하고 raw `ENEMY_` 노출을 차단
+  - EditMode/PlayMode smoke에 node icon binding, map UI icon, rest/combat layer 확인을 추가
+  - Unity batchmode 기본 `-runTests` 결과 XML 미생성 문제는 임시 TestRunner entrypoint로 검증 후 제거
+- **Files**: 변경/추가 16개 (PrototypeHud.cs, DemoPresentationData.cs, SO_DemoPresentationData.asset, Art/Nodes/**, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs)
+- **GDD impact**: 없음
+- **Blockers**: Codex가 GameView를 직접 조작하는 수동 시각 QA는 미수행. PlayMode batchmode는 결과 저장 후 종료 신호를 놓치는 현상이 있어 사용자가 Unity 종료/lock 정리 필요.
+- **Next**: Mac Editor에서 실제 1080x1920 손플레이로 map/rest/combat/ending layer 가독성 확인 후 폰트 크기/터치 영역 P0만 조정
+- **Agent**: Codex
+
 ### 2026-05-11 12:54 — Renamed enemy art mappings finalized
 - **Phase**: W2-2
 - **Done**:
