@@ -69,7 +69,7 @@ namespace HwigiTower.EditorTools
                 new EnemySpec(1, "ENEMY_SLIME_POOL_01", "elite", "슬라임 무리", "층 1 엘리트 생물형 적", "enemy_slime_pool_01.png", 16, 4, 6),
                 new EnemySpec(1, "ENEMY_WILD_BEAST_PACK_01", "elite", "야생 짐승 무리", "층 1 엘리트 야수형 적", "enemy_wild_beast_pack_01.png", 18, 4, 6),
                 new EnemySpec(1, "ENEMY_STATUE_01", "boss", "움직이는 석상", "층 1 보스 placeholder", "enemy_statue_01.png", 20, 4, 10),
-                new EnemySpec(2, "ENEMY_FRACTURE_HOUND", "normal", "변이된 들짐승", "균열에 오염된 야수", "enemy_fracture_hound_demo.png", 12, 3, 4),
+                new EnemySpec(2, "ENEMY_FRACTURE_HOUND", "normal", "변이된 들짐승", "늑대 강화 / 변이된 들짐승", "enemy_fracture_hound.png", 12, 3, 4),
                 new EnemySpec(2, "ENEMY_MANEATER_PLANT_01", "normal", "식인 식물", "층 2 식물형 적", "enemy_maneater_plant_01.png", 13, 3, 4),
                 new EnemySpec(2, "ENEMY_MERCENARY_MELEE_01", "normal", "용병 검수", "근거리 용병", "enemy_mercenary_melee_01.png", 13, 3, 4),
                 new EnemySpec(2, "ENEMY_MERCENARY_RANGED_01", "normal", "용병 사수", "원거리 용병", "enemy_mercenary_ranged_01.png", 12, 3, 4),
@@ -88,6 +88,7 @@ namespace HwigiTower.EditorTools
                 new EnemySpec(5, "ENEMY_MANEATER_JUNGLE_01", "normal", "밀림 식인수", "층 5 식물형 적", "enemy_maneater_jungle_01.png", 18, 4, 6),
                 new EnemySpec(5, "ENEMY_HOMUNCULUS_01", "normal", "호문쿨루스", "층 5 조형 생명체", "enemy_homunculus_01.png", 18, 5, 6),
                 new EnemySpec(5, "ENEMY_COLLAPSE_ECHO", "elite", "스펙터", "층 5 엘리트 collapse echo", "enemy_collapse_echo.png", 26, 4, 14),
+                new EnemySpec(5, "ENEMY_LAMPLIGHTER_01", "elite", "점등인", "최종층 엘리트", "enemy_lamplighter_01.png", 26, 5, 14),
                 new EnemySpec(5, "BOSS_APEX_02", "boss", "최종 보스", "final boss", "enemy_boss_apex_02.png", 30, 4, 30)
             };
         }

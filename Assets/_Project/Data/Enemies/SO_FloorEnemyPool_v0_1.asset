@@ -59,5 +59,6 @@ MonoBehaviour:
     - ENEMY_HOMUNCULUS_01
     eliteEnemyRefs:
     - ENEMY_COLLAPSE_ECHO
+    - ENEMY_LAMPLIGHTER_01
     bossEnemyRefs:
     - BOSS_APEX_02

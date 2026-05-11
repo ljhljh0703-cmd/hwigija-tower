@@ -88,7 +88,7 @@ MonoBehaviour:
     titleTextKey: PLACEHOLDER_ENC_COMBAT_GATE_01_TITLE
     bodyTextKey: PLACEHOLDER_ENC_COMBAT_GATE_01_BODY
     mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
-    enemySprite: {fileID: 21300000, guid: 3551576cb7aa3414bba08acef4c9d6ab, type: 3}
+    enemySprite: {fileID: 21300000, guid: e302c1fecb4c24b95824580830587601, type: 3}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}
@@ -504,7 +504,7 @@ MonoBehaviour:
     titleTextKey:
     bodyTextKey:
     mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
-    enemySprite: {fileID: 21300000, guid: 3551576cb7aa3414bba08acef4c9d6ab, type: 3}
+    enemySprite: {fileID: 21300000, guid: e302c1fecb4c24b95824580830587601, type: 3}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}
@@ -518,6 +518,19 @@ MonoBehaviour:
     bodyTextKey:
     mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
     enemySprite: {fileID: 21300000, guid: 8f91b8d98a3bb47c992b364f57a41a74, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_LAMPLIGHTER_01
+    displayName: "\uC810\uB4F1\uC778"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 01a3b2dbc21ca4e17a3df512d7d51c82, type: 3}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}

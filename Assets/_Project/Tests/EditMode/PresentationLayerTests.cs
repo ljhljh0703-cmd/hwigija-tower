@@ -35,7 +35,7 @@ namespace HwigiTower.Tests.EditMode
             var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
 
             Assert.IsNotNull(data);
-            AssertSlotSprites(data, "ENC_COMBAT_GATE_01", null, "enemy_fracture_hound_demo", null, null);
+            AssertSlotSprites(data, "ENC_COMBAT_GATE_01", null, "enemy_fracture_hound", null, null);
             AssertSlotSprites(data, "ENC_COMBAT_GATE_02", null, "enemy_collapse_echo", null, null);
             AssertSlotSprites(data, "ENC_COMBAT_GATE_03", "enc_combat_gate_03_bg", "enemy_boss_apex_02", "char_mataios_bust_s3_s4", null);
             AssertSlotSprites(data, "EVT_F01_JAR_ROOM", "evt_f01_jar_room_bg", null, "char_mataios_bust_s0_s2", null);
@@ -52,6 +52,9 @@ namespace HwigiTower.Tests.EditMode
             AssertSlotSprites(data, "ENEMY_WILD_BEAST_01", null, "enemy_wild_beast_01", null, null);
             AssertSlotSprites(data, "ENEMY_MERCENARY_CAPTAIN_SAGAN_01", null, "enemy_mercenary_captain_sagan_01", null, null);
             AssertSlotSprites(data, "ENEMY_HOMUNCULUS_01", null, "enemy_homunculus_01", null, null);
+            AssertSlotSprites(data, "ENEMY_FRACTURE_HOUND", null, "enemy_fracture_hound", null, null);
+            AssertSlotSprites(data, "ENEMY_LAMPLIGHTER_01", null, "enemy_lamplighter_01", null, null);
+            AssertSlotSprites(data, "BOSS_APEX_02", null, "enemy_boss_apex_02", null, null);
             AssertSlotSprites(data, "run.clear", "ending_choice_bg", null, "char_mataios_bust_s3_s4", null);
         }
 

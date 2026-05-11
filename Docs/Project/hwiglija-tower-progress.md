@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-11 12:54 — Renamed enemy art mappings finalized
+- **Phase**: W2-2
+- **Done**:
+  - `88ebb31` floor enemy catalog commit을 `origin/Proto`에 push하고 원격 HEAD를 확인
+  - `ENEMY_FRACTURE_HOUND` stableId는 유지한 채 presentation/art reference를 `enemy_fracture_hound.png`로 교체
+  - `ENEMY_LAMPLIGHTER_01` 점등인을 Floor 5 elite EnemyData, floor pool, presentation slot, catalog 문서에 추가
+  - `BOSS_APEX_02` final boss art/stableId mapping과 ending path를 유지하는 테스트를 보강
+  - `Assets/_Project/Art/Nodes/` intake 파일 목록은 확인만 하고 node icon binding은 다음 작업으로 보류
+- **Files**: 변경/추가/삭제 19개 (EnemyCatalog docs, Art README, FloorEnemyCatalogBuilder.cs, EncounterRuntimeCatalogBuilder.cs, SO_FloorEnemyPool_v0_1.asset, SO_DemoPresentationData.asset, EnemyData/Art assets, tests)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: node icon art를 branching map UI에 바인딩하고, Floor 5 elite encounter가 플레이 중 충분히 노출되는지 수동 QA
+- **Agent**: Codex
+
 ### 2026-05-11 07:55 — Floor enemy catalog and pools
 - **Phase**: W2-2
 - **Done**:
