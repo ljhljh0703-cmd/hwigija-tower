@@ -831,6 +831,80 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void EnemyCatalogV01_ContainsDocumentedStableIdsAndFloorPools()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
+            Assert.IsNotNull(catalog);
+            Assert.IsNotNull(catalog.FloorEnemyPools);
+
+            var expectedIds = new[]
+            {
+                "ENEMY_BANDIT_MELEE_01",
+                "ENEMY_BANDIT_RANGED_01",
+                "ENEMY_SLIME_01",
+                "ENEMY_SKELETON_01",
+                "ENEMY_WILD_BEAST_01",
+                "ENEMY_SLIME_POOL_01",
+                "ENEMY_WILD_BEAST_PACK_01",
+                "ENEMY_STATUE_01",
+                "ENEMY_FRACTURE_HOUND",
+                "ENEMY_MANEATER_PLANT_01",
+                "ENEMY_MERCENARY_MELEE_01",
+                "ENEMY_MERCENARY_RANGED_01",
+                "ENEMY_IRON_MAIDEN_01",
+                "BOSS_GATE_01",
+                "ENEMY_MERCENARY_ASSASSIN_01",
+                "ENEMY_MERCENARY_MAGE_01",
+                "ENEMY_EMPTY_ARMOR",
+                "ENEMY_MERCENARY_CAPTAIN_SAGAN_01",
+                "ENEMY_COLLAPSE_ECHO",
+                "ENEMY_SKELETON_HORDE_01",
+                "ENEMY_LIVING_TOMBSTONE_01",
+                "ENEMY_LIVING_ARMOR_LIGHT_01",
+                "ENEMY_SHADE_03",
+                "ENEMY_WRAITH_04",
+                "ENEMY_MANEATER_JUNGLE_01",
+                "ENEMY_HOMUNCULUS_01",
+                "BOSS_APEX_02"
+            };
+
+            foreach (var id in expectedIds)
+            {
+                Assert.IsTrue(catalog.TryGetEnemy(id, out _), id);
+            }
+
+            for (var floor = 1; floor <= 5; floor++)
+            {
+                Assert.IsTrue(catalog.FloorEnemyPools.TryGetPool(floor, out var pool), "floor " + floor);
+                Assert.Greater(pool.NormalEnemyRefs.Length, 0, "normal floor " + floor);
+                Assert.Greater(pool.EliteEnemyRefs.Length, 0, "elite floor " + floor);
+                Assert.Greater(pool.BossEnemyRefs.Length, 0, "boss floor " + floor);
+                AssertPoolRefsResolve(catalog, pool.NormalEnemyRefs);
+                AssertPoolRefsResolve(catalog, pool.EliteEnemyRefs);
+                AssertPoolRefsResolve(catalog, pool.BossEnemyRefs);
+            }
+        }
+
+        [Test]
+        public void CombatHandoff_UsesSelectedFloorEnemyPoolByNodeType()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
+            var normal = CreateRuntimeEncounter("ENC_POOL_NORMAL", CreateChoice("CHOICE_POOL_NORMAL", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_POOL_NORMAL", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+            var shop = CreateRuntimeEncounter("ENC_POOL_SHOP", CreateChoice("CHOICE_POOL_SHOP", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 0) }));
+            var boss = CreateRuntimeEncounter("ENC_POOL_BOSS", CreateChoice("CHOICE_POOL_BOSS", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_POOL_BOSS", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+            var battleNode = CreateNode("node.pool.battle", normal);
+            var shopNode = CreateNode("node.pool.shop", shop);
+            var bossNode = CreateNode("node.pool.boss", boss);
+            var state = new PrototypeRunState("run-pool-combat", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AttachFloorRunPaths(new[] { CreateFloorPath(1, new PrototypeDemoRunStep(battleNode, normal), new PrototypeDemoRunStep(shopNode, shop), new PrototypeDemoRunStep(bossNode, boss)) }, null);
+
+            SelectMapNodeForEncounter(state, "ENC_POOL_NORMAL");
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-pool-combat", 1001), battleNode.NodeId, normal, "CHOICE_POOL_NORMAL");
+            CollectionAssert.Contains(new[] { "ENEMY_BANDIT_MELEE_01", "ENEMY_BANDIT_RANGED_01", "ENEMY_SLIME_01", "ENEMY_SKELETON_01", "ENEMY_WILD_BEAST_01" }, state.LastCombatEnemyId);
+        }
+
+        [Test]
         public void FinalBoss_BossApexBalanceSupportsVerticalSliceClear()
         {
             var boss = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_BOSS_APEX_02.asset");
@@ -1965,6 +2039,14 @@ namespace HwigiTower.Tests.EditMode
             var match = state.GetSelectableMapNodeViews().FirstOrDefault(node => node.Type == type);
             Assert.IsFalse(string.IsNullOrEmpty(match.MapNodeId), "Expected selectable map node type " + type);
             Assert.IsTrue(state.TrySelectMapNode(match.MapNodeId, out _), "Expected selectable map node type " + type);
+        }
+
+        private static void AssertPoolRefsResolve(EncounterRuntimeCatalogData catalog, string[] refs)
+        {
+            foreach (var enemyRef in refs)
+            {
+                Assert.IsTrue(catalog.TryGetEnemy(enemyRef, out _), enemyRef);
+            }
         }
 
         private static string[] RouteEncounterIds(IReadOnlyList<PrototypeDemoRunStep> steps)

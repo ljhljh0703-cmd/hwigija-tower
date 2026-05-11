@@ -1080,10 +1080,12 @@ namespace HwigiTower.Run
             var enemyId = handoff.enemyRefs != null && handoff.enemyRefs.Length > 0 && !string.IsNullOrEmpty(handoff.enemyRefs[0])
                 ? handoff.enemyRefs[0]
                 : "enemy.placeholder";
-            var enemy = EncounterCatalog != null && EncounterCatalog.TryGetEnemy(enemyId, out var enemyData)
+            var combatId = string.IsNullOrEmpty(handoff.stableId) ? encounter == null ? nodeId : encounter.Id : handoff.stableId;
+            var poolRank = ResolveCombatPoolRank(encounter, combatId);
+            var enemyData = ResolveCombatEnemyData(context, poolRank, string.IsNullOrEmpty(handoff.seedKey) ? combatId : handoff.seedKey, enemyId);
+            var enemy = enemyData != null
                 ? CreateEnemyState(enemyData)
                 : new CombatantState(enemyId, FallbackEnemyHp, FallbackEnemyAttack);
-            var combatId = string.IsNullOrEmpty(handoff.stableId) ? encounter == null ? nodeId : encounter.Id : handoff.stableId;
             var combat = new CombatController(context, string.IsNullOrEmpty(handoff.seedKey) ? combatId : handoff.seedKey);
 
             _lastCombatId = combatId;
@@ -1116,7 +1118,7 @@ namespace HwigiTower.Run
                 var rounds = 0;
                 while (IsInCombat && rounds < 12)
                 {
-                    ResolveCombatRoundInteractive(CombatAction.Attack);
+                    ResolveCombatRoundInteractive(rounds == 0 && HasPlayableSkill() ? CombatAction.Skill : CombatAction.Attack);
                     rounds++;
                 }
                 return new PrototypeCombatHandoffResolution(true, _lastCombatResultId, combatId, enemy.Id);
@@ -1336,6 +1338,36 @@ namespace HwigiTower.Run
         private bool HasPlayableSkill()
         {
             return HasAbilityRef("ABILITY_SCOUT");
+        }
+
+        private EnemyData ResolveCombatEnemyData(DeterministicRunContext context, EnemyPoolRank rank, string seedKey, string fallbackEnemyId)
+        {
+            if (TryGetSelectedMapNode(out _) &&
+                EncounterCatalog != null &&
+                EncounterCatalog.TrySelectEnemyForFloor(_currentFloor, rank, context, seedKey, out var pooledEnemy))
+            {
+                return pooledEnemy;
+            }
+
+            return EncounterCatalog != null && EncounterCatalog.TryGetEnemy(fallbackEnemyId, out var fallbackEnemy)
+                ? fallbackEnemy
+                : null;
+        }
+
+        private EnemyPoolRank ResolveCombatPoolRank(EncounterData encounter, string combatId)
+        {
+            if (TryGetSelectedMapNode(out var selectedNode) && selectedNode.Type == PrototypeFloorMapNodeType.Boss)
+            {
+                return EnemyPoolRank.Boss;
+            }
+
+            var encounterId = encounter == null ? string.Empty : encounter.Id;
+            if (encounterId.Contains("ELITE") || combatId.Contains("ELITE"))
+            {
+                return EnemyPoolRank.Elite;
+            }
+
+            return EnemyPoolRank.Normal;
         }
 
         private bool TryApplyRecallAnchor()

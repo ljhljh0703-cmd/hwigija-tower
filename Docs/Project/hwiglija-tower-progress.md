@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-11 07:55 — Floor enemy catalog and pools
+- **Phase**: W2-2
+- **Done**:
+  - `be0a350` Rest interaction flow를 `origin/Proto`에 push하고 원격 HEAD를 확인
+  - `enemy_catalog_v0.1.md`로 floor/rank 기반 enemy catalog 문서를 추가
+  - Floor 1-5 normal/elite/boss enemy pool SO와 missing EnemyData placeholder SO를 추가
+  - branching map combat handoff가 selected map node 기준으로 floor enemy pool을 사용하도록 연결
+  - 사용 가능한 enemy art 20개를 presentation slot에 바인딩하고 catalog/presentation 테스트를 보강
+- **Files**: 변경/추가 96개 (EnemyCatalog docs, FloorEnemyPoolData.cs, FloorEnemyCatalogBuilder.cs, SO_FloorEnemyPool_v0_1.asset, EnemyData/Art/Presentation assets, RuntimeShellTests.cs, PrototypeRoomSmokeTests.cs)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: Mac Editor 수동 QA에서 floor별 enemy pool 체감, elite encounter 진입 빈도, floor boss 난이도와 reward pacing을 확인
+- **Agent**: Codex
+
 ### 2026-05-10 22:07 — Mataios rest interaction flow
 - **Phase**: W2-2
 - **Done**:

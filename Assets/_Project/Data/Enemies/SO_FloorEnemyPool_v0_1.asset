@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 985617dcb3d5a4fa6afce2db28457138, type: 3}
+  m_Name: SO_FloorEnemyPool_v0_1
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Combat.FloorEnemyPoolData
+  floors:
+  - floor: 1
+    normalEnemyRefs:
+    - ENEMY_BANDIT_MELEE_01
+    - ENEMY_BANDIT_RANGED_01
+    - ENEMY_SLIME_01
+    - ENEMY_SKELETON_01
+    - ENEMY_WILD_BEAST_01
+    eliteEnemyRefs:
+    - ENEMY_SLIME_POOL_01
+    - ENEMY_WILD_BEAST_PACK_01
+    bossEnemyRefs:
+    - ENEMY_STATUE_01
+  - floor: 2
+    normalEnemyRefs:
+    - ENEMY_FRACTURE_HOUND
+    - ENEMY_MANEATER_PLANT_01
+    - ENEMY_MERCENARY_MELEE_01
+    - ENEMY_MERCENARY_RANGED_01
+    eliteEnemyRefs:
+    - ENEMY_IRON_MAIDEN_01
+    bossEnemyRefs:
+    - BOSS_GATE_01
+  - floor: 3
+    normalEnemyRefs:
+    - ENEMY_MERCENARY_ASSASSIN_01
+    - ENEMY_MERCENARY_MAGE_01
+    - ENEMY_EMPTY_ARMOR
+    eliteEnemyRefs:
+    - ENEMY_MERCENARY_CAPTAIN_SAGAN_01
+    bossEnemyRefs:
+    - ENEMY_COLLAPSE_ECHO
+  - floor: 4
+    normalEnemyRefs:
+    - ENEMY_SKELETON_HORDE_01
+    - ENEMY_LIVING_TOMBSTONE_01
+    - ENEMY_LIVING_ARMOR_LIGHT_01
+    eliteEnemyRefs:
+    - ENEMY_SHADE_03
+    bossEnemyRefs:
+    - ENEMY_WRAITH_04
+  - floor: 5
+    normalEnemyRefs:
+    - ENEMY_MANEATER_JUNGLE_01
+    - ENEMY_HOMUNCULUS_01
+    eliteEnemyRefs:
+    - ENEMY_COLLAPSE_ECHO
+    bossEnemyRefs:
+    - BOSS_APEX_02
