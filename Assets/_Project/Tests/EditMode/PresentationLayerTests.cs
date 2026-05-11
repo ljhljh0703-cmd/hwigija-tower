@@ -45,6 +45,13 @@ namespace HwigiTower.Tests.EditMode
             AssertSlotSprites(data, "ENEMY_EMPTY_ARMOR", null, "enemy_empty_armor", null, null);
             AssertSlotSprites(data, "ENEMY_SHADE_03", null, "enemy_shade_03", null, null);
             AssertSlotSprites(data, "ENEMY_WRAITH_04", null, "enemy_wraith_04", null, null);
+            AssertSlotSprites(data, "ENEMY_BANDIT_MELEE_01", null, "enemy_bandit_melee_01", null, null);
+            AssertSlotSprites(data, "ENEMY_BANDIT_RANGED_01", null, "enemy_bandit_ranged_01", null, null);
+            AssertSlotSprites(data, "ENEMY_SLIME_01", null, "enemy_slime_01", null, null);
+            AssertSlotSprites(data, "ENEMY_SKELETON_01", null, "enemy_skeleton_01", null, null);
+            AssertSlotSprites(data, "ENEMY_WILD_BEAST_01", null, "enemy_wild_beast_01", null, null);
+            AssertSlotSprites(data, "ENEMY_MERCENARY_CAPTAIN_SAGAN_01", null, "enemy_mercenary_captain_sagan_01", null, null);
+            AssertSlotSprites(data, "ENEMY_HOMUNCULUS_01", null, "enemy_homunculus_01", null, null);
             AssertSlotSprites(data, "run.clear", "ending_choice_bg", null, "char_mataios_bust_s3_s4", null);
         }
 

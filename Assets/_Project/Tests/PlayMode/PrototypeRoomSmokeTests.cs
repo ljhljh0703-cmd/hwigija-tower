@@ -123,6 +123,7 @@ namespace HwigiTower.Tests.PlayMode
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
 
             Assert.IsTrue(controller.RunState.IsInCombat);
+            Assert.AreEqual("ENEMY_STATUE_01", controller.RunState.LastCombatEnemyId);
             Assert.IsTrue(hud.CombatPanelVisible);
             StringAssert.Contains("전투", hud.CombatMessage);
             StringAssert.Contains("적 HP", hud.CombatMessage);
@@ -267,6 +268,7 @@ namespace HwigiTower.Tests.PlayMode
             yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
             yield return ResolveRouteActionChoice(hud, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            Assert.AreEqual("ENEMY_WRAITH_04", controller.RunState.LastCombatEnemyId);
             yield return ResolveNextFloorButton(hud);
 
             yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
@@ -565,7 +567,9 @@ namespace HwigiTower.Tests.PlayMode
         private static IEnumerator ResolveNextFloorButton(PrototypeHud hud)
         {
             var buttonObject = GameObject.Find("Next Floor Button");
-            Assert.IsNotNull(buttonObject);
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var snapshot = controller == null ? default : controller.GetSnapshot();
+            Assert.IsNotNull(buttonObject, "Next Floor Button inactive; floor=" + snapshot.CurrentFloor + " status=" + snapshot.RunStatus + " stair=" + snapshot.StairUnlocked + " hp=" + snapshot.PlayerHp + " lastCombat=" + snapshot.LastCombatResultId + "/" + snapshot.LastCombatEnemyId);
             var button = buttonObject.GetComponent<Button>();
             Assert.IsNotNull(button);
             Assert.IsTrue(button.gameObject.activeInHierarchy);

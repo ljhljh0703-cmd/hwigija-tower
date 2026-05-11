@@ -1,5 +1,6 @@
 using HwigiTower.Abilities;
 using HwigiTower.Combat;
+using HwigiTower.Core;
 using HwigiTower.Items;
 using HwigiTower.Rewards;
 using UnityEngine;
@@ -13,12 +14,14 @@ namespace HwigiTower.Encounters
         [SerializeField] private RewardBundleData[] rewardBundles = new RewardBundleData[0];
         [SerializeField] private AbilityData[] abilities = new AbilityData[0];
         [SerializeField] private EnemyData[] enemies = new EnemyData[0];
+        [SerializeField] private FloorEnemyPoolData floorEnemyPools;
         [SerializeField] private MemoryFragmentData[] memoryFragments = new MemoryFragmentData[0];
 
         public ItemData[] Items => items;
         public RewardBundleData[] RewardBundles => rewardBundles;
         public AbilityData[] Abilities => abilities;
         public EnemyData[] Enemies => enemies;
+        public FloorEnemyPoolData FloorEnemyPools => floorEnemyPools;
         public MemoryFragmentData[] MemoryFragments => memoryFragments;
 
         public bool TryGetItem(string stableId, out ItemData item)
@@ -99,6 +102,19 @@ namespace HwigiTower.Encounters
             }
 
             return false;
+        }
+
+        public bool TrySelectEnemyForFloor(int floor, EnemyPoolRank rank, DeterministicRunContext context, string seedKey, out EnemyData enemy)
+        {
+            enemy = null;
+            if (floorEnemyPools == null ||
+                !floorEnemyPools.TrySelectEnemy(floor, rank, context, seedKey, out var stableId) ||
+                !TryGetEnemy(stableId, out enemy))
+            {
+                return false;
+            }
+
+            return enemy != null;
         }
 
         public bool TryGetMemoryFragment(string stableId, out MemoryFragmentData memoryFragment)

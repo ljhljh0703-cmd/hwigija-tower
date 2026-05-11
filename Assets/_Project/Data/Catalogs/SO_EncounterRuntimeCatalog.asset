@@ -23,11 +23,37 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 33e6a52b926604baeb54441b81db2d5f, type: 2}
   - {fileID: 11400000, guid: d026bba7a3664455c8c92a4f6bc2f9cd, type: 2}
   enemies:
+  - {fileID: 11400000, guid: d86f6aa37810647699ffdd66a9edf731, type: 2}
+  - {fileID: 11400000, guid: 4bf12e379723748489746c15e9bba379, type: 2}
   - {fileID: 11400000, guid: 0ab6be0b8acd446c8bffb2fcd6449abe, type: 2}
   - {fileID: 11400000, guid: 308c1e6261f834699a549e18676695dc, type: 2}
   - {fileID: 11400000, guid: 1c536928272974e8a83ae152a15bd7d1, type: 2}
+  - {fileID: 11400000, guid: 87cdb0a77456447069202578e4f39c36, type: 2}
+  - {fileID: 11400000, guid: 377b42304da5641829b3bf1e4657c3dc, type: 2}
+  - {fileID: 11400000, guid: 300eaea37800b41a1b255552277db196, type: 2}
+  - {fileID: 11400000, guid: 1babd3a536964460293dfbb59a36b0b9, type: 2}
+  - {fileID: 11400000, guid: 7ecc3514a661747af9db3a92356758a1, type: 2}
+  - {fileID: 11400000, guid: e91e92557ef174d359c6462f9d3069ee, type: 2}
+  - {fileID: 11400000, guid: 3006fb771dd224a3abba8f228d15a49a, type: 2}
+  - {fileID: 11400000, guid: 028152d4597f04a06a8d3775361f740f, type: 2}
+  - {fileID: 11400000, guid: 4d217aa272f594d1da08dd4974a7cd73, type: 2}
+  - {fileID: 11400000, guid: b911ba73e7b074e1dadf8e37f61aedfc, type: 2}
+  - {fileID: 11400000, guid: 704433d1c200c4025ba60b6e4b2eb55a, type: 2}
+  - {fileID: 11400000, guid: d36c3559caadf4289b84c7b33728c68a, type: 2}
+  - {fileID: 11400000, guid: c98396552663943e2ae5b67640fc6186, type: 2}
+  - {fileID: 11400000, guid: 825f0980f61d84b8ca065ed8cd506234, type: 2}
+  - {fileID: 11400000, guid: d1a0c8342f27642909f52f0b00e7ad2a, type: 2}
+  - {fileID: 11400000, guid: 340a695512baf459f8d4bc253c963e55, type: 2}
+  - {fileID: 11400000, guid: 99977535a74b24a72b8eba1be424dfec, type: 2}
+  - {fileID: 11400000, guid: b7df6e19c54db47909a7dd4ff6a5effe, type: 2}
+  - {fileID: 11400000, guid: 30fa77c966f6e4a608cf5da6a76c7801, type: 2}
+  - {fileID: 11400000, guid: 75ced90d9931248b394a3517ed232628, type: 2}
   - {fileID: 11400000, guid: dcece5496775b44a6976f4173f3bd009, type: 2}
   - {fileID: 11400000, guid: 7de5e9970206042ebbe3d91c7a6d1ee2, type: 2}
+  - {fileID: 11400000, guid: e22a4803b433042bb853ee1671e04cc2, type: 2}
+  - {fileID: 11400000, guid: eb9c0360621124637ad5a46077f624a0, type: 2}
+  - {fileID: 11400000, guid: ad452e755629f41be922d7218e046a7b, type: 2}
+  floorEnemyPools: {fileID: 11400000, guid: 5eabbdee3b1384b4295eb290588ee8c7, type: 2}
   memoryFragments:
   - {fileID: 11400000, guid: ed0afb4cfdb2547c7b16452a7a267dd2, type: 2}
   - {fileID: 11400000, guid: b29e0d4aa626d4ac9be2a6e857cb161e, type: 2}

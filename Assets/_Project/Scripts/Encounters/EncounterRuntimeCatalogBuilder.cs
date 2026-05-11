@@ -37,6 +37,7 @@ namespace HwigiTower.Encounters
         public const string PrototypeBossGateEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset";
         public const string PrototypeFinalBossEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset";
         public const string PrototypeFloorTwoShopEncounterPath = "Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset";
+        private const string FloorEnemyPoolPath = "Assets/_Project/Data/Enemies/SO_FloorEnemyPool_v0_1.asset";
 
         private static readonly string[] ItemIds =
         {
@@ -59,11 +60,36 @@ namespace HwigiTower.Encounters
 
         private static readonly string[] EnemyIds =
         {
+            "ENEMY_BANDIT_MELEE_01",
+            "ENEMY_BANDIT_RANGED_01",
             "ENEMY_COLLAPSE_ECHO",
             "ENEMY_EMPTY_ARMOR",
             "ENEMY_FRACTURE_HOUND",
+            "ENEMY_HOMUNCULUS_01",
+            "ENEMY_IRON_MAIDEN_01",
+            "ENEMY_LIVING_ARMOR_LIGHT_01",
+            "ENEMY_LIVING_TOMBSTONE_01",
+            "ENEMY_MANEATER_JUNGLE_01",
+            "ENEMY_MANEATER_PLANT_01",
+            "ENEMY_MERCENARY_ASSASSIN_01",
+            "ENEMY_MERCENARY_CAPTAIN_SAGAN_01",
+            "ENEMY_MERCENARY_MAGE_01",
+            "ENEMY_MERCENARY_MELEE_01",
+            "ENEMY_MERCENARY_RANGED_01",
+            "ENEMY_SHADE_03",
+            "ENEMY_SKELETON_01",
+            "ENEMY_SKELETON_HORDE_01",
+            "ENEMY_SLIME_01",
+            "ENEMY_SLIME_POOL_01",
+            "ENEMY_STATUE_01",
+            "ENEMY_WILD_BEAST_01",
+            "ENEMY_WILD_BEAST_PACK_01",
+            "ENEMY_WRAITH_04",
             "BOSS_GATE_01",
-            "BOSS_APEX_02"
+            "BOSS_APEX_02",
+            "ENEMY_WALKER_01",
+            "ENEMY_CRAWLER_02",
+            "ENEMY_HERALD_05"
         };
 
         private static readonly string[] MemoryFragmentIds =
@@ -117,7 +143,10 @@ namespace HwigiTower.Encounters
             {
                 var path = "Assets/_Project/Data/Enemies/SO_Enemy_" + EnemyIds[i] + ".asset";
                 enemies[i] = EnsureAsset<EnemyData>(path, result);
-                ApplyEnemy(enemies[i], EnemyIds[i]);
+                if (string.IsNullOrEmpty(enemies[i].Id))
+                {
+                    ApplyEnemy(enemies[i], EnemyIds[i]);
+                }
             }
 
             var rewardBundles = new RewardBundleData[RewardBundleIds.Length];
@@ -225,15 +254,137 @@ namespace HwigiTower.Encounters
         {
             var serialized = new SerializedObject(enemy);
             serialized.FindProperty("id").stringValue = stableId;
-            serialized.FindProperty("hp").intValue = stableId == "BOSS_GATE_01" ? 28 : stableId == "BOSS_APEX_02" ? 30 : 12;
-            serialized.FindProperty("attack").intValue = stableId == "BOSS_GATE_01" ? 4 : stableId == "BOSS_APEX_02" ? 4 : 3;
-            serialized.FindProperty("patternId").stringValue = stableId == "BOSS_GATE_01" || stableId == "BOSS_APEX_02" ? "PATTERN_ELITE" : "PATTERN_PLACEHOLDER";
-            serialized.FindProperty("goldReward").intValue = stableId == "BOSS_GATE_01" ? 16 : stableId == "BOSS_APEX_02" ? 30 : 0;
-            serialized.FindProperty("xpReward").intValue = stableId == "BOSS_GATE_01" ? 50 : stableId == "BOSS_APEX_02" ? 100 : 0;
-            serialized.FindProperty("glitchDelta").intValue = stableId == "BOSS_GATE_01" ? -4 : stableId == "BOSS_APEX_02" ? -8 : 0;
-            serialized.FindProperty("affinityDelta").intValue = stableId == "BOSS_GATE_01" ? 4 : stableId == "BOSS_APEX_02" ? 6 : 0;
+            serialized.FindProperty("hp").intValue = ResolveEnemyHp(stableId);
+            serialized.FindProperty("attack").intValue = ResolveEnemyAttack(stableId);
+            serialized.FindProperty("patternId").stringValue = IsEliteOrBoss(stableId) ? "PATTERN_ELITE" : "PATTERN_BASIC";
+            serialized.FindProperty("pattern").objectReferenceValue = AssetDatabase.LoadAssetAtPath<EnemyPatternData>(
+                IsEliteOrBoss(stableId)
+                    ? "Assets/_Project/Data/EnemyPatterns/SO_EnemyPattern_PATTERN_ELITE.asset"
+                    : "Assets/_Project/Data/EnemyPatterns/SO_EnemyPattern_PATTERN_BASIC.asset");
+            serialized.FindProperty("goldReward").intValue = ResolveEnemyGold(stableId);
+            serialized.FindProperty("xpReward").intValue = ResolveEnemyXp(stableId);
+            serialized.FindProperty("glitchDelta").intValue = IsBoss(stableId) ? -3 : 0;
+            serialized.FindProperty("affinityDelta").intValue = IsBoss(stableId) ? 2 : 0;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(enemy);
+        }
+
+        private static int ResolveEnemyHp(string stableId)
+        {
+            switch (stableId)
+            {
+                case "BOSS_APEX_02":
+                    return 30;
+                case "BOSS_GATE_01":
+                    return 28;
+                case "ENEMY_WRAITH_04":
+                    return 12;
+                case "ENEMY_COLLAPSE_ECHO":
+                    return 26;
+                case "ENEMY_STATUE_01":
+                    return 20;
+                case "ENEMY_MERCENARY_CAPTAIN_SAGAN_01":
+                    return 24;
+                case "ENEMY_SHADE_03":
+                    return 22;
+                case "ENEMY_IRON_MAIDEN_01":
+                    return 20;
+                case "ENEMY_WILD_BEAST_PACK_01":
+                    return 18;
+                case "ENEMY_SLIME_POOL_01":
+                    return 16;
+                default:
+                    return IsFloorFiveNormal(stableId) ? 18 : IsFloorFourNormal(stableId) ? 16 : IsFloorThreeNormal(stableId) ? 14 : 12;
+            }
+        }
+
+        private static int ResolveEnemyAttack(string stableId)
+        {
+            if (stableId == "ENEMY_WRAITH_04")
+            {
+                return 2;
+            }
+
+            if (stableId == "ENEMY_MERCENARY_CAPTAIN_SAGAN_01" ||
+                stableId == "ENEMY_SHADE_03" ||
+                stableId == "ENEMY_HOMUNCULUS_01")
+            {
+                return 5;
+            }
+
+            return IsEliteOrBoss(stableId) || IsFloorThreeNormal(stableId) || IsFloorFourNormal(stableId) || IsFloorFiveNormal(stableId) ? 4 : 3;
+        }
+
+        private static int ResolveEnemyGold(string stableId)
+        {
+            switch (stableId)
+            {
+                case "BOSS_APEX_02":
+                    return 30;
+                case "BOSS_GATE_01":
+                    return 16;
+                case "ENEMY_WRAITH_04":
+                    return 18;
+                case "ENEMY_COLLAPSE_ECHO":
+                    return 14;
+                case "ENEMY_STATUE_01":
+                    return 10;
+                case "ENEMY_MERCENARY_CAPTAIN_SAGAN_01":
+                case "ENEMY_SHADE_03":
+                    return 10;
+                case "ENEMY_IRON_MAIDEN_01":
+                    return 8;
+                case "ENEMY_SLIME_POOL_01":
+                case "ENEMY_WILD_BEAST_PACK_01":
+                    return 6;
+                default:
+                    return IsFloorFiveNormal(stableId) ? 6 : IsFloorThreeNormal(stableId) || IsFloorFourNormal(stableId) ? 5 : 4;
+            }
+        }
+
+        private static int ResolveEnemyXp(string stableId)
+        {
+            var gold = ResolveEnemyGold(stableId);
+            return IsBoss(stableId) ? gold * 3 : gold;
+        }
+
+        private static bool IsEliteOrBoss(string stableId)
+        {
+            return IsBoss(stableId) ||
+                   stableId == "ENEMY_IRON_MAIDEN_01" ||
+                   stableId == "ENEMY_MERCENARY_CAPTAIN_SAGAN_01" ||
+                   stableId == "ENEMY_SHADE_03" ||
+                   stableId == "ENEMY_SLIME_POOL_01" ||
+                   stableId == "ENEMY_WILD_BEAST_PACK_01";
+        }
+
+        private static bool IsBoss(string stableId)
+        {
+            return stableId == "BOSS_APEX_02" ||
+                   stableId == "BOSS_GATE_01" ||
+                   stableId == "ENEMY_COLLAPSE_ECHO" ||
+                   stableId == "ENEMY_STATUE_01" ||
+                   stableId == "ENEMY_WRAITH_04";
+        }
+
+        private static bool IsFloorThreeNormal(string stableId)
+        {
+            return stableId == "ENEMY_MERCENARY_ASSASSIN_01" ||
+                   stableId == "ENEMY_MERCENARY_MAGE_01" ||
+                   stableId == "ENEMY_EMPTY_ARMOR";
+        }
+
+        private static bool IsFloorFourNormal(string stableId)
+        {
+            return stableId == "ENEMY_SKELETON_HORDE_01" ||
+                   stableId == "ENEMY_LIVING_TOMBSTONE_01" ||
+                   stableId == "ENEMY_LIVING_ARMOR_LIGHT_01";
+        }
+
+        private static bool IsFloorFiveNormal(string stableId)
+        {
+            return stableId == "ENEMY_MANEATER_JUNGLE_01" ||
+                   stableId == "ENEMY_HOMUNCULUS_01";
         }
 
         private static void ApplyPrototypeBossGateOverride(EncounterData encounter)
@@ -411,6 +562,8 @@ namespace HwigiTower.Encounters
             SetObjectArray(serialized.FindProperty("abilities"), abilities);
             SetObjectArray(serialized.FindProperty("enemies"), enemies);
             SetObjectArray(serialized.FindProperty("memoryFragments"), memoryFragments);
+            serialized.FindProperty("floorEnemyPools").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<FloorEnemyPoolData>(FloorEnemyPoolPath);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(catalog);
         }

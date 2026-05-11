@@ -161,10 +161,10 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 11400000, guid: b74e40fc8ef94f6e98acac267dff00fe, type: 2}
     demoCompleteCutscene: {fileID: 11400000, guid: e436d1041ade4e8298c9eee52c4ae2fd, type: 2}
   - encounterStableId: ENEMY_EMPTY_ARMOR
-    displayName: Enemy
+    displayName: "\uB9AC\uBE59\uC544\uBA38 \uC911\uBB34\uC7A5"
     backgroundSprite: {fileID: 0}
-    titleTextKey: PLACEHOLDER_ENEMY_EMPTY_ARMOR_TITLE
-    bodyTextKey: PLACEHOLDER_ENEMY_EMPTY_ARMOR_BODY
+    titleTextKey:
+    bodyTextKey:
     mataiosPortrait: {fileID: 0}
     enemySprite: {fileID: 21300000, guid: 1682fdadf38f54d28ad1221259180769, type: 3}
     memoryFragmentSprite: {fileID: 0}
@@ -174,10 +174,10 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENEMY_SHADE_03
-    displayName: Enemy
+    displayName: "\uAE08\uAE30\uB97C \uC5FF\uBCF8 \uC790"
     backgroundSprite: {fileID: 0}
-    titleTextKey: PLACEHOLDER_ENEMY_SHADE_03_TITLE
-    bodyTextKey: PLACEHOLDER_ENEMY_SHADE_03_BODY
+    titleTextKey:
+    bodyTextKey:
     mataiosPortrait: {fileID: 0}
     enemySprite: {fileID: 21300000, guid: aded02627b8d84e8cb003d5a4ce1a2c1, type: 3}
     memoryFragmentSprite: {fileID: 0}
@@ -187,10 +187,10 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENEMY_WRAITH_04
-    displayName: Enemy
+    displayName: "\uC9C4\uB9AC\uB97C \uC5FF\uBCF8 \uC790"
     backgroundSprite: {fileID: 0}
-    titleTextKey: PLACEHOLDER_ENEMY_WRAITH_04_TITLE
-    bodyTextKey: PLACEHOLDER_ENEMY_WRAITH_04_BODY
+    titleTextKey:
+    bodyTextKey:
     mataiosPortrait: {fileID: 0}
     enemySprite: {fileID: 21300000, guid: b06bb49a636a44b53bd7bae698f9dfae, type: 3}
     memoryFragmentSprite: {fileID: 0}
@@ -206,6 +206,318 @@ MonoBehaviour:
     bodyTextKey: PLACEHOLDER_ENDING_CHOICE_BODY
     mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
     enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_BANDIT_MELEE_01
+    displayName: "\uB3C4\uC801 \uAC80\uC218"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: c58741f0739c844fe9c2f3a4f63e9c5e, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_BANDIT_RANGED_01
+    displayName: "\uB3C4\uC801 \uAD81\uC218"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 33bdc706934bb43b2af2972ae24a268a, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_SKELETON_01
+    displayName: "\uC2A4\uCF08\uB808\uD1A4"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: ac96a3df9e3444e0eadb7d2e31a308d2, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_WILD_BEAST_01
+    displayName: "\uC57C\uC0DD \uC9D0\uC2B9"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: a48374a6fa81c43249ff23865597de1f, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_SLIME_POOL_01
+    displayName: "\uC2AC\uB77C\uC784 \uBB34\uB9AC"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: dfeef0eb38bf54b28ac1d6c4d5080b64, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_WILD_BEAST_PACK_01
+    displayName: "\uC57C\uC0DD \uC9D0\uC2B9 \uBB34\uB9AC"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 992a5d74989d1441ba73d34d0910ada9, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_STATUE_01
+    displayName: "\uC6C0\uC9C1\uC774\uB294 \uC11D\uC0C1"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 5e58ea600264441438c7f34fbd8985a1, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_MANEATER_PLANT_01
+    displayName: "\uC2DD\uC778 \uC2DD\uBB3C"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 54fd9df60225443df98bc783eb575b8e, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_MERCENARY_MELEE_01
+    displayName: "\uC6A9\uBCD1 \uAC80\uC218"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: d31696438ea1443a39312a4b5177ec5a, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_MERCENARY_RANGED_01
+    displayName: "\uC6A9\uBCD1 \uC0AC\uC218"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 3d9db859d55c2448d9dd45938112b45e, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_IRON_MAIDEN_01
+    displayName: "\uC544\uC774\uC5B8 \uBA54\uC774\uB4E0"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 66dba72d799b84c5dbfca5717374ec0d, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: BOSS_GATE_01
+    displayName: "\uBB38\uC9C0\uAE30"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 1682fdadf38f54d28ad1221259180769, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_MERCENARY_ASSASSIN_01
+    displayName: "\uC6A9\uBCD1 \uC554\uC0B4\uC790"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 3b4b1718c9cc24baab5a840c91730afa, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_MERCENARY_MAGE_01
+    displayName: "\uC6A9\uBCD1 \uB9C8\uB3C4\uC0AC"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 9bff613223b714053ae2860c7070c533, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_MERCENARY_CAPTAIN_SAGAN_01
+    displayName: "\uC6A9\uBCD1\uB300\uC7A5 \uC0AC\uAC04"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: ac63f778b992941978afca0b10d4654b, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_COLLAPSE_ECHO
+    displayName: "\uC2A4\uD399\uD130"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 462f4f17b32ee409791916c3ac5e95c2, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_SKELETON_HORDE_01
+    displayName: "\uC2A4\uCF08\uB808\uD1A4 \uAD70\uC9D1"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 1444276c762184b619240944edf80ba6, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_LIVING_TOMBSTONE_01
+    displayName: "\uC0B4\uC544\uC788\uB294 \uBB18\uBE44"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 9e047eeeacebb4ca888b14d92789fca3, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_LIVING_ARMOR_LIGHT_01
+    displayName: "\uB9AC\uBE59\uC544\uBA38 \uACBD\uC7A5"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 3fdd37b11d9f348f996ccd44abee148a, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_MANEATER_JUNGLE_01
+    displayName: "\uBC00\uB9BC \uC2DD\uC778\uC218"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 49cd2f33b07c54b49bd2535372d99e18, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_HOMUNCULUS_01
+    displayName: "\uD638\uBB38\uCFE8\uB8E8\uC2A4"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: e94b1c821c841422ead4f7749130b9ea, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_SLIME_01
+    displayName: "\uC2AC\uB77C\uC784"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 98b584057985f41f8a29cf5e47ffe474, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: ENEMY_FRACTURE_HOUND
+    displayName: "\uBCC0\uC774\uB41C \uB4E4\uC9D0\uC2B9"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 3551576cb7aa3414bba08acef4c9d6ab, type: 3}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 11400000, guid: d319fa0ad36946f7ab478974ff55d86b, type: 2}
+  - encounterStableId: BOSS_APEX_02
+    displayName: "\uCD5C\uC885 \uBCF4\uC2A4"
+    backgroundSprite: {fileID: 0}
+    titleTextKey:
+    bodyTextKey:
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 21300000, guid: 8f91b8d98a3bb47c992b364f57a41a74, type: 3}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}
