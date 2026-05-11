@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-11 22:47 — Lobby scene and audio scaffold
+- **Phase**: W2-2
+- **Done**:
+  - Lobby scene을 추가하고 BuildSettings 첫 scene으로 설정, PrototypeRoom은 두 번째 playable scene으로 유지
+  - New Game / Continue placeholder / Settings panel UI를 런타임 생성하는 `LobbyController`를 추가
+  - BGM/Ambience/SFX 채널과 volume clamp, context switch API를 가진 `PrototypeAudioService` 및 `SO_AudioCueCatalog`를 추가
+  - Music/Ambience/SFX intake folder와 naming/import README를 추가하고 missing clip safe behavior를 테스트로 고정
+  - PrototypeRoom runtime에 Lobby/Exploration/Combat/Boss/Rest/Shop/Event/Ending audio context hooks를 연결
+- **Files**: 변경/추가 70여 개 (Lobby.unity, Audio/** folders, Audio scripts/data, LobbyController.cs, PrototypeRoomController.cs, tests, EditorBuildSettings.asset)
+- **GDD impact**: 없음
+- **Blockers**: 실제 음악/SFX asset 없음. Continue는 save system 확장 전 안전 placeholder/disabled 상태.
+- **Next**: 로비를 첫 화면으로 수동 확인하고, 실제 audio asset 수령 시 `SO_AudioCueCatalog`에 cue slot 바인딩
+- **Agent**: Codex
+
 ### 2026-05-11 22:08 — Screen Layer v2 readability polish
 - **Phase**: W2-2
 - **Done**:

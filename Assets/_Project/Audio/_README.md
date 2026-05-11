@@ -1,11 +1,22 @@
-# Audio Intake
+# Audio Intake Rules
 
-Place audio imports here before assigning them to prefabs, mixers, or timelines.
+This folder is the drop zone for prototype audio assets. Keep runtime bindings data-driven through `SO_AudioCueCatalog`.
 
-- `Music/`: loopable BGM and stingers.
-- `SFX/`: UI, combat, node interaction, reward, transition sounds.
-- `Ambience/`: room and tower ambience loops.
-- `Voice/`: reserved for voice or vocal texture assets.
+## Folders
+- `Music/Lobby`, `Music/Exploration`, `Music/Combat`, `Music/Boss`, `Music/Rest`, `Music/Shop`, `Music/Ending`
+- `Ambience/Floor01` through `Ambience/Floor05`
+- `SFX/UI`, `SFX/Combat`, `SFX/Event`, `SFX/Shop`, `SFX/Rest`, `SFX/Memory`, `SFX/Cutscene`
 
-Prefer clear role names:
-`SFX_Combat_Hit_01`, `SFX_UI_Select_01`, `Music_Tower_Loop_01`.
+## Naming
+- Music: `bgm_<context>_<variant>.wav`
+- Ambience: `amb_floor##_ <variant>.wav`
+- SFX: `sfx_<category>_<action>.wav`
+
+Use lowercase ASCII filenames. Avoid spaces.
+
+## Import
+- Music/Ambience: streaming or compressed-in-memory depending final size.
+- SFX: decompress on load for short clips.
+- Loop metadata lives in `AudioCueData`, not filename suffixes.
+
+No final music or sound design is implied by placeholder folders.
