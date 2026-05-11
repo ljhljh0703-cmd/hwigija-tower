@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HwigiTower.Audio;
 using HwigiTower.Core;
 using HwigiTower.Combat;
 using HwigiTower.Encounters;
@@ -13,6 +14,7 @@ namespace HwigiTower.Run
         [SerializeField] private PrototypeRoomDefinition roomDefinition;
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
         [SerializeField] private DemoPresentationData demoPresentationData;
+        [SerializeField] private PrototypeAudioService audioService;
         [SerializeField] private PrototypeHud hud;
         [SerializeField] private bool autoResolveCombat;
         [SerializeField] private bool showDemoNodeDebugLabels;
@@ -121,6 +123,7 @@ namespace HwigiTower.Run
             RunState.ModifyGold(6);
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, runId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, runId, RunContext.RunId, string.Empty));
+            PlayAudioContext(PrototypeAudioContext.Exploration);
         }
 
         private void PreserveCurrentMemoryFragments()
@@ -222,6 +225,7 @@ namespace HwigiTower.Run
                 step = selectedStep;
             }
 
+            PlayAudioContextForEncounter(step.Encounter);
             return new EncounterSelection(step.Node, step.Encounter);
         }
 
@@ -247,6 +251,7 @@ namespace HwigiTower.Run
                 return new EncounterSelection(null, null);
             }
 
+            PlayAudioContextForEncounter(step.Encounter);
             return new EncounterSelection(step.Node, step.Encounter);
         }
 
@@ -300,7 +305,9 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", false);
             }
 
-            return RunState.ResolveEncounterChoice(CreateActiveContext(), selection.Node.NodeId, selection.Encounter, choiceStableId);
+            var resolution = RunState.ResolveEncounterChoice(CreateActiveContext(), selection.Node.NodeId, selection.Encounter, choiceStableId);
+            PlayAudioContextForSnapshot(RunState.CreateSnapshot(), selection.Encounter);
+            return resolution;
         }
 
         public PrototypeNodeResolution ResolveCurrentRouteRestInteraction(EncounterSelection selection, string actionId, string utterance)
@@ -320,7 +327,9 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", false);
             }
 
-            return RunState.ResolveRestInteraction(selection.Node.NodeId, selection.EncounterId, actionId, utterance);
+            var resolution = RunState.ResolveRestInteraction(selection.Node.NodeId, selection.EncounterId, actionId, utterance);
+            PlayAudioContext(PrototypeAudioContext.Rest);
+            return resolution;
         }
 
         public PrototypeNodeResolution ResolveCurrentRouteNode(EncounterSelection selection)
@@ -370,6 +379,7 @@ namespace HwigiTower.Run
 
             var resolution = RunState.ResolveNextFloor();
             ConfigureHudDemoRoute();
+            PlayAudioContext(PrototypeAudioContext.Exploration);
             return resolution;
         }
 
@@ -380,7 +390,9 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution("ending.choice", string.Empty, "ending unavailable", false);
             }
 
-            return RunState.ResolveEndingChoice(choiceStableId);
+            var resolution = RunState.ResolveEndingChoice(choiceStableId);
+            PlayAudioContext(PrototypeAudioContext.Ending);
+            return resolution;
         }
 
         public PrototypeNodeResolution ResolveCombatAction(CombatAction action)
@@ -398,6 +410,7 @@ namespace HwigiTower.Run
             var hpBefore = RunState.ActiveCombatPlayer?.Hp ?? RunState.PlayerHp;
             var round = RunState.ResolveCombatRoundInteractive(action);
             var snapshot = RunState.CreateSnapshot();
+            PlayAudioContextForSnapshot(snapshot, null);
             var message =
                 "combat " + snapshot.LastCombatResultId +
                 " | round " + snapshot.CombatRound +
@@ -524,6 +537,62 @@ namespace HwigiTower.Run
             }
 
             return RunState.CreateSnapshot();
+        }
+
+        private void PlayAudioContextForEncounter(EncounterData encounter)
+        {
+            if (encounter == null)
+            {
+                PlayAudioContext(PrototypeAudioContext.Exploration);
+                return;
+            }
+
+            var context = encounter.Type switch
+            {
+                EncounterType.Shop => PrototypeAudioContext.Shop,
+                EncounterType.Rest => PrototypeAudioContext.Rest,
+                EncounterType.Battle => encounter.Id == "ENC_COMBAT_GATE_03" ? PrototypeAudioContext.Boss : PrototypeAudioContext.Combat,
+                EncounterType.Remnant => PrototypeAudioContext.Ending,
+                _ => PrototypeAudioContext.Event
+            };
+            PlayAudioContext(context);
+        }
+
+        private void PlayAudioContextForSnapshot(PrototypeRunSnapshot snapshot, EncounterData encounter)
+        {
+            if (snapshot.EndingChoicePending || snapshot.EndingRest || snapshot.EndingContinue)
+            {
+                PlayAudioContext(PrototypeAudioContext.Ending);
+                return;
+            }
+
+            if (snapshot.IsInCombat)
+            {
+                PlayAudioContext(snapshot.LastCombatEnemyId == "BOSS_APEX_02" ? PrototypeAudioContext.Boss : PrototypeAudioContext.Combat);
+                return;
+            }
+
+            PlayAudioContextForEncounter(encounter);
+        }
+
+        private void PlayAudioContext(PrototypeAudioContext context)
+        {
+            if (audioService == null)
+            {
+                audioService = PrototypeAudioService.GetOrCreate();
+            }
+
+            audioService.PlayContext(context);
+            var floor = RunState == null ? 1 : RunState.CurrentFloor;
+            var ambience = floor switch
+            {
+                2 => PrototypeAudioContext.Floor02Ambience,
+                3 => PrototypeAudioContext.Floor03Ambience,
+                4 => PrototypeAudioContext.Floor04Ambience,
+                5 => PrototypeAudioContext.Floor05Ambience,
+                _ => PrototypeAudioContext.Floor01Ambience
+            };
+            audioService.PlayContext(ambience);
         }
 
         private void RebuildContext()
