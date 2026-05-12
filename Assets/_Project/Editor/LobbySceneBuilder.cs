@@ -12,18 +12,22 @@ namespace HwigiTower.EditorTools
         private const string LobbyScenePath = "Assets/_Project/Scenes/Lobby.unity";
         private const string PrototypeScenePath = "Assets/_Project/Scenes/PrototypeRoom.unity";
         private const string AudioCatalogPath = "Assets/_Project/Data/Audio/SO_AudioCueCatalog.asset";
+        private const string LobbyPresentationPath = "Assets/_Project/Data/Presentation/SO_LobbyPresentationData.asset";
+        private const string LobbyBackgroundPath = "Assets/_Project/Art/Lobby/lobby_bg_tower_temp.png";
 
         [MenuItem("Hwigi Tower/Build Lobby Scene")]
         public static void Build()
         {
             EnsureFolders();
             var catalog = LoadOrCreate<AudioCueCatalog>(AudioCatalogPath);
+            var presentation = LoadOrCreate<LobbyPresentationData>(LobbyPresentationPath);
+            ConfigureLobbyPresentation(presentation);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "Lobby";
             CreateCamera();
             CreateAudioService(catalog);
-            CreateLobbyRuntime(catalog);
+            CreateLobbyRuntime(catalog, presentation);
 
             EditorSceneManager.SaveScene(scene, LobbyScenePath);
             EditorBuildSettings.scenes = new[]
@@ -41,7 +45,10 @@ namespace HwigiTower.EditorTools
             EnsureFolder("Assets", "_Project");
             EnsureFolder("Assets/_Project", "Data");
             EnsureFolder("Assets/_Project/Data", "Audio");
+            EnsureFolder("Assets/_Project/Data", "Presentation");
             EnsureFolder("Assets/_Project", "Scenes");
+            EnsureFolder("Assets/_Project", "Art");
+            EnsureFolder("Assets/_Project/Art", "Lobby");
         }
 
         private static void EnsureFolder(string parent, string child)
@@ -72,11 +79,46 @@ namespace HwigiTower.EditorTools
             SetObject(service, "cueCatalog", catalog);
         }
 
-        private static void CreateLobbyRuntime(AudioCueCatalog catalog)
+        private static void CreateLobbyRuntime(AudioCueCatalog catalog, LobbyPresentationData presentation)
         {
             var controller = new GameObject("Lobby Runtime").AddComponent<LobbyController>();
             SetString(controller, "newGameSceneName", "PrototypeRoom");
             SetObject(controller, "audioCueCatalog", catalog);
+            SetObject(controller, "presentationData", presentation);
+        }
+
+        private static void ConfigureLobbyPresentation(LobbyPresentationData presentation)
+        {
+            var background = LoadLobbyBackgroundSprite();
+            var serialized = new SerializedObject(presentation);
+            serialized.FindProperty("backgroundSprite").objectReferenceValue = background;
+            serialized.FindProperty("logoSprite").objectReferenceValue = null;
+            serialized.FindProperty("titleText").stringValue = "회귀자는 탑을 오른다";
+            serialized.FindProperty("subtitleText").stringValue = "Prototype";
+            serialized.FindProperty("defaultProfileName").stringValue = "Player";
+            serialized.FindProperty("showQuitButtonOnDesktopOnly").boolValue = true;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(presentation);
+        }
+
+        private static Sprite LoadLobbyBackgroundSprite()
+        {
+            if (!System.IO.File.Exists(LobbyBackgroundPath))
+            {
+                return null;
+            }
+
+            if (AssetImporter.GetAtPath(LobbyBackgroundPath) is TextureImporter importer)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = false;
+                importer.maxTextureSize = 2048;
+                importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Sprite>(LobbyBackgroundPath);
         }
 
         private static T LoadOrCreate<T>(string path) where T : ScriptableObject
