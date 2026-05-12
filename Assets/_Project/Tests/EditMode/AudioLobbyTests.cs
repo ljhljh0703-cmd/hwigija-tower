@@ -45,11 +45,24 @@ namespace HwigiTower.Tests.EditMode
             var controller = new GameObject("Lobby Controller Test").AddComponent<LobbyController>();
 
             Assert.AreEqual("PrototypeRoom", controller.NewGameSceneName);
+            Assert.AreEqual("저장된 진행 없음", controller.ContinueDisabledReason);
             Assert.IsTrue(System.IO.File.Exists("Assets/_Project/Scenes/Lobby.unity"));
             Assert.IsTrue(System.IO.File.Exists("Assets/_Project/Data/Audio/SO_AudioCueCatalog.asset"));
+            Assert.IsTrue(System.IO.File.Exists("Assets/_Project/Data/Presentation/SO_LobbyPresentationData.asset"));
             Assert.AreEqual("Assets/_Project/Scenes/Lobby.unity", EditorBuildSettings.scenes[0].path);
             Assert.AreEqual("Assets/_Project/Scenes/PrototypeRoom.unity", EditorBuildSettings.scenes[1].path);
             Object.DestroyImmediate(controller.gameObject);
+        }
+
+        [Test]
+        public void LobbyPresentationData_ExistsAndHandlesMissingBackground()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<LobbyPresentationData>("Assets/_Project/Data/Presentation/SO_LobbyPresentationData.asset");
+
+            Assert.IsNotNull(data);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(data.TitleText));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(data.SubtitleText));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(data.DefaultProfileName));
         }
     }
 }

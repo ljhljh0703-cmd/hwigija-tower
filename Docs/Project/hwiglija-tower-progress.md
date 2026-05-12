@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-12 16:07 — Lobby main menu presentation polish
+- **Phase**: W3-1
+- **Done**:
+  - Lobby 전용 art intake folder/README를 추가하고 `lobby_bg_tower_temp.png`를 Sprite background slot에 바인딩
+  - `LobbyPresentationData`와 `SO_LobbyPresentationData`를 추가해 background/logo/title/subtitle/profile/quit visibility를 data-driven으로 분리
+  - Lobby UI를 profile card, title/subtitle, large touch buttons, profile/settings panels, desktop quit button이 있는 player-facing main menu로 재구성
+  - Continue는 `이어 하기` + `저장된 진행 없음` disabled state로 고정하고 Profile placeholder panel을 추가
+  - EditMode/PlayMode lobby smoke coverage를 presentation/profile/settings/new game 흐름에 맞게 확장
+- **Files**: 변경/추가 15개 (LobbyController.cs, LobbyPresentationData.cs, LobbySceneBuilder.cs, Lobby.unity, Art/Lobby/**, SO_LobbyPresentationData.asset, tests)
+- **GDD impact**: 없음
+- **Blockers**: 최종 로고/세이브 시스템 없음. Continue는 placeholder/disabled 유지.
+- **Next**: 실제 로비 로고와 음악 cue 수령 후 `SO_LobbyPresentationData` / `SO_AudioCueCatalog` 바인딩
+- **Agent**: Codex
+
 ### 2026-05-11 22:47 — Lobby scene and audio scaffold
 - **Phase**: W2-2
 - **Done**:
