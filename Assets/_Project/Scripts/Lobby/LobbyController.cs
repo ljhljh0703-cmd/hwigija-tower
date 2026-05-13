@@ -1,4 +1,5 @@
 using HwigiTower.Audio;
+using HwigiTower.Run;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -30,6 +31,19 @@ namespace HwigiTower.Lobby
 
         public void StartNewGame()
         {
+            PrototypeRunSaveRequest.RequestNewGame();
+            SceneManager.LoadScene(NewGameSceneName);
+        }
+
+        public void ContinueSavedRun()
+        {
+            if (!PrototypeRunSaveStore.HasSave())
+            {
+                ShowContinuePlaceholder();
+                return;
+            }
+
+            PrototypeRunSaveRequest.RequestContinue();
             SceneManager.LoadScene(NewGameSceneName);
         }
 
@@ -103,9 +117,8 @@ namespace HwigiTower.Lobby
             _statusText.alignment = TextAnchor.MiddleLeft;
 
             CreateButton(canvasObject.transform, "Lobby New Game Button", "새 게임", new Vector2(0.08f, 0.38f), new Vector2(0.56f, 0.46f), StartNewGame);
-            _continueButton = CreateButton(canvasObject.transform, "Lobby Continue Button", "이어 하기", new Vector2(0.08f, 0.29f), new Vector2(0.56f, 0.37f), ShowContinuePlaceholder);
-            _continueButton.interactable = false;
-            SetButtonDisabledText(_continueButton, ContinueDisabledReason);
+            _continueButton = CreateButton(canvasObject.transform, "Lobby Continue Button", "이어 하기", new Vector2(0.08f, 0.29f), new Vector2(0.56f, 0.37f), ContinueSavedRun);
+            ConfigureContinueButton();
             CreateButton(canvasObject.transform, "Lobby Profile Button", "프로필", new Vector2(0.08f, 0.20f), new Vector2(0.56f, 0.28f), OpenProfile);
             CreateButton(canvasObject.transform, "Lobby Settings Button", "설정", new Vector2(0.08f, 0.11f), new Vector2(0.56f, 0.19f), OpenSettings);
             if (ShouldShowQuitButton())
@@ -115,6 +128,28 @@ namespace HwigiTower.Lobby
 
             BuildProfilePanel(canvasObject.transform);
             BuildSettingsPanel(canvasObject.transform);
+        }
+
+        private void ConfigureContinueButton()
+        {
+            if (_continueButton == null)
+            {
+                return;
+            }
+
+            if (PrototypeRunSaveStore.TryLoadSummary(out var summary))
+            {
+                _continueButton.interactable = true;
+                SetButtonText(_continueButton, "이어 하기\n" + summary.DisplayText, 24);
+                if (_statusText != null)
+                {
+                    _statusText.text = summary.DisplayText;
+                }
+                return;
+            }
+
+            _continueButton.interactable = false;
+            SetButtonText(_continueButton, "이어 하기\n" + ContinueDisabledReason, 24);
         }
 
         private void BuildBackground(Transform parent)
@@ -284,15 +319,15 @@ namespace HwigiTower.Lobby
             return button;
         }
 
-        private static void SetButtonDisabledText(Button button, string reason)
+        private static void SetButtonText(Button button, string value, int fontSize)
         {
             var label = button.GetComponentInChildren<Text>();
             if (label != null)
             {
-                label.text = "이어 하기\n" + reason;
-                label.fontSize = 26;
+                label.text = value;
+                label.fontSize = fontSize;
                 label.resizeTextMinSize = 18;
-                label.resizeTextMaxSize = 26;
+                label.resizeTextMaxSize = fontSize;
             }
         }
 

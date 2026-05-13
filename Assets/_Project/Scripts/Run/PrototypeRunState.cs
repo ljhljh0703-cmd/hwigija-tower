@@ -166,6 +166,274 @@ namespace HwigiTower.Run
         public string LastRestUtterance => _lastRestUtterance;
         public string LastMataiosResponse => _lastMataiosResponse;
 
+        public PrototypeRunSaveData CreateSaveData()
+        {
+            var completedMapNodeIds = new List<string>();
+            var skippedMapNodeIds = new List<string>();
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node == null)
+                {
+                    continue;
+                }
+
+                if (node.Completed)
+                {
+                    completedMapNodeIds.Add(node.MapNodeId);
+                }
+                else if (node.Skipped)
+                {
+                    skippedMapNodeIds.Add(node.MapNodeId);
+                }
+            }
+
+            var items = new List<PrototypeRunSaveItemEntry>();
+            foreach (var pair in _items)
+            {
+                if (!string.IsNullOrEmpty(pair.Key) && pair.Value > 0)
+                {
+                    items.Add(new PrototypeRunSaveItemEntry { itemRef = pair.Key, count = pair.Value });
+                }
+            }
+
+            var resolvedChoices = new List<PrototypeRunSaveResolvedChoice>();
+            foreach (var pair in _resolvedEncounterChoices)
+            {
+                resolvedChoices.Add(new PrototypeRunSaveResolvedChoice { key = pair.Key, choiceStableId = pair.Value });
+            }
+
+            return new PrototypeRunSaveData
+            {
+                runId = RunId,
+                currentFloor = _currentFloor,
+                playerHp = _activeCombatPlayer?.Hp ?? _playerHp,
+                playerMaxHp = _playerMaxHp,
+                mental = _mental,
+                gold = _gold,
+                glitchLevel = _glitchLevel,
+                affinity = _affinity,
+                nodesResolved = NodesResolved,
+                battlesWon = BattlesWon,
+                runCompleted = _runCompleted,
+                runClear = _runClear,
+                runFailed = _runFailed,
+                restartReady = _restartReady,
+                endingRest = _endingRest,
+                endingContinue = _endingContinue,
+                endingChoiceId = _endingChoiceId,
+                stairUnlocked = _stairUnlocked,
+                trainingBuffActive = _trainingBuffActive,
+                selectedMapNodeId = _selectedMapNodeId,
+                flags = ToArray(_flags),
+                items = items.ToArray(),
+                abilityRefs = ToArray(_abilityRefs),
+                rewardBundleRefs = ToArray(_rewardBundleRefs),
+                memoryFragmentRefs = ToArray(_memoryFragmentRefs),
+                resolvedChoices = resolvedChoices.ToArray(),
+                resolvedDemoStepKeys = ToArray(_resolvedDemoSteps),
+                completedMapNodeIds = completedMapNodeIds.ToArray(),
+                skippedMapNodeIds = skippedMapNodeIds.ToArray()
+            };
+        }
+
+        public void RestoreFromSaveData(
+            PrototypeRunSaveData data,
+            IReadOnlyList<PrototypeFloorRunPath> floorRunPaths,
+            IReadOnlyList<PrototypeDemoRunStep> fallbackFloorOnePath)
+        {
+            if (data == null || string.IsNullOrEmpty(data.runId))
+            {
+                return;
+            }
+
+            _floorRunPaths.Clear();
+            if (floorRunPaths != null)
+            {
+                for (var i = 0; i < floorRunPaths.Count; i++)
+                {
+                    var path = floorRunPaths[i];
+                    if (path != null && path.Floor > 0 && path.Steps != null && path.Steps.Count > 0)
+                    {
+                        _floorRunPaths.Add(path);
+                    }
+                }
+            }
+
+            _currentFloor = data.currentFloor < 1 ? 1 : data.currentFloor;
+            AttachDemoRunPath(GetFloorRunPath(_currentFloor, fallbackFloorOnePath));
+
+            _flags.Clear();
+            AddRange(_flags, data.flags);
+            _items.Clear();
+            if (data.items != null)
+            {
+                for (var i = 0; i < data.items.Length; i++)
+                {
+                    var item = data.items[i];
+                    if (item != null && !string.IsNullOrEmpty(item.itemRef) && item.count > 0)
+                    {
+                        _items[item.itemRef] = item.count;
+                    }
+                }
+            }
+
+            _abilityRefs.Clear();
+            Abilities.Clear();
+            AddRange(_abilityRefs, data.abilityRefs);
+            if (data.abilityRefs != null && EncounterCatalog != null)
+            {
+                for (var i = 0; i < data.abilityRefs.Length; i++)
+                {
+                    if (EncounterCatalog.TryGetAbility(data.abilityRefs[i], out var ability) && ability != null)
+                    {
+                        Abilities.Add(ability);
+                    }
+                }
+            }
+
+            _rewardBundleRefs.Clear();
+            AddRange(_rewardBundleRefs, data.rewardBundleRefs);
+            _memoryFragmentRefs.Clear();
+            AddRange(_memoryFragmentRefs, data.memoryFragmentRefs);
+            _lastMemoryFragmentId = data.memoryFragmentRefs != null && data.memoryFragmentRefs.Length > 0 ? data.memoryFragmentRefs[data.memoryFragmentRefs.Length - 1] : string.Empty;
+            if (!string.IsNullOrEmpty(_lastMemoryFragmentId) && EncounterCatalog != null && EncounterCatalog.TryGetMemoryFragment(_lastMemoryFragmentId, out var memoryFragment))
+            {
+                _lastMemoryFragmentTitleKey = memoryFragment.TitleKey;
+                _lastMemoryFragmentBodyKey = memoryFragment.BodyKey;
+            }
+            else
+            {
+                _lastMemoryFragmentTitleKey = string.Empty;
+                _lastMemoryFragmentBodyKey = string.Empty;
+            }
+            _resolvedEncounterChoices.Clear();
+            if (data.resolvedChoices != null)
+            {
+                for (var i = 0; i < data.resolvedChoices.Length; i++)
+                {
+                    var entry = data.resolvedChoices[i];
+                    if (entry != null && !string.IsNullOrEmpty(entry.key))
+                    {
+                        _resolvedEncounterChoices[entry.key] = entry.choiceStableId ?? string.Empty;
+                    }
+                }
+            }
+
+            _resolvedDemoSteps.Clear();
+            AddRange(_resolvedDemoSteps, data.resolvedDemoStepKeys);
+            ApplySavedMapNodeState(data.completedMapNodeIds, data.skippedMapNodeIds);
+
+            _stairUnlocked = data.stairUnlocked;
+            _runCompleted = data.runCompleted;
+            _runClear = data.runClear;
+            _runFailed = data.runFailed;
+            _restartReady = data.restartReady;
+            _endingRest = data.endingRest;
+            _endingContinue = data.endingContinue;
+            _endingChoiceId = data.endingChoiceId ?? string.Empty;
+            _selectedMapNodeId = IsSavedMapNodeSelectable(data.selectedMapNodeId) ? data.selectedMapNodeId : string.Empty;
+            NodesResolved = data.nodesResolved < 0 ? 0 : data.nodesResolved;
+            BattlesWon = data.battlesWon < 0 ? 0 : data.battlesWon;
+            _mental = Clamp(data.mental, MinMental, MaxMental);
+            _gold = Clamp(data.gold, MinGold, MaxGold);
+            _glitchLevel = Clamp(data.glitchLevel, MinGlitchLevel, MaxGlitchLevel);
+            _affinity = Clamp(data.affinity, MinAffinity, MaxAffinity);
+            _trainingBuffActive = data.trainingBuffActive;
+            if (_trainingBuffActive)
+            {
+                _flags.Add("MATAIOS_TRAINING_BUFF_ACTIVE");
+            }
+
+            RecalculatePlayerStats();
+            _playerMaxHp = data.playerMaxHp <= 0 ? _playerMaxHp : data.playerMaxHp;
+            _playerHp = Clamp(data.playerHp, 0, _playerMaxHp);
+            _lastCombatResultId = string.Empty;
+            _lastCombatRoundResult = "loaded save";
+            _lastNpcReactionKey = "NPC_REACT_SAVE_LOADED";
+        }
+
+        private void ApplySavedMapNodeState(string[] completedMapNodeIds, string[] skippedMapNodeIds)
+        {
+            if (completedMapNodeIds != null)
+            {
+                for (var i = 0; i < completedMapNodeIds.Length; i++)
+                {
+                    var node = FindMapNode(completedMapNodeIds[i]);
+                    if (node != null)
+                    {
+                        node.Completed = true;
+                    }
+                }
+            }
+
+            if (skippedMapNodeIds != null)
+            {
+                for (var i = 0; i < skippedMapNodeIds.Length; i++)
+                {
+                    var node = FindMapNode(skippedMapNodeIds[i]);
+                    if (node != null && !node.Completed)
+                    {
+                        node.Skipped = true;
+                    }
+                }
+            }
+        }
+
+        private bool IsSavedMapNodeSelectable(string mapNodeId)
+        {
+            var node = FindMapNode(mapNodeId);
+            return node != null && !node.Completed && !node.Skipped;
+        }
+
+        private PrototypeFloorMapNode FindMapNode(string mapNodeId)
+        {
+            if (string.IsNullOrEmpty(mapNodeId))
+            {
+                return null;
+            }
+
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node != null && node.MapNodeId == mapNodeId)
+                {
+                    return node;
+                }
+            }
+
+            return null;
+        }
+
+        private static void AddRange(HashSet<string> destination, string[] source)
+        {
+            if (destination == null || source == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(source[i]))
+                {
+                    destination.Add(source[i]);
+                }
+            }
+        }
+
+        private static string[] ToArray(HashSet<string> values)
+        {
+            if (values == null || values.Count == 0)
+            {
+                return System.Array.Empty<string>();
+            }
+
+            var result = new string[values.Count];
+            values.CopyTo(result);
+            System.Array.Sort(result, System.StringComparer.Ordinal);
+            return result;
+        }
+
         public PrototypeRunSnapshot CreateSnapshot()
         {
             return new PrototypeRunSnapshot(

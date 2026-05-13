@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-12 22:32 — Prototype run save and Lobby Continue
+- **Phase**: W3-1
+- **Done**:
+  - deterministic prototype run save JSON model/store를 추가하고 missing save safe behavior를 고정
+  - PrototypeRoom safe points(run start, node/choice completion, rest commit, combat result, floor/ending transition)에 save write를 연결
+  - Lobby Continue가 save 존재 시 활성화되고 Floor/HP/Memory summary를 표시한 뒤 PrototypeRoom continue load로 진입하도록 연결
+  - run id/floor/map node completion/memory fragment state restore와 reflection/cache save 제외 정책을 EditMode 테스트로 고정
+  - Lobby PlayMode smoke에 no-save disabled, New Game save creation, Continue load path를 추가
+- **Files**: 변경/추가 12개 (PrototypeRunSaveData.cs, PrototypeRunSaveStore.cs, PrototypeRunState.cs, PrototypeRoomController.cs, LobbyController.cs, tests)
+- **GDD impact**: 없음
+- **Blockers**: reflection repo / deterministic LLM cache는 현 구조상 save file에 열거 API가 없어 명시적으로 제외. PlayMode batchmode가 결과 저장 후 종료 신호를 놓쳐 수동 Unity 종료 필요.
+- **Next**: save 파일에 reflection/cache를 포함할지 SSOT 결정 후 필요 시 repo snapshot API 추가
+- **Agent**: Codex
+
 ### 2026-05-12 16:07 — Lobby main menu presentation polish
 - **Phase**: W3-1
 - **Done**:

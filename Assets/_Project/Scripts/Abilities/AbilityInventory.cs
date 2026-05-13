@@ -17,6 +17,11 @@ namespace HwigiTower.Abilities
 
         public IReadOnlyList<AbilityData> Abilities => _abilities;
 
+        public void Clear()
+        {
+            _abilities.Clear();
+        }
+
         public bool Add(AbilityData ability)
         {
             if (ability == null)
