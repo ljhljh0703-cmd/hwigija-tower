@@ -51,7 +51,14 @@ namespace HwigiTower.Run
         {
             if (RunState == null)
             {
-                BeginRun();
+                if (PrototypeRunSaveRequest.ConsumeContinueRequested() && PrototypeRunSaveStore.TryLoad(out var saveData))
+                {
+                    StartRunFromSave(saveData);
+                }
+                else
+                {
+                    BeginRun();
+                }
             }
 
             hud?.ShowRunState(GetSnapshot());
@@ -83,6 +90,7 @@ namespace HwigiTower.Run
 
         public void BeginRun()
         {
+            PrototypeRunSaveRequest.RequestNewGame();
             _restartIndex = 0;
             StartRun(RunContext.RunId);
         }
@@ -123,6 +131,30 @@ namespace HwigiTower.Run
             RunState.ModifyGold(6);
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, runId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, runId, RunContext.RunId, string.Empty));
+            PlayAudioContext(PrototypeAudioContext.Exploration);
+            SaveCurrentRun();
+        }
+
+        private void StartRunFromSave(PrototypeRunSaveData saveData)
+        {
+            if (saveData == null || string.IsNullOrEmpty(saveData.runId))
+            {
+                BeginRun();
+                return;
+            }
+
+            if (_persistentMemoryRepo == null)
+            {
+                _persistentMemoryRepo = new InMemoryNpcMemoryRepo();
+            }
+
+            RunState = new PrototypeRunState(saveData.runId, EventBus, null, _persistentMemoryRepo) { AutoResolveCombat = autoResolveCombat };
+            RunState.AttachEncounterCatalog(encounterRuntimeCatalog);
+            RunState.RestoreFromSaveData(saveData, roomDefinition == null ? null : roomDefinition.FloorRunPaths, roomDefinition == null ? null : roomDefinition.DemoRunPath);
+            PreserveCurrentMemoryFragments();
+            ConfigureHudDemoRoute();
+            EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, saveData.runId, "save.loaded", string.Empty));
+            EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, saveData.runId, "save.loaded", string.Empty));
             PlayAudioContext(PrototypeAudioContext.Exploration);
         }
 
@@ -307,6 +339,7 @@ namespace HwigiTower.Run
 
             var resolution = RunState.ResolveEncounterChoice(CreateActiveContext(), selection.Node.NodeId, selection.Encounter, choiceStableId);
             PlayAudioContextForSnapshot(RunState.CreateSnapshot(), selection.Encounter);
+            SaveCurrentRun();
             return resolution;
         }
 
@@ -329,6 +362,7 @@ namespace HwigiTower.Run
 
             var resolution = RunState.ResolveRestInteraction(selection.Node.NodeId, selection.EncounterId, actionId, utterance);
             PlayAudioContext(PrototypeAudioContext.Rest);
+            SaveCurrentRun();
             return resolution;
         }
 
@@ -349,7 +383,9 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", false);
             }
 
-            return ResolveNodeDefinition(selection.Node, selection);
+            var resolution = ResolveNodeDefinition(selection.Node, selection);
+            SaveCurrentRun();
+            return resolution;
         }
 
         public PrototypeNodeResolution ResolveEncounterChoice(InteractableNode node, EncounterData encounter, string choiceStableId)
@@ -367,6 +403,7 @@ namespace HwigiTower.Run
             var nodeId = node == null || node.Definition == null ? string.Empty : node.Definition.NodeId;
             var resolution = RunState.ResolveEncounterChoice(CreateActiveContext(), nodeId, encounter, choiceStableId);
             NotifyNodeResolved(node, resolution.PayloadId);
+            SaveCurrentRun();
             return resolution;
         }
 
@@ -380,6 +417,7 @@ namespace HwigiTower.Run
             var resolution = RunState.ResolveNextFloor();
             ConfigureHudDemoRoute();
             PlayAudioContext(PrototypeAudioContext.Exploration);
+            SaveCurrentRun();
             return resolution;
         }
 
@@ -392,6 +430,7 @@ namespace HwigiTower.Run
 
             var resolution = RunState.ResolveEndingChoice(choiceStableId);
             PlayAudioContext(PrototypeAudioContext.Ending);
+            SaveCurrentRun();
             return resolution;
         }
 
@@ -450,6 +489,7 @@ namespace HwigiTower.Run
                 }
             }
 
+            SaveCurrentRun();
             return new PrototypeNodeResolution(snapshot.LastCombatId, snapshot.LastCombatResultId, message, snapshot.RunCompleted);
         }
 
@@ -482,7 +522,18 @@ namespace HwigiTower.Run
 
             var resolution = ResolveNodeDefinition(definition, selection, enemy);
             NotifyNodeResolved(node, resolution.PayloadId);
+            SaveCurrentRun();
             return resolution;
+        }
+
+        public void SaveCurrentRun()
+        {
+            if (RunState == null)
+            {
+                return;
+            }
+
+            PrototypeRunSaveStore.Save(RunState.CreateSaveData());
         }
 
         private PrototypeNodeResolution ResolveNodeDefinition(PrototypeNodeDefinition definition, EncounterSelection selection)
