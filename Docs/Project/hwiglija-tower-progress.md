@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-13 21:30 — Mataios training dataset spec and seed samples
+- **Phase**: W3-1
+- **Done**:
+  - Mataios SFT dataset schema/spec 문서와 eval plan v0.1 문서를 추가
+  - banmal, affinity variation, no direct answer, keyword-only memory, light S3/S4 fracture, no final lore/moral judgment/Glitch exposure 규칙을 명시
+  - SFT seed JSONL 13개와 eval seed JSONL 13개를 추가해 rest/combat/event/shop/memory/boss/ending pending task를 커버
+  - JSONL line-by-line parse와 required field check를 수행
+- **Files**: 변경/추가 7개 (Docs/AI/**, mataios_sft_v0_1.sample.jsonl, mataios_eval_v0_1.sample.jsonl, metas)
+- **GDD impact**: 없음
+- **Blockers**: base model 미정. 샘플 target은 training-format temporary 예시이며 최종 canon dialogue가 아님.
+- **Next**: 실제 작가 승인 tone rows를 추가하고, eval 자동 체크 스크립트/CI 편입 여부 결정
+- **Agent**: Codex
+
 ### 2026-05-12 22:32 — Prototype run save and Lobby Continue
 - **Phase**: W3-1
 - **Done**:
