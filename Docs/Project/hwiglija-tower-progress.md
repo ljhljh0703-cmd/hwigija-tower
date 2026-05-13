@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-13 22:31 — Mataios model-specific training plan split
+- **Phase**: W3-1
+- **Done**:
+  - `d405638 Document Mataios training dataset spec`를 origin/Proto에 push해 모델 비의존 spec 커밋을 보존
+  - 외부 편집으로 섞인 HyperCLOVA/Colab/Ollama/512-token/TRL 실행 가정을 새 training run plan 문서로 분리
+  - dataset spec v0.1은 schema, behavior contract, task coverage, keyword-only memory, fracture/forbidden rules 중심으로 정리
+  - eval plan v0.1은 model/tool 비의존 eval axes, manual rubric, optional automation note 중심으로 정리
+- **Files**: 변경/추가 4개 (Docs/AI/**, Docs/Project/hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: base model, training environment, final author-approved rows, Unity model artifact format은 아직 미정
+- **Next**: 작가 승인 tone rows 추가 후 선택 모델 기준으로 실제 SFT run script를 별도 repo/tooling에서 준비
+- **Agent**: Codex
+
 ### 2026-05-13 21:30 — Mataios training dataset spec and seed samples
 - **Phase**: W3-1
 - **Done**:
