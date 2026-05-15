@@ -6,11 +6,19 @@ using UnityEngine.UI;
 
 namespace HwigiTower.Lobby
 {
+    [ExecuteAlways]
+    [DefaultExecutionOrder(-10000)]
     public sealed class LobbyController : MonoBehaviour
     {
         [SerializeField] private string newGameSceneName = "PrototypeRoom";
         [SerializeField] private AudioCueCatalog audioCueCatalog;
         [SerializeField] private LobbyPresentationData presentationData;
+
+        private const string LobbyCanvasName = "Lobby Canvas";
+        private const string LobbyTitleName = "Lobby Title";
+        private const string LobbyNewGameButtonName = "Lobby New Game Button";
+        private const string LobbyContinueButtonName = "Lobby Continue Button";
+        private const string LobbySettingsButtonName = "Lobby Settings Button";
 
         private GameObject _settingsPanel;
         private GameObject _profilePanel;
@@ -24,6 +32,23 @@ namespace HwigiTower.Lobby
         public bool ProfilePanelVisible => _profilePanel != null && _profilePanel.activeSelf;
         public string ContinueDisabledReason => "저장된 진행 없음";
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void EnsureLobbySceneRuntimeUi()
+        {
+            if (SceneManager.GetActiveScene().name != "Lobby")
+            {
+                return;
+            }
+
+            var controller = FindFirstObjectByType<LobbyController>();
+            if (controller == null)
+            {
+                controller = new GameObject("Lobby Runtime").AddComponent<LobbyController>();
+            }
+
+            controller.EnsureRuntimeUi();
+        }
+
         private void Awake()
         {
             EnsureRuntimeUi();
@@ -31,10 +56,7 @@ namespace HwigiTower.Lobby
 
         private void OnEnable()
         {
-            if (Application.isPlaying)
-            {
-                EnsureRuntimeUi();
-            }
+            EnsureRuntimeUi();
         }
 
         private void Start()
@@ -44,23 +66,69 @@ namespace HwigiTower.Lobby
 
         private void Update()
         {
-            if (Application.isPlaying && !_uiBuilt)
+            if (!IsRuntimeUiPresent())
             {
                 EnsureRuntimeUi();
             }
         }
 
+        private void OnDisable()
+        {
+            _uiBuilt = false;
+            _safeAreaRoot = null;
+            _settingsPanel = null;
+            _profilePanel = null;
+            _statusText = null;
+            _continueButton = null;
+        }
+
         private void EnsureRuntimeUi()
         {
-            if (_uiBuilt)
+            if (!Application.isPlaying && gameObject.scene.name != "Lobby")
             {
                 return;
             }
 
-            PrototypeAudioService.GetOrCreate().Configure(audioCueCatalog);
-            PrototypeAudioService.GetOrCreate().PlayContext(PrototypeAudioContext.Lobby);
+            if (IsRuntimeUiPresent())
+            {
+                _uiBuilt = true;
+                return;
+            }
+
+            HidePartialRuntimeUi();
+            if (Application.isPlaying)
+            {
+                PrototypeAudioService.GetOrCreate().Configure(audioCueCatalog);
+                PrototypeAudioService.GetOrCreate().PlayContext(PrototypeAudioContext.Lobby);
+            }
+
             BuildUi();
             _uiBuilt = true;
+        }
+
+        private bool IsRuntimeUiPresent()
+        {
+            return transform.Find(LobbyCanvasName) != null
+                && GameObject.Find(LobbyTitleName) != null
+                && GameObject.Find(LobbyNewGameButtonName) != null
+                && GameObject.Find(LobbyContinueButtonName) != null
+                && GameObject.Find(LobbySettingsButtonName) != null;
+        }
+
+        private void HidePartialRuntimeUi()
+        {
+            var existing = transform.Find(LobbyCanvasName);
+            if (existing != null)
+            {
+                existing.gameObject.SetActive(false);
+            }
+
+            _safeAreaRoot = null;
+            _settingsPanel = null;
+            _profilePanel = null;
+            _statusText = null;
+            _continueButton = null;
+            _uiBuilt = false;
         }
 
         public void StartNewGame()
@@ -133,7 +201,7 @@ namespace HwigiTower.Lobby
 
         private void BuildUi()
         {
-            var canvasObject = new GameObject("Lobby Canvas");
+            var canvasObject = new GameObject(LobbyCanvasName);
             canvasObject.transform.SetParent(transform, false);
             var canvas = canvasObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -274,7 +342,7 @@ namespace HwigiTower.Lobby
             }
 
             var titleValue = presentationData != null ? presentationData.TitleText : "회귀자는 탑을 오른다";
-            var title = CreateText(parent, "Lobby Title", titleValue, 66, new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.76f));
+            var title = CreateText(parent, LobbyTitleName, titleValue, 66, new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.76f));
             title.color = new Color(0.94f, 0.97f, 0.92f, 1f);
             var subtitleValue = presentationData != null ? presentationData.SubtitleText : "Prototype";
             var subtitle = CreateText(parent, "Lobby Subtitle", subtitleValue, 28, new Vector2(0.14f, 0.61f), new Vector2(0.86f, 0.65f));

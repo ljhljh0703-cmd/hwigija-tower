@@ -32,6 +32,48 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-15 21:18 — Lobby Play Mode black screen fix
+- **Phase**: W3-2
+- **Done**:
+  - Lobby Play Mode black Game View 원인을 stale `_uiBuilt` 상태와 실제 runtime Canvas 누락 불일치로 좁힘
+  - `LobbyController`가 `_uiBuilt` 플래그만 믿지 않고 `Lobby Canvas`/title/buttons 존재를 확인해 누락 시 UI를 재생성하도록 수정
+  - PlayMode smoke에 Canvas active/render mode/GraphicRaycaster 검증과 Canvas 누락 후 자동 재생성 회귀 테스트 추가
+  - 2026-05-15 QA report/handoff 문서를 repo 내부 `Docs/QA/`에 보존
+  - `git diff --check` 통과, forbidden search 신규 코드 위반 없음, EditMode 116/116 pass, PlayMode 18/18 pass, skipped 0 확인
+- **Files**: 변경/추가 5개 (LobbyController.cs, LobbySmokeTests.cs, Docs/QA/**, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Blockers**: Codex manual Editor 세션은 이전 임시 wrapper compile error 이후 stale 상태가 섞여 육안 판정이 불안정했음. PlayMode 회귀 테스트로 Canvas 누락 재생성을 고정.
+- **Next**: 사용자 단일 Editor 인스턴스에서 Lobby 1080x1920 육안 재확인 후 P1 map/combat readability 개선
+- **Agent**: Codex
+
+### 2026-05-15 20:48 — Unity retry 성공 + Lobby black screen blocker handoff
+- **Phase**: W3-2
+- **Done**:
+  - Unity `6000.4.3f1` 재실행 성공: LicenseClient 연결, Unity Personal entitlement 확인, access token 갱신 통과
+  - 프로젝트 로드, script compilation/domain reload, `Lobby.unity` 열기 성공
+  - Play Mode 진입 성공 확인
+  - Game View 가 검은 화면으로 유지되어 Lobby UI가 보이지 않는 P0 blocker 확인
+  - QA 리포트를 최신 상태로 정정하고 개발 handoff 문서를 추가
+- **Files**: 변경/추가 3개 (`Docs/QA/QA_Report_2026-05-15.md`, `Docs/QA/Dev_Handoff_Unity_Retry_2026-05-15.md`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (QA/개발 인계 기록만, 신규 디자인 결정 없음)
+- **Blockers**: `Lobby.unity` Play Mode black Game View. 다음 개발 세션은 `LobbyController` UI 생성, Canvas/camera/render mode, presentation data binding 우선 확인 필요
+- **Next**: Lobby black screen P0 수정 후 1080x1920 fresh manual QA 재개
+- **Agent**: Codex
+
+### 2026-05-15 17:19 — QA playtest report 작성, Unity licensing blocker 기록
+- **Phase**: W3-2
+- **Done**:
+  - `origin/Proto` 최신 상태 확인 (`c4cad87`)
+  - SSOT pillars / locked decisions / tone bible 금지선과 최근 PROGRESS 확인
+  - Unity `6000.4.3f1` batch/GUI 실행을 시도했으나 LicenseClient 초기화 실패로 fresh manual playtest 차단 확인
+  - 기존 PlayMode/Lobby smoke coverage, runtime source, 1080x1920 screenshot artifacts를 근거로 QA 리포트 작성
+  - P0 environment blocker, P1 design gaps, dev/content/asset task를 우선순위화
+- **Files**: 변경/추가 2개 (`Docs/QA/QA_Report_2026-05-15.md`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (QA 제안만, 신규 디자인 결정 없음)
+- **Blockers**: Unity LicenseClient timeout으로 실제 Editor 수동 플레이/신규 PlayMode 결과 생성 불가
+- **Next**: Unity licensing 복구 후 Lobby부터 1080x1920 fresh manual QA 재실행, combat intent/map preview/Mataios reaction 우선 구현 검토
+- **Agent**: Codex
+
 ### 2026-05-15 12:31 — Lobby portrait menu layout fix
 - **Phase**: W3-2
 - **Done**:
