@@ -32,6 +32,21 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-15 12:31 — Lobby portrait menu layout fix
+- **Phase**: W3-2
+- **Done**:
+  - Lobby UI를 1080x1920 portrait safe-area 루트 아래에 생성하도록 변경해 landscape Game View에서도 중앙 컬럼에 고정
+  - 새 게임/이어 하기/프로필/설정/종료 버튼을 동일 폭 세로 컬럼으로 정렬하고 종료 버튼의 far-right 배치를 제거
+  - 기본 화면의 큰 profile card를 작은 top-left chip으로 축소하고, 상세 정보는 Profile panel 안에서만 표시되도록 유지
+  - Settings slider가 기본 로비 화면에 노출되지 않고 Settings panel 안에서만 생성/표시되는지 PlayMode smoke 검증을 보강
+  - scene reload/enter play mode 설정 차이로 Awake가 누락되어도 Start/Update fallback에서 로비 UI를 1회 생성하도록 보강
+- **Files**: 변경/추가 3개 (LobbyController.cs, LobbySmokeTests.cs, hwiglija-tower-progress.md)
+- **GDD impact**: 없음
+- **Validation**: `git diff --check` pass, forbidden search 신규 코드 위반 없음, EditMode 116/116 pass, PlayMode 17/17 pass, skipped 0
+- **Blockers**: 1080x1920 수동 visual QA는 중복 Unity Editor lock/Hub focus 문제로 캡처 확인까지는 완료하지 못함. PlayMode smoke가 safe-area/button-column/settings/profile visibility를 구조적으로 검증.
+- **Next**: 사용자가 Editor에서 단일 인스턴스로 Lobby를 열어 최종 육안 확인. 다음 작업은 실제 배경/로고/저장 슬롯 polish.
+- **Agent**: Codex
+
 ### 2026-05-13 22:31 — Mataios model-specific training plan split
 - **Phase**: W3-1
 - **Done**:

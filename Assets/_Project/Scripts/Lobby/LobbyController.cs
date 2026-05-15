@@ -16,6 +16,8 @@ namespace HwigiTower.Lobby
         private GameObject _profilePanel;
         private Text _statusText;
         private Button _continueButton;
+        private RectTransform _safeAreaRoot;
+        private bool _uiBuilt;
 
         public string NewGameSceneName => string.IsNullOrEmpty(newGameSceneName) ? "PrototypeRoom" : newGameSceneName;
         public bool SettingsPanelVisible => _settingsPanel != null && _settingsPanel.activeSelf;
@@ -24,9 +26,41 @@ namespace HwigiTower.Lobby
 
         private void Awake()
         {
+            EnsureRuntimeUi();
+        }
+
+        private void OnEnable()
+        {
+            if (Application.isPlaying)
+            {
+                EnsureRuntimeUi();
+            }
+        }
+
+        private void Start()
+        {
+            EnsureRuntimeUi();
+        }
+
+        private void Update()
+        {
+            if (Application.isPlaying && !_uiBuilt)
+            {
+                EnsureRuntimeUi();
+            }
+        }
+
+        private void EnsureRuntimeUi()
+        {
+            if (_uiBuilt)
+            {
+                return;
+            }
+
             PrototypeAudioService.GetOrCreate().Configure(audioCueCatalog);
             PrototypeAudioService.GetOrCreate().PlayContext(PrototypeAudioContext.Lobby);
             BuildUi();
+            _uiBuilt = true;
         }
 
         public void StartNewGame()
@@ -109,25 +143,41 @@ namespace HwigiTower.Lobby
             scaler.matchWidthOrHeight = 1f;
             canvasObject.AddComponent<GraphicRaycaster>();
 
-            BuildBackground(canvasObject.transform);
-            BuildProfileCard(canvasObject.transform);
-            BuildHero(canvasObject.transform);
+            CreateSafeAreaRoot(canvasObject.transform);
+            BuildBackground(canvasObject.transform, _safeAreaRoot.transform);
+            BuildProfileChip(_safeAreaRoot.transform);
+            BuildHero(_safeAreaRoot.transform);
+            BuildMenuColumn(_safeAreaRoot.transform);
+            BuildProfilePanel(_safeAreaRoot.transform);
+            BuildSettingsPanel(_safeAreaRoot.transform);
+        }
 
-            _statusText = CreateText(canvasObject.transform, "Lobby Status", string.Empty, 30, new Vector2(0.08f, 0.24f), new Vector2(0.56f, 0.29f));
-            _statusText.alignment = TextAnchor.MiddleLeft;
+        private void CreateSafeAreaRoot(Transform parent)
+        {
+            var safeAreaObject = new GameObject("Lobby Portrait Safe Area");
+            safeAreaObject.transform.SetParent(parent, false);
+            _safeAreaRoot = safeAreaObject.AddComponent<RectTransform>();
+            _safeAreaRoot.anchorMin = new Vector2(0.5f, 0.5f);
+            _safeAreaRoot.anchorMax = new Vector2(0.5f, 0.5f);
+            _safeAreaRoot.pivot = new Vector2(0.5f, 0.5f);
+            _safeAreaRoot.sizeDelta = new Vector2(1080f, 1920f);
+            _safeAreaRoot.anchoredPosition = Vector2.zero;
+        }
 
-            CreateButton(canvasObject.transform, "Lobby New Game Button", "새 게임", new Vector2(0.08f, 0.38f), new Vector2(0.56f, 0.46f), StartNewGame);
-            _continueButton = CreateButton(canvasObject.transform, "Lobby Continue Button", "이어 하기", new Vector2(0.08f, 0.29f), new Vector2(0.56f, 0.37f), ContinueSavedRun);
+        private void BuildMenuColumn(Transform parent)
+        {
+            _statusText = CreateText(parent, "Lobby Status", string.Empty, 28, new Vector2(0.14f, 0.52f), new Vector2(0.86f, 0.57f));
+            _statusText.alignment = TextAnchor.MiddleCenter;
+
+            CreateButton(parent, "Lobby New Game Button", "새 게임", new Vector2(0.14f, 0.43f), new Vector2(0.86f, 0.50f), StartNewGame);
+            _continueButton = CreateButton(parent, "Lobby Continue Button", "이어 하기", new Vector2(0.14f, 0.34f), new Vector2(0.86f, 0.42f), ContinueSavedRun);
             ConfigureContinueButton();
-            CreateButton(canvasObject.transform, "Lobby Profile Button", "프로필", new Vector2(0.08f, 0.20f), new Vector2(0.56f, 0.28f), OpenProfile);
-            CreateButton(canvasObject.transform, "Lobby Settings Button", "설정", new Vector2(0.08f, 0.11f), new Vector2(0.56f, 0.19f), OpenSettings);
+            CreateButton(parent, "Lobby Profile Button", "프로필", new Vector2(0.14f, 0.26f), new Vector2(0.86f, 0.33f), OpenProfile);
+            CreateButton(parent, "Lobby Settings Button", "설정", new Vector2(0.14f, 0.18f), new Vector2(0.86f, 0.25f), OpenSettings);
             if (ShouldShowQuitButton())
             {
-                CreateButton(canvasObject.transform, "Lobby Quit Button", "종료", new Vector2(0.62f, 0.11f), new Vector2(0.92f, 0.19f), QuitOrShowPlaceholder);
+                CreateButton(parent, "Lobby Quit Button", "종료", new Vector2(0.14f, 0.10f), new Vector2(0.86f, 0.17f), QuitOrShowPlaceholder);
             }
-
-            BuildProfilePanel(canvasObject.transform);
-            BuildSettingsPanel(canvasObject.transform);
         }
 
         private void ConfigureContinueButton()
@@ -152,10 +202,21 @@ namespace HwigiTower.Lobby
             SetButtonText(_continueButton, "이어 하기\n" + ContinueDisabledReason, 24);
         }
 
-        private void BuildBackground(Transform parent)
+        private void BuildBackground(Transform canvasParent, Transform portraitParent)
         {
+            var gutterObject = new GameObject("Lobby Landscape Gutter");
+            gutterObject.transform.SetParent(canvasParent, false);
+            var gutterRect = gutterObject.AddComponent<RectTransform>();
+            gutterRect.anchorMin = Vector2.zero;
+            gutterRect.anchorMax = Vector2.one;
+            gutterRect.offsetMin = Vector2.zero;
+            gutterRect.offsetMax = Vector2.zero;
+            var gutter = gutterObject.AddComponent<Image>();
+            gutter.color = new Color(0.012f, 0.016f, 0.022f, 1f);
+            gutter.raycastTarget = false;
+
             var backgroundObject = new GameObject("Lobby Background");
-            backgroundObject.transform.SetParent(parent, false);
+            backgroundObject.transform.SetParent(portraitParent, false);
             var rect = backgroundObject.AddComponent<RectTransform>();
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
@@ -165,7 +226,7 @@ namespace HwigiTower.Lobby
             if (presentationData != null && presentationData.BackgroundSprite != null)
             {
                 image.sprite = presentationData.BackgroundSprite;
-                image.preserveAspect = true;
+                image.preserveAspect = false;
                 image.color = Color.white;
             }
             else
@@ -174,7 +235,7 @@ namespace HwigiTower.Lobby
             }
 
             var overlayObject = new GameObject("Lobby Background Readability Overlay");
-            overlayObject.transform.SetParent(parent, false);
+            overlayObject.transform.SetParent(portraitParent, false);
             var overlayRect = overlayObject.AddComponent<RectTransform>();
             overlayRect.anchorMin = Vector2.zero;
             overlayRect.anchorMax = Vector2.one;
@@ -185,16 +246,14 @@ namespace HwigiTower.Lobby
             overlay.raycastTarget = false;
         }
 
-        private void BuildProfileCard(Transform parent)
+        private void BuildProfileChip(Transform parent)
         {
-            var card = CreatePanel(parent, "Lobby Profile Card", new Vector2(0.06f, 0.84f), new Vector2(0.46f, 0.94f), new Color(0.04f, 0.055f, 0.07f, 0.86f));
-            var icon = CreatePanel(card.transform, "Lobby Profile Icon Placeholder", new Vector2(0.04f, 0.18f), new Vector2(0.22f, 0.82f), new Color(0.17f, 0.20f, 0.22f, 1f));
-            CreateText(icon.transform, "Lobby Profile Icon Text", "P", 36, Vector2.zero, Vector2.one);
+            var card = CreatePanel(parent, "Lobby Profile Chip", new Vector2(0.06f, 0.91f), new Vector2(0.42f, 0.965f), new Color(0.04f, 0.055f, 0.07f, 0.70f));
+            var icon = CreatePanel(card.transform, "Lobby Profile Icon Placeholder", new Vector2(0.05f, 0.18f), new Vector2(0.18f, 0.82f), new Color(0.17f, 0.20f, 0.22f, 1f));
+            CreateText(icon.transform, "Lobby Profile Icon Text", "P", 24, Vector2.zero, Vector2.one);
             var name = presentationData != null ? presentationData.DefaultProfileName : "Player";
-            var profileName = CreateText(card.transform, "Lobby Profile Name", name, 28, new Vector2(0.27f, 0.46f), new Vector2(0.96f, 0.82f));
+            var profileName = CreateText(card.transform, "Lobby Profile Name", name, 22, new Vector2(0.22f, 0.14f), new Vector2(0.96f, 0.86f));
             profileName.alignment = TextAnchor.MiddleLeft;
-            var status = CreateText(card.transform, "Lobby Profile Status", "Prototype", 22, new Vector2(0.27f, 0.16f), new Vector2(0.96f, 0.48f));
-            status.alignment = TextAnchor.MiddleLeft;
         }
 
         private void BuildHero(Transform parent)
@@ -204,8 +263,8 @@ namespace HwigiTower.Lobby
                 var logoObject = new GameObject("Lobby Logo");
                 logoObject.transform.SetParent(parent, false);
                 var logoRect = logoObject.AddComponent<RectTransform>();
-                logoRect.anchorMin = new Vector2(0.16f, 0.64f);
-                logoRect.anchorMax = new Vector2(0.84f, 0.78f);
+                logoRect.anchorMin = new Vector2(0.18f, 0.67f);
+                logoRect.anchorMax = new Vector2(0.82f, 0.80f);
                 logoRect.offsetMin = Vector2.zero;
                 logoRect.offsetMax = Vector2.zero;
                 var logo = logoObject.AddComponent<Image>();
@@ -215,10 +274,10 @@ namespace HwigiTower.Lobby
             }
 
             var titleValue = presentationData != null ? presentationData.TitleText : "회귀자는 탑을 오른다";
-            var title = CreateText(parent, "Lobby Title", titleValue, 64, new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.76f));
+            var title = CreateText(parent, "Lobby Title", titleValue, 66, new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.76f));
             title.color = new Color(0.94f, 0.97f, 0.92f, 1f);
             var subtitleValue = presentationData != null ? presentationData.SubtitleText : "Prototype";
-            var subtitle = CreateText(parent, "Lobby Subtitle", subtitleValue, 30, new Vector2(0.14f, 0.61f), new Vector2(0.86f, 0.66f));
+            var subtitle = CreateText(parent, "Lobby Subtitle", subtitleValue, 28, new Vector2(0.14f, 0.61f), new Vector2(0.86f, 0.65f));
             subtitle.color = new Color(0.74f, 0.82f, 0.84f, 1f);
         }
 
@@ -227,8 +286,8 @@ namespace HwigiTower.Lobby
             _settingsPanel = new GameObject("Lobby Settings Panel");
             _settingsPanel.transform.SetParent(parent, false);
             var rect = _settingsPanel.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.08f, 0.24f);
-            rect.anchorMax = new Vector2(0.92f, 0.70f);
+            rect.anchorMin = new Vector2(0.10f, 0.30f);
+            rect.anchorMax = new Vector2(0.90f, 0.70f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             var image = _settingsPanel.AddComponent<Image>();
@@ -247,8 +306,8 @@ namespace HwigiTower.Lobby
             _profilePanel = new GameObject("Lobby Profile Panel");
             _profilePanel.transform.SetParent(parent, false);
             var rect = _profilePanel.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.08f, 0.28f);
-            rect.anchorMax = new Vector2(0.92f, 0.68f);
+            rect.anchorMin = new Vector2(0.10f, 0.30f);
+            rect.anchorMax = new Vector2(0.90f, 0.68f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             var image = _profilePanel.AddComponent<Image>();
