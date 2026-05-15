@@ -37,10 +37,19 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(GameObject.Find("Lobby Profile Button"));
             Assert.IsNotNull(GameObject.Find("Lobby Title"));
             Assert.IsNotNull(GameObject.Find("Lobby Subtitle"));
+            Assert.IsNotNull(GameObject.Find("Lobby Portrait Safe Area"));
+            Assert.IsNotNull(GameObject.Find("Lobby Profile Chip"));
+            Assert.IsNull(GameObject.Find("Lobby Profile Card"));
             var continueButton = GameObject.Find("Lobby Continue Button").GetComponent<Button>();
             Assert.IsNotNull(continueButton);
             Assert.IsFalse(continueButton.interactable);
             Assert.IsTrue(continueButton.GetComponentInChildren<Text>().text.Contains(controller.ContinueDisabledReason));
+            AssertMainMenuButtonsSharePortraitColumn();
+
+            var canvasScaler = GameObject.Find("Lobby Canvas").GetComponent<CanvasScaler>();
+            Assert.AreEqual(CanvasScaler.ScaleMode.ScaleWithScreenSize, canvasScaler.uiScaleMode);
+            Assert.AreEqual(new Vector2(1080f, 1920f), canvasScaler.referenceResolution);
+            Assert.AreEqual(1f, canvasScaler.matchWidthOrHeight);
         }
 
         [UnityTest]
@@ -52,6 +61,9 @@ namespace HwigiTower.Tests.PlayMode
             var controller = Object.FindFirstObjectByType<LobbyController>();
             Assert.IsNotNull(controller);
             Assert.IsFalse(controller.SettingsPanelVisible);
+            Assert.IsNull(GameObject.Find("Lobby BGM Volume Slider"));
+            Assert.IsNull(GameObject.Find("Lobby SFX Volume Slider"));
+            Assert.IsNull(GameObject.Find("Lobby Text Speed Slider"));
 
             GameObject.Find("Lobby Settings Button").GetComponent<Button>().onClick.Invoke();
             yield return null;
@@ -74,6 +86,8 @@ namespace HwigiTower.Tests.PlayMode
             var controller = Object.FindFirstObjectByType<LobbyController>();
             Assert.IsNotNull(controller);
             Assert.IsFalse(controller.ProfilePanelVisible);
+            Assert.IsNull(GameObject.Find("Lobby Profile Runs Cleared"));
+            Assert.IsNull(GameObject.Find("Lobby Profile Memories"));
 
             GameObject.Find("Lobby Profile Button").GetComponent<Button>().onClick.Invoke();
             yield return null;
@@ -131,6 +145,31 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(room);
             Assert.AreEqual("run-playmode-continue", room.RunState.RunId);
             Assert.AreEqual(2, room.RunState.CurrentFloor);
+        }
+
+        private static void AssertMainMenuButtonsSharePortraitColumn()
+        {
+            var names = new[]
+            {
+                "Lobby New Game Button",
+                "Lobby Continue Button",
+                "Lobby Profile Button",
+                "Lobby Settings Button",
+                "Lobby Quit Button"
+            };
+
+            foreach (var name in names)
+            {
+                var button = GameObject.Find(name);
+                if (button == null)
+                {
+                    continue;
+                }
+
+                var rect = button.GetComponent<RectTransform>();
+                Assert.AreEqual(0.14f, rect.anchorMin.x, 0.001f, name);
+                Assert.AreEqual(0.86f, rect.anchorMax.x, 0.001f, name);
+            }
         }
     }
 }
