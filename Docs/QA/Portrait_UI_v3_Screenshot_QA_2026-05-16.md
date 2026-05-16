@@ -29,8 +29,9 @@
 - Result panels do not block the active action buttons in the captured states.
 - 2026-05-17 readability pass refreshed Floor Map, Shop, Top HUD, Rest input, and Combat text density using the same screenshot harness.
 - 2026-05-17 merchant/rest/map pass connected floor merchant slots, strengthened map focus contrast, and separated rest input/response/effect areas.
+- 2026-05-17 text density pass compressed result summaries to core lines, moved companion status beside the portrait, and limited combat feedback to enemy/player HP plus the latest action consequence.
 
 ## Remaining UI Polish
 - P1: improve font sharpness/readability in captured Game View output.
-- P1: keep reducing companion/result text density as final content labels arrive.
+- P1: final content labels may need one more copyfit pass after writer-approved text lands.
 - P2: add final merchant art variants and stronger selected/focused animation states for rest input and map nodes.

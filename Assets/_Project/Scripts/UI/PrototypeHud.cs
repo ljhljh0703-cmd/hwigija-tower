@@ -77,10 +77,23 @@ namespace HwigiTower.UI
         private const float MapNodeButtonHeight = 118f;
         private const float MapNodeButtonSpacing = 132f;
         private const float MapNodeIconSize = 72f;
-        private const int ChoiceFontSize = 30;
+        private const int TitleFontSize = 34;
+        private const int SubtitleFontSize = 30;
+        private const int BodyFontSize = 28;
+        private const int ButtonFontSize = 30;
+        private const int ResultFontSize = 28;
+        private const int StatFontSize = 26;
+        private const int CaptionFontSize = 23;
+        private const int CombatBodyFontSize = 31;
+        private const int ChoiceFontSize = ButtonFontSize;
         private const int MapNodeFontSize = 29;
-        private const int RestBodyFontSize = 31;
+        private const int RestBodyFontSize = 30;
         private const int RestInputFontSize = 34;
+        private const int ResultLineLimit = 3;
+        private const float DenseLineSpacing = 0.92f;
+        private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
+        private static readonly Color ResultTextColor = new Color(0.88f, 0.93f, 0.95f, 1f);
+        private static readonly Color PanelColor = new Color(0.035f, 0.045f, 0.055f, 0.88f);
 
         public int ChoiceButtonCount => _choiceButtons.Count;
         public string ResultMessage => resultText == null ? string.Empty : resultText.text;
@@ -557,8 +570,8 @@ namespace HwigiTower.UI
                     snapshot.RunFailed ? " | 실패" :
                     string.Empty;
                 runStateText.text =
-                    $"Floor {snapshot.CurrentFloor}{status}  HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp}  Gold {snapshot.Gold}  Mental {snapshot.Mental}\n" +
-                    $"Memory {snapshot.MemoryFragmentCount}  Ability {snapshot.AbilityCount}  Item {snapshot.ItemCount}";
+                    $"Floor {snapshot.CurrentFloor}{status}  HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp}  Gold {snapshot.Gold}  정신 {snapshot.Mental}\n" +
+                    $"기억 {snapshot.MemoryFragmentCount}  능력 {snapshot.AbilityCount}  아이템 {snapshot.ItemCount}";
             }
 
             if (snapshot.RunCompleted)
@@ -834,7 +847,7 @@ namespace HwigiTower.UI
             topStatusLayer = EnsureLayerPanel(topStatusLayer, "Screen Layer Top Status", new Vector2(0f, 0.92f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, new Color(0.025f, 0.032f, 0.04f, 0.88f), false);
             objectiveLayer = EnsureLayerPanel(objectiveLayer, "Screen Layer Objective", new Vector2(0.04f, 0.84f), new Vector2(0.96f, 0.915f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, new Color(0.05f, 0.07f, 0.09f, 0.82f), false);
             visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.49f), new Vector2(0.96f, 0.835f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.52f), false);
-            npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.86f), false);
+            npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, PanelColor, false);
             resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.305f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.90f), false);
             nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.305f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.265f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.02f, 0.025f, 0.03f, 0.50f), false);
@@ -881,10 +894,14 @@ namespace HwigiTower.UI
             MoveTextUnderPortraitRoot(interactionText);
             MoveTextUnderPortraitRoot(runStateText);
             MoveTextUnderPortraitRoot(resultText);
-            ApplyTextRect(focusText, new Vector2(0.06f, 0.965f), new Vector2(0.94f, 0.995f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, 30, TextAnchor.UpperCenter);
-            ApplyTextRect(interactionText, new Vector2(0.06f, 0.89f), new Vector2(0.94f, 0.925f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, 32, TextAnchor.MiddleCenter);
-            ApplyTextRect(runStateText, new Vector2(0.06f, 0.925f), new Vector2(0.94f, 0.965f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, 28, TextAnchor.MiddleCenter);
-            ApplyTextRect(resultText, new Vector2(0.08f, 0.315f), new Vector2(0.92f, 0.395f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 30, TextAnchor.MiddleCenter);
+            ApplyTextRect(focusText, new Vector2(0.06f, 0.965f), new Vector2(0.94f, 0.995f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, SubtitleFontSize, TextAnchor.UpperCenter);
+            ApplyTextRect(interactionText, new Vector2(0.06f, 0.89f), new Vector2(0.94f, 0.925f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, TitleFontSize, TextAnchor.MiddleCenter);
+            ApplyTextRect(runStateText, new Vector2(0.06f, 0.925f), new Vector2(0.94f, 0.965f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, BodyFontSize, TextAnchor.MiddleCenter);
+            ApplyTextRect(resultText, new Vector2(0.08f, 0.315f), new Vector2(0.92f, 0.395f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, ResultFontSize, TextAnchor.MiddleCenter);
+            if (resultText != null)
+            {
+                resultText.lineSpacing = DenseLineSpacing;
+            }
         }
 
         private void MoveTextUnderPortraitRoot(Text text)
@@ -1010,11 +1027,11 @@ namespace HwigiTower.UI
             var image = panelObject.AddComponent<Image>();
             image.color = new Color(0.045f, 0.055f, 0.070f, 0.97f);
 
-            var title = CreateHudText("Rest Interaction Title", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-36f, 56f), 34, TextAnchor.MiddleCenter, new Color(0.92f, 0.96f, 0.94f, 1f));
+            var title = CreateHudText("Rest Interaction Title", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-36f, 56f), TitleFontSize, TextAnchor.MiddleCenter, new Color(0.92f, 0.96f, 0.94f, 1f));
             title.transform.SetParent(panelObject.transform, false);
             title.text = "휴식";
 
-            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", "기분\nAffinity +2", new Vector2(0.17f, 0.81f), "rest.ask_mood");
+            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", "기분\n신뢰 +2", new Vector2(0.17f, 0.81f), "rest.ask_mood");
             restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", "훈련\n피해 +1", new Vector2(0.50f, 0.81f), "rest.train");
             restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", "휴식\nHP 회복", new Vector2(0.83f, 0.81f), "rest.recover");
 
@@ -1071,8 +1088,8 @@ namespace HwigiTower.UI
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
 
-            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 28, TextAnchor.MiddleCenter, new Color(0.90f, 0.94f, 0.95f, 1f));
-            text.lineSpacing = 0.92f;
+            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, BodyFontSize, TextAnchor.MiddleCenter, PrimaryTextColor);
+            text.lineSpacing = DenseLineSpacing;
             text.transform.SetParent(buttonObject.transform, false);
             text.text = label;
             return button;
@@ -1099,7 +1116,7 @@ namespace HwigiTower.UI
             text.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
             input.textComponent = text;
 
-            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 31, TextAnchor.MiddleLeft, new Color(0.16f, 0.22f, 0.24f, 1f));
+            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, RestBodyFontSize, TextAnchor.MiddleLeft, new Color(0.16f, 0.22f, 0.24f, 1f));
             placeholder.transform.SetParent(inputObject.transform, false);
             placeholder.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
             placeholder.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
@@ -1120,7 +1137,7 @@ namespace HwigiTower.UI
             {
                 restResponseText.text = actionId switch
                 {
-                    "rest.ask_mood" => "기분을 묻는다\n말을 입력하면 Affinity +2",
+                    "rest.ask_mood" => "기분을 묻는다\n말을 입력하면 신뢰 +2",
                     "rest.train" => "훈련을 진행한다\n다음 전투 피해 +1",
                     "rest.recover" => "휴식을 취한다\n입력 없이 HP 회복",
                     _ => "말을 입력한 뒤 전달하세요"
@@ -1184,7 +1201,7 @@ namespace HwigiTower.UI
         {
             var effect = actionId switch
             {
-                "rest.ask_mood" => "결과: Affinity +2",
+                "rest.ask_mood" => "결과: 신뢰 +2",
                 "rest.train" => "결과: 다음 전투 피해 +1",
                 "rest.recover" => "결과: HP 회복",
                 _ => "결과: 완료"
@@ -1247,15 +1264,16 @@ namespace HwigiTower.UI
 
             resultText = resultObject.AddComponent<Text>();
             resultText.font = ResolveFont();
-            resultText.fontSize = 30;
+            resultText.fontSize = ResultFontSize;
             resultText.alignment = TextAnchor.MiddleCenter;
             resultText.horizontalOverflow = HorizontalWrapMode.Wrap;
             resultText.verticalOverflow = VerticalWrapMode.Truncate;
             resultText.resizeTextForBestFit = true;
-            resultText.resizeTextMinSize = 22;
-            resultText.resizeTextMaxSize = 30;
+            resultText.resizeTextMinSize = CaptionFontSize;
+            resultText.resizeTextMaxSize = ResultFontSize;
             resultText.supportRichText = false;
-            resultText.color = new Color(0.88f, 0.93f, 0.95f, 1f);
+            resultText.color = ResultTextColor;
+            resultText.lineSpacing = DenseLineSpacing;
             NormalizeLayout();
         }
 
@@ -1276,7 +1294,8 @@ namespace HwigiTower.UI
                 return;
             }
 
-            memoryText = CreateHudText("Memory Combat Text", new Vector2(0.08f, 0f), new Vector2(0.92f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 650f), new Vector2(0f, 132f), 24, TextAnchor.MiddleCenter, new Color(0.82f, 0.89f, 0.92f, 1f));
+            memoryText = CreateHudText("Memory Combat Text", new Vector2(0.31f, 0.382f), new Vector2(0.92f, 0.478f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, CaptionFontSize, TextAnchor.MiddleLeft, new Color(0.82f, 0.89f, 0.92f, 1f));
+            memoryText.lineSpacing = 0.88f;
         }
 
         private void EnsureDemoCompleteText()
@@ -1413,7 +1432,8 @@ namespace HwigiTower.UI
             image.color = new Color(0.05f, 0.065f, 0.08f, 0.94f);
 
             combatEnemyImage = CreateCombatImage(panelObject.transform, "Combat Enemy Image", new Vector2(0.08f, 0.50f), new Vector2(0.92f, 0.93f));
-            combatText = CreateHudText("Combat Status Text", new Vector2(0.08f, 0.26f), new Vector2(0.92f, 0.47f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 33, TextAnchor.UpperLeft, new Color(0.90f, 0.95f, 0.96f, 1f));
+            combatText = CreateHudText("Combat Status Text", new Vector2(0.08f, 0.26f), new Vector2(0.92f, 0.47f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, CombatBodyFontSize, TextAnchor.UpperLeft, PrimaryTextColor);
+            combatText.lineSpacing = DenseLineSpacing;
             combatText.transform.SetParent(panelObject.transform, false);
             var combatTextRect = combatText.GetComponent<RectTransform>();
             combatTextRect.anchorMin = new Vector2(0.08f, 0.26f);
@@ -1512,11 +1532,11 @@ namespace HwigiTower.UI
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 30;
+            label.fontSize = ButtonFontSize;
             label.alignment = TextAnchor.MiddleCenter;
             label.resizeTextForBestFit = true;
             label.resizeTextMinSize = 22;
-            label.resizeTextMaxSize = 30;
+            label.resizeTextMaxSize = ButtonFontSize;
             label.raycastTarget = false;
             label.color = new Color(0.94f, 0.97f, 0.98f, 1f);
             label.text = labelText;
@@ -2194,8 +2214,8 @@ namespace HwigiTower.UI
             }
 
             var npc = string.IsNullOrEmpty(snapshot.LastNpcReactionKey)
-                ? "NPC: -"
-                : "NPC: " + ResolvePublicNpcReaction(snapshot.LastNpcReactionKey);
+                ? "반응 없음"
+                : ShortenPublicLine(ResolvePublicNpcReaction(snapshot.LastNpcReactionKey), 24);
             memoryText.text = BuildPlayerStatusLine(snapshot) + "\n" +
                 BuildCompanionStatusLine(snapshot) + "\n" +
                 memory + " | " + combat + " | " + npc;
@@ -2217,11 +2237,11 @@ namespace HwigiTower.UI
                 buff = "회상 닻 보유";
             }
 
-            return "Player | HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
-                " | ATK " + snapshot.PlayerAttack +
-                " | Item " + snapshot.ItemCount +
-                " | Ability " + snapshot.AbilityCount +
-                " | " + buff;
+            return "[Player] HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
+                "  ATK " + snapshot.PlayerAttack +
+                "  아이템 " + snapshot.ItemCount +
+                "  능력 " + snapshot.AbilityCount +
+                "  " + buff;
         }
 
         private static string BuildCompanionStatusLine(PrototypeRunSnapshot snapshot)
@@ -2230,7 +2250,17 @@ namespace HwigiTower.UI
                 snapshot.Affinity > 0 ? "신뢰 형성" :
                 snapshot.Affinity < 0 ? "거리감" :
                 "동행 중";
-            return "Mataios | " + affinity + " | Memory " + snapshot.MemoryFragmentCount + " | 상태 안정";
+            return "[Mataios] " + affinity + "  기억 " + snapshot.MemoryFragmentCount + "  안정";
+        }
+
+        private static string ShortenPublicLine(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= maxLength)
+            {
+                return value;
+            }
+
+            return value.Substring(0, Mathf.Max(1, maxLength - 1)).TrimEnd() + "…";
         }
 
         private void UpdateCombatPanel(PrototypeRunSnapshot snapshot)
@@ -2545,7 +2575,7 @@ namespace HwigiTower.UI
 
             if (message.Contains("enemyDefeated True", StringComparison.Ordinal))
             {
-                AppendResultLine(ref summary, "적 처치");
+                AppendResultLine(ref summary, "적 처치", allowOverflow: false);
             }
 
             if (message.Contains("already resolved:", StringComparison.Ordinal))
@@ -2563,7 +2593,7 @@ namespace HwigiTower.UI
             if (message.Contains("run.clear", StringComparison.Ordinal))
             {
                 AppendResultLine(ref summary, "최종 보스 격파");
-                AppendResultLine(ref summary, "엔딩 선택 가능");
+                AppendResultLine(ref summary, "엔딩 선택 가능", allowOverflow: true);
             }
 
             if (message.Contains("ending.rest", StringComparison.Ordinal))
@@ -2623,7 +2653,14 @@ namespace HwigiTower.UI
                 token.StartsWith("Mental ", StringComparison.Ordinal) ||
                 token.StartsWith("Affinity ", StringComparison.Ordinal))
             {
-                return IsNoOpDelta(token.Substring(token.IndexOf(' ') + 1)) ? string.Empty : token;
+                if (IsNoOpDelta(token.Substring(token.IndexOf(' ') + 1)))
+                {
+                    return string.Empty;
+                }
+
+                return token
+                    .Replace("Mental ", "정신 ", StringComparison.Ordinal)
+                    .Replace("Affinity ", "신뢰 ", StringComparison.Ordinal);
             }
 
             if (token.StartsWith("Glitch ", StringComparison.Ordinal))
@@ -2663,7 +2700,7 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("affinity ", StringComparison.Ordinal))
             {
-                return "Affinity " + token.Substring("affinity ".Length).Trim();
+                return "신뢰 " + token.Substring("affinity ".Length).Trim();
             }
 
             if (token.StartsWith("playerDamage ", StringComparison.Ordinal))
@@ -2683,12 +2720,12 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("item ", StringComparison.Ordinal))
             {
-                return "아이템 획득: " + NormalizeRefDelta(token.Substring("item ".Length).Trim());
+                return NormalizeRefDelta(token.Substring("item ".Length).Trim()) + " 획득";
             }
 
             if (token.StartsWith("ability ", StringComparison.Ordinal))
             {
-                return "능력 획득: " + NormalizeRefDelta(token.Substring("ability ".Length).Trim());
+                return NormalizeRefDelta(token.Substring("ability ".Length).Trim()) + " 획득";
             }
 
             if (token.StartsWith("reward ", StringComparison.Ordinal))
@@ -2795,7 +2832,7 @@ namespace HwigiTower.UI
             }
         }
 
-        private static void AppendResultLine(ref string summary, string line)
+        private static void AppendResultLine(ref string summary, string line, bool allowOverflow = false)
         {
             if (string.IsNullOrEmpty(line))
             {
@@ -2808,7 +2845,31 @@ namespace HwigiTower.UI
                 return;
             }
 
+            if (!allowOverflow && CountResultLines(summary) >= ResultLineLimit)
+            {
+                return;
+            }
+
             summary += "\n" + line;
+        }
+
+        private static int CountResultLines(string summary)
+        {
+            if (string.IsNullOrEmpty(summary) || summary == "결과")
+            {
+                return 0;
+            }
+
+            var count = 0;
+            for (var i = 0; i < summary.Length; i++)
+            {
+                if (summary[i] == '\n')
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private static string BuildCombatOutcomeLabel(PrototypeRunSnapshot snapshot)
@@ -2828,14 +2889,17 @@ namespace HwigiTower.UI
 
         private string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
-            var text =
-                "상대: " + PublicEnemyName(snapshot.LastCombatEnemyId) + "\n" +
-                "적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "   내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
-                "라운드 " + snapshot.CombatRound + " | " + BuildCombatFeedback(snapshot.LastCombatRoundResult) + "\n" +
-                (HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" : "기술 불가: 정찰 필요");
-
+            var skill = HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" : "기술 불가: 정찰 필요";
             var extra = BuildCombatExtraLine(snapshot);
-            return string.IsNullOrEmpty(extra) ? text : text + "\n" + extra;
+            var state = string.IsNullOrEmpty(extra) ? skill :
+                extra.StartsWith("콤보 피해", StringComparison.Ordinal) ? "정찰 기술 | " + extra : extra;
+            var round = ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult) + " | " + state, 44);
+            var text =
+                "상대: " + PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + "\n" +
+                "내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + " | R" + snapshot.CombatRound + "\n" +
+                round;
+
+            return text;
         }
 
         private static string BuildCombatExtraLine(PrototypeRunSnapshot snapshot)
@@ -2885,7 +2949,8 @@ namespace HwigiTower.UI
                 var ready = "전투 준비";
                 if (roundResult.Contains("scout ", StringComparison.Ordinal))
                 {
-                    ready += " | 정찰 공격 +" + ExtractRoundNumber(roundResult, "scout +").Trim();
+                    var scout = ExtractRoundNumber(roundResult, "scout +").Trim();
+                    ready += string.IsNullOrEmpty(scout) ? " | 정찰 준비" : " | 정찰 공격 +" + scout;
                 }
 
                 return ready;
