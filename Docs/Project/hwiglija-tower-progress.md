@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 00:28 — Portrait UI v3 readability polish
+- **Phase**: W3-2
+- **Done**:
+  - Floor Map을 2열 노드 카드로 재배치하고 선택 가능/완료/잠김 상태 문구를 player-facing하게 정리
+  - Shop 화면에 현재 Gold와 보스 전 준비 맥락을 표시하고 구매/부족/지나가기 선택 가독성을 보강
+  - Top HUD, Rest input, Combat feedback 텍스트 크기와 영역을 조정해 1080x1920 캡처 기준 판독성을 개선
+  - screenshot harness로 8종 PNG를 `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 재생성하고 1080x1920 dimensions 확인
+  - EditMode 119/119 pass, PlayMode 19/19 pass, skipped 0 확인
+- **Files**: 변경/추가 3개 (`PrototypeHud.cs`, `Docs/QA/Portrait_UI_v3_Screenshot_QA_2026-05-16.md`, progress)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: merchant 전용 presentation과 최종 폰트/텍스트 스타일 정리로 P1/P2 visual polish 진행
+- **Agent**: Codex
+
 ### 2026-05-16 16:20 — Portrait UI v3 screenshot harness QA
 - **Phase**: W3-2
 - **Done**:
