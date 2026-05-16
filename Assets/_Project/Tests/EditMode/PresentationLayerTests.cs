@@ -72,6 +72,17 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void ProjectSettings_UsePortraitDemoResolution()
+        {
+            Assert.AreEqual(1080, PlayerSettings.defaultScreenWidth);
+            Assert.AreEqual(1920, PlayerSettings.defaultScreenHeight);
+            Assert.AreEqual(UIOrientation.Portrait, PlayerSettings.defaultInterfaceOrientation);
+            Assert.IsTrue(PlayerSettings.allowedAutorotateToPortrait);
+            Assert.IsFalse(PlayerSettings.allowedAutorotateToLandscapeLeft);
+            Assert.IsFalse(PlayerSettings.allowedAutorotateToLandscapeRight);
+        }
+
+        [Test]
         public void CutsceneData_EmptyStepsIsSafeScaffold()
         {
             var cutscene = ScriptableObject.CreateInstance<CutsceneData>();
@@ -146,6 +157,88 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsNotNull(first);
             StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", first.text);
             StringAssert.DoesNotContain("floor1.layer1", first.text);
+        }
+
+        [Test]
+        public void Hud_PortraitShellUsesMobileBoundsAndHidesGlitch()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-portrait",
+                19,
+                24,
+                5,
+                7,
+                12,
+                3,
+                2,
+                1,
+                0,
+                1,
+                false,
+                "demo.active",
+                "node.battle",
+                "ENC_COMBAT_GATE_01",
+                4,
+                1,
+                memoryFragmentCount: 1,
+                currentFloor: 2,
+                itemCount: 2,
+                floorMapNodes: new[]
+                {
+                    new PrototypeFloorMapNodeView("floor2.layer1.combat.ENC_COMBAT_GATE_01", PrototypeFloorMapNodeType.Combat, 2, 1, 0, true, false, false)
+                });
+
+            hud.ShowRunState(snapshot);
+
+            Assert.IsTrue(hud.HasPortraitRoot);
+            Assert.AreEqual(new Vector2(1080f, 1920f), hud.PortraitRootSize);
+            Assert.IsTrue(hud.HasScreenLayerPanels);
+            StringAssert.Contains("Floor 2", hud.RunStateMessage);
+            StringAssert.Contains("Memory 1", hud.RunStateMessage);
+            StringAssert.Contains("Item 2", hud.RunStateMessage);
+            StringAssert.DoesNotContain("Glitch", hud.RunStateMessage);
+            StringAssert.Contains("지도", hud.RouteMessage);
+        }
+
+        [Test]
+        public void Hud_CombatScreenShowsIntentWithoutRawEnemyId()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-combat-ui",
+                15,
+                24,
+                6,
+                0,
+                9,
+                1,
+                1,
+                0,
+                0,
+                0,
+                false,
+                "demo.active",
+                "node.battle",
+                "ENC_COMBAT_GATE_03",
+                4,
+                2,
+                currentFloor: 5,
+                isInCombat: true,
+                lastCombatEnemyId: "BOSS_APEX_02",
+                enemyHp: 22,
+                enemyMaxHp: 34,
+                combatRound: 3,
+                lastCombatRoundResult: "round 3 | action Defend | playerDamage 0 | enemyDamage 2");
+
+            hud.ShowRunState(snapshot);
+
+            Assert.IsTrue(hud.CombatPanelVisible);
+            StringAssert.Contains("최종 보스", hud.CombatMessage);
+            StringAssert.Contains("적 HP 22/34", hud.CombatMessage);
+            StringAssert.Contains("방어: 받은 피해", hud.CombatMessage);
+            StringAssert.DoesNotContain("BOSS_APEX_02", hud.CombatMessage);
+            StringAssert.DoesNotContain("Glitch", hud.CombatMessage);
         }
 
         [Test]
