@@ -195,8 +195,8 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(new Vector2(1080f, 1920f), hud.PortraitRootSize);
             Assert.IsTrue(hud.HasScreenLayerPanels);
             StringAssert.Contains("Floor 2", hud.RunStateMessage);
-            StringAssert.Contains("Memory 1", hud.RunStateMessage);
-            StringAssert.Contains("Item 2", hud.RunStateMessage);
+            StringAssert.Contains("기억 1", hud.RunStateMessage);
+            StringAssert.Contains("아이템 2", hud.RunStateMessage);
             StringAssert.DoesNotContain("Glitch", hud.RunStateMessage);
             StringAssert.Contains("지도", hud.RouteMessage);
         }
@@ -249,9 +249,9 @@ namespace HwigiTower.Tests.EditMode
             hud.ShowResultMessage("choice applied: CHOICE_SHOP_01_BUY_ITEM; effects=2; ignored=0 | Gold -5, item ITEM_FIELD_BANDAGE +1 | memory unlocked MEM_FRAGMENT_03 | stair unlocked");
 
             StringAssert.Contains("Gold -5", result.text);
-            StringAssert.Contains("아이템 획득: 붕대 +1", result.text);
+            StringAssert.Contains("붕대 +1 획득", result.text);
             StringAssert.Contains("기억 파편 해금", result.text);
-            StringAssert.Contains("다음 층 준비", result.text);
+            Assert.LessOrEqual(result.text.Split('\n').Length, 4);
             StringAssert.DoesNotContain("choice applied", result.text);
             StringAssert.DoesNotContain("ITEM_FIELD_BANDAGE", result.text);
             StringAssert.DoesNotContain("MEM_FRAGMENT_03", result.text);

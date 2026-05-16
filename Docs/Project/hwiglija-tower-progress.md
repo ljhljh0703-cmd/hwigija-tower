@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 07:25 — Text density and companion panel polish
+- **Phase**: W3-2
+- **Done**:
+  - `PrototypeHud`의 title/body/button/result/stat/caption 텍스트 크기와 dense line spacing을 상수로 정리
+  - Result summary를 핵심 3줄 중심으로 압축하고 Mental/Affinity/Memory/Item 라벨을 player-facing 한국어로 정리
+  - Companion strip을 Mataios portrait 옆 고정 영역으로 옮기고 NPC reaction을 1줄 축약 표시로 제한
+  - Combat feedback을 enemy/player HP와 최신 action consequence 중심의 2-3줄로 줄이고 action button 위치를 유지
+  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
+- **Files**: 변경/추가 4개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`, `Docs/QA/**`, progress)
+- **GDD impact**: 없음
+- **Blockers**: Unity `-runTests` 직접 XML 출력이 불안정해 임시 TestRunner wrapper로 fresh 검증했고 wrapper는 커밋에서 제거
+- **Next**: 최종 폰트 선명도, writer-approved label copyfit, selected/focus animation polish
+- **Agent**: Codex
+
 ### 2026-05-17 01:27 — Merchant/Rest/Map presentation polish
 - **Phase**: W3-2
 - **Done**:
