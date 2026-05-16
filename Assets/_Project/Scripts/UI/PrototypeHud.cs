@@ -351,6 +351,13 @@ namespace HwigiTower.UI
             return restContinueButton;
         }
 
+#if UNITY_EDITOR || UNITY_INCLUDE_TESTS
+        public void OpenQaRouteStep(EncounterSelection selection)
+        {
+            OpenSelectedRouteStep(selection);
+        }
+#endif
+
         public void ShowChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
         {
             ClearChoices();

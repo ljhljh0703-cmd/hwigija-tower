@@ -817,6 +817,28 @@ namespace HwigiTower.Run
             return views.ToArray();
         }
 
+#if UNITY_EDITOR || UNITY_INCLUDE_TESTS
+        public PrototypeFloorMapNodeView[] GetQaFloorMapNodeViews()
+        {
+            var views = new List<PrototypeFloorMapNodeView>();
+            var activeLayer = GetActiveMapLayer();
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node == null)
+                {
+                    continue;
+                }
+
+                var selectable = IsMapNodeSelectable(node, activeLayer);
+                var locked = !node.Completed && !selectable;
+                views.Add(ToMapNodeView(node, selectable, locked));
+            }
+
+            return views.ToArray();
+        }
+#endif
+
         public bool TrySelectMapNode(string mapNodeId, out PrototypeDemoRunStep step)
         {
             step = null;
@@ -1103,6 +1125,20 @@ namespace HwigiTower.Run
 
             return new PrototypeNodeResolution("ending.choice", string.Empty, "ending unavailable", _runCompleted);
         }
+
+#if UNITY_EDITOR || UNITY_INCLUDE_TESTS
+        public void OpenQaEndingChoice()
+        {
+            _runCompleted = true;
+            _runClear = true;
+            _runFailed = false;
+            _restartReady = false;
+            _endingRest = false;
+            _endingContinue = false;
+            _endingChoiceId = string.Empty;
+            SetNpcReaction("NPC_REACT_RUN_CLEAR");
+        }
+#endif
 
         public PrototypeNodeResolution ResolveGeneric(string nodeId, string payloadId, string message)
         {

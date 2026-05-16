@@ -271,6 +271,95 @@ namespace HwigiTower.Run
             return RunState == null ? new PrototypeFloorMapNodeView[0] : RunState.GetSelectableMapNodeViews();
         }
 
+#if UNITY_EDITOR || UNITY_INCLUDE_TESTS
+        public PrototypeFloorMapNodeView[] GetQaFloorMapNodes()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            return RunState == null ? new PrototypeFloorMapNodeView[0] : RunState.GetQaFloorMapNodeViews();
+        }
+
+        public EncounterSelection CreateQaEncounterSelection(string encounterId)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (TryFindQaStep(encounterId, out var step))
+            {
+                PlayAudioContextForEncounter(step.Encounter);
+                return new EncounterSelection(step.Node, step.Encounter);
+            }
+
+            return new EncounterSelection(null, null);
+        }
+
+        public void OpenQaEndingChoice()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            RunState?.OpenQaEndingChoice();
+            PlayAudioContext(PrototypeAudioContext.Ending);
+        }
+
+        private bool TryFindQaStep(string encounterId, out PrototypeDemoRunStep step)
+        {
+            step = null;
+            if (string.IsNullOrEmpty(encounterId) || roomDefinition == null)
+            {
+                return false;
+            }
+
+            if (TryFindQaStepInPath(roomDefinition.DemoRunPath, encounterId, out step))
+            {
+                return true;
+            }
+
+            var paths = roomDefinition.FloorRunPaths;
+            if (paths != null)
+            {
+                for (var i = 0; i < paths.Count; i++)
+                {
+                    var path = paths[i];
+                    if (path != null && TryFindQaStepInPath(path.Steps, encounterId, out step))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryFindQaStepInPath(IReadOnlyList<PrototypeDemoRunStep> steps, string encounterId, out PrototypeDemoRunStep step)
+        {
+            step = null;
+            if (steps == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < steps.Count; i++)
+            {
+                var candidate = steps[i];
+                if (candidate != null && candidate.IsValid && candidate.EncounterId == encounterId)
+                {
+                    step = candidate;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+#endif
+
         public EncounterSelection SelectMapNode(string mapNodeId)
         {
             if (RunState == null)
