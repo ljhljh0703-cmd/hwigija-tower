@@ -1,6 +1,8 @@
 using HwigiTower.Audio;
 using HwigiTower.Run;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -31,6 +33,21 @@ namespace HwigiTower.Lobby
         public bool SettingsPanelVisible => _settingsPanel != null && _settingsPanel.activeSelf;
         public bool ProfilePanelVisible => _profilePanel != null && _profilePanel.activeSelf;
         public string ContinueDisabledReason => "저장된 진행 없음";
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RegisterLobbySceneBootstrap()
+        {
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+        }
+
+        private static void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name == "Lobby")
+            {
+                EnsureLobbySceneRuntimeUi();
+            }
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void EnsureLobbySceneRuntimeUi()
@@ -72,6 +89,14 @@ namespace HwigiTower.Lobby
             }
         }
 
+        private void OnGUI()
+        {
+            if (SceneManager.GetActiveScene().name == "Lobby" && !IsRuntimeUiPresent())
+            {
+                EnsureRuntimeUi();
+            }
+        }
+
         private void OnDisable()
         {
             _uiBuilt = false;
@@ -91,6 +116,8 @@ namespace HwigiTower.Lobby
 
             if (IsRuntimeUiPresent())
             {
+                NormalizeRuntimeUi();
+                BindRuntimeUi();
                 _uiBuilt = true;
                 return;
             }
@@ -201,8 +228,11 @@ namespace HwigiTower.Lobby
 
         private void BuildUi()
         {
+            EnsureEventSystem();
+
             var canvasObject = new GameObject(LobbyCanvasName);
             canvasObject.transform.SetParent(transform, false);
+            canvasObject.transform.localScale = Vector3.one;
             var canvas = canvasObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = canvasObject.AddComponent<CanvasScaler>();
@@ -218,12 +248,14 @@ namespace HwigiTower.Lobby
             BuildMenuColumn(_safeAreaRoot.transform);
             BuildProfilePanel(_safeAreaRoot.transform);
             BuildSettingsPanel(_safeAreaRoot.transform);
+            BindRuntimeUi();
         }
 
         private void CreateSafeAreaRoot(Transform parent)
         {
             var safeAreaObject = new GameObject("Lobby Portrait Safe Area");
             safeAreaObject.transform.SetParent(parent, false);
+            safeAreaObject.transform.localScale = Vector3.one;
             _safeAreaRoot = safeAreaObject.AddComponent<RectTransform>();
             _safeAreaRoot.anchorMin = new Vector2(0.5f, 0.5f);
             _safeAreaRoot.anchorMax = new Vector2(0.5f, 0.5f);
@@ -282,6 +314,7 @@ namespace HwigiTower.Lobby
             var gutter = gutterObject.AddComponent<Image>();
             gutter.color = new Color(0.012f, 0.016f, 0.022f, 1f);
             gutter.raycastTarget = false;
+            gutterObject.transform.SetAsFirstSibling();
 
             var backgroundObject = new GameObject("Lobby Background");
             backgroundObject.transform.SetParent(portraitParent, false);
@@ -301,6 +334,7 @@ namespace HwigiTower.Lobby
             {
                 image.color = new Color(0.025f, 0.032f, 0.042f, 1f);
             }
+            backgroundObject.transform.SetAsFirstSibling();
 
             var overlayObject = new GameObject("Lobby Background Readability Overlay");
             overlayObject.transform.SetParent(portraitParent, false);
@@ -312,6 +346,7 @@ namespace HwigiTower.Lobby
             var overlay = overlayObject.AddComponent<Image>();
             overlay.color = new Color(0.0f, 0.0f, 0.0f, presentationData != null && presentationData.BackgroundSprite != null ? 0.36f : 0.0f);
             overlay.raycastTarget = false;
+            overlayObject.transform.SetSiblingIndex(1);
         }
 
         private void BuildProfileChip(Transform parent)
@@ -480,6 +515,132 @@ namespace HwigiTower.Lobby
         private static Font ResolveFont()
         {
             return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+        }
+
+        private void NormalizeRuntimeUi()
+        {
+            var canvasTransform = transform.Find(LobbyCanvasName);
+            if (canvasTransform == null)
+            {
+                return;
+            }
+
+            canvasTransform.gameObject.SetActive(true);
+            canvasTransform.localScale = Vector3.one;
+            if (canvasTransform is RectTransform canvasRect)
+            {
+                canvasRect.anchorMin = Vector2.zero;
+                canvasRect.anchorMax = Vector2.zero;
+                canvasRect.anchoredPosition = Vector2.zero;
+                canvasRect.sizeDelta = Vector2.zero;
+            }
+
+            var canvas = canvasTransform.GetComponent<Canvas>();
+            if (canvas != null)
+            {
+                canvas.enabled = true;
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            }
+
+            var scaler = canvasTransform.GetComponent<CanvasScaler>();
+            if (scaler != null)
+            {
+                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                scaler.referenceResolution = new Vector2(1080f, 1920f);
+                scaler.matchWidthOrHeight = 1f;
+            }
+
+            if (canvasTransform.GetComponent<GraphicRaycaster>() == null)
+            {
+                canvasTransform.gameObject.AddComponent<GraphicRaycaster>();
+            }
+        }
+
+        private void BindRuntimeUi()
+        {
+            _safeAreaRoot = FindChildComponent<RectTransform>("Lobby Portrait Safe Area");
+            _settingsPanel = FindChildGameObject("Lobby Settings Panel");
+            _profilePanel = FindChildGameObject("Lobby Profile Panel");
+            _statusText = FindChildComponent<Text>("Lobby Status");
+            _continueButton = FindChildComponent<Button>(LobbyContinueButtonName);
+
+            BindButton(LobbyNewGameButtonName, StartNewGame);
+            BindButton(LobbyContinueButtonName, ContinueSavedRun);
+            BindButton("Lobby Profile Button", OpenProfile);
+            BindButton("Lobby Settings Button", OpenSettings);
+            BindButton("Lobby Quit Button", QuitOrShowPlaceholder);
+            BindButton("Lobby Profile Close Button", CloseProfile);
+            BindButton("Lobby Settings Close Button", CloseSettings);
+
+            if (_settingsPanel != null)
+            {
+                _settingsPanel.SetActive(false);
+            }
+
+            if (_profilePanel != null)
+            {
+                _profilePanel.SetActive(false);
+            }
+
+            ConfigureContinueButton();
+        }
+
+        private void BindButton(string name, UnityEngine.Events.UnityAction action)
+        {
+            var button = FindChildComponent<Button>(name);
+            if (button == null)
+            {
+                return;
+            }
+
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(action);
+        }
+
+        private GameObject FindChildGameObject(string targetName)
+        {
+            var child = FindChildTransform(transform, targetName);
+            return child != null ? child.gameObject : null;
+        }
+
+        private T FindChildComponent<T>(string targetName) where T : Component
+        {
+            var child = FindChildTransform(transform, targetName);
+            return child != null ? child.GetComponent<T>() : null;
+        }
+
+        private static Transform FindChildTransform(Transform root, string targetName)
+        {
+            if (root.name == targetName)
+            {
+                return root;
+            }
+
+            for (var i = 0; i < root.childCount; i++)
+            {
+                var match = FindChildTransform(root.GetChild(i), targetName);
+                if (match != null)
+                {
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
+        private static void EnsureEventSystem()
+        {
+            var eventSystem = EventSystem.current;
+            if (eventSystem == null)
+            {
+                var eventSystemObject = new GameObject("EventSystem");
+                eventSystem = eventSystemObject.AddComponent<EventSystem>();
+            }
+
+            if (eventSystem.GetComponent<InputSystemUIInputModule>() == null)
+            {
+                eventSystem.gameObject.AddComponent<InputSystemUIInputModule>();
+            }
         }
 
         private bool ShouldShowQuitButton()

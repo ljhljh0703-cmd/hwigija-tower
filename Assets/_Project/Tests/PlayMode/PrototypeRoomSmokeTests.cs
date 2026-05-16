@@ -81,11 +81,17 @@ namespace HwigiTower.Tests.PlayMode
             var hud = Object.FindFirstObjectByType<PrototypeHud>();
             Assert.IsNotNull(controller);
             Assert.IsNotNull(hud);
-            Assert.IsTrue(hud.RouteActionButtonVisible);
+            Assert.IsFalse(hud.RouteActionButtonVisible);
             StringAssert.Contains("Floor 1", hud.RunStateMessage);
             StringAssert.DoesNotContain("Glitch", hud.RunStateMessage);
+            Assert.IsTrue(hud.HasPortraitRoot);
+            Assert.AreEqual(new Vector2(1080f, 1920f), hud.PortraitRootSize);
+            var canvasScaler = GameObject.Find("Prototype HUD").GetComponent<CanvasScaler>();
+            Assert.IsNotNull(canvasScaler);
+            Assert.AreEqual(new Vector2(1080f, 1920f), canvasScaler.referenceResolution);
+            Assert.IsNotNull(UnityEngine.EventSystems.EventSystem.current);
+            Assert.IsTrue(HasUiInputModule(UnityEngine.EventSystems.EventSystem.current.gameObject));
 
-            hud.GetRouteActionButton().onClick.Invoke();
             yield return null;
 
             Assert.IsTrue(hud.HasScreenLayerPanels);
@@ -194,7 +200,15 @@ namespace HwigiTower.Tests.PlayMode
             yield return ResolveRouteActionChoice(hud, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
             yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
 
-            hud.GetRouteActionButton().onClick.Invoke();
+            if (hud.RouteActionButtonVisible)
+            {
+                hud.GetRouteActionButton().onClick.Invoke();
+                yield return null;
+            }
+
+            var shopMapButton = FindMapChoiceButton(hud, "ENC_SHOP_01");
+            Assert.IsNotNull(shopMapButton, DescribeChoiceButtons(hud));
+            shopMapButton.onClick.Invoke();
             yield return null;
             Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM"), DescribeChoiceButtons(hud));
             Assert.IsNull(FindChoiceButton(hud, "CHOICE_COMBAT_01_ENGAGE"));
@@ -509,11 +523,13 @@ namespace HwigiTower.Tests.PlayMode
 
         private static IEnumerator ResolveRouteActionChoice(PrototypeHud hud, string expectedEncounterId, string choiceStableId)
         {
-            Assert.IsTrue(hud.RouteActionButtonVisible, "Route action should be visible before " + choiceStableId);
-            hud.GetRouteActionButton().onClick.Invoke();
-            yield return null;
+            if (hud.RouteActionButtonVisible)
+            {
+                hud.GetRouteActionButton().onClick.Invoke();
+                yield return null;
+            }
 
-            Assert.IsFalse(hud.RouteActionButtonVisible, "Route action should hide while choices are open.");
+            Assert.IsFalse(hud.RouteActionButtonVisible, "Route action should hide while choices or map nodes are open.");
             var mapButton = FindMapChoiceButton(hud, expectedEncounterId);
             if (mapButton != null)
             {
@@ -530,9 +546,11 @@ namespace HwigiTower.Tests.PlayMode
 
         private static IEnumerator ResolveRouteActionRest(PrototypeHud hud, string expectedEncounterId, string actionId, string utterance)
         {
-            Assert.IsTrue(hud.RouteActionButtonVisible, "Route action should be visible before " + expectedEncounterId);
-            hud.GetRouteActionButton().onClick.Invoke();
-            yield return null;
+            if (hud.RouteActionButtonVisible)
+            {
+                hud.GetRouteActionButton().onClick.Invoke();
+                yield return null;
+            }
 
             var mapButton = FindMapChoiceButton(hud, expectedEncounterId);
             if (mapButton != null)
@@ -693,6 +711,21 @@ namespace HwigiTower.Tests.PlayMode
             var text = button.GetComponentInChildren<Text>();
             Assert.IsNotNull(text);
             return text.text;
+        }
+
+        private static bool HasUiInputModule(GameObject eventSystemObject)
+        {
+            var behaviours = eventSystemObject.GetComponents<Behaviour>();
+            for (var i = 0; i < behaviours.Length; i++)
+            {
+                var behaviour = behaviours[i];
+                if (behaviour != null && behaviour.GetType().Name.Contains("InputModule"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void AssertChoiceLayout(PrototypeHud hud)

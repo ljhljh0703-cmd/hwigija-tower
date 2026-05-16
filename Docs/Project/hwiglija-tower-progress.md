@@ -32,6 +32,34 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-16 11:38 — Portrait gameplay UI v3 shell
+- **Phase**: W3-2
+- **Done**:
+  - `PrototypeHud`에 1080x1920 `PortraitRoot`와 landscape dark gutter를 추가하고 top/objective/visual/companion/result/map/action/ending 레이어를 분리
+  - PrototypeRoom 시작 화면을 단일 `진행` 버튼이 아닌 branching node map 중심으로 전환하고 normal HUD에서 Glitch/raw id 노출을 줄임
+  - Top HUD/companion strip/combat panel을 portrait 기준으로 재배치하고 enemy visual, HP, action feedback, skill/buff 상태가 크게 읽히도록 정리
+  - Lobby scene bootstrap을 `sceneLoaded` 경로까지 보강하고 `Lobby.unity`에 Canvas/EventSystem을 저장해 black Game View를 직접 해소
+  - EditMode 119/119 pass, PlayMode 18/18 pass, skipped 0 확인
+- **Files**: 변경/추가 6개 (`Lobby.unity`, `PrototypeHud.cs`, `LobbyController.cs`, `PresentationLayerTests.cs`, `PrototypeRoomSmokeTests.cs`, progress)
+- **GDD impact**: 없음
+- **Blockers**: 전체 8-screen 수동 캡처는 미완료. Lobby visible screenshot만 `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 저장.
+- **Next**: 1080x1920 수동 화면 캡처로 Lobby/Map/Event/Rest/Shop/Combat/Boss/Ending 가독성 확인 후 P1 visual polish
+- **Agent**: Codex
+
+### 2026-05-16 10:37 — First boss manual playtest blocked by Lobby/input P0s
+- **Phase**: W3-2
+- **Done**:
+  - Unity `6000.4.3f1` GUI 실행 후 `Lobby.unity` Play Mode 재확인
+  - Lobby black Game View 재현: New Game 버튼이 보이지 않아 정식 진입 불가
+  - `PrototypeRoom.unity` 직접 우회 실행으로 배경/Mataios/HUD/`진행` 버튼 렌더링 확인
+  - `진행` 버튼 클릭, Return, Space 입력을 시도했으나 노드/전투 흐름으로 진행되지 않음
+  - 개발용 first-boss playtest QA 리포트 작성
+- **Files**: 변경/추가 2개 (`Docs/QA/FirstBoss_Playtest_2026-05-16.md`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (QA/개발 인계 기록만, 신규 디자인 결정 없음)
+- **Blockers**: 첫 보스 수동 클리어 실패. `Lobby` black screen + `PrototypeRoom` runtime button input 미동작이 P0.
+- **Next**: Lobby actual Play Mode visibility와 EventSystem/Button input path를 먼저 수정한 뒤 첫 보스 클리어 QA 재시도
+- **Agent**: Codex
+
 ### 2026-05-15 21:18 — Lobby Play Mode black screen fix
 - **Phase**: W3-2
 - **Done**:
