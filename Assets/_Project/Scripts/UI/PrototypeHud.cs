@@ -30,6 +30,7 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform combatPanel;
         [SerializeField] private Text combatText;
         [SerializeField] private Image combatEnemyImage;
+        [SerializeField] private Image merchantVisualImage;
         [SerializeField] private Image enemyHpFill;
         [SerializeField] private Image playerHpFill;
         [SerializeField] private Button attackButton;
@@ -69,6 +70,17 @@ namespace HwigiTower.UI
         private string _lastCombatCutsceneKey = string.Empty;
         private string _lastDemoCompleteCutsceneKey = string.Empty;
         private bool _cutsceneFinishedSubscribed;
+        private bool _shopPresentationActive;
+
+        private const float ChoiceButtonHeight = 118f;
+        private const float ChoiceButtonSpacing = 130f;
+        private const float MapNodeButtonHeight = 118f;
+        private const float MapNodeButtonSpacing = 132f;
+        private const float MapNodeIconSize = 72f;
+        private const int ChoiceFontSize = 30;
+        private const int MapNodeFontSize = 29;
+        private const int RestBodyFontSize = 31;
+        private const int RestInputFontSize = 34;
 
         public int ChoiceButtonCount => _choiceButtons.Count;
         public string ResultMessage => resultText == null ? string.Empty : resultText.text;
@@ -389,6 +401,17 @@ namespace HwigiTower.UI
             if (interactionText != null && encounter != null)
             {
                 ApplyPresentationSlot(encounter.Id);
+                if (encounter.Type == EncounterType.Shop)
+                {
+                    _shopPresentationActive = true;
+                    ApplyMerchantPresentation(_roomController == null ? 1 : _roomController.GetSnapshot().CurrentFloor);
+                }
+                else
+                {
+                    _shopPresentationActive = false;
+                    HideMerchantPresentation();
+                }
+
                 interactionText.text = showRawDebugText
                     ? $"node: {ResolveEncounterDisplayName(encounter)} | encounter: {encounter.Id} | choices pending"
                     : ResolvePresentationDisplayName(encounter);
@@ -398,7 +421,7 @@ namespace HwigiTower.UI
             if (!showRawDebugText && encounter != null && encounter.Type == EncounterType.Shop && resultText != null)
             {
                 var gold = _roomController == null ? 0 : _roomController.GetSnapshot().Gold;
-                resultText.text = "상점\n현재 Gold " + gold + "\n보스 전 준비";
+                resultText.text = "상점\n보스 전 준비 | 현재 Gold " + gold + "\n가격과 효과를 보고 구매하세요";
             }
         }
 
@@ -414,6 +437,8 @@ namespace HwigiTower.UI
 
             _choiceButtons.Clear();
             _mapNodeIconImages.Clear();
+            _shopPresentationActive = false;
+            HideMerchantPresentation();
         }
 
         public void ShowMapChoices(PrototypeFloorMapNodeView[] nodes, Action<string> onNodeSelected)
@@ -648,8 +673,8 @@ namespace HwigiTower.UI
             rect.anchorMin = new Vector2(0f, 1f);
             rect.anchorMax = new Vector2(1f, 1f);
             rect.pivot = new Vector2(0.5f, 1f);
-            rect.sizeDelta = new Vector2(0f, 118f);
-            rect.anchoredPosition = new Vector2(0f, -_choiceButtons.Count * 130f);
+            rect.sizeDelta = new Vector2(0f, ChoiceButtonHeight);
+            rect.anchoredPosition = new Vector2(0f, -_choiceButtons.Count * ChoiceButtonSpacing);
 
             var image = buttonObject.AddComponent<Image>();
             image.color = view.Enabled
@@ -677,13 +702,13 @@ namespace HwigiTower.UI
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = 30;
+            label.fontSize = ChoiceFontSize;
             label.alignment = TextAnchor.MiddleCenter;
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
             label.verticalOverflow = VerticalWrapMode.Truncate;
             label.resizeTextForBestFit = true;
             label.resizeTextMinSize = 22;
-            label.resizeTextMaxSize = 30;
+            label.resizeTextMaxSize = ChoiceFontSize;
             label.supportRichText = false;
             label.lineSpacing = 1f;
             label.raycastTarget = false;
@@ -723,8 +748,8 @@ namespace HwigiTower.UI
                 rect.anchorMin = new Vector2(column == 0 ? 0f : 0.52f, 1f);
                 rect.anchorMax = new Vector2(column == 0 ? 0.48f : 1f, 1f);
                 rect.pivot = new Vector2(0f, 1f);
-                rect.sizeDelta = new Vector2(0f, 108f);
-                rect.anchoredPosition = new Vector2(0f, -row * 122f);
+                rect.sizeDelta = new Vector2(0f, MapNodeButtonHeight);
+                rect.anchoredPosition = new Vector2(0f, -row * MapNodeButtonSpacing);
             }
 
             var image = button.targetGraphic as Image;
@@ -737,12 +762,17 @@ namespace HwigiTower.UI
             if (label != null)
             {
                 var labelRect = label.GetComponent<RectTransform>();
-                labelRect.offsetMin = new Vector2(92f, 8f);
+                labelRect.offsetMin = new Vector2(100f, 8f);
                 labelRect.offsetMax = new Vector2(-14f, -8f);
-                label.fontSize = 27;
-                label.resizeTextMinSize = 20;
-                label.resizeTextMaxSize = 27;
+                label.fontSize = node.Selectable ? MapNodeFontSize : 26;
+                label.resizeTextMinSize = 21;
+                label.resizeTextMaxSize = node.Selectable ? MapNodeFontSize : 26;
                 label.alignment = TextAnchor.MiddleLeft;
+                label.color = node.Selectable
+                    ? new Color(0.96f, 0.99f, 1f, 1f)
+                    : node.Completed
+                        ? new Color(0.74f, 0.84f, 0.78f, 0.92f)
+                        : new Color(0.50f, 0.54f, 0.58f, 0.82f);
             }
 
             var iconObject = new GameObject("Node Icon");
@@ -752,16 +782,16 @@ namespace HwigiTower.UI
             iconRect.anchorMax = new Vector2(0f, 0.5f);
             iconRect.pivot = new Vector2(0f, 0.5f);
             iconRect.anchoredPosition = new Vector2(16f, 0f);
-            iconRect.sizeDelta = new Vector2(64f, 64f);
+            iconRect.sizeDelta = new Vector2(MapNodeIconSize, MapNodeIconSize);
 
             var icon = iconObject.AddComponent<Image>();
             icon.sprite = ResolveNodeIcon(node.Type);
             icon.preserveAspect = true;
             icon.raycastTarget = false;
             icon.color = node.Completed
-                ? new Color(0.56f, 0.72f, 0.66f, 0.74f)
+                ? new Color(0.56f, 0.78f, 0.66f, 0.84f)
                 : node.Locked
-                    ? new Color(0.45f, 0.48f, 0.52f, 0.58f)
+                    ? new Color(0.32f, 0.34f, 0.38f, 0.52f)
                     : Color.white;
             _mapNodeIconImages.Add(icon);
 
@@ -777,24 +807,24 @@ namespace HwigiTower.UI
         {
             if (node.Completed)
             {
-                return new Color(0.08f, 0.16f, 0.13f, 0.92f);
+                return new Color(0.07f, 0.20f, 0.14f, 0.90f);
             }
 
             if (node.Locked || !node.Selectable)
             {
-                return new Color(0.055f, 0.06f, 0.07f, 0.76f);
+                return new Color(0.035f, 0.040f, 0.050f, 0.64f);
             }
 
             return node.Type == PrototypeFloorMapNodeType.Boss
-                ? new Color(0.24f, 0.09f, 0.10f, 0.98f)
+                ? new Color(0.36f, 0.08f, 0.10f, 0.99f)
                 : node.Type == PrototypeFloorMapNodeType.Shop
-                    ? new Color(0.15f, 0.13f, 0.08f, 0.98f)
-                    : new Color(0.11f, 0.15f, 0.18f, 0.98f);
+                    ? new Color(0.27f, 0.20f, 0.08f, 0.99f)
+                    : new Color(0.11f, 0.22f, 0.28f, 0.99f);
         }
 
         private static string BuildMapNodeHint(PrototypeFloorMapNodeView node)
         {
-            var state = node.Completed ? "완료" : node.Locked ? "아직 갈 수 없음" : node.Selectable ? "선택 가능" : "대기";
+            var state = node.Completed ? "완료" : node.Locked ? "잠김" : node.Selectable ? "선택 가능" : "대기";
             return state + " · " + ResolveMapNodeHint(node.Type);
         }
 
@@ -803,10 +833,10 @@ namespace HwigiTower.UI
             EnsurePortraitRoot();
             topStatusLayer = EnsureLayerPanel(topStatusLayer, "Screen Layer Top Status", new Vector2(0f, 0.92f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, new Color(0.025f, 0.032f, 0.04f, 0.88f), false);
             objectiveLayer = EnsureLayerPanel(objectiveLayer, "Screen Layer Objective", new Vector2(0.04f, 0.84f), new Vector2(0.96f, 0.915f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, new Color(0.05f, 0.07f, 0.09f, 0.82f), false);
-            visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.49f), new Vector2(0.96f, 0.835f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.46f), false);
-            npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.82f), false);
-            resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.305f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.88f), false);
-            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.295f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.86f), false);
+            visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.49f), new Vector2(0.96f, 0.835f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.52f), false);
+            npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.86f), false);
+            resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.305f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.90f), false);
+            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.305f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.265f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.02f, 0.025f, 0.03f, 0.50f), false);
             endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.30f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.06f, 0.055f, 0.04f, 0.90f), false);
         }
@@ -975,37 +1005,55 @@ namespace HwigiTower.UI
             restInteractionPanel.anchorMax = new Vector2(0.92f, 0f);
             restInteractionPanel.pivot = new Vector2(0.5f, 0f);
             restInteractionPanel.anchoredPosition = new Vector2(0f, 54f);
-            restInteractionPanel.sizeDelta = new Vector2(0f, 690f);
+            restInteractionPanel.sizeDelta = new Vector2(0f, 730f);
 
             var image = panelObject.AddComponent<Image>();
-            image.color = new Color(0.055f, 0.065f, 0.08f, 0.96f);
+            image.color = new Color(0.045f, 0.055f, 0.070f, 0.97f);
 
             var title = CreateHudText("Rest Interaction Title", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-36f, 56f), 34, TextAnchor.MiddleCenter, new Color(0.92f, 0.96f, 0.94f, 1f));
             title.transform.SetParent(panelObject.transform, false);
             title.text = "휴식";
 
-            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", "기분을 묻는다", new Vector2(0.17f, 0.80f), "rest.ask_mood");
-            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", "훈련을 진행한다", new Vector2(0.50f, 0.80f), "rest.train");
-            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", "휴식을 취한다", new Vector2(0.83f, 0.80f), "rest.recover");
+            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", "기분\nAffinity +2", new Vector2(0.17f, 0.81f), "rest.ask_mood");
+            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", "훈련\n피해 +1", new Vector2(0.50f, 0.81f), "rest.train");
+            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", "휴식\nHP 회복", new Vector2(0.83f, 0.81f), "rest.recover");
 
             restInputField = CreateRestInputField(panelObject.transform);
-            restSubmitButton = CreateRestButton(panelObject.transform, "Rest Submit Button", "전달", new Vector2(0.18f, 0.16f), new Vector2(0.46f, 0.29f));
+            restSubmitButton = CreateRestButton(panelObject.transform, "Rest Submit Button", "전달", new Vector2(0.16f, 0.13f), new Vector2(0.46f, 0.26f));
             restSubmitButton.onClick.AddListener(SubmitRestInteraction);
-            restContinueButton = CreateRestButton(panelObject.transform, "Rest Continue Button", "계속", new Vector2(0.54f, 0.16f), new Vector2(0.82f, 0.29f));
+            restContinueButton = CreateRestButton(panelObject.transform, "Rest Continue Button", "계속", new Vector2(0.54f, 0.13f), new Vector2(0.84f, 0.26f));
             restContinueButton.onClick.AddListener(ContinueAfterRestInteraction);
             restContinueButton.gameObject.SetActive(false);
 
-            restResponseText = CreateHudText("Rest Response Text", new Vector2(0.06f, 0.32f), new Vector2(0.94f, 0.48f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 30, TextAnchor.MiddleCenter, new Color(0.88f, 0.93f, 0.92f, 1f));
+            var responsePanel = CreatePanel("Rest Response Bubble", panelObject.transform, new Vector2(0.06f, 0.30f), new Vector2(0.94f, 0.50f), new Color(0.10f, 0.13f, 0.15f, 0.96f));
+            restResponseText = CreateHudText("Rest Response Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), new Vector2(20f, 10f), new Vector2(-20f, -10f), RestBodyFontSize, TextAnchor.MiddleLeft, new Color(0.88f, 0.93f, 0.92f, 1f));
+            restResponseText.horizontalOverflow = HorizontalWrapMode.Wrap;
             restResponseText.transform.SetParent(panelObject.transform, false);
+            restResponseText.transform.SetParent(responsePanel, false);
             restResponseText.text = "행동을 선택하세요";
             restInteractionPanel.gameObject.SetActive(false);
         }
 
         private Button CreateRestActionButton(Transform parent, string name, string label, Vector2 center, string actionId)
         {
-            var button = CreateRestButton(parent, name, label, new Vector2(center.x - 0.15f, center.y - 0.085f), new Vector2(center.x + 0.15f, center.y + 0.085f));
+            var button = CreateRestButton(parent, name, label, new Vector2(center.x - 0.15f, center.y - 0.09f), new Vector2(center.x + 0.15f, center.y + 0.09f));
             button.onClick.AddListener(() => SelectRestAction(actionId));
             return button;
+        }
+
+        private static RectTransform CreatePanel(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax, Color color)
+        {
+            var panelObject = new GameObject(name);
+            panelObject.transform.SetParent(parent, false);
+            var rect = panelObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var image = panelObject.AddComponent<Image>();
+            image.color = color;
+            image.raycastTarget = false;
+            return rect;
         }
 
         private Button CreateRestButton(Transform parent, string name, string label, Vector2 anchorMin, Vector2 anchorMax)
@@ -1023,7 +1071,8 @@ namespace HwigiTower.UI
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
 
-            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 29, TextAnchor.MiddleCenter, new Color(0.90f, 0.94f, 0.95f, 1f));
+            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 28, TextAnchor.MiddleCenter, new Color(0.90f, 0.94f, 0.95f, 1f));
+            text.lineSpacing = 0.92f;
             text.transform.SetParent(buttonObject.transform, false);
             text.text = label;
             return button;
@@ -1034,27 +1083,27 @@ namespace HwigiTower.UI
             var inputObject = new GameObject("Rest Utterance Input");
             inputObject.transform.SetParent(parent, false);
             var rect = inputObject.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.06f, 0.54f);
-            rect.anchorMax = new Vector2(0.94f, 0.70f);
+            rect.anchorMin = new Vector2(0.06f, 0.535f);
+            rect.anchorMax = new Vector2(0.94f, 0.705f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
             var image = inputObject.AddComponent<Image>();
-            image.color = new Color(0.94f, 0.97f, 0.96f, 0.98f);
+            image.color = new Color(0.96f, 0.985f, 0.98f, 1f);
             var input = inputObject.AddComponent<InputField>();
             input.targetGraphic = image;
 
-            var text = CreateHudText("Rest Input Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 32, TextAnchor.MiddleLeft, new Color(0.05f, 0.07f, 0.08f, 1f));
+            var text = CreateHudText("Rest Input Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, RestInputFontSize, TextAnchor.MiddleLeft, new Color(0.05f, 0.07f, 0.08f, 1f));
             text.transform.SetParent(inputObject.transform, false);
             text.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
             text.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
             input.textComponent = text;
 
-            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 30, TextAnchor.MiddleLeft, new Color(0.23f, 0.28f, 0.30f, 1f));
+            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 31, TextAnchor.MiddleLeft, new Color(0.16f, 0.22f, 0.24f, 1f));
             placeholder.transform.SetParent(inputObject.transform, false);
             placeholder.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
             placeholder.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
-            placeholder.text = "마타이오스에게 전할 말을 입력";
+            placeholder.text = "마타이오스에게 전할 말";
             input.placeholder = placeholder;
             return input;
         }
@@ -1069,7 +1118,13 @@ namespace HwigiTower.UI
 
             if (restResponseText != null)
             {
-                restResponseText.text = actionId == "rest.recover" ? "입력 없이도 쉴 수 있습니다" : "말을 입력한 뒤 전달하세요";
+                restResponseText.text = actionId switch
+                {
+                    "rest.ask_mood" => "기분을 묻는다\n말을 입력하면 Affinity +2",
+                    "rest.train" => "훈련을 진행한다\n다음 전투 피해 +1",
+                    "rest.recover" => "휴식을 취한다\n입력 없이 HP 회복",
+                    _ => "말을 입력한 뒤 전달하세요"
+                };
             }
         }
 
@@ -1118,11 +1173,24 @@ namespace HwigiTower.UI
             if (restResponseText != null)
             {
                 var response = _roomController.RunState == null ? string.Empty : _roomController.RunState.LastMataiosResponse;
-                restResponseText.text = string.IsNullOrEmpty(response) ? "응답 준비 완료" : response;
+                restResponseText.text = BuildRestCommittedMessage(_pendingRestActionId, response);
             }
 
             ShowResult(resolution);
             ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private static string BuildRestCommittedMessage(string actionId, string response)
+        {
+            var effect = actionId switch
+            {
+                "rest.ask_mood" => "결과: Affinity +2",
+                "rest.train" => "결과: 다음 전투 피해 +1",
+                "rest.recover" => "결과: HP 회복",
+                _ => "결과: 완료"
+            };
+            var line = string.IsNullOrEmpty(response) ? "마타이오스 응답 준비 완료" : response;
+            return line + "\n" + effect;
         }
 
         private void ContinueAfterRestInteraction()
@@ -1278,6 +1346,50 @@ namespace HwigiTower.UI
             encounterBackgroundImage.preserveAspect = false;
             encounterBackgroundImage.raycastTarget = false;
             encounterBackgroundImage.gameObject.SetActive(false);
+        }
+
+        private void EnsureMerchantVisualImage()
+        {
+            if (merchantVisualImage != null)
+            {
+                return;
+            }
+
+            EnsureScreenLayers();
+            var merchantObject = new GameObject("Merchant Visual");
+            merchantObject.transform.SetParent(HudParent, false);
+
+            var rect = merchantObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.53f, 0.50f);
+            rect.anchorMax = new Vector2(0.92f, 0.82f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            merchantVisualImage = merchantObject.AddComponent<Image>();
+            merchantVisualImage.color = new Color(1f, 1f, 1f, 0.98f);
+            merchantVisualImage.preserveAspect = true;
+            merchantVisualImage.raycastTarget = false;
+            merchantVisualImage.gameObject.SetActive(false);
+        }
+
+        private void ApplyMerchantPresentation(int floor)
+        {
+            EnsureMerchantVisualImage();
+            if (merchantVisualImage == null)
+            {
+                return;
+            }
+
+            merchantVisualImage.sprite = presentationData != null && presentationData.TryGetMerchantSprite(floor, out var sprite) ? sprite : mataiosPortrait;
+            merchantVisualImage.gameObject.SetActive(merchantVisualImage.sprite != null);
+        }
+
+        private void HideMerchantPresentation()
+        {
+            if (merchantVisualImage != null)
+            {
+                merchantVisualImage.gameObject.SetActive(false);
+            }
         }
 
         private void EnsureCombatPanel()
@@ -2251,6 +2363,11 @@ namespace HwigiTower.UI
                 : view.ChoiceStableId.StartsWith("floor.", StringComparison.Ordinal) && !string.IsNullOrEmpty(view.TextKey)
                     ? view.TextKey
                     : ResolvePublicChoiceLabel(view.ChoiceStableId, index);
+            if (!showRawDebugText && IsPurchaseChoice(view.ChoiceStableId))
+            {
+                label = ResolvePurchaseChoiceTitle(view.HintText);
+            }
+
             if (!view.Enabled)
             {
                 label += showRawDebugText && !string.IsNullOrEmpty(view.ReasonTextKey)
@@ -2263,6 +2380,42 @@ namespace HwigiTower.UI
             }
 
             return label;
+        }
+
+        private static bool IsPurchaseChoice(string choiceStableId)
+        {
+            return !string.IsNullOrEmpty(choiceStableId) && choiceStableId.Contains("_BUY_", StringComparison.Ordinal);
+        }
+
+        private static string ResolvePurchaseChoiceTitle(string hint)
+        {
+            var normalized = NormalizePublicHint(hint);
+            if (normalized.Contains("붕대", StringComparison.Ordinal))
+            {
+                return "붕대";
+            }
+
+            if (normalized.Contains("등유", StringComparison.Ordinal))
+            {
+                return "등유";
+            }
+
+            if (normalized.Contains("찢어진 부적", StringComparison.Ordinal))
+            {
+                return "찢어진 부적";
+            }
+
+            if (normalized.Contains("정찰", StringComparison.Ordinal))
+            {
+                return "정찰";
+            }
+
+            if (normalized.Contains("회상 닻", StringComparison.Ordinal))
+            {
+                return "회상 닻";
+            }
+
+            return "구매";
         }
 
         private static string ResolveMapNodeLabel(PrototypeFloorMapNodeType type)
@@ -2801,6 +2954,15 @@ namespace HwigiTower.UI
         {
             var slot = ResolveCurrentPresentationSlot(snapshot);
             ApplyPresentationSlot(slot);
+            if (!snapshot.IsInCombat && (_shopPresentationActive || IsShopEncounterId(snapshot.NextDemoEncounterId)))
+            {
+                ApplyMerchantPresentation(snapshot.CurrentFloor);
+            }
+            else if (!RestInteractionPanelVisible)
+            {
+                HideMerchantPresentation();
+            }
+
             if (interactionText != null && !showRawDebugText && snapshot.RunClear && !snapshot.IsInCombat)
             {
                 interactionText.text = snapshot.EndingChoicePending ? "엔딩 선택" : "클리어";
@@ -2867,6 +3029,11 @@ namespace HwigiTower.UI
             }
 
             return string.Empty;
+        }
+
+        private static bool IsShopEncounterId(string encounterId)
+        {
+            return !string.IsNullOrEmpty(encounterId) && encounterId.Contains("SHOP", StringComparison.Ordinal);
         }
 
         private void UpdateCutsceneTriggers(PrototypeRunSnapshot snapshot)
@@ -3216,6 +3383,7 @@ namespace HwigiTower.UI
 
             var normalized = hint
                 .Replace("Unavailable:", "선택 불가:", StringComparison.Ordinal)
+                .Replace("선택 불가: Gold 부족", "구매 불가: Gold 부족", StringComparison.Ordinal)
                 .Replace("Combat start", "전투 시작", StringComparison.Ordinal)
                 .Replace("Memory unlock", "기억 파편 해금", StringComparison.Ordinal)
                 .Replace("Ability 필요", "능력 필요", StringComparison.Ordinal);

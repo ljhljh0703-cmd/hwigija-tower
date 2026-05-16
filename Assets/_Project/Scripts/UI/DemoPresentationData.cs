@@ -86,6 +86,22 @@ namespace HwigiTower.UI
             return false;
         }
 
+        public bool TryGetMerchantSprite(int floor, out Sprite sprite)
+        {
+            sprite = null;
+            var source = MerchantSlots;
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (source[i] != null && source[i].Floor == floor && source[i].MerchantSprite != null)
+                {
+                    sprite = source[i].MerchantSprite;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool TryGetSlot(string encounterStableId, out DemoPresentationSlot slot)
         {
             slot = null;

@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 01:27 — Merchant/Rest/Map presentation polish
+- **Phase**: W3-2
+- **Done**:
+  - 기존 `DemoPresentationData` merchant floor slots를 HUD shop 화면에 실제 visual로 연결
+  - Shop 구매 카드를 상품명/가격·효과/불가 이유 중심으로 정리하고 보스 전 준비 맥락을 강화
+  - Rest interaction을 action 효과 요약, 큰 입력창, response bubble, commit 결과 요약으로 분리
+  - Floor Map 선택 가능/완료/잠김 상태의 색 대비와 아이콘/텍스트 크기를 보강
+  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
+- **Files**: 변경/추가 4개 (`PrototypeHud.cs`, `DemoPresentationData.cs`, `Docs/QA/**`, progress)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: 최종 폰트/텍스트 스타일, merchant art variants, selected/focus animation polish
+- **Agent**: Codex
+
 ### 2026-05-17 00:28 — Portrait UI v3 readability polish
 - **Phase**: W3-2
 - **Done**:
