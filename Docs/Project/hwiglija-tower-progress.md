@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-16 16:20 — Portrait UI v3 screenshot harness QA
+- **Phase**: W3-2
+- **Done**:
+  - `PrototypeHud`/`PrototypeRoomController`/`PrototypeRunState`에 `UNITY_EDITOR || UNITY_INCLUDE_TESTS` 범위 QA 진입 hook 추가
+  - PlayMode screenshot harness로 Lobby/Floor Map/Event/Rest/Shop/Combat/Boss/Ending 8종을 실제 runtime UI 상태에서 1080x1920 PNG로 생성
+  - `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 필수 screenshot 8개 생성 및 PNG dimensions 1080x1920 확인
+  - `Docs/QA/Portrait_UI_v3_Screenshot_QA_2026-05-16.md`에 pass/needs polish 판정과 남은 P1 polish 기록
+  - EditMode 119/119 pass, PlayMode 19/19 pass, skipped 0 확인
+- **Files**: 변경/추가 7개 (`PrototypeHud.cs`, `PrototypeRoomController.cs`, `PrototypeRunState.cs`, `PortraitUiScreenshotQaTests.cs`, `Docs/QA/**`, progress)
+- **GDD impact**: 없음
+- **Blockers**: 없음. Unity `-runTests` 직접 XML 출력은 여전히 불안정해 임시 TestRunner wrapper로 fresh PlayMode를 검증했으며 wrapper는 커밋 제외 예정.
+- **Next**: harness 커밋/푸시 후 P1로 텍스트 선명도, top HUD 밀도, shop/rest focus polish 진행.
+- **Agent**: Codex
+
 ### 2026-05-16 11:38 — Portrait gameplay UI v3 shell
 - **Phase**: W3-2
 - **Done**:
