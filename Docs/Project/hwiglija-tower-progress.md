@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 11:19 — Event cutscene layout reference pass
+- **Phase**: W3-2
+- **Done**:
+  - 이벤트 화면을 top status / central cutscene image / event text / bottom choice buttons 구조로 분리
+  - Jar Room 이벤트에서 probability hint 선택지는 유지하면서 route/debug-like text와 raw stableId 노출을 차단
+  - 이벤트 진입 중 기존 route/memory/result/portrait 잔상 노출을 정리
+  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
+- **Files**: 변경/추가 5개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`, `PrototypeRoomSmokeTests.cs`, `Docs/QA/**`, progress)
+- **GDD impact**: 없음
+- **Blockers**: event screen font sharpness/final copyfit은 writer-approved text 이후 추가 polish 필요
+- **Next**: player portrait/action icon art binding, event/font rendering polish, final copyfit pass
+- **Agent**: Codex
+
 ### 2026-05-17 09:00 — Combat party layout v4
 - **Phase**: W3-2
 - **Done**:

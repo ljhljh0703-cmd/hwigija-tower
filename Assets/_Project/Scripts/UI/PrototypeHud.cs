@@ -35,6 +35,11 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform combatPartyDock;
         [SerializeField] private RectTransform combatPlayerCard;
         [SerializeField] private RectTransform combatMataiosCard;
+        [SerializeField] private RectTransform eventCutscenePanel;
+        [SerializeField] private Image eventCutsceneImage;
+        [SerializeField] private Text eventHeaderText;
+        [SerializeField] private Text eventBodyText;
+        [SerializeField] private Text eventUtilityText;
         [SerializeField] private Text combatEnemyTitleText;
         [SerializeField] private Text combatPlayerCardText;
         [SerializeField] private Text combatMataiosCardText;
@@ -81,9 +86,12 @@ namespace HwigiTower.UI
         private string _lastDemoCompleteCutsceneKey = string.Empty;
         private bool _cutsceneFinishedSubscribed;
         private bool _shopPresentationActive;
+        private bool _eventPresentationActive;
 
         private const float ChoiceButtonHeight = 118f;
         private const float ChoiceButtonSpacing = 130f;
+        private const float EventChoiceButtonHeight = 104f;
+        private const float EventChoiceButtonSpacing = 116f;
         private const float MapNodeButtonHeight = 118f;
         private const float MapNodeButtonSpacing = 132f;
         private const float MapNodeIconSize = 72f;
@@ -126,6 +134,8 @@ namespace HwigiTower.UI
         public string CurrentCombatEnemySpriteName => combatEnemyImage != null && combatEnemyImage.sprite != null ? combatEnemyImage.sprite.name : string.Empty;
         public bool CombatPartyDockVisible => combatPartyDock != null && combatPartyDock.gameObject.activeInHierarchy;
         public string CombatPartyMessage => ((combatPlayerCardText == null ? string.Empty : combatPlayerCardText.text) + "\n" + (combatMataiosCardText == null ? string.Empty : combatMataiosCardText.text)).Trim();
+        public bool EventCutsceneVisible => eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy;
+        public string EventCutsceneMessage => ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
         public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
         public bool HasScreenLayerPanels => topStatusLayer != null && objectiveLayer != null && visualLayer != null && nodeMapLayer != null && npcReactionLayer != null && actionLayer != null && resultLayer != null && endingLayer != null;
         public string CurrentMapNodeIconNames
@@ -400,8 +410,12 @@ namespace HwigiTower.UI
             ClearChoices();
             HideRestInteractionPanel();
             EnsureScreenLayers();
+            HideEventCutsceneLayout();
             SetLayerVisible(actionLayer, true);
             SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(objectiveLayer, true);
+            SetLayerVisible(visualLayer, true);
+            SetLayerVisible(npcReactionLayer, true);
             SetLayerVisible(resultLayer, false);
             EnsureEventSystem();
             EnsureChoiceContainer();
@@ -426,20 +440,31 @@ namespace HwigiTower.UI
             if (interactionText != null && encounter != null)
             {
                 ApplyPresentationSlot(encounter.Id);
-                if (encounter.Type == EncounterType.Shop)
-                {
-                    _shopPresentationActive = true;
-                    ApplyMerchantPresentation(_roomController == null ? 1 : _roomController.GetSnapshot().CurrentFloor);
-                }
-                else
+                if (!showRawDebugText && IsEventCutsceneEncounter(encounter))
                 {
                     _shopPresentationActive = false;
                     HideMerchantPresentation();
+                    ShowEventCutsceneLayout(encounter);
+                    ConfigureChoiceContainerForEvent();
+                }
+                else if (encounter.Type == EncounterType.Shop)
+                {
+                    _eventPresentationActive = false;
+                    _shopPresentationActive = true;
+                    ApplyMerchantPresentation(_roomController == null ? 1 : _roomController.GetSnapshot().CurrentFloor);
+                    ConfigureChoiceContainerDefault();
+                }
+                else
+                {
+                    _eventPresentationActive = false;
+                    _shopPresentationActive = false;
+                    HideMerchantPresentation();
+                    ConfigureChoiceContainerDefault();
                 }
 
                 interactionText.text = showRawDebugText
                     ? $"node: {ResolveEncounterDisplayName(encounter)} | encounter: {encounter.Id} | choices pending"
-                    : ResolvePresentationDisplayName(encounter);
+                    : _eventPresentationActive ? string.Empty : ResolvePresentationDisplayName(encounter);
             }
 
             ShowResultMessage(string.Empty);
@@ -470,9 +495,13 @@ namespace HwigiTower.UI
         {
             ClearChoices();
             HideRestInteractionPanel();
+            HideEventCutsceneLayout();
             EnsureScreenLayers();
             SetLayerVisible(nodeMapLayer, true);
             SetLayerVisible(actionLayer, false);
+            SetLayerVisible(objectiveLayer, true);
+            SetLayerVisible(visualLayer, true);
+            SetLayerVisible(npcReactionLayer, true);
             SetLayerVisible(resultLayer, true);
             EnsureEventSystem();
             EnsureChoiceContainer();
@@ -611,11 +640,11 @@ namespace HwigiTower.UI
             EnsureScreenLayers();
             SetLayerVisible(topStatusLayer, true);
             SetLayerVisible(objectiveLayer, true);
-            SetLayerVisible(visualLayer, !snapshot.IsInCombat);
+            SetLayerVisible(visualLayer, !snapshot.IsInCombat && !_eventPresentationActive);
             SetLayerVisible(nodeMapLayer, snapshot.HasFloorMap && !snapshot.IsInCombat && !snapshot.RunCompleted && _choiceButtons.Count > 0);
-            SetLayerVisible(npcReactionLayer, !snapshot.IsInCombat && !snapshot.EndingChoicePending);
+            SetLayerVisible(npcReactionLayer, !snapshot.IsInCombat && !snapshot.EndingChoicePending && !_eventPresentationActive);
             SetLayerVisible(actionLayer, !snapshot.IsInCombat && !snapshot.RunCompleted);
-            SetLayerVisible(resultLayer, !snapshot.IsInCombat && !RestInteractionPanelVisible && resultText != null && resultText.gameObject.activeSelf);
+            SetLayerVisible(resultLayer, !snapshot.IsInCombat && !_eventPresentationActive && !RestInteractionPanelVisible && resultText != null && resultText.gameObject.activeSelf);
             SetLayerVisible(endingLayer, snapshot.EndingChoicePending && !snapshot.IsInCombat);
         }
 
@@ -970,10 +999,222 @@ namespace HwigiTower.UI
             choiceContainer.anchoredPosition = new Vector2(0f, 52f);
         }
 
+        private void ConfigureChoiceContainerDefault()
+        {
+            EnsureChoiceContainer();
+            if (choiceContainer == null)
+            {
+                return;
+            }
+
+            choiceContainer.anchorMin = new Vector2(0.08f, 0f);
+            choiceContainer.anchorMax = new Vector2(0.92f, 0f);
+            choiceContainer.pivot = new Vector2(0.5f, 0f);
+            choiceContainer.sizeDelta = new Vector2(0f, 560f);
+            choiceContainer.anchoredPosition = new Vector2(0f, 52f);
+        }
+
+        private void ConfigureChoiceContainerForEvent()
+        {
+            EnsureChoiceContainer();
+            if (choiceContainer == null)
+            {
+                return;
+            }
+
+            choiceContainer.anchorMin = new Vector2(0.08f, 0f);
+            choiceContainer.anchorMax = new Vector2(0.92f, 0f);
+            choiceContainer.pivot = new Vector2(0.5f, 0f);
+            choiceContainer.sizeDelta = new Vector2(0f, 360f);
+            choiceContainer.anchoredPosition = new Vector2(0f, 74f);
+
+            for (var i = 0; i < _choiceButtons.Count; i++)
+            {
+                var button = _choiceButtons[i];
+                if (button == null)
+                {
+                    continue;
+                }
+
+                var rect = button.GetComponent<RectTransform>();
+                if (rect != null)
+                {
+                    rect.anchorMin = new Vector2(0f, 1f);
+                    rect.anchorMax = new Vector2(1f, 1f);
+                    rect.pivot = new Vector2(0.5f, 1f);
+                    rect.sizeDelta = new Vector2(0f, EventChoiceButtonHeight);
+                    rect.anchoredPosition = new Vector2(0f, -i * EventChoiceButtonSpacing);
+                }
+            }
+        }
+
+        private void EnsureEventCutscenePanel()
+        {
+            if (eventCutscenePanel != null)
+            {
+                return;
+            }
+
+            EnsureScreenLayers();
+            var panelObject = new GameObject("Event Cutscene Panel");
+            panelObject.transform.SetParent(HudParent, false);
+
+            eventCutscenePanel = panelObject.AddComponent<RectTransform>();
+            eventCutscenePanel.anchorMin = new Vector2(0.06f, 0.255f);
+            eventCutscenePanel.anchorMax = new Vector2(0.94f, 0.835f);
+            eventCutscenePanel.offsetMin = Vector2.zero;
+            eventCutscenePanel.offsetMax = Vector2.zero;
+
+            var image = panelObject.AddComponent<Image>();
+            image.color = new Color(0.015f, 0.018f, 0.022f, 0.86f);
+            image.raycastTarget = false;
+
+            eventHeaderText = CreateCombatChildText(eventCutscenePanel, "Event Header Text", new Vector2(0.04f, 0.88f), new Vector2(0.96f, 0.99f), 30, TextAnchor.MiddleCenter);
+            eventHeaderText.color = new Color(0.92f, 0.95f, 0.94f, 1f);
+
+            var imageFrame = CreateCombatPanelRect(eventCutscenePanel, "Event Image Frame", new Vector2(0.07f, 0.36f), new Vector2(0.93f, 0.86f), new Color(0.035f, 0.040f, 0.046f, 0.95f));
+            eventCutsceneImage = CreateCombatImage(imageFrame, "Event Cutscene Image", new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.98f));
+            eventCutsceneImage.color = Color.white;
+
+            eventBodyText = CreateCombatChildText(eventCutscenePanel, "Event Body Text", new Vector2(0.06f, 0.10f), new Vector2(0.94f, 0.33f), 29, TextAnchor.MiddleLeft);
+            eventBodyText.lineSpacing = 0.94f;
+
+            eventUtilityText = CreateCombatChildText(eventCutscenePanel, "Event Utility Text", new Vector2(0.08f, 0.01f), new Vector2(0.92f, 0.07f), 24, TextAnchor.MiddleCenter);
+            eventUtilityText.color = new Color(0.76f, 0.82f, 0.84f, 1f);
+            eventUtilityText.text = "기록    정보    설정";
+            eventCutscenePanel.gameObject.SetActive(false);
+        }
+
+        private void ShowEventCutsceneLayout(EncounterData encounter)
+        {
+            EnsureEventCutscenePanel();
+            _eventPresentationActive = true;
+            SetLayerVisible(objectiveLayer, false);
+            SetLayerVisible(visualLayer, false);
+            SetLayerVisible(npcReactionLayer, false);
+            SetLayerVisible(resultLayer, false);
+            if (eventCutscenePanel != null)
+            {
+                eventCutscenePanel.gameObject.SetActive(true);
+            }
+
+            if (routeText != null)
+            {
+                routeText.gameObject.SetActive(false);
+            }
+
+            if (memoryText != null)
+            {
+                memoryText.text = string.Empty;
+                memoryText.gameObject.SetActive(false);
+            }
+
+            if (resultText != null)
+            {
+                resultText.text = string.Empty;
+                resultText.gameObject.SetActive(false);
+            }
+
+            if (npcPortraitImage != null)
+            {
+                npcPortraitImage.gameObject.SetActive(false);
+            }
+
+            var slot = ResolvePresentationSlot(encounter == null ? string.Empty : encounter.Id);
+            if (eventCutsceneImage != null)
+            {
+                eventCutsceneImage.sprite = ResolveEventSprite(slot);
+                eventCutsceneImage.gameObject.SetActive(eventCutsceneImage.sprite != null);
+            }
+
+            if (eventHeaderText != null)
+            {
+                eventHeaderText.text = ResolveEventHeader(encounter);
+            }
+
+            if (eventBodyText != null)
+            {
+                eventBodyText.text = ResolveEventBody(encounter, slot);
+            }
+
+            if (eventUtilityText != null)
+            {
+                eventUtilityText.gameObject.SetActive(true);
+            }
+        }
+
+        private void HideEventCutsceneLayout(bool restoreRouteText = true)
+        {
+            _eventPresentationActive = false;
+            if (eventCutscenePanel != null)
+            {
+                eventCutscenePanel.gameObject.SetActive(false);
+            }
+
+            if (restoreRouteText && routeText != null)
+            {
+                routeText.gameObject.SetActive(true);
+            }
+        }
+
+        private DemoPresentationSlot ResolvePresentationSlot(string encounterStableId)
+        {
+            return presentationData != null && presentationData.TryGetSlot(encounterStableId, out var slot) ? slot : null;
+        }
+
+        private static Sprite ResolveEventSprite(DemoPresentationSlot slot)
+        {
+            if (slot == null)
+            {
+                return null;
+            }
+
+            return slot.MemoryFragmentSprite != null ? slot.MemoryFragmentSprite : slot.BackgroundSprite;
+        }
+
+        private static bool IsEventCutsceneEncounter(EncounterData encounter)
+        {
+            if (encounter == null)
+            {
+                return false;
+            }
+
+            return encounter.Type == EncounterType.Story ||
+                encounter.Type == EncounterType.MoralChoice ||
+                encounter.Type == EncounterType.MemoryFragment ||
+                encounter.Type == EncounterType.Remnant;
+        }
+
+        private static string ResolveEventHeader(EncounterData encounter)
+        {
+            if (encounter != null && encounter.Id == "EVT_F01_JAR_ROOM")
+            {
+                return "당신은 이상한 냄새가 나는 항아리 방에 들어섰다.";
+            }
+
+            return encounter == null ? "이벤트" : ResolvePublicEncounterLabel(string.Empty, encounter);
+        }
+
+        private static string ResolveEventBody(EncounterData encounter, DemoPresentationSlot slot)
+        {
+            if (encounter != null && encounter.Id == "EVT_F01_JAR_ROOM")
+            {
+                return "방 한가운데 놓인 항아리들이 낮게 울린다.\n무엇을 건드릴지 고르면 결과가 결정된다.";
+            }
+
+            if (slot != null && !string.IsNullOrEmpty(slot.BodyTextKey))
+            {
+                return "임시 이벤트 텍스트\n" + slot.BodyTextKey;
+            }
+
+            return "임시 이벤트 텍스트\n선택 전 결과와 위험을 확인하세요.";
+        }
+
         private void ShowRestInteraction(EncounterSelection selection)
         {
             ClearChoices();
             EnsureRestInteractionPanel();
+            HideEventCutsceneLayout();
             EnsureScreenLayers();
             SetLayerVisible(actionLayer, false);
             SetLayerVisible(nodeMapLayer, false);
@@ -2055,8 +2296,8 @@ namespace HwigiTower.UI
                 return;
             }
 
-            routeText.gameObject.SetActive(!snapshot.IsInCombat || showRawDebugText);
-            if (snapshot.IsInCombat && !showRawDebugText)
+            routeText.gameObject.SetActive((!snapshot.IsInCombat && !_eventPresentationActive) || showRawDebugText);
+            if ((snapshot.IsInCombat || _eventPresentationActive) && !showRawDebugText)
             {
                 routeText.text = string.Empty;
                 return;
@@ -2270,6 +2511,13 @@ namespace HwigiTower.UI
                 return;
             }
 
+            if (_eventPresentationActive && !showRawDebugText)
+            {
+                memoryText.gameObject.SetActive(false);
+                memoryText.text = string.Empty;
+                return;
+            }
+
             string memory;
             string combat;
             if (showRawDebugText)
@@ -2351,6 +2599,11 @@ namespace HwigiTower.UI
             }
 
             var hasCombat = snapshot.IsInCombat;
+            if (hasCombat)
+            {
+                HideEventCutsceneLayout(restoreRouteText: false);
+            }
+
             combatPanel.gameObject.SetActive(hasCombat);
             if (memoryText != null)
             {
