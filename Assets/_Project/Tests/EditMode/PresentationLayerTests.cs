@@ -54,7 +54,7 @@ namespace HwigiTower.Tests.EditMode
             AssertSlotSprites(data, "ENEMY_SLIME_01", null, "enemy_slime_01", null, null);
             AssertSlotSprites(data, "ENEMY_SKELETON_01", null, "enemy_skeleton_01", null, null);
             AssertSlotSprites(data, "ENEMY_WILD_BEAST_01", null, "enemy_wild_beast_01", null, null);
-            AssertSlotSprites(data, "ENEMY_MERCENARY_CAPTAIN_SAGAN_01", null, "enemy_mercenary_captain_sagan_01", null, null);
+            AssertSlotSprites(data, "ENEMY_MERCENARY_CAPTAIN_SAGAN_01", null, "boss_mercenary_captain_sagan_01", null, null);
             AssertSlotSprites(data, "ENEMY_HOMUNCULUS_01", null, "enemy_homunculus_01", null, null);
             AssertSlotSprites(data, "ENEMY_FRACTURE_HOUND", null, "enemy_fracture_hound", null, null);
             AssertSlotSprites(data, "ENEMY_LAMPLIGHTER_01", null, "enemy_lamplighter_01", null, null);
@@ -73,6 +73,8 @@ namespace HwigiTower.Tests.EditMode
             AssertNodeIcon(data, PrototypeFloorMapNodeType.Rest, "node_rest");
             AssertNodeIcon(data, PrototypeFloorMapNodeType.Shop, "node_shop");
             AssertNodeIcon(data, PrototypeFloorMapNodeType.Boss, "node_boss");
+            Assert.IsTrue(data.TryGetCompletedNodeBackground(out var completed));
+            Assert.AreEqual("node_back_cleared", completed.name);
         }
 
         [Test]
@@ -82,9 +84,9 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsNotNull(data);
             Assert.IsNull(data.DefaultPlayerPortrait);
-            AssertCombatActionIcon(data, CombatAction.Attack, "node_combat");
-            AssertCombatActionIcon(data, CombatAction.Defend, "node_rest");
-            AssertCombatActionIcon(data, CombatAction.Skill, "node_event");
+            AssertCombatActionIcon(data, CombatAction.Attack, "icon_action_attack");
+            AssertCombatActionIcon(data, CombatAction.Defend, "icon_action_defend");
+            AssertCombatActionIcon(data, CombatAction.Skill, "icon_action_skill_scout");
         }
 
         [Test]
@@ -259,9 +261,9 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(hud.CombatPartyDockVisible);
             Assert.IsTrue(hud.CombatPlayerPortraitVisible);
             Assert.IsEmpty(hud.CurrentCombatPlayerPortraitSpriteName);
-            StringAssert.Contains("node_combat", hud.CurrentCombatActionIconNames);
-            StringAssert.Contains("node_rest", hud.CurrentCombatActionIconNames);
-            StringAssert.Contains("node_event", hud.CurrentCombatActionIconNames);
+            StringAssert.Contains("icon_action_attack", hud.CurrentCombatActionIconNames);
+            StringAssert.Contains("icon_action_defend", hud.CurrentCombatActionIconNames);
+            StringAssert.Contains("icon_action_skill_scout", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("최종 보스", hud.CombatMessage);
             StringAssert.Contains("적 HP 22/34", hud.CombatMessage);
             StringAssert.Contains("방어: 받은 피해", hud.CombatMessage);

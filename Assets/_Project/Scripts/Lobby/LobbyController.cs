@@ -361,13 +361,14 @@ namespace HwigiTower.Lobby
 
         private void BuildHero(Transform parent)
         {
-            if (presentationData != null && presentationData.LogoSprite != null)
+            var hasLogo = presentationData != null && presentationData.LogoSprite != null;
+            if (hasLogo)
             {
                 var logoObject = new GameObject("Lobby Logo");
                 logoObject.transform.SetParent(parent, false);
                 var logoRect = logoObject.AddComponent<RectTransform>();
-                logoRect.anchorMin = new Vector2(0.18f, 0.67f);
-                logoRect.anchorMax = new Vector2(0.82f, 0.80f);
+                logoRect.anchorMin = new Vector2(0.20f, 0.69f);
+                logoRect.anchorMax = new Vector2(0.80f, 0.82f);
                 logoRect.offsetMin = Vector2.zero;
                 logoRect.offsetMax = Vector2.zero;
                 var logo = logoObject.AddComponent<Image>();
@@ -377,10 +378,10 @@ namespace HwigiTower.Lobby
             }
 
             var titleValue = presentationData != null ? presentationData.TitleText : "회귀자는 탑을 오른다";
-            var title = CreateText(parent, LobbyTitleName, titleValue, 66, new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.76f));
+            var title = CreateText(parent, LobbyTitleName, titleValue, hasLogo ? 42 : 66, hasLogo ? new Vector2(0.10f, 0.615f) : new Vector2(0.08f, 0.66f), hasLogo ? new Vector2(0.90f, 0.675f) : new Vector2(0.92f, 0.76f));
             title.color = new Color(0.94f, 0.97f, 0.92f, 1f);
             var subtitleValue = presentationData != null ? presentationData.SubtitleText : "Prototype";
-            var subtitle = CreateText(parent, "Lobby Subtitle", subtitleValue, 28, new Vector2(0.14f, 0.61f), new Vector2(0.86f, 0.65f));
+            var subtitle = CreateText(parent, "Lobby Subtitle", subtitleValue, 28, hasLogo ? new Vector2(0.14f, 0.57f) : new Vector2(0.14f, 0.61f), hasLogo ? new Vector2(0.86f, 0.605f) : new Vector2(0.86f, 0.65f));
             subtitle.color = new Color(0.74f, 0.82f, 0.84f, 1f);
         }
 

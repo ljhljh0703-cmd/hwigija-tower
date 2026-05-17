@@ -862,12 +862,35 @@ namespace HwigiTower.UI
                     : Color.white;
             _mapNodeIconImages.Add(icon);
 
+            if (node.Completed && ResolveCompletedNodeBackground() != null)
+            {
+                var completedObject = new GameObject("Node Completed Mark");
+                completedObject.transform.SetParent(button.transform, false);
+                var completedRect = completedObject.AddComponent<RectTransform>();
+                completedRect.anchorMin = new Vector2(1f, 0.5f);
+                completedRect.anchorMax = new Vector2(1f, 0.5f);
+                completedRect.pivot = new Vector2(1f, 0.5f);
+                completedRect.anchoredPosition = new Vector2(-18f, 0f);
+                completedRect.sizeDelta = new Vector2(MapNodeIconSize * 0.92f, MapNodeIconSize * 0.92f);
+
+                var completedImage = completedObject.AddComponent<Image>();
+                completedImage.sprite = ResolveCompletedNodeBackground();
+                completedImage.preserveAspect = true;
+                completedImage.raycastTarget = false;
+                completedImage.color = new Color(1f, 1f, 1f, 0.92f);
+            }
+
             return button;
         }
 
         private Sprite ResolveNodeIcon(PrototypeFloorMapNodeType type)
         {
             return presentationData != null && presentationData.TryGetNodeIcon(type, out var icon) ? icon : null;
+        }
+
+        private Sprite ResolveCompletedNodeBackground()
+        {
+            return presentationData != null && presentationData.TryGetCompletedNodeBackground(out var sprite) ? sprite : null;
         }
 
         private static Color ResolveMapNodeTint(PrototypeFloorMapNodeView node)

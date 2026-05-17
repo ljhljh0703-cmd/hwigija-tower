@@ -22,7 +22,7 @@ This document is a handoff index only. It does not define final lore or final en
 | 3 | ENEMY_MERCENARY_ASSASSIN_01 | 용병 암살자 | normal | 속공형 용병 | enemy_mercenary_assassin_01.png | ready | 신규 placeholder EnemyData |
 | 3 | ENEMY_MERCENARY_MAGE_01 | 용병 마도사 | normal | 마법형 용병 | enemy_mercenary_mage_01.png | ready | 신규 placeholder EnemyData |
 | 3 | ENEMY_EMPTY_ARMOR | 리빙아머 중무장 | normal | 중무장 갑옷형 적 | enemy_empty_armor.png | ready | existing mapping |
-| 3 | ENEMY_MERCENARY_CAPTAIN_SAGAN_01 | 용병대장 사간 | elite | 층 3 엘리트 지휘관 | enemy_mercenary_captain_sagan_01.png | ready | 신규 placeholder EnemyData |
+| 3 | ENEMY_MERCENARY_CAPTAIN_SAGAN_01 | 용병대장 사간 | elite | 층 3 엘리트 지휘관 | boss_mercenary_captain_sagan_01.png | ready | 신규 placeholder EnemyData; new boss/elite art bound |
 | 3 | ENEMY_COLLAPSE_ECHO | 스펙터 | boss | collapse echo | enemy_collapse_echo.png | ready | existing mapping |
 | 4 | ENEMY_SKELETON_HORDE_01 | 스켈레톤 군집 | normal | 언데드 무리 | enemy_skeleton_horde_01.png | ready | 신규 placeholder EnemyData |
 | 4 | ENEMY_LIVING_TOMBSTONE_01 | 살아있는 묘비 | normal | 묘비형 적 | enemy_living_tombstone_01.png | ready | 신규 placeholder EnemyData |
@@ -38,3 +38,19 @@ This document is a handoff index only. It does not define final lore or final en
 ## Missing Art
 
 - No listed art is missing at the time of this catalog.
+
+## Unbound Art Intake Candidates
+
+The following files were imported for future enemy expansion but do not yet have approved stableId mappings or floor-pool membership:
+
+- `enemy_branded_01.png`
+- `enemy_crystalized_human_a_01.png`
+- `enemy_crystalized_human_b_01.png`
+- `enemy_cultist_01.png`
+- `enemy_execution_judge_01.png`
+- `enemy_isolated_inquisitor_01.png`
+- `enemy_offering_01.png`
+- `enemy_old_receiver_body_01.png`
+- `enemy_outer_receiver_body_01.png`
+- `enemy_prepared_offering_01.png`
+- `enemy_receiver_body_01.png`

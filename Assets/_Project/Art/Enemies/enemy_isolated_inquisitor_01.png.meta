@@ -1,0 +1,637 @@
+fileFormatVersion: 2
+guid: 0fc36c0852d3e4b6eb602b98efccdac0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7241643347927473141
+    second: enemy_isolated_inquisitor_01_0
+  - first:
+      213: 9089818368247846468
+    second: enemy_isolated_inquisitor_01_1
+  - first:
+      213: -2626912040327971657
+    second: enemy_isolated_inquisitor_01_2
+  - first:
+      213: 4101536158515893651
+    second: enemy_isolated_inquisitor_01_3
+  - first:
+      213: -8962523875159050551
+    second: enemy_isolated_inquisitor_01_4
+  - first:
+      213: 2530154222934229198
+    second: enemy_isolated_inquisitor_01_5
+  - first:
+      213: 3353676084895720168
+    second: enemy_isolated_inquisitor_01_6
+  - first:
+      213: -4900020530385680557
+    second: enemy_isolated_inquisitor_01_7
+  - first:
+      213: 3086174914025048021
+    second: enemy_isolated_inquisitor_01_8
+  - first:
+      213: -1057043131144725793
+    second: enemy_isolated_inquisitor_01_9
+  - first:
+      213: 8682691807797394599
+    second: enemy_isolated_inquisitor_01_10
+  - first:
+      213: -8611411833800090889
+    second: enemy_isolated_inquisitor_01_11
+  - first:
+      213: 5722574352759804084
+    second: enemy_isolated_inquisitor_01_12
+  - first:
+      213: -8294526935771512448
+    second: enemy_isolated_inquisitor_01_13
+  - first:
+      213: 5367520737929671949
+    second: enemy_isolated_inquisitor_01_14
+  - first:
+      213: 5470339666096410396
+    second: enemy_isolated_inquisitor_01_15
+  - first:
+      213: 6231903602037448768
+    second: enemy_isolated_inquisitor_01_16
+  - first:
+      213: -2809529436543168181
+    second: enemy_isolated_inquisitor_01_17
+  - first:
+      213: 5877517893472111172
+    second: enemy_isolated_inquisitor_01_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_0
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 28
+        width: 1226
+        height: 1841
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fb994fc14c7f7460800000000000000
+      internalID: 7241643347927473141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_1
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 1849
+        width: 16
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 446db3065a5852e70800000000000000
+      internalID: 9089818368247846468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_2
+      rect:
+        serializedVersion: 2
+        x: 1656
+        y: 1857
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bcfd04da655b8bd0800000000000000
+      internalID: -2626912040327971657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_3
+      rect:
+        serializedVersion: 2
+        x: 1655
+        y: 1365
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39592c1c7659be830800000000000000
+      internalID: 4101536158515893651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_4
+      rect:
+        serializedVersion: 2
+        x: 1648
+        y: 1253
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c6ff226508be9380800000000000000
+      internalID: -8962523875159050551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_5
+      rect:
+        serializedVersion: 2
+        x: 1660
+        y: 1261
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec003f44cd9ec1320800000000000000
+      internalID: 2530154222934229198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_6
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 1066
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e2aee371a6aa8e20800000000000000
+      internalID: 3353676084895720168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_7
+      rect:
+        serializedVersion: 2
+        x: 1655
+        y: 958
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3578d3ef941affbb0800000000000000
+      internalID: -4900020530385680557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_8
+      rect:
+        serializedVersion: 2
+        x: 1654
+        y: 551
+        width: 7
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d74f29abbb44da20800000000000000
+      internalID: 3086174914025048021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_9
+      rect:
+        serializedVersion: 2
+        x: 1648
+        y: 502
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fda1ad76fd0a451f0800000000000000
+      internalID: -1057043131144725793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_10
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 28
+        width: 42
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ac35f1423e1f7870800000000000000
+      internalID: 8682691807797394599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_11
+      rect:
+        serializedVersion: 2
+        x: 727
+        y: 29
+        width: 20
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fa10c7ff8e1e7880800000000000000
+      internalID: -8611411833800090889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_12
+      rect:
+        serializedVersion: 2
+        x: 847
+        y: 29
+        width: 37
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b05209ed0baa6f40800000000000000
+      internalID: 5722574352759804084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_13
+      rect:
+        serializedVersion: 2
+        x: 1064
+        y: 29
+        width: 80
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0810e6db2bbe3ec80800000000000000
+      internalID: -8294526935771512448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_14
+      rect:
+        serializedVersion: 2
+        x: 1262
+        y: 29
+        width: 20
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0537dc3ca34d7a40800000000000000
+      internalID: 5367520737929671949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_15
+      rect:
+        serializedVersion: 2
+        x: 1281
+        y: 28
+        width: 23
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1fc76671fc8aeb40800000000000000
+      internalID: 5470339666096410396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_16
+      rect:
+        serializedVersion: 2
+        x: 1325
+        y: 28
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0406be9de4b2c7650800000000000000
+      internalID: 6231903602037448768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_17
+      rect:
+        serializedVersion: 2
+        x: 1464
+        y: 29
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4157dcecdb8209d0800000000000000
+      internalID: -2809529436543168181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy_isolated_inquisitor_01_18
+      rect:
+        serializedVersion: 2
+        x: 1474
+        y: 29
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44a48693263219150800000000000000
+      internalID: 5877517893472111172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      enemy_isolated_inquisitor_01_0: 7241643347927473141
+      enemy_isolated_inquisitor_01_1: 9089818368247846468
+      enemy_isolated_inquisitor_01_10: 8682691807797394599
+      enemy_isolated_inquisitor_01_11: -8611411833800090889
+      enemy_isolated_inquisitor_01_12: 5722574352759804084
+      enemy_isolated_inquisitor_01_13: -8294526935771512448
+      enemy_isolated_inquisitor_01_14: 5367520737929671949
+      enemy_isolated_inquisitor_01_15: 5470339666096410396
+      enemy_isolated_inquisitor_01_16: 6231903602037448768
+      enemy_isolated_inquisitor_01_17: -2809529436543168181
+      enemy_isolated_inquisitor_01_18: 5877517893472111172
+      enemy_isolated_inquisitor_01_2: -2626912040327971657
+      enemy_isolated_inquisitor_01_3: 4101536158515893651
+      enemy_isolated_inquisitor_01_4: -8962523875159050551
+      enemy_isolated_inquisitor_01_5: 2530154222934229198
+      enemy_isolated_inquisitor_01_6: 3353676084895720168
+      enemy_isolated_inquisitor_01_7: -4900020530385680557
+      enemy_isolated_inquisitor_01_8: 3086174914025048021
+      enemy_isolated_inquisitor_01_9: -1057043131144725793
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
