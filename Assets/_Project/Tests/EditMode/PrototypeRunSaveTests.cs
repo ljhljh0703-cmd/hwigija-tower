@@ -54,7 +54,7 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(14, loaded.playerHp);
             Assert.AreEqual(2, loaded.memoryFragmentRefs.Length);
             Assert.IsTrue(PrototypeRunSaveStore.TryLoadSummary(out var summary, _savePath));
-            Assert.AreEqual("Floor 3 | HP 14/24 | Memory 2", summary.DisplayText);
+            Assert.AreEqual("Floor 3 | HP 14/24 | 기억 2", summary.DisplayText);
         }
 
         [Test]

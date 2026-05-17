@@ -18,8 +18,8 @@ Current W2 demo intake slots:
 
 - `Encounters/enc_shop_01_bg.png`
 - `Encounters/enc_moral_choice_01_bg.png`
-- `Encounters/enc_memory_fragment_01_bg.png`
-- `Encounters/enc_memory_fragment_01_art.png`
+- `Encounters/enc_memory_fragment_01_bg.png` — memory echo / 기억의 잔향 background slot.
+- `Encounters/enc_memory_fragment_01_art.png` — memory echo / 기억의 잔향 focus art slot.
 - `Encounters/enc_combat_gate_01_bg.png`
 - `Encounters/demo_complete_bg.png`
 - `Characters/char_mataios_bust_s0_s2.png`

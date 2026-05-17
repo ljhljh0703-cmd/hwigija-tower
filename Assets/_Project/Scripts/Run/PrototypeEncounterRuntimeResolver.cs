@@ -233,7 +233,7 @@ namespace HwigiTower.Run
                 case "GrantRewardBundle":
                     return string.IsNullOrEmpty(effect.rewardBundleRef) ? "Reward" : effect.rewardBundleRef;
                 case "UnlockMemoryFragment":
-                    return "Memory unlock";
+                    return "기억의 잔향 해금";
                 case "StartCombat":
                     return "Combat start";
                 default:

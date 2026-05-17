@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 19:24 — Memory fragment public terminology rename
+- **Phase**: W3-2
+- **Done**:
+  - Public UI/result/save summary에서 `Memory Fragment`/`기억 파편` 노출을 `기억의 잔향` 또는 `기억`으로 교체
+  - `MEM_FRAGMENT_*` stableId와 내부 `MemoryFragment` 타입/저장 정책은 유지
+  - DemoPresentationData memory encounter displayName과 asset intake 문구를 memory echo / 기억의 잔향 기준으로 정리
+  - EditMode 120/120 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
+- **Files**: 변경 9개 (`PrototypeHud.cs`, `PrototypeEncounterRuntimeResolver.cs`, `PrototypeRunSaveData.cs`, presentation asset, tests, docs)
+- **GDD impact**: 없음
+- **Next**: writer-approved 기억의 잔향 본문/타이틀이 들어오면 placeholder key copyfit 재검수
+- **Agent**: Codex
+
 ### 2026-05-17 17:34 — Combat action icon drop-in folder
 - **Phase**: W3-2
 - **Done**:

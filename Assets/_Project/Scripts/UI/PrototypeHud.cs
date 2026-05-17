@@ -2561,8 +2561,8 @@ namespace HwigiTower.UI
             else
             {
                 memory = string.IsNullOrEmpty(snapshot.LastMemoryFragmentId)
-                    ? "기억 파편: 보류"
-                    : "기억 파편: 해금";
+                    ? "기억의 잔향: 보류"
+                    : "기억의 잔향: 해금";
                 combat = string.IsNullOrEmpty(snapshot.LastCombatId)
                     ? "전투: -"
                     : "전투: " + BuildCombatOutcomeLabel(snapshot);
@@ -3188,7 +3188,7 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("memory unlocked ", StringComparison.Ordinal))
             {
-                return "기억 파편 해금";
+                return "기억의 잔향 해금";
             }
 
             if (token.StartsWith("action ", StringComparison.Ordinal))
@@ -3820,7 +3820,7 @@ namespace HwigiTower.UI
 
                 if (choiceStableId.Contains("_UNLOCK", StringComparison.Ordinal))
                 {
-                    return "기억 파편";
+                    return "기억의 잔향";
                 }
 
                 if (choiceStableId.Contains("_WITHDRAW", StringComparison.Ordinal))
@@ -3869,7 +3869,7 @@ namespace HwigiTower.UI
                 "CHOICE_MORAL_01_AID" => "돕는다",
                 "CHOICE_MORAL_01_REFUSE" => "거절한다",
                 "CHOICE_MORAL_01_TRADE" => "거래한다",
-                "CHOICE_MEMORY_01_UNLOCK" => "기억 파편",
+                "CHOICE_MEMORY_01_UNLOCK" => "기억의 잔향",
                 "CHOICE_MEMORY_01_WITHDRAW" => "보류",
                 "CHOICE_COMBAT_01_ENGAGE" => "전투",
                 "CHOICE_COMBAT_01_PREPARE" => "준비",
@@ -3903,14 +3903,14 @@ namespace HwigiTower.UI
             {
                 "ENC_SHOP_01" => "상점",
                 "ENC_MORAL_CHOICE_01" => "선택",
-                "ENC_MEMORY_FRAGMENT_01" => "기억 파편",
+                "ENC_MEMORY_FRAGMENT_01" => "기억의 잔향",
                 "ENC_COMBAT_GATE_01" => "전투",
                 "ENC_F02_SHOP_001" => "상점",
                 "ENC_F02_MORAL_CHOICE_001" => "선택",
                 "ENC_COMBAT_GATE_02" => "보스 관문",
                 "ENC_COMBAT_GATE_03" => "최종 보스",
                 _ => encounter.Type == EncounterType.MoralChoice ? "선택" :
-                    encounter.Type == EncounterType.MemoryFragment ? "기억 파편" :
+                    encounter.Type == EncounterType.MemoryFragment ? "기억의 잔향" :
                     encounter.Type == EncounterType.Shop ? "상점" :
                     "조우"
             };
@@ -3967,7 +3967,7 @@ namespace HwigiTower.UI
                 .Replace("Unavailable:", "선택 불가:", StringComparison.Ordinal)
                 .Replace("선택 불가: Gold 부족", "구매 불가: Gold 부족", StringComparison.Ordinal)
                 .Replace("Combat start", "전투 시작", StringComparison.Ordinal)
-                .Replace("Memory unlock", "기억 파편 해금", StringComparison.Ordinal)
+                .Replace("Memory unlock", "기억의 잔향 해금", StringComparison.Ordinal)
                 .Replace("Ability 필요", "능력 필요", StringComparison.Ordinal);
 
             return ReplacePublicRefs(normalized);

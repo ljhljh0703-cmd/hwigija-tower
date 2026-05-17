@@ -34,6 +34,7 @@
 - 2026-05-17 event cutscene layout pass split event presentation into top status, central cutscene art, event text, and bottom probability choices.
 - 2026-05-17 combat party layout follow-up removed combat objective residue, expanded the combat panel into a clearer top/middle/bottom stack, and kept action controls as compact square buttons.
 - 2026-05-17 combat icon binding pass added DemoPresentationData player portrait/action icon slots, uses a visible player fallback portrait when no portrait asset exists, and binds temporary Attack/Defend/Skill icons from existing node icon art.
+- 2026-05-17 terminology pass replaced public memory-fragment wording with `기억의 잔향` while preserving internal `MEM_FRAGMENT_*` stableIds.
 
 ## Remaining UI Polish
 - P1: improve font sharpness/readability in captured Game View output.

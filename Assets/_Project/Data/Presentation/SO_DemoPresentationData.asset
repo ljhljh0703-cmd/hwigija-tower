@@ -89,7 +89,7 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_MEMORY_FRAGMENT_01
-    displayName: Memory
+    displayName: 기억의 잔향
     backgroundSprite: {fileID: 21300000, guid: 64bb8f8e97cfc4c138a4b3614e14587a, type: 3}
     titleTextKey: PLACEHOLDER_MEM_FRAGMENT_01_TITLE
     bodyTextKey: PLACEHOLDER_ENC_MEMORY_FRAGMENT_01_BODY
@@ -141,7 +141,7 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 11400000, guid: 677268a230d34f898538b2d4366c4e41, type: 2}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_MEMORY_FRAGMENT_03
-    displayName: Memory
+    displayName: 기억의 잔향
     backgroundSprite: {fileID: 21300000, guid: 366cf39e224d2491cbd35d954f774e75, type: 3}
     titleTextKey: PLACEHOLDER_MEM_FRAGMENT_03_TITLE
     bodyTextKey: PLACEHOLDER_ENC_MEMORY_FRAGMENT_03_BODY
@@ -154,7 +154,7 @@ MonoBehaviour:
     combatStartCutscene: {fileID: 0}
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_MEMORY_FRAGMENT_05
-    displayName: Memory
+    displayName: 기억의 잔향
     backgroundSprite: {fileID: 21300000, guid: 366cf39e224d2491cbd35d954f774e75, type: 3}
     titleTextKey: PLACEHOLDER_MEM_FRAGMENT_05_TITLE
     bodyTextKey: PLACEHOLDER_ENC_MEMORY_FRAGMENT_05_BODY
