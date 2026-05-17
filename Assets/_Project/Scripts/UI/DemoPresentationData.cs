@@ -1,3 +1,4 @@
+using HwigiTower.Combat;
 using HwigiTower.Run;
 using UnityEngine;
 
@@ -57,18 +58,48 @@ namespace HwigiTower.UI
         public Sprite Icon => icon;
     }
 
+    [System.Serializable]
+    public sealed class DemoCombatActionIconSlot
+    {
+        [SerializeField] private CombatAction action;
+        [SerializeField] private Sprite icon;
+
+        public CombatAction Action => action;
+        public Sprite Icon => icon;
+    }
+
     [CreateAssetMenu(menuName = "Hwigi Tower/Prototype/Demo Presentation Data", fileName = "SO_DemoPresentationData")]
     public sealed class DemoPresentationData : ScriptableObject
     {
+        [SerializeField] private Sprite defaultPlayerPortrait;
         [SerializeField] private Sprite defaultMataiosPortrait;
         [SerializeField] private DemoMerchantPresentationSlot[] merchantSlots = new DemoMerchantPresentationSlot[0];
         [SerializeField] private DemoNodeIconSlot[] nodeIconSlots = new DemoNodeIconSlot[0];
+        [SerializeField] private DemoCombatActionIconSlot[] combatActionIconSlots = new DemoCombatActionIconSlot[0];
         [SerializeField] private DemoPresentationSlot[] slots = new DemoPresentationSlot[0];
 
+        public Sprite DefaultPlayerPortrait => defaultPlayerPortrait;
         public Sprite DefaultMataiosPortrait => defaultMataiosPortrait;
         public DemoMerchantPresentationSlot[] MerchantSlots => merchantSlots ?? new DemoMerchantPresentationSlot[0];
         public DemoNodeIconSlot[] NodeIconSlots => nodeIconSlots ?? new DemoNodeIconSlot[0];
+        public DemoCombatActionIconSlot[] CombatActionIconSlots => combatActionIconSlots ?? new DemoCombatActionIconSlot[0];
         public DemoPresentationSlot[] Slots => slots ?? new DemoPresentationSlot[0];
+
+        public bool TryGetCombatActionIcon(CombatAction action, out Sprite icon)
+        {
+            var source = CombatActionIconSlots;
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (source[i] != null && source[i].Action == action && source[i].Icon != null)
+                {
+                    icon = source[i].Icon;
+                    return true;
+                }
+            }
+
+            icon = null;
+            return false;
+        }
 
         public bool TryGetNodeIcon(PrototypeFloorMapNodeType nodeType, out Sprite icon)
         {

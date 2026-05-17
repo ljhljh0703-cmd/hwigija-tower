@@ -1,4 +1,5 @@
 using HwigiTower.UI;
+using HwigiTower.Combat;
 using HwigiTower.Core;
 using HwigiTower.Encounters;
 using HwigiTower.Run;
@@ -69,6 +70,18 @@ namespace HwigiTower.Tests.EditMode
             AssertNodeIcon(data, PrototypeFloorMapNodeType.Rest, "node_rest");
             AssertNodeIcon(data, PrototypeFloorMapNodeType.Shop, "node_shop");
             AssertNodeIcon(data, PrototypeFloorMapNodeType.Boss, "node_boss");
+        }
+
+        [Test]
+        public void DemoPresentationData_BindsCombatActionIconsAndPlayerSlot()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+
+            Assert.IsNotNull(data);
+            Assert.IsNull(data.DefaultPlayerPortrait);
+            AssertCombatActionIcon(data, CombatAction.Attack, "node_combat");
+            AssertCombatActionIcon(data, CombatAction.Defend, "node_rest");
+            AssertCombatActionIcon(data, CombatAction.Skill, "node_event");
         }
 
         [Test]
@@ -209,6 +222,8 @@ namespace HwigiTower.Tests.EditMode
         public void Hud_CombatScreenShowsIntentWithoutRawEnemyId()
         {
             var hud = CreateHud(out _);
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            hud.SetPresentationData(data);
             var snapshot = new PrototypeRunSnapshot(
                 "run-combat-ui",
                 15,
@@ -239,6 +254,11 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(hud.CombatPanelVisible);
             Assert.IsTrue(hud.CombatPartyDockVisible);
+            Assert.IsTrue(hud.CombatPlayerPortraitVisible);
+            Assert.IsEmpty(hud.CurrentCombatPlayerPortraitSpriteName);
+            StringAssert.Contains("node_combat", hud.CurrentCombatActionIconNames);
+            StringAssert.Contains("node_rest", hud.CurrentCombatActionIconNames);
+            StringAssert.Contains("node_event", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("최종 보스", hud.CombatMessage);
             StringAssert.Contains("적 HP 22/34", hud.CombatMessage);
             StringAssert.Contains("방어: 받은 피해", hud.CombatMessage);
@@ -513,6 +533,13 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(data.TryGetNodeIcon(type, out var icon), type.ToString());
             Assert.IsNotNull(icon, type.ToString());
             Assert.AreEqual(spriteName, icon.name);
+        }
+
+        private static void AssertCombatActionIcon(DemoPresentationData data, CombatAction action, string spriteNamePrefix)
+        {
+            Assert.IsTrue(data.TryGetCombatActionIcon(action, out var icon), action.ToString());
+            Assert.IsNotNull(icon, action.ToString());
+            StringAssert.StartsWith(spriteNamePrefix, icon.name);
         }
     }
 }

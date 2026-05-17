@@ -45,6 +45,10 @@ namespace HwigiTower.UI
         [SerializeField] private Text combatMataiosCardText;
         [SerializeField] private Image combatPlayerPortraitImage;
         [SerializeField] private Image combatMataiosPortraitImage;
+        [SerializeField] private Text combatPlayerPortraitFallbackText;
+        [SerializeField] private Image attackActionIconImage;
+        [SerializeField] private Image defendActionIconImage;
+        [SerializeField] private Image skillActionIconImage;
         [SerializeField] private Image merchantVisualImage;
         [SerializeField] private Image enemyHpFill;
         [SerializeField] private Image playerHpFill;
@@ -133,8 +137,16 @@ namespace HwigiTower.UI
         public Vector2 PortraitRootSize => portraitRoot == null ? Vector2.zero : portraitRoot.sizeDelta;
         public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
         public string CurrentCombatEnemySpriteName => combatEnemyImage != null && combatEnemyImage.sprite != null ? combatEnemyImage.sprite.name : string.Empty;
+        public string CurrentCombatPlayerPortraitSpriteName => combatPlayerPortraitImage != null && combatPlayerPortraitImage.sprite != null ? combatPlayerPortraitImage.sprite.name : string.Empty;
+        public bool CombatPlayerPortraitVisible => combatPlayerPortraitImage != null && combatPlayerPortraitImage.gameObject.activeInHierarchy;
         public bool CombatPartyDockVisible => combatPartyDock != null && combatPartyDock.gameObject.activeInHierarchy;
         public string CombatPartyMessage => ((combatPlayerCardText == null ? string.Empty : combatPlayerCardText.text) + "\n" + (combatMataiosCardText == null ? string.Empty : combatMataiosCardText.text)).Trim();
+        public string CurrentCombatActionIconNames => string.Join("|", new[]
+        {
+            attackActionIconImage != null && attackActionIconImage.sprite != null ? attackActionIconImage.sprite.name : string.Empty,
+            defendActionIconImage != null && defendActionIconImage.sprite != null ? defendActionIconImage.sprite.name : string.Empty,
+            skillActionIconImage != null && skillActionIconImage.sprite != null ? skillActionIconImage.sprite.name : string.Empty
+        });
         public bool EventCutsceneVisible => eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy;
         public string EventCutsceneMessage => ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
         public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
@@ -1697,15 +1709,15 @@ namespace HwigiTower.UI
             combatPartyDock = CreateCombatPanelRect(panelObject.transform, "Combat Party Dock", new Vector2(0.04f, 0.025f), new Vector2(0.96f, 0.33f), new Color(0.018f, 0.022f, 0.028f, 0.94f));
             combatPlayerCard = CreateCombatPanelRect(combatPartyDock, "Combat Player Card", new Vector2(0.04f, 0.43f), new Vector2(0.48f, 0.94f), new Color(0.055f, 0.072f, 0.085f, 0.96f));
             combatMataiosCard = CreateCombatPanelRect(combatPartyDock, "Combat Mataios Card", new Vector2(0.52f, 0.43f), new Vector2(0.96f, 0.94f), new Color(0.055f, 0.064f, 0.083f, 0.96f));
-            combatPlayerPortraitImage = CreateCombatPortraitBox(combatPlayerCard, "Combat Player Portrait", new Vector2(0.04f, 0.22f), new Vector2(0.30f, 0.88f), new Color(0.15f, 0.19f, 0.22f, 1f), "P");
-            combatMataiosPortraitImage = CreateCombatPortraitBox(combatMataiosCard, "Combat Mataios Portrait", new Vector2(0.04f, 0.16f), new Vector2(0.31f, 0.90f), new Color(0.12f, 0.14f, 0.18f, 1f), string.Empty);
+            combatPlayerPortraitImage = CreateCombatPortraitBox(combatPlayerCard, "Combat Player Portrait", new Vector2(0.04f, 0.22f), new Vector2(0.30f, 0.88f), new Color(0.15f, 0.19f, 0.22f, 1f), "P", out combatPlayerPortraitFallbackText);
+            combatMataiosPortraitImage = CreateCombatPortraitBox(combatMataiosCard, "Combat Mataios Portrait", new Vector2(0.04f, 0.16f), new Vector2(0.31f, 0.90f), new Color(0.12f, 0.14f, 0.18f, 1f), string.Empty, out _);
             combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
             combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.35f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
             playerHpFill = CreateHpBar(combatPlayerCard, "Player HP Bar", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.15f), new Color(0.30f, 0.78f, 0.50f, 1f));
 
-            attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.22f, 0.045f), CombatAction.Attack);
-            defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.045f), CombatAction.Defend);
-            skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "정찰", new Vector2(0.78f, 0.045f), CombatAction.Skill);
+            attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.22f, 0.045f), CombatAction.Attack, out attackActionIconImage);
+            defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.045f), CombatAction.Defend, out defendActionIconImage);
+            skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "정찰", new Vector2(0.78f, 0.045f), CombatAction.Skill, out skillActionIconImage);
             skillButton.interactable = false;
         }
 
@@ -1739,8 +1751,9 @@ namespace HwigiTower.UI
             return text;
         }
 
-        private Image CreateCombatPortraitBox(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Color color, string fallbackLabel)
+        private Image CreateCombatPortraitBox(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Color color, string fallbackLabel, out Text fallbackText)
         {
+            fallbackText = null;
             var portraitObject = new GameObject(name);
             portraitObject.transform.SetParent(parent, false);
 
@@ -1760,6 +1773,7 @@ namespace HwigiTower.UI
                 var label = CreateCombatChildText(portraitObject.transform, name + " Label", Vector2.zero, Vector2.one, 34, TextAnchor.MiddleCenter);
                 label.text = fallbackLabel;
                 label.color = new Color(0.78f, 0.86f, 0.88f, 1f);
+                fallbackText = label;
             }
 
             return image;
@@ -1817,7 +1831,7 @@ namespace HwigiTower.UI
             return fill;
         }
 
-        private Button CreateCombatButton(Transform parent, string name, string labelText, Vector2 anchor, CombatAction action)
+        private Button CreateCombatButton(Transform parent, string name, string labelText, Vector2 anchor, CombatAction action, out Image iconImage)
         {
             var buttonObject = new GameObject(name);
             buttonObject.transform.SetParent(parent, false);
@@ -1836,11 +1850,24 @@ namespace HwigiTower.UI
             button.targetGraphic = image;
             button.onClick.AddListener(() => ResolveCombatAction(action));
 
+            var iconObject = new GameObject("Icon");
+            iconObject.transform.SetParent(buttonObject.transform, false);
+            var iconRect = iconObject.AddComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0.24f, 0.42f);
+            iconRect.anchorMax = new Vector2(0.76f, 0.90f);
+            iconRect.offsetMin = Vector2.zero;
+            iconRect.offsetMax = Vector2.zero;
+
+            iconImage = iconObject.AddComponent<Image>();
+            iconImage.color = new Color(0.92f, 0.86f, 0.68f, 0.96f);
+            iconImage.preserveAspect = true;
+            iconImage.raycastTarget = false;
+
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(buttonObject.transform, false);
             var labelRect = labelObject.AddComponent<RectTransform>();
-            labelRect.anchorMin = Vector2.zero;
-            labelRect.anchorMax = Vector2.one;
+            labelRect.anchorMin = new Vector2(0f, 0.04f);
+            labelRect.anchorMax = new Vector2(1f, 0.36f);
             labelRect.offsetMin = new Vector2(8f, 4f);
             labelRect.offsetMax = new Vector2(-8f, -4f);
 
@@ -2650,6 +2677,7 @@ namespace HwigiTower.UI
 
             UpdateCombatVisuals(snapshot);
             UpdatePartyDock(snapshot);
+            UpdateCombatActionIcons();
 
             var canAct = snapshot.IsInCombat && _roomController != null && !IsCutscenePlaying();
             if (attackButton != null)
@@ -2709,8 +2737,16 @@ namespace HwigiTower.UI
 
             if (combatPlayerPortraitImage != null)
             {
-                combatPlayerPortraitImage.sprite = null;
-                combatPlayerPortraitImage.color = new Color(0.15f, 0.19f, 0.22f, 1f);
+                combatPlayerPortraitImage.sprite = presentationData == null ? null : presentationData.DefaultPlayerPortrait;
+                combatPlayerPortraitImage.color = combatPlayerPortraitImage.sprite == null
+                    ? new Color(0.15f, 0.19f, 0.22f, 1f)
+                    : Color.white;
+                combatPlayerPortraitImage.gameObject.SetActive(true);
+            }
+
+            if (combatPlayerPortraitFallbackText != null)
+            {
+                combatPlayerPortraitFallbackText.gameObject.SetActive(combatPlayerPortraitImage == null || combatPlayerPortraitImage.sprite == null);
             }
 
             if (combatMataiosPortraitImage != null)
@@ -2729,6 +2765,25 @@ namespace HwigiTower.UI
             {
                 combatMataiosCardText.text = BuildCombatMataiosCardText(snapshot);
             }
+        }
+
+        private void UpdateCombatActionIcons()
+        {
+            SetCombatActionIcon(attackActionIconImage, CombatAction.Attack, new Color(0.84f, 0.34f, 0.26f, 0.94f));
+            SetCombatActionIcon(defendActionIconImage, CombatAction.Defend, new Color(0.38f, 0.58f, 0.82f, 0.94f));
+            SetCombatActionIcon(skillActionIconImage, CombatAction.Skill, new Color(0.78f, 0.68f, 0.34f, 0.94f));
+        }
+
+        private void SetCombatActionIcon(Image target, CombatAction action, Color fallbackColor)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            target.sprite = presentationData != null && presentationData.TryGetCombatActionIcon(action, out var icon) ? icon : null;
+            target.color = target.sprite == null ? fallbackColor : Color.white;
+            target.gameObject.SetActive(true);
         }
 
         private void ResolveCombatAction(CombatAction action)
