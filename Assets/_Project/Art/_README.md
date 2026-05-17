@@ -31,3 +31,6 @@ Combat UI slots prepared:
 - `Nodes/node_combat.png` — temporary attack action icon source until dedicated action icons arrive.
 - `Nodes/node_rest.png` — temporary defend action icon source until dedicated action icons arrive.
 - `Nodes/node_event.png` — temporary skill/scout action icon source until a dedicated skill icon arrives.
+- `UI/CombatActions/icon_action_attack.png` — preferred dedicated Attack icon drop-in.
+- `UI/CombatActions/icon_action_defend.png` — preferred dedicated Defend icon drop-in.
+- `UI/CombatActions/icon_action_skill_scout.png` — preferred dedicated Skill/Scout icon drop-in.
