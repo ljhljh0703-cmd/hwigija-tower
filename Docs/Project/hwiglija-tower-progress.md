@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 17:34 — Combat action icon drop-in folder
+- **Phase**: W3-2
+- **Done**:
+  - 전용 combat action icon 드롭인 폴더 `Assets/_Project/Art/UI/CombatActions/` 추가
+  - Attack/Defend/Skill 권장 파일명과 import 규칙 문서화
+  - 기존 `DemoPresentationData` 슬롯과 임시 node icon 바인딩 정책을 art README에 연결
+- **Files**: 변경/추가 4개 (`Assets/_Project/Art/UI/CombatActions/**`, `Assets/_Project/Art/_README.md`, progress)
+- **GDD impact**: 없음
+- **Blockers**: 실제 `icon_action_attack/defend/skill_scout` 에셋은 아직 없음
+- **Next**: 전용 아이콘/플레이어 portrait 에셋 수급 후 `SO_DemoPresentationData` 슬롯 교체
+- **Agent**: Codex
+
 ### 2026-05-17 17:19 — Player portrait slot and combat action icons
 - **Phase**: W3-2
 - **Done**:
