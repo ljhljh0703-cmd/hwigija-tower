@@ -31,7 +31,7 @@ namespace HwigiTower.Tests.PlayMode
             });
             yield return CaptureEncounterScreen("03_event_jar_room.png", "EVT_F01_JAR_ROOM");
             yield return CaptureEncounterScreen("04_rest_mataios.png", "ENC_REST_01");
-            yield return CaptureEncounterScreen("05_shop.png", "ENC_SHOP_01");
+            yield return CaptureShopScreen();
             yield return CaptureCombatScreen("06_normal_combat.png", "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return CaptureCombatScreen("07_boss_combat.png", "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
             yield return CaptureEndingChoice();
@@ -57,6 +57,24 @@ namespace HwigiTower.Tests.PlayMode
                 var selection = controller.CreateQaEncounterSelection(encounterId);
                 Assert.IsTrue(selection.HasEncounter, "Missing QA encounter selection for " + encounterId);
                 hud.OpenQaRouteStep(selection);
+            });
+        }
+
+        private static IEnumerator CaptureShopScreen()
+        {
+            yield return CapturePrototypeRoomScreen("05_shop.png", (controller, hud) =>
+            {
+                var selection = controller.CreateQaEncounterSelection("ENC_SHOP_01");
+                Assert.IsTrue(selection.HasEncounter, "Missing QA shop selection");
+                hud.OpenQaRouteStep(selection);
+
+                var merchantVisual = GameObject.Find("Merchant Visual");
+                Assert.IsNotNull(merchantVisual, "Missing merchant spotlight visual");
+                Assert.IsTrue(merchantVisual.activeInHierarchy, "Merchant spotlight should be visible for shop");
+                var image = merchantVisual.GetComponent<Image>();
+                Assert.IsNotNull(image);
+                Assert.IsNotNull(image.sprite);
+                Assert.AreEqual("merchant_human", image.sprite.name);
             });
         }
 

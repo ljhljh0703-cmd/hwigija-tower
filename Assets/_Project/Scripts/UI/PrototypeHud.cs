@@ -1889,11 +1889,11 @@ namespace HwigiTower.UI
 
             EnsureScreenLayers();
             var merchantObject = new GameObject("Merchant Visual");
-            merchantObject.transform.SetParent(HudParent, false);
+            merchantObject.transform.SetParent(visualLayer == null ? HudParent : visualLayer, false);
 
             var rect = merchantObject.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.53f, 0.50f);
-            rect.anchorMax = new Vector2(0.92f, 0.82f);
+            rect.anchorMin = new Vector2(0.48f, 0.06f);
+            rect.anchorMax = new Vector2(0.98f, 0.98f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
