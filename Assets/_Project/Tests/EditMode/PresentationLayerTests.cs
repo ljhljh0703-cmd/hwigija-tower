@@ -102,6 +102,25 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void DemoPresentationData_BindsRestActionIcons()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+
+            Assert.IsNotNull(data);
+            AssertRestActionIcon(data, "rest.ask_mood", "icon_rest_talk");
+            AssertRestActionIcon(data, "rest.train", "icon_rest_train");
+            AssertRestActionIcon(data, "rest.recover", "icon_rest_recover");
+        }
+
+        [Test]
+        public void Hud_RestActionCardLabelsStayPublicAndHideGlitch()
+        {
+            AssertRestActionCardLabel("rest.ask_mood", "대화", "마타이오스와 대화");
+            AssertRestActionCardLabel("rest.train", "훈련", "다음 전투 피해 +1");
+            AssertRestActionCardLabel("rest.recover", "휴식", "HP 회복");
+        }
+
+        [Test]
         public void ProjectSettings_UsePortraitDemoResolution()
         {
             Assert.AreEqual(1080, PlayerSettings.defaultScreenWidth);
@@ -558,6 +577,23 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(data.TryGetCombatActionIcon(action, out var icon), action.ToString());
             Assert.IsNotNull(icon, action.ToString());
             StringAssert.StartsWith(spriteNamePrefix, icon.name);
+        }
+
+        private static void AssertRestActionIcon(DemoPresentationData data, string actionId, string spriteNamePrefix)
+        {
+            Assert.IsTrue(data.TryGetRestActionIcon(actionId, out var icon), actionId);
+            Assert.IsNotNull(icon, actionId);
+            StringAssert.StartsWith(spriteNamePrefix, icon.name);
+        }
+
+        private static void AssertRestActionCardLabel(string actionId, string title, string preview)
+        {
+            var method = typeof(PrototypeHud).GetMethod("BuildRestActionCardLabel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method);
+            var label = (string)method.Invoke(null, new object[] { actionId });
+            StringAssert.Contains(title, label);
+            StringAssert.Contains(preview, label);
+            StringAssert.DoesNotContain("Glitch", label);
         }
 
         private static void AssertPublicLabel(DemoPresentationData data, string stableId, string expected)
