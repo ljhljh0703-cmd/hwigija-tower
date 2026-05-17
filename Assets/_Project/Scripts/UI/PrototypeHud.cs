@@ -50,6 +50,12 @@ namespace HwigiTower.UI
         [SerializeField] private Image defendActionIconImage;
         [SerializeField] private Image skillActionIconImage;
         [SerializeField] private Image merchantVisualImage;
+        [SerializeField] private RectTransform npcSpotlightLayer;
+        [SerializeField] private Image npcSpotlightBackdropImage;
+        [SerializeField] private Image npcSpotlightGlowImage;
+        [SerializeField] private Image npcSpotlightShadowImage;
+        [SerializeField] private Text npcSpotlightNameText;
+        [SerializeField] private Text npcSpotlightDialogueText;
         [SerializeField] private Image enemyHpFill;
         [SerializeField] private Image playerHpFill;
         [SerializeField] private Button attackButton;
@@ -90,9 +96,17 @@ namespace HwigiTower.UI
         private string _lastMemoryCutsceneKey = string.Empty;
         private string _lastCombatCutsceneKey = string.Empty;
         private string _lastDemoCompleteCutsceneKey = string.Empty;
+        private string _npcSpotlightModeLabel = string.Empty;
         private bool _cutsceneFinishedSubscribed;
         private bool _shopPresentationActive;
         private bool _eventPresentationActive;
+
+        private enum NpcSpotlightMode
+        {
+            Shop,
+            Rest,
+            Event
+        }
 
         private const float ChoiceButtonHeight = 118f;
         private const float ChoiceButtonSpacing = 130f;
@@ -152,6 +166,10 @@ namespace HwigiTower.UI
         public bool EventCutsceneVisible => eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy;
         public string EventCutsceneMessage => ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
         public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
+        public bool NpcSpotlightVisible => npcSpotlightLayer != null && npcSpotlightLayer.gameObject.activeInHierarchy;
+        public string CurrentNpcSpotlightSpriteName => merchantVisualImage != null && merchantVisualImage.sprite != null ? merchantVisualImage.sprite.name : string.Empty;
+        public string NpcSpotlightMessage => ((npcSpotlightNameText == null ? string.Empty : npcSpotlightNameText.text) + "\n" + (npcSpotlightDialogueText == null ? string.Empty : npcSpotlightDialogueText.text)).Trim();
+        public string CurrentNpcSpotlightModeLabel => _npcSpotlightModeLabel;
         public bool HasScreenLayerPanels => topStatusLayer != null && objectiveLayer != null && visualLayer != null && nodeMapLayer != null && npcReactionLayer != null && actionLayer != null && resultLayer != null && endingLayer != null;
         public string CurrentMapNodeIconNames
         {
@@ -1478,9 +1496,11 @@ namespace HwigiTower.UI
             EnsureScreenLayers();
             SetLayerVisible(actionLayer, false);
             SetLayerVisible(nodeMapLayer, false);
-            SetLayerVisible(npcReactionLayer, true);
+            SetLayerVisible(visualLayer, true);
+            SetLayerVisible(npcReactionLayer, false);
             SetLayerVisible(resultLayer, true);
             ApplyPresentationSlot(selection.EncounterId);
+            ShowNpcSpotlight(mataiosPortrait, "마타이오스", "잠시 숨을 고른다. 무엇을 건넬지 정하세요.", NpcSpotlightMode.Rest);
             _pendingRestSelection = selection;
             _pendingRestActionId = string.Empty;
             if (restInputField != null)
@@ -1738,6 +1758,8 @@ namespace HwigiTower.UI
             {
                 restInteractionPanel.gameObject.SetActive(false);
             }
+
+            HideNpcSpotlight();
         }
 
         private void SetRestActionButtonsInteractable(bool interactable)
@@ -1880,20 +1902,43 @@ namespace HwigiTower.UI
             encounterBackgroundImage.gameObject.SetActive(false);
         }
 
-        private void EnsureMerchantVisualImage()
+        private void EnsureNpcSpotlightLayer()
         {
-            if (merchantVisualImage != null)
+            if (npcSpotlightLayer != null)
             {
                 return;
             }
 
             EnsureScreenLayers();
+            var layerObject = new GameObject("NPC Spotlight Layer");
+            layerObject.transform.SetParent(visualLayer == null ? HudParent : visualLayer, false);
+            npcSpotlightLayer = layerObject.AddComponent<RectTransform>();
+            npcSpotlightLayer.anchorMin = Vector2.zero;
+            npcSpotlightLayer.anchorMax = Vector2.one;
+            npcSpotlightLayer.offsetMin = Vector2.zero;
+            npcSpotlightLayer.offsetMax = Vector2.zero;
+
+            npcSpotlightBackdropImage = CreateCombatImage(npcSpotlightLayer, "NPC Spotlight Backdrop", Vector2.zero, Vector2.one);
+            npcSpotlightBackdropImage.sprite = null;
+            npcSpotlightBackdropImage.color = new Color(0f, 0f, 0f, 0.34f);
+            npcSpotlightBackdropImage.gameObject.SetActive(true);
+
+            npcSpotlightGlowImage = CreateCombatImage(npcSpotlightLayer, "NPC Spotlight Glow", new Vector2(0.01f, 0.08f), new Vector2(0.52f, 0.98f));
+            npcSpotlightGlowImage.sprite = null;
+            npcSpotlightGlowImage.color = new Color(0.52f, 0.72f, 0.62f, 0.22f);
+            npcSpotlightGlowImage.gameObject.SetActive(true);
+
+            npcSpotlightShadowImage = CreateCombatImage(npcSpotlightLayer, "NPC Spotlight Shadow", new Vector2(0.04f, 0.05f), new Vector2(0.48f, 0.88f));
+            npcSpotlightShadowImage.sprite = null;
+            npcSpotlightShadowImage.color = new Color(0f, 0f, 0f, 0.42f);
+            npcSpotlightShadowImage.gameObject.SetActive(true);
+
             var merchantObject = new GameObject("Merchant Visual");
-            merchantObject.transform.SetParent(visualLayer == null ? HudParent : visualLayer, false);
+            merchantObject.transform.SetParent(npcSpotlightLayer, false);
 
             var rect = merchantObject.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.48f, 0.06f);
-            rect.anchorMax = new Vector2(0.98f, 0.98f);
+            rect.anchorMin = new Vector2(0.05f, -0.05f);
+            rect.anchorMax = new Vector2(0.48f, 0.96f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -1902,6 +1947,18 @@ namespace HwigiTower.UI
             merchantVisualImage.preserveAspect = true;
             merchantVisualImage.raycastTarget = false;
             merchantVisualImage.gameObject.SetActive(false);
+
+            var plate = CreatePanel("NPC Dialogue Plate", npcSpotlightLayer, new Vector2(0.04f, 0.05f), new Vector2(0.49f, 0.28f), new Color(0.03f, 0.045f, 0.050f, 0.78f));
+            npcSpotlightNameText = CreateCombatChildText(plate, "NPC Spotlight Name", new Vector2(0.06f, 0.60f), new Vector2(0.94f, 0.92f), 25, TextAnchor.MiddleLeft);
+            npcSpotlightNameText.color = new Color(0.91f, 0.98f, 0.91f, 1f);
+            npcSpotlightDialogueText = CreateCombatChildText(plate, "NPC Spotlight Dialogue", new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.58f), 23, TextAnchor.MiddleLeft);
+            npcSpotlightDialogueText.color = new Color(0.84f, 0.91f, 0.89f, 1f);
+            npcSpotlightLayer.gameObject.SetActive(false);
+        }
+
+        private void EnsureMerchantVisualImage()
+        {
+            EnsureNpcSpotlightLayer();
         }
 
         private void ApplyMerchantPresentation(int floor)
@@ -1912,16 +1969,112 @@ namespace HwigiTower.UI
                 return;
             }
 
-            merchantVisualImage.sprite = presentationData != null && presentationData.TryGetMerchantSprite(floor, out var sprite) ? sprite : mataiosPortrait;
-            merchantVisualImage.gameObject.SetActive(merchantVisualImage.sprite != null);
+            var sprite = presentationData != null && presentationData.TryGetMerchantSprite(floor, out var merchantSprite) ? merchantSprite : mataiosPortrait;
+            ShowNpcSpotlight(sprite, "상인", ResolveMerchantSpotlightLine(floor), NpcSpotlightMode.Shop);
         }
 
         private void HideMerchantPresentation()
         {
+            HideNpcSpotlight();
+        }
+
+        private void ShowNpcSpotlight(Sprite sprite, string displayName, string dialogue, NpcSpotlightMode mode)
+        {
+            EnsureNpcSpotlightLayer();
+            SetLayerVisible(visualLayer, true);
+            _npcSpotlightModeLabel = ResolveNpcSpotlightModeLabel(mode);
+            if (npcSpotlightLayer != null)
+            {
+                npcSpotlightLayer.gameObject.SetActive(sprite != null);
+            }
+
             if (merchantVisualImage != null)
             {
-                merchantVisualImage.gameObject.SetActive(false);
+                merchantVisualImage.sprite = sprite;
+                merchantVisualImage.gameObject.SetActive(sprite != null);
             }
+
+            ApplyNpcSpotlightModeLayout(mode);
+            if (npcSpotlightNameText != null)
+            {
+                npcSpotlightNameText.text = displayName;
+            }
+
+            if (npcSpotlightDialogueText != null)
+            {
+                npcSpotlightDialogueText.text = dialogue;
+            }
+        }
+
+        private void HideNpcSpotlight()
+        {
+            _npcSpotlightModeLabel = string.Empty;
+            if (npcSpotlightLayer != null)
+            {
+                npcSpotlightLayer.gameObject.SetActive(false);
+            }
+        }
+
+        private void ApplyNpcSpotlightModeLayout(NpcSpotlightMode mode)
+        {
+            if (npcSpotlightLayer == null || merchantVisualImage == null)
+            {
+                return;
+            }
+
+            var characterRect = merchantVisualImage.GetComponent<RectTransform>();
+            var plateRect = npcSpotlightNameText == null ? null : npcSpotlightNameText.transform.parent.GetComponent<RectTransform>();
+            if (mode == NpcSpotlightMode.Shop)
+            {
+                ApplyRect(characterRect, new Vector2(0.02f, -0.08f), new Vector2(0.43f, 0.99f));
+                ApplyRect(plateRect, new Vector2(0.04f, 0.05f), new Vector2(0.44f, 0.29f));
+                ApplyRect(npcSpotlightGlowImage == null ? null : npcSpotlightGlowImage.GetComponent<RectTransform>(), new Vector2(0.00f, 0.05f), new Vector2(0.47f, 0.98f));
+                ApplyRect(npcSpotlightShadowImage == null ? null : npcSpotlightShadowImage.GetComponent<RectTransform>(), new Vector2(0.03f, 0.00f), new Vector2(0.45f, 0.88f));
+                return;
+            }
+
+            if (mode == NpcSpotlightMode.Rest)
+            {
+                ApplyRect(characterRect, new Vector2(0.04f, -0.12f), new Vector2(0.42f, 0.96f));
+                ApplyRect(plateRect, new Vector2(0.08f, 0.06f), new Vector2(0.52f, 0.28f));
+                ApplyRect(npcSpotlightGlowImage == null ? null : npcSpotlightGlowImage.GetComponent<RectTransform>(), new Vector2(0.02f, 0.04f), new Vector2(0.48f, 0.98f));
+                ApplyRect(npcSpotlightShadowImage == null ? null : npcSpotlightShadowImage.GetComponent<RectTransform>(), new Vector2(0.05f, 0.00f), new Vector2(0.44f, 0.88f));
+                return;
+            }
+
+            ApplyRect(characterRect, new Vector2(0.04f, -0.06f), new Vector2(0.42f, 0.94f));
+            ApplyRect(plateRect, new Vector2(0.07f, 0.06f), new Vector2(0.50f, 0.27f));
+        }
+
+        private static void ApplyRect(RectTransform rect, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            if (rect == null)
+            {
+                return;
+            }
+
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
+        private static string ResolveNpcSpotlightModeLabel(NpcSpotlightMode mode)
+        {
+            return mode switch
+            {
+                NpcSpotlightMode.Shop => "상점",
+                NpcSpotlightMode.Rest => "휴식",
+                NpcSpotlightMode.Event => "이벤트",
+                _ => string.Empty
+            };
+        }
+
+        private static string ResolveMerchantSpotlightLine(int floor)
+        {
+            return floor >= 4
+                ? "필요한 걸 골라. 오래 머무를 곳은 아니니까."
+                : "보스 전에 필요한 준비를 끝내세요.";
         }
 
         private void EnsureCombatPanel()
