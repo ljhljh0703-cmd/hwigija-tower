@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-18 00:08 — Merchant spotlight sprites bound
+- **Phase**: W3-2
+- **Done**:
+  - `Assets/_Project/Art/Characters/Merchants/` merchant sprites imported as Sprite/Single with alpha transparency
+  - `SO_DemoPresentationData` merchant slots updated: Floors 1-3 use human merchant, Floors 4-5 use otherworld merchant
+  - Shop merchant visual moved into the visual layer as a spotlight character so it remains separate from shop cards/actions
+  - EditMode/PlayMode coverage added for merchant floor mapping and shop screenshot spotlight visibility
+- **Files**: 변경/추가 10개 (주요: `SO_DemoPresentationData.asset`, `PrototypeHud.cs`, `Assets/_Project/Art/Characters/Merchants/**`)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: 1080x1920 shop screenshot에서 merchant/card overlap 최종 육안 QA
+- **Agent**: Codex
+
 ### 2026-05-17 23:34 — Randomized floor map graph added
 - **Phase**: W3-2
 - **Done**:

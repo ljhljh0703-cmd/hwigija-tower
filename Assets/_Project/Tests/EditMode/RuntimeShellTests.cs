@@ -850,6 +850,16 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsNotNull(presentation);
             Assert.AreEqual(5, presentation.MerchantSlots.Count(slot => slot.Floor >= 1 && slot.Floor <= 5));
             Assert.IsTrue(presentation.MerchantSlots.All(slot => !string.IsNullOrEmpty(slot.StateKey)));
+            Assert.IsTrue(presentation.TryGetMerchantSprite(1, out var floorOneMerchant));
+            Assert.IsTrue(presentation.TryGetMerchantSprite(2, out var floorTwoMerchant));
+            Assert.IsTrue(presentation.TryGetMerchantSprite(3, out var floorThreeMerchant));
+            Assert.IsTrue(presentation.TryGetMerchantSprite(4, out var floorFourMerchant));
+            Assert.IsTrue(presentation.TryGetMerchantSprite(5, out var floorFiveMerchant));
+            Assert.AreEqual("merchant_human", floorOneMerchant.name);
+            Assert.AreEqual("merchant_human", floorTwoMerchant.name);
+            Assert.AreEqual("merchant_human", floorThreeMerchant.name);
+            Assert.AreEqual("merchant_otherworld", floorFourMerchant.name);
+            Assert.AreEqual("merchant_otherworld", floorFiveMerchant.name);
         }
 
         [Test]
