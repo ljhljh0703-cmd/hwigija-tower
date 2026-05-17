@@ -15,8 +15,8 @@
 | Event / Jar Room | `/private/tmp/hwigi-portrait-ui-v3-screenshots/03_event_jar_room.png` | pass | Probability hints are visible before selection. No raw stableId or Glitch visible in normal UI. |
 | Rest / Mataios | `/private/tmp/hwigi-portrait-ui-v3-screenshots/04_rest_mataios.png` | pass | Mataios portrait, three rest actions with effect summaries, larger input field, response bubble, and submit button are visible. |
 | Shop | `/private/tmp/hwigi-portrait-ui-v3-screenshots/05_shop.png` | pass | Merchant visual slot is visible, current Gold and boss-prep context are shown, and purchase cards expose item name, price/effect, insufficient-gold state, and leave option. |
-| Normal Combat | `/private/tmp/hwigi-portrait-ui-v3-screenshots/06_normal_combat.png` | pass | Enemy visual, enemy HP, player HP, round/status text, and Attack/Defend/Skill buttons are visible. Combat log text can be sharpened later. |
-| Boss Combat | `/private/tmp/hwigi-portrait-ui-v3-screenshots/07_boss_combat.png` | pass | Boss visual and boss HP are distinguishable from normal combat. Buttons remain reachable. |
+| Normal Combat | `/private/tmp/hwigi-portrait-ui-v3-screenshots/06_normal_combat.png` | pass | Combat now reads as top enemy stage, middle log, and bottom party dock. Player card, Mataios card, HP bars, and action buttons are visible. |
+| Boss Combat | `/private/tmp/hwigi-portrait-ui-v3-screenshots/07_boss_combat.png` | pass | Boss visual and boss HP stay in the top stage, while player/Mataios cards and action buttons remain anchored in the bottom party dock. |
 | Ending Choice | `/private/tmp/hwigi-portrait-ui-v3-screenshots/08_ending_choice.png` | pass | Ending choice screen renders with Rest/Continue buttons and no extra node/combat controls. |
 
 ## Checks
@@ -30,8 +30,9 @@
 - 2026-05-17 readability pass refreshed Floor Map, Shop, Top HUD, Rest input, and Combat text density using the same screenshot harness.
 - 2026-05-17 merchant/rest/map pass connected floor merchant slots, strengthened map focus contrast, and separated rest input/response/effect areas.
 - 2026-05-17 text density pass compressed result summaries to core lines, moved companion status beside the portrait, and limited combat feedback to enemy/player HP plus the latest action consequence.
+- 2026-05-17 combat party layout pass split combat into top enemy stage, middle combat log, and bottom player/Mataios party dock with square action buttons.
 
 ## Remaining UI Polish
 - P1: improve font sharpness/readability in captured Game View output.
 - P1: final content labels may need one more copyfit pass after writer-approved text lands.
-- P2: add final merchant art variants and stronger selected/focused animation states for rest input and map nodes.
+- P2: add final player portrait, merchant art variants, and stronger selected/focused animation states for combat/rest/map controls.

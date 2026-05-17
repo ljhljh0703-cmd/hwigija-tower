@@ -234,11 +234,15 @@ namespace HwigiTower.Tests.EditMode
             hud.ShowRunState(snapshot);
 
             Assert.IsTrue(hud.CombatPanelVisible);
+            Assert.IsTrue(hud.CombatPartyDockVisible);
             StringAssert.Contains("최종 보스", hud.CombatMessage);
             StringAssert.Contains("적 HP 22/34", hud.CombatMessage);
             StringAssert.Contains("방어: 받은 피해", hud.CombatMessage);
+            StringAssert.Contains("플레이어", hud.CombatPartyMessage);
+            StringAssert.Contains("마타이오스", hud.CombatPartyMessage);
             StringAssert.DoesNotContain("BOSS_APEX_02", hud.CombatMessage);
             StringAssert.DoesNotContain("Glitch", hud.CombatMessage);
+            StringAssert.DoesNotContain("Glitch", hud.CombatPartyMessage);
         }
 
         [Test]
@@ -304,8 +308,7 @@ namespace HwigiTower.Tests.EditMode
 
             hud.ShowRunState(snapshot);
 
-            StringAssert.Contains("Floor 5", hud.RouteMessage);
-            StringAssert.Contains("전투 중", hud.RouteMessage);
+            Assert.IsEmpty(hud.RouteMessage);
             StringAssert.Contains("공격: 적 피해 6", hud.CombatMessage);
             StringAssert.Contains("정찰 기술: 추가 공격", hud.CombatMessage);
             StringAssert.DoesNotContain("ENC_COMBAT_GATE_03", hud.RouteMessage);

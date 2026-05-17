@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 09:00 — Combat party layout v4
+- **Phase**: W3-2
+- **Done**:
+  - 전투 화면을 top enemy stage / middle combat log / bottom party dock 구조로 재배치
+  - Player card placeholder, HP bar, ATK/buff chips와 Mataios card, affinity/memory/reaction line을 combat dock에 통합
+  - Attack/Defend/Skill을 하단 square action row로 고정하고 전투 중 기존 route/debug-like text 노출을 차단
+  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
+- **Files**: 변경/추가 5개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`, `PrototypeRoomSmokeTests.cs`, `Docs/QA/**`, progress)
+- **GDD impact**: 없음
+- **Blockers**: 실제 player portrait asset은 아직 없어 placeholder card 사용
+- **Next**: player portrait asset 바인딩, combat action icon art, boss/enemy intent icon polish
+- **Agent**: Codex
+
 ### 2026-05-17 07:25 — Text density and companion panel polish
 - **Phase**: W3-2
 - **Done**:
