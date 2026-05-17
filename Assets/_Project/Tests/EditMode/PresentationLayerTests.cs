@@ -75,6 +75,18 @@ namespace HwigiTower.Tests.EditMode
             AssertNodeIcon(data, PrototypeFloorMapNodeType.Boss, "node_boss");
             Assert.IsTrue(data.TryGetCompletedNodeBackground(out var completed));
             Assert.AreEqual("node_back_cleared", completed.name);
+            Assert.IsNotNull(data.SelectedNodeRing);
+            Assert.AreEqual("map_node_selected_ring", data.SelectedNodeRing.name);
+            Assert.IsNotNull(data.LockedNodeOverlay);
+            Assert.AreEqual("map_node_locked_overlay", data.LockedNodeOverlay.name);
+            Assert.IsNotNull(data.CurrentPositionMarker);
+            Assert.AreEqual("map_current_position_marker", data.CurrentPositionMarker.name);
+
+            for (var floor = 1; floor <= 5; floor++)
+            {
+                Assert.IsTrue(data.TryGetFloorMapBackground(floor, out var background), "Missing map background for floor " + floor);
+                Assert.AreEqual("map_floor0" + floor + "_bg", background.name);
+            }
         }
 
         [Test]

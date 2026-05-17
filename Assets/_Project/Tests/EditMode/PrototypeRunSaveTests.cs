@@ -84,7 +84,13 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(state.Gold, restored.Gold);
             Assert.IsTrue(restored.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
             Assert.AreEqual(state.NodesResolved, restored.NodesResolved);
-            Assert.IsTrue(HasCompletedMapNode(restored.CreateSnapshot(), selectable[0].MapNodeId));
+            var restoredSnapshot = restored.CreateSnapshot();
+            Assert.IsTrue(HasCompletedMapNode(restoredSnapshot, selectable[0].MapNodeId));
+            Assert.IsTrue(TryGetMapNode(state.CreateSnapshot(), selectable[0].MapNodeId, out var originalNode));
+            Assert.IsTrue(TryGetMapNode(restoredSnapshot, selectable[0].MapNodeId, out var restoredNode));
+            Assert.AreEqual(originalNode.NormalizedX, restoredNode.NormalizedX);
+            Assert.AreEqual(originalNode.NormalizedY, restoredNode.NormalizedY);
+            CollectionAssert.AreEqual(originalNode.NextMapNodeIds, restoredNode.NextMapNodeIds);
         }
 
         [Test]
@@ -133,6 +139,21 @@ namespace HwigiTower.Tests.EditMode
                 }
             }
 
+            return false;
+        }
+
+        private static bool TryGetMapNode(PrototypeRunSnapshot snapshot, string mapNodeId, out PrototypeFloorMapNodeView node)
+        {
+            for (var i = 0; i < snapshot.FloorMapNodes.Length; i++)
+            {
+                if (snapshot.FloorMapNodes[i].MapNodeId == mapNodeId)
+                {
+                    node = snapshot.FloorMapNodes[i];
+                    return true;
+                }
+            }
+
+            node = default;
             return false;
         }
     }

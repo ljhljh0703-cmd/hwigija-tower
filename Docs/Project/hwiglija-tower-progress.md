@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 23:34 — Randomized floor map graph added
+- **Phase**: W3-2
+- **Done**:
+  - Floor 1-5 map background/marker assets imported and bound through `DemoPresentationData`
+  - `PrototypeFloorMapBuilder` upgraded to deterministic seeded graph generation with positioned nodes, edges, selectable/completed/skipped/locked state
+  - Map UI now draws floor background, route lines, selected/current/locked/completed overlays, and graph-positioned node buttons
+  - Save/restore keeps seed-regenerated graph stable while restoring completed/skipped map node ids
+  - Tests updated for deterministic graph rules, connected-node selection, save restore, map presentation assets, and branching-map PlayMode traversal
+- **Files**: 변경/추가 28개 (주요: `Assets/_Project/Scripts/Run/PrototypeFloorMap.cs`, `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `Assets/_Project/Art/Map/**`)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: 1080x1920 map text sharpness/contrast polish 또는 actual device touch QA
+- **Agent**: Codex
+
 ### 2026-05-17 22:23 — Final presentation art drop-ins bound
 - **Phase**: W3-2
 - **Done**:
