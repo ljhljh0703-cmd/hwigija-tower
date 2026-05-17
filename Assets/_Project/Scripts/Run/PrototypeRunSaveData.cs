@@ -70,6 +70,6 @@ namespace HwigiTower.Run
         public int MemoryFragmentCount { get; }
         public string RunStatus { get; }
         public bool IsValid => !string.IsNullOrEmpty(RunId);
-        public string DisplayText => "Floor " + CurrentFloor + " | HP " + PlayerHp + "/" + PlayerMaxHp + " | Memory " + MemoryFragmentCount;
+        public string DisplayText => "Floor " + CurrentFloor + " | HP " + PlayerHp + "/" + PlayerMaxHp + " | 기억 " + MemoryFragmentCount;
     }
 }

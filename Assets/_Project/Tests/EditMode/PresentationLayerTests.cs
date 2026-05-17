@@ -43,6 +43,9 @@ namespace HwigiTower.Tests.EditMode
             AssertSlotSprites(data, "ENC_SHOP_02", "enc_shop_02_bg", null, "char_mataios_bust_s3_s4", null);
             AssertSlotSprites(data, "ENC_MEMORY_FRAGMENT_03", "enc_memory_fragment_03_bg", null, "char_mataios_bust_s3_s4", null);
             AssertSlotSprites(data, "ENC_MEMORY_FRAGMENT_05", "enc_memory_fragment_03_bg", null, "char_mataios_bust_s3_s4", "enc_memory_fragment_05_art");
+            AssertPublicLabel(data, "ENC_MEMORY_FRAGMENT_01", "기억의 잔향");
+            AssertPublicLabel(data, "ENC_MEMORY_FRAGMENT_03", "기억의 잔향");
+            AssertPublicLabel(data, "ENC_MEMORY_FRAGMENT_05", "기억의 잔향");
             AssertSlotSprites(data, "ENEMY_EMPTY_ARMOR", null, "enemy_empty_armor", null, null);
             AssertSlotSprites(data, "ENEMY_SHADE_03", null, "enemy_shade_03", null, null);
             AssertSlotSprites(data, "ENEMY_WRAITH_04", null, "enemy_wraith_04", null, null);
@@ -278,7 +281,8 @@ namespace HwigiTower.Tests.EditMode
 
             StringAssert.Contains("Gold -5", result.text);
             StringAssert.Contains("붕대 +1 획득", result.text);
-            StringAssert.Contains("기억 파편 해금", result.text);
+            StringAssert.Contains("기억의 잔향 해금", result.text);
+            StringAssert.DoesNotContain("기억 파편", result.text);
             Assert.LessOrEqual(result.text.Split('\n').Length, 4);
             StringAssert.DoesNotContain("choice applied", result.text);
             StringAssert.DoesNotContain("ITEM_FIELD_BANDAGE", result.text);
@@ -540,6 +544,14 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(data.TryGetCombatActionIcon(action, out var icon), action.ToString());
             Assert.IsNotNull(icon, action.ToString());
             StringAssert.StartsWith(spriteNamePrefix, icon.name);
+        }
+
+        private static void AssertPublicLabel(DemoPresentationData data, string stableId, string expected)
+        {
+            Assert.IsTrue(data.TryGetSlot(stableId, out var slot), stableId);
+            Assert.AreEqual(expected, slot.DisplayName);
+            StringAssert.DoesNotContain("Memory", slot.DisplayName);
+            StringAssert.DoesNotContain("기억 파편", slot.DisplayName);
         }
     }
 }
