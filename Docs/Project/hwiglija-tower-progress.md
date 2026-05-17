@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 14:53 — Combat party layout v4 follow-up
+- **Phase**: W3-2
+- **Done**:
+  - 전투 중 objective/route/result/merchant/event 잔상 노출을 차단
+  - Combat panel을 top enemy stage / middle combat log / bottom party dock 구조로 확장
+  - Player/Mataios card를 하단 dock에 고정하고 action buttons를 compact square 형태로 재배치
+  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
+- **Files**: 변경 3개 (`PrototypeHud.cs`, `Portrait_UI_v3_Screenshot_QA_2026-05-16.md`, progress)
+- **GDD impact**: 없음
+- **Blockers**: font sharpness/player portrait/action icon final art는 후속 polish 필요
+- **Next**: player portrait/action icon art binding, font rendering polish, final copyfit pass
+- **Agent**: Codex
+
 ### 2026-05-17 11:19 — Event cutscene layout reference pass
 - **Phase**: W3-2
 - **Done**:
