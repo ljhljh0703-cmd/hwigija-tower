@@ -863,6 +863,35 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void PrototypeHud_NpcSpotlightUsesPublicModeLabels()
+        {
+            var hudObject = new GameObject("hud-spotlight-test");
+            var texture = new Texture2D(8, 8);
+            var sprite = Sprite.Create(texture, new Rect(0f, 0f, 8f, 8f), new Vector2(0.5f, 0.5f));
+            sprite.name = "spotlight_test";
+            try
+            {
+                var hud = hudObject.AddComponent<PrototypeHud>();
+                var modeType = typeof(PrototypeHud).GetNestedType("NpcSpotlightMode", System.Reflection.BindingFlags.NonPublic);
+                var method = typeof(PrototypeHud).GetMethod("ShowNpcSpotlight", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                Assert.IsNotNull(modeType);
+                Assert.IsNotNull(method);
+
+                method.Invoke(hud, new object[] { sprite, "상인", "임시 안내", System.Enum.Parse(modeType, "Shop") });
+                Assert.IsTrue(hud.NpcSpotlightVisible);
+                Assert.AreEqual("상점", hud.CurrentNpcSpotlightModeLabel);
+                Assert.AreEqual(sprite.name, hud.CurrentNpcSpotlightSpriteName);
+                StringAssert.Contains("상인", hud.NpcSpotlightMessage);
+            }
+            finally
+            {
+                Object.DestroyImmediate(sprite);
+                Object.DestroyImmediate(texture);
+                Object.DestroyImmediate(hudObject);
+            }
+        }
+
+        [Test]
         public void FloorTwoBossGateOverride_DoesNotLeakIntoFloorThreeOrFinalBoss()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;

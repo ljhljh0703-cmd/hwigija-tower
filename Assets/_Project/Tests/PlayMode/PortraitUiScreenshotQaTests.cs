@@ -30,7 +30,7 @@ namespace HwigiTower.Tests.PlayMode
                 hud.ShowMapChoices(controller.GetQaFloorMapNodes(), _ => { });
             });
             yield return CaptureEncounterScreen("03_event_jar_room.png", "EVT_F01_JAR_ROOM");
-            yield return CaptureEncounterScreen("04_rest_mataios.png", "ENC_REST_01");
+            yield return CaptureRestScreen();
             yield return CaptureShopScreen();
             yield return CaptureCombatScreen("06_normal_combat.png", "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return CaptureCombatScreen("07_boss_combat.png", "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
@@ -75,6 +75,23 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.IsNotNull(image);
                 Assert.IsNotNull(image.sprite);
                 Assert.AreEqual("merchant_human", image.sprite.name);
+                Assert.IsTrue(hud.NpcSpotlightVisible);
+                Assert.AreEqual("상점", hud.CurrentNpcSpotlightModeLabel);
+                StringAssert.Contains("상인", hud.NpcSpotlightMessage);
+            });
+        }
+
+        private static IEnumerator CaptureRestScreen()
+        {
+            yield return CapturePrototypeRoomScreen("04_rest_mataios.png", (controller, hud) =>
+            {
+                var selection = controller.CreateQaEncounterSelection("ENC_REST_01");
+                Assert.IsTrue(selection.HasEncounter, "Missing QA rest selection");
+                hud.OpenQaRouteStep(selection);
+                Assert.IsTrue(hud.RestInteractionPanelVisible);
+                Assert.IsTrue(hud.NpcSpotlightVisible);
+                Assert.AreEqual("휴식", hud.CurrentNpcSpotlightModeLabel);
+                StringAssert.Contains("마타이오스", hud.NpcSpotlightMessage);
             });
         }
 

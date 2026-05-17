@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-18 00:24 — NPC spotlight encounter layout added
+- **Phase**: W3-2
+- **Done**:
+  - `PrototypeHud`에 공통 NPC spotlight layer를 추가해 background overlay, glow, shadow, character visual, dialogue plate를 한 묶음으로 표시
+  - Shop 화면의 merchant visual을 좌측 spotlight 구조로 이동하고 Floor 1-3 human / Floor 4-5 otherworld mapping을 유지
+  - Rest 화면에서 Mataios portrait도 같은 spotlight framing을 사용하도록 연결하고 기존 natural-language input/action flow는 유지
+  - EditMode/PlayMode screenshot harness에 spotlight visibility, public mode label, shop/rest visual framing 검증을 추가
+  - 1080x1920 screenshot harness 8종을 재생성해 `04_rest_mataios`, `05_shop` 중심으로 overlap을 확인
+- **Files**: 변경/추가 4개 (주요: `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `RuntimeShellTests.cs`, `PortraitUiScreenshotQaTests.cs`)
+- **GDD impact**: 없음
+- **Blockers**: 없음
+- **Next**: text sharpness/contrast와 product card density를 actual device 또는 Editor GameView에서 최종 polish
+- **Agent**: Codex
+
 ### 2026-05-18 00:08 — Merchant spotlight sprites bound
 - **Phase**: W3-2
 - **Done**:
