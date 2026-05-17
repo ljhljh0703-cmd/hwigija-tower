@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 22:23 — Final presentation art drop-ins bound
+- **Phase**: W3-2
+- **Done**:
+  - 신규 PNG import/meta 정상화 후 combat action icon 3종과 lobby logo를 presentation data에 바인딩
+  - completed node badge slot을 추가하고 `node_back_cleared`를 floor map 완료 상태에 표시
+  - `ENEMY_MERCENARY_CAPTAIN_SAGAN_01` presentation/catalog를 `boss_mercenary_captain_sagan_01` 아트로 교체
+  - 매칭 stableId가 없는 신규 enemy art 11종은 catalog intake 후보로 문서화
+  - 1080x1920 screenshot harness 8종 재생성 및 Lobby/Map/Combat 중심 육안 QA
+- **Files**: 변경/추가 44개 (주요: SO_DemoPresentationData, SO_LobbyPresentationData, PrototypeHud, 신규 Art PNG/meta)
+- **GDD impact**: 없음
+- **Blockers**: player portrait `char_player_bust_01.png`, merchant 전용 sprite, 실제 audio clip 파일은 아직 없음. Unity CLI `-runTests`는 XML 미생성이라 임시 TestRunner wrapper로 검증 후 제거.
+- **Next**: player/merchant/audio 실제 에셋 수령 시 동일 슬롯에 바인딩하고, 신규 map art는 별도 map presentation 목표에서 연결
+- **Agent**: Codex
+
 ### 2026-05-17 19:24 — Memory fragment public terminology rename
 - **Phase**: W3-2
 - **Done**:

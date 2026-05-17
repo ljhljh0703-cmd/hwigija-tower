@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.UI.DemoPresentationData
   defaultPlayerPortrait: {fileID: 0}
   defaultMataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
+  completedNodeBackground: {fileID: 21300000, guid: c630860c5a148416e80cb8c8ff1d387a, type: 3}
   merchantSlots:
   - floor: 1
     stateKey: MERCHANT_FLOOR_01
@@ -43,11 +44,11 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 259460dde131f4cafa26bf074b3df49c, type: 3}
   combatActionIconSlots:
   - action: 0
-    icon: {fileID: 21300000, guid: d64fd7a9ef3d44a68bcb60679a3db878, type: 3}
+    icon: {fileID: 21300000, guid: beeee962c424845bd9a0d67f98cfe1e3, type: 3}
   - action: 1
-    icon: {fileID: 21300000, guid: fe56896c2e4774bfeb1acf6a2ac8d385, type: 3}
+    icon: {fileID: 21300000, guid: 663ab0af95a364dc0a8dde8573ee3f33, type: 3}
   - action: 2
-    icon: {fileID: 21300000, guid: 24786721795ce450f91f7674e4b58e85, type: 3}
+    icon: {fileID: 21300000, guid: da2baaa9624b746179275cab9f875e1e, type: 3}
   slots:
   - encounterStableId: ENC_SHOP_01
     displayName: Shop
@@ -419,7 +420,7 @@ MonoBehaviour:
     titleTextKey:
     bodyTextKey:
     mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
-    enemySprite: {fileID: 21300000, guid: ac63f778b992941978afca0b10d4654b, type: 3}
+    enemySprite: {fileID: 21300000, guid: 5e6adcbbbe3014a4486dd047a801de7a, type: 3}
     memoryFragmentSprite: {fileID: 0}
     sfxCue: {fileID: 0}
     bgmCue: {fileID: 0}

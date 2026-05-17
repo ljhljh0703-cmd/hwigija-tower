@@ -78,7 +78,7 @@ namespace HwigiTower.EditorTools
                 new EnemySpec(3, "ENEMY_MERCENARY_ASSASSIN_01", "normal", "용병 암살자", "층 3 속공형 용병", "enemy_mercenary_assassin_01.png", 14, 4, 5),
                 new EnemySpec(3, "ENEMY_MERCENARY_MAGE_01", "normal", "용병 마도사", "층 3 마법형 용병", "enemy_mercenary_mage_01.png", 13, 4, 5),
                 new EnemySpec(3, "ENEMY_EMPTY_ARMOR", "normal", "리빙아머 중무장", "중무장 갑옷형 적", "enemy_empty_armor.png", 16, 4, 5),
-                new EnemySpec(3, "ENEMY_MERCENARY_CAPTAIN_SAGAN_01", "elite", "용병대장 사간", "층 3 엘리트 지휘관", "enemy_mercenary_captain_sagan_01.png", 24, 5, 10),
+                new EnemySpec(3, "ENEMY_MERCENARY_CAPTAIN_SAGAN_01", "elite", "용병대장 사간", "층 3 엘리트 지휘관", "boss_mercenary_captain_sagan_01.png", 24, 5, 10),
                 new EnemySpec(3, "ENEMY_COLLAPSE_ECHO", "boss", "스펙터", "collapse echo", "enemy_collapse_echo.png", 26, 4, 14),
                 new EnemySpec(4, "ENEMY_SKELETON_HORDE_01", "normal", "스켈레톤 군집", "층 4 언데드 무리", "enemy_skeleton_horde_01.png", 16, 4, 5),
                 new EnemySpec(4, "ENEMY_LIVING_TOMBSTONE_01", "normal", "살아있는 묘비", "층 4 묘비형 적", "enemy_living_tombstone_01.png", 17, 4, 5),

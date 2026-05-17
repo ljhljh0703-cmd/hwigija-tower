@@ -73,6 +73,7 @@ namespace HwigiTower.UI
     {
         [SerializeField] private Sprite defaultPlayerPortrait;
         [SerializeField] private Sprite defaultMataiosPortrait;
+        [SerializeField] private Sprite completedNodeBackground;
         [SerializeField] private DemoMerchantPresentationSlot[] merchantSlots = new DemoMerchantPresentationSlot[0];
         [SerializeField] private DemoNodeIconSlot[] nodeIconSlots = new DemoNodeIconSlot[0];
         [SerializeField] private DemoCombatActionIconSlot[] combatActionIconSlots = new DemoCombatActionIconSlot[0];
@@ -80,6 +81,7 @@ namespace HwigiTower.UI
 
         public Sprite DefaultPlayerPortrait => defaultPlayerPortrait;
         public Sprite DefaultMataiosPortrait => defaultMataiosPortrait;
+        public Sprite CompletedNodeBackground => completedNodeBackground;
         public DemoMerchantPresentationSlot[] MerchantSlots => merchantSlots ?? new DemoMerchantPresentationSlot[0];
         public DemoNodeIconSlot[] NodeIconSlots => nodeIconSlots ?? new DemoNodeIconSlot[0];
         public DemoCombatActionIconSlot[] CombatActionIconSlots => combatActionIconSlots ?? new DemoCombatActionIconSlot[0];
@@ -115,6 +117,12 @@ namespace HwigiTower.UI
 
             icon = null;
             return false;
+        }
+
+        public bool TryGetCompletedNodeBackground(out Sprite sprite)
+        {
+            sprite = completedNodeBackground;
+            return sprite != null;
         }
 
         public bool TryGetMerchantSprite(int floor, out Sprite sprite)

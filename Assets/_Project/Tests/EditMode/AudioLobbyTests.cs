@@ -63,6 +63,8 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsFalse(string.IsNullOrWhiteSpace(data.TitleText));
             Assert.IsFalse(string.IsNullOrWhiteSpace(data.SubtitleText));
             Assert.IsFalse(string.IsNullOrWhiteSpace(data.DefaultProfileName));
+            Assert.IsNotNull(data.LogoSprite);
+            Assert.AreEqual("lobby_logo_temp", data.LogoSprite.name);
         }
     }
 }
