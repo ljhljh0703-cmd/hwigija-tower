@@ -24,3 +24,10 @@ Current W2 demo intake slots:
 - `Encounters/demo_complete_bg.png`
 - `Characters/char_mataios_bust_s0_s2.png`
 - `Enemies/enemy_fracture_hound.png`
+
+Combat UI slots prepared:
+
+- `Characters/char_player_portrait_temp.png` — optional player portrait slot. If absent, the HUD uses a built-in player silhouette fallback.
+- `Nodes/node_combat.png` — temporary attack action icon source until dedicated action icons arrive.
+- `Nodes/node_rest.png` — temporary defend action icon source until dedicated action icons arrive.
+- `Nodes/node_event.png` — temporary skill/scout action icon source until a dedicated skill icon arrives.

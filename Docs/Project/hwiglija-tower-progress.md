@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-17 17:19 — Player portrait slot and combat action icons
+- **Phase**: W3-2
+- **Done**:
+  - `DemoPresentationData`에 player portrait slot과 CombatAction icon slots 추가
+  - 전투 하단 player card가 실제 portrait slot 또는 fallback silhouette를 표시하도록 정리
+  - Attack/Defend/Skill 버튼을 icon + short label 구조로 바꾸고 임시 node icon을 바인딩
+  - EditMode 120/120 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
+- **Files**: 변경 7개 (`PrototypeHud.cs`, `DemoPresentationData.cs`, `SO_DemoPresentationData.asset`, tests, QA/progress docs)
+- **GDD impact**: 없음
+- **Blockers**: 실제 player portrait와 전용 action icon art는 아직 없음
+- **Next**: dedicated player portrait/action icon art 수급 후 슬롯 교체, font sharpness polish
+- **Agent**: Codex
+
 ### 2026-05-17 14:53 — Combat party layout v4 follow-up
 - **Phase**: W3-2
 - **Done**:
