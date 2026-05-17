@@ -121,6 +121,10 @@ namespace HwigiTower.Tests.EditMode
             hud.ShowChoices(jar, views, _ => { });
 
             Assert.AreEqual(3, hud.ChoiceButtonCount);
+            Assert.IsTrue(hud.EventCutsceneVisible);
+            StringAssert.Contains("항아리 방", hud.EventCutsceneMessage);
+            StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", hud.EventCutsceneMessage);
+            StringAssert.DoesNotContain("Glitch", hud.EventCutsceneMessage);
             var patterned = hud.GetChoiceButton(0).GetComponentInChildren<Text>();
             Assert.IsNotNull(patterned);
             StringAssert.Contains("신기한 문양이 각인된 항아리", patterned.text);

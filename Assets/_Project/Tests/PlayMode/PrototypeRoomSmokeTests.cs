@@ -103,6 +103,10 @@ namespace HwigiTower.Tests.PlayMode
             eventButton.onClick.Invoke();
             yield return null;
 
+            Assert.IsTrue(hud.EventCutsceneVisible);
+            StringAssert.Contains("항아리 방", hud.EventCutsceneMessage);
+            StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", hud.EventCutsceneMessage);
+            StringAssert.DoesNotContain("Glitch", hud.EventCutsceneMessage);
             var patternedJar = FindChoiceButton(hud, "CHOICE_EVT_F01_JAR_PATTERNED");
             Assert.IsNotNull(patternedJar, DescribeChoiceButtons(hud));
             var label = ReadButtonText(patternedJar);
