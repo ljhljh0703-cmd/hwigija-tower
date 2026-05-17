@@ -271,6 +271,16 @@ namespace HwigiTower.Run
             return RunState == null ? new PrototypeFloorMapNodeView[0] : RunState.GetSelectableMapNodeViews();
         }
 
+        public PrototypeFloorMapNodeView[] GetFloorMapNodes()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            return RunState == null ? new PrototypeFloorMapNodeView[0] : RunState.GetFloorMapNodeViews();
+        }
+
 #if UNITY_EDITOR || UNITY_INCLUDE_TESTS
         public PrototypeFloorMapNodeView[] GetQaFloorMapNodes()
         {

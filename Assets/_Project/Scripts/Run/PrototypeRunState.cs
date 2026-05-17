@@ -743,7 +743,7 @@ namespace HwigiTower.Run
                 }
             }
 
-            PrototypeFloorMapBuilder.Build(_currentFloor, _demoRunPath, _floorMapNodes);
+            PrototypeFloorMapBuilder.Build(_currentFloor, _demoRunPath, RunId, _floorMapNodes);
         }
 
         public void AttachFloorRunPaths(IReadOnlyList<PrototypeFloorRunPath> floorRunPaths, IReadOnlyList<PrototypeDemoRunStep> fallbackFloorOnePath)
@@ -815,6 +815,11 @@ namespace HwigiTower.Run
             }
 
             return views.ToArray();
+        }
+
+        public PrototypeFloorMapNodeView[] GetFloorMapNodeViews()
+        {
+            return BuildMapNodeViews();
         }
 
 #if UNITY_EDITOR || UNITY_INCLUDE_TESTS
@@ -1944,7 +1949,18 @@ namespace HwigiTower.Run
 
         private bool IsMapNodeSelectable(PrototypeFloorMapNode node, int activeLayer)
         {
-            return node != null && node.IsValid && !node.Completed && !node.Skipped && node.Layer == activeLayer && string.IsNullOrEmpty(_selectedMapNodeId);
+            if (node == null || !node.IsValid || node.Completed || node.Skipped || node.Layer != activeLayer || !string.IsNullOrEmpty(_selectedMapNodeId))
+            {
+                return false;
+            }
+
+            var lastCompleted = GetLastCompletedMapNode();
+            if (lastCompleted == null)
+            {
+                return node.Layer == 1;
+            }
+
+            return lastCompleted.NextMapNodeIds.Contains(node.MapNodeId);
         }
 
         private void MarkSelectedMapNodeCompleted(string resolvedKey)
@@ -2016,18 +2032,53 @@ namespace HwigiTower.Run
             for (var i = 0; i < _floorMapNodes.Count; i++)
             {
                 var node = _floorMapNodes[i];
-                var locked = node == null || node.Skipped || (activeLayer > 0 && node.Layer > activeLayer);
+                var locked = node == null || node.Skipped || !IsMapNodeSelectable(node, activeLayer) && !node.Completed;
                 views[i] = ToMapNodeView(node, IsMapNodeSelectable(node, activeLayer), locked);
             }
 
             return views;
         }
 
-        private static PrototypeFloorMapNodeView ToMapNodeView(PrototypeFloorMapNode node, bool selectable, bool locked)
+        private PrototypeFloorMapNode GetLastCompletedMapNode()
+        {
+            PrototypeFloorMapNode result = null;
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node == null || !node.Completed)
+                {
+                    continue;
+                }
+
+                if (result == null ||
+                    node.Layer > result.Layer ||
+                    node.Layer == result.Layer && node.Index > result.Index)
+                {
+                    result = node;
+                }
+            }
+
+            return result;
+        }
+
+        private PrototypeFloorMapNodeView ToMapNodeView(PrototypeFloorMapNode node, bool selectable, bool locked)
         {
             return node == null
                 ? default
-                : new PrototypeFloorMapNodeView(node.MapNodeId, node.Type, node.Floor, node.Layer, node.Index, selectable, node.Completed, locked);
+                : new PrototypeFloorMapNodeView(
+                    node.MapNodeId,
+                    node.Type,
+                    node.Floor,
+                    node.Layer,
+                    node.Index,
+                    selectable,
+                    node.Completed,
+                    locked,
+                    node.NormalizedX,
+                    node.NormalizedY,
+                    GetLastCompletedMapNode()?.MapNodeId == node.MapNodeId,
+                    node.NextMapNodeIds.ToArray(),
+                    node.PreviousMapNodeIds.ToArray());
         }
 
         private static bool HasStartCombatEffect(EncounterData encounter)

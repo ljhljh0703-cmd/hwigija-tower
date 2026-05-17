@@ -98,6 +98,7 @@ namespace HwigiTower.Tests.PlayMode
             StringAssert.Contains("node_event", hud.CurrentMapNodeIconNames);
             StringAssert.Contains("node_rest", hud.CurrentMapNodeIconNames);
             Assert.GreaterOrEqual(hud.ChoiceButtonCount, 2);
+            yield return AdvanceMapUntilEncounterSelectable(hud, "EVT_F01_JAR_ROOM");
             var eventButton = FindMapChoiceButton(hud, "EVT_F01_JAR_ROOM");
             Assert.IsNotNull(eventButton, DescribeChoiceButtons(hud));
             eventButton.onClick.Invoke();
@@ -535,6 +536,7 @@ namespace HwigiTower.Tests.PlayMode
             }
 
             Assert.IsFalse(hud.RouteActionButtonVisible, "Route action should hide while choices or map nodes are open.");
+            yield return AdvanceMapUntilEncounterSelectable(hud, expectedEncounterId);
             var mapButton = FindMapChoiceButton(hud, expectedEncounterId);
             if (mapButton != null)
             {
@@ -557,6 +559,7 @@ namespace HwigiTower.Tests.PlayMode
                 yield return null;
             }
 
+            yield return AdvanceMapUntilEncounterSelectable(hud, expectedEncounterId);
             var mapButton = FindMapChoiceButton(hud, expectedEncounterId);
             if (mapButton != null)
             {
@@ -588,6 +591,51 @@ namespace HwigiTower.Tests.PlayMode
             yield return null;
         }
 
+        private static IEnumerator AdvanceMapUntilEncounterSelectable(PrototypeHud hud, string expectedEncounterId)
+        {
+            var guard = 0;
+            while (FindMapChoiceButton(hud, expectedEncounterId) == null && guard++ < 8)
+            {
+                var next = FindFirstInteractableMapChoiceButton(hud);
+                Assert.IsNotNull(next, "Missing selectable map node while advancing toward " + expectedEncounterId + " among " + DescribeChoiceButtons(hud));
+                next.onClick.Invoke();
+                yield return null;
+                yield return ResolveOpenEncounterForMapAdvance(hud);
+                if (hud.RouteActionButtonVisible)
+                {
+                    hud.GetRouteActionButton().onClick.Invoke();
+                    yield return null;
+                }
+            }
+
+            Assert.Less(guard, 8, "Could not advance map toward " + expectedEncounterId);
+        }
+
+        private static IEnumerator ResolveOpenEncounterForMapAdvance(PrototypeHud hud)
+        {
+            if (hud.RestInteractionPanelVisible)
+            {
+                var restButton = hud.GetRestActionButton("rest.recover");
+                Assert.IsNotNull(restButton);
+                restButton.onClick.Invoke();
+                yield return null;
+                var submit = hud.GetRestSubmitButton();
+                Assert.IsNotNull(submit);
+                submit.onClick.Invoke();
+                yield return null;
+                var continueButton = hud.GetRestContinueButton();
+                Assert.IsNotNull(continueButton);
+                continueButton.onClick.Invoke();
+                yield return null;
+                yield break;
+            }
+
+            var choice = FindFirstInteractableNonCombatChoiceButton(hud) ?? FindFirstInteractableChoiceButton(hud);
+            Assert.IsNotNull(choice, "Missing encounter choice while advancing map among " + DescribeChoiceButtons(hud));
+            choice.onClick.Invoke();
+            yield return null;
+        }
+
         private static void SelectMapNodeForEncounter(PrototypeRunState state, string expectedEncounterId)
         {
             if (state == null)
@@ -607,6 +655,26 @@ namespace HwigiTower.Tests.PlayMode
                 {
                     Assert.IsTrue(state.TrySelectMapNode(selectable[i].MapNodeId, out _));
                     return;
+                }
+            }
+
+            var guard = 0;
+            while (guard++ < 8)
+            {
+                selectable = state.GetSelectableMapNodeViews();
+                Assert.Greater(selectable.Length, 0, "Missing selectable map node for " + expectedEncounterId);
+                var selected = selectable[0];
+                Assert.IsTrue(state.TrySelectMapNode(selected.MapNodeId, out var step));
+                var choiceStableId = ResolvePreferredChoiceId(state, step);
+                state.ResolveEncounterChoice(new DeterministicRunContext(state.RunId, 1001), step.NodeId, step.Encounter, choiceStableId);
+                selectable = state.GetSelectableMapNodeViews();
+                for (var i = 0; i < selectable.Length; i++)
+                {
+                    if (selectable[i].MapNodeId.EndsWith("." + expectedEncounterId))
+                    {
+                        Assert.IsTrue(state.TrySelectMapNode(selectable[i].MapNodeId, out _));
+                        return;
+                    }
                 }
             }
 
@@ -686,13 +754,73 @@ namespace HwigiTower.Tests.PlayMode
             for (var i = 0; i < hud.ChoiceButtonCount; i++)
             {
                 var button = hud.GetChoiceButton(i);
-                if (button != null && button.name.EndsWith("." + encounterId))
+                if (button != null && button.interactable && button.name.EndsWith("." + encounterId))
                 {
                     return button;
                 }
             }
 
             return null;
+        }
+
+        private static Button FindFirstInteractableMapChoiceButton(PrototypeHud hud)
+        {
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button != null && button.interactable && button.name.StartsWith("Map Node Button "))
+                {
+                    return button;
+                }
+            }
+
+            return null;
+        }
+
+        private static Button FindFirstInteractableChoiceButton(PrototypeHud hud)
+        {
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button != null && button.interactable && button.name.StartsWith("Choice Button "))
+                {
+                    return button;
+                }
+            }
+
+            return null;
+        }
+
+        private static Button FindFirstInteractableNonCombatChoiceButton(PrototypeHud hud)
+        {
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button != null && button.interactable && button.name.StartsWith("Choice Button ") && !button.name.Contains("COMBAT"))
+                {
+                    return button;
+                }
+            }
+
+            return null;
+        }
+
+        private static string ResolvePreferredChoiceId(PrototypeRunState state, PrototypeDemoRunStep step)
+        {
+            Assert.IsNotNull(step);
+            Assert.IsNotNull(step.Encounter);
+            var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, step.Encounter);
+            for (var i = 0; i < views.Length; i++)
+            {
+                if (views[i].Visible && views[i].Enabled)
+                {
+                    return views[i].ChoiceStableId;
+                }
+            }
+
+            Assert.IsNotNull(step.Encounter.Choices);
+            Assert.Greater(step.Encounter.Choices.Length, 0);
+            return step.Encounter.Choices[0].stableId;
         }
 
         private static string DescribeChoiceButtons(PrototypeHud hud)
