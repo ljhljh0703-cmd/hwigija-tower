@@ -134,9 +134,10 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.AreEqual("ENEMY_STATUE_01", controller.RunState.LastCombatEnemyId);
             Assert.IsTrue(hud.CombatPanelVisible);
-            StringAssert.Contains("전투", hud.CombatMessage);
-            StringAssert.Contains("상대:", hud.CombatMessage);
+            Assert.IsTrue(hud.CombatPartyDockVisible);
             StringAssert.Contains("적 HP", hud.CombatMessage);
+            StringAssert.Contains("플레이어", hud.CombatPartyMessage);
+            StringAssert.Contains("마타이오스", hud.CombatPartyMessage);
             StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
         }
 
@@ -483,7 +484,7 @@ namespace HwigiTower.Tests.PlayMode
             }
 
             Assert.IsTrue(skillButton.interactable);
-            StringAssert.Contains("정찰 기술", ReadButtonText(skillButton));
+            StringAssert.Contains("정찰", ReadButtonText(skillButton));
             skillButton.onClick.Invoke();
             yield return null;
             StringAssert.Contains("정찰 기술", hud.CombatMessage);
