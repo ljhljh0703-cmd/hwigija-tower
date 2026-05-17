@@ -69,6 +69,16 @@ namespace HwigiTower.UI
     }
 
     [System.Serializable]
+    public sealed class DemoRestActionIconSlot
+    {
+        [SerializeField] private string actionId = string.Empty;
+        [SerializeField] private Sprite icon;
+
+        public string ActionId => actionId;
+        public Sprite Icon => icon;
+    }
+
+    [System.Serializable]
     public sealed class DemoFloorMapBackgroundSlot
     {
         [SerializeField, Min(1)] private int floor = 1;
@@ -91,6 +101,7 @@ namespace HwigiTower.UI
         [SerializeField] private DemoMerchantPresentationSlot[] merchantSlots = new DemoMerchantPresentationSlot[0];
         [SerializeField] private DemoNodeIconSlot[] nodeIconSlots = new DemoNodeIconSlot[0];
         [SerializeField] private DemoCombatActionIconSlot[] combatActionIconSlots = new DemoCombatActionIconSlot[0];
+        [SerializeField] private DemoRestActionIconSlot[] restActionIconSlots = new DemoRestActionIconSlot[0];
         [SerializeField] private DemoPresentationSlot[] slots = new DemoPresentationSlot[0];
 
         public Sprite DefaultPlayerPortrait => defaultPlayerPortrait;
@@ -103,6 +114,7 @@ namespace HwigiTower.UI
         public DemoMerchantPresentationSlot[] MerchantSlots => merchantSlots ?? new DemoMerchantPresentationSlot[0];
         public DemoNodeIconSlot[] NodeIconSlots => nodeIconSlots ?? new DemoNodeIconSlot[0];
         public DemoCombatActionIconSlot[] CombatActionIconSlots => combatActionIconSlots ?? new DemoCombatActionIconSlot[0];
+        public DemoRestActionIconSlot[] RestActionIconSlots => restActionIconSlots ?? new DemoRestActionIconSlot[0];
         public DemoPresentationSlot[] Slots => slots ?? new DemoPresentationSlot[0];
 
         public bool TryGetCombatActionIcon(CombatAction action, out Sprite icon)
@@ -111,6 +123,22 @@ namespace HwigiTower.UI
             for (var i = 0; i < source.Length; i++)
             {
                 if (source[i] != null && source[i].Action == action && source[i].Icon != null)
+                {
+                    icon = source[i].Icon;
+                    return true;
+                }
+            }
+
+            icon = null;
+            return false;
+        }
+
+        public bool TryGetRestActionIcon(string actionId, out Sprite icon)
+        {
+            var source = RestActionIconSlots;
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (source[i] != null && source[i].ActionId == actionId && source[i].Icon != null)
                 {
                     icon = source[i].Icon;
                     return true;

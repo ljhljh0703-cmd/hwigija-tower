@@ -63,6 +63,13 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 663ab0af95a364dc0a8dde8573ee3f33, type: 3}
   - action: 2
     icon: {fileID: 21300000, guid: da2baaa9624b746179275cab9f875e1e, type: 3}
+  restActionIconSlots:
+  - actionId: rest.ask_mood
+    icon: {fileID: 21300000, guid: 277bce5d0acb4a3995d67949f369e2e3, type: 3}
+  - actionId: rest.train
+    icon: {fileID: 21300000, guid: 2564f42e7193451193b5185c00c3800b, type: 3}
+  - actionId: rest.recover
+    icon: {fileID: 21300000, guid: 7026243fa4f244ff8f400bace00a5e49, type: 3}
   slots:
   - encounterStableId: ENC_SHOP_01
     displayName: Shop
