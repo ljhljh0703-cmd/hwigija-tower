@@ -103,6 +103,7 @@ namespace HwigiTower.UI
         private const int StatFontSize = 26;
         private const int CaptionFontSize = 23;
         private const int CombatBodyFontSize = 31;
+        private const float CombatActionButtonSize = 118f;
         private const int ChoiceFontSize = ButtonFontSize;
         private const int MapNodeFontSize = 29;
         private const int RestBodyFontSize = 30;
@@ -639,7 +640,7 @@ namespace HwigiTower.UI
         {
             EnsureScreenLayers();
             SetLayerVisible(topStatusLayer, true);
-            SetLayerVisible(objectiveLayer, true);
+            SetLayerVisible(objectiveLayer, !snapshot.IsInCombat && !_eventPresentationActive);
             SetLayerVisible(visualLayer, !snapshot.IsInCombat && !_eventPresentationActive);
             SetLayerVisible(nodeMapLayer, snapshot.HasFloorMap && !snapshot.IsInCombat && !snapshot.RunCompleted && _choiceButtons.Count > 0);
             SetLayerVisible(npcReactionLayer, !snapshot.IsInCombat && !snapshot.EndingChoicePending && !_eventPresentationActive);
@@ -1675,8 +1676,8 @@ namespace HwigiTower.UI
             panelObject.transform.SetParent(HudParent, false);
 
             combatPanel = panelObject.AddComponent<RectTransform>();
-            combatPanel.anchorMin = new Vector2(0.06f, 0.045f);
-            combatPanel.anchorMax = new Vector2(0.94f, 0.835f);
+            combatPanel.anchorMin = new Vector2(0.06f, 0.035f);
+            combatPanel.anchorMax = new Vector2(0.94f, 0.895f);
             combatPanel.pivot = new Vector2(0.5f, 0.5f);
             combatPanel.anchoredPosition = Vector2.zero;
             combatPanel.sizeDelta = Vector2.zero;
@@ -1684,27 +1685,27 @@ namespace HwigiTower.UI
             var image = panelObject.AddComponent<Image>();
             image.color = new Color(0.025f, 0.032f, 0.040f, 0.92f);
 
-            combatEnemyStage = CreateCombatPanelRect(panelObject.transform, "Combat Enemy Stage", new Vector2(0.04f, 0.50f), new Vector2(0.96f, 0.97f), new Color(0.02f, 0.028f, 0.035f, 0.72f));
-            combatEnemyImage = CreateCombatImage(combatEnemyStage, "Combat Enemy Image", new Vector2(0.08f, 0.05f), new Vector2(0.92f, 0.78f));
-            combatEnemyTitleText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Title", new Vector2(0.06f, 0.82f), new Vector2(0.94f, 0.96f), 30, TextAnchor.MiddleCenter);
-            enemyHpFill = CreateHpBar(combatEnemyStage, "Enemy HP Bar", new Vector2(0.07f, 0.76f), new Vector2(0.93f, 0.81f), new Color(0.84f, 0.24f, 0.24f, 1f));
+            combatEnemyStage = CreateCombatPanelRect(panelObject.transform, "Combat Enemy Stage", new Vector2(0.04f, 0.515f), new Vector2(0.96f, 0.985f), new Color(0.02f, 0.028f, 0.035f, 0.78f));
+            combatEnemyImage = CreateCombatImage(combatEnemyStage, "Combat Enemy Image", new Vector2(0.05f, 0.03f), new Vector2(0.95f, 0.76f));
+            combatEnemyTitleText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Title", new Vector2(0.06f, 0.83f), new Vector2(0.94f, 0.97f), 32, TextAnchor.MiddleCenter);
+            enemyHpFill = CreateHpBar(combatEnemyStage, "Enemy HP Bar", new Vector2(0.07f, 0.765f), new Vector2(0.93f, 0.815f), new Color(0.84f, 0.24f, 0.24f, 1f));
 
-            combatLogPanel = CreateCombatPanelRect(panelObject.transform, "Combat Log Panel", new Vector2(0.04f, 0.335f), new Vector2(0.96f, 0.49f), new Color(0.02f, 0.025f, 0.030f, 0.82f));
+            combatLogPanel = CreateCombatPanelRect(panelObject.transform, "Combat Log Panel", new Vector2(0.04f, 0.345f), new Vector2(0.96f, 0.505f), new Color(0.02f, 0.025f, 0.030f, 0.84f));
             combatText = CreateCombatChildText(combatLogPanel, "Combat Status Text", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), CombatBodyFontSize, TextAnchor.MiddleLeft);
             combatText.lineSpacing = DenseLineSpacing;
 
-            combatPartyDock = CreateCombatPanelRect(panelObject.transform, "Combat Party Dock", new Vector2(0.04f, 0.035f), new Vector2(0.96f, 0.32f), new Color(0.018f, 0.022f, 0.028f, 0.92f));
-            combatPlayerCard = CreateCombatPanelRect(combatPartyDock, "Combat Player Card", new Vector2(0.04f, 0.39f), new Vector2(0.48f, 0.94f), new Color(0.055f, 0.072f, 0.085f, 0.96f));
-            combatMataiosCard = CreateCombatPanelRect(combatPartyDock, "Combat Mataios Card", new Vector2(0.52f, 0.39f), new Vector2(0.96f, 0.94f), new Color(0.055f, 0.064f, 0.083f, 0.96f));
-            combatPlayerPortraitImage = CreateCombatPortraitBox(combatPlayerCard, "Combat Player Portrait", new Vector2(0.04f, 0.23f), new Vector2(0.28f, 0.88f), new Color(0.15f, 0.19f, 0.22f, 1f), "P");
-            combatMataiosPortraitImage = CreateCombatPortraitBox(combatMataiosCard, "Combat Mataios Portrait", new Vector2(0.04f, 0.17f), new Vector2(0.30f, 0.90f), new Color(0.12f, 0.14f, 0.18f, 1f), string.Empty);
-            combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.32f, 0.18f), new Vector2(0.96f, 0.92f), 23, TextAnchor.MiddleLeft);
-            combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 23, TextAnchor.MiddleLeft);
+            combatPartyDock = CreateCombatPanelRect(panelObject.transform, "Combat Party Dock", new Vector2(0.04f, 0.025f), new Vector2(0.96f, 0.33f), new Color(0.018f, 0.022f, 0.028f, 0.94f));
+            combatPlayerCard = CreateCombatPanelRect(combatPartyDock, "Combat Player Card", new Vector2(0.04f, 0.43f), new Vector2(0.48f, 0.94f), new Color(0.055f, 0.072f, 0.085f, 0.96f));
+            combatMataiosCard = CreateCombatPanelRect(combatPartyDock, "Combat Mataios Card", new Vector2(0.52f, 0.43f), new Vector2(0.96f, 0.94f), new Color(0.055f, 0.064f, 0.083f, 0.96f));
+            combatPlayerPortraitImage = CreateCombatPortraitBox(combatPlayerCard, "Combat Player Portrait", new Vector2(0.04f, 0.22f), new Vector2(0.30f, 0.88f), new Color(0.15f, 0.19f, 0.22f, 1f), "P");
+            combatMataiosPortraitImage = CreateCombatPortraitBox(combatMataiosCard, "Combat Mataios Portrait", new Vector2(0.04f, 0.16f), new Vector2(0.31f, 0.90f), new Color(0.12f, 0.14f, 0.18f, 1f), string.Empty);
+            combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
+            combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.35f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
             playerHpFill = CreateHpBar(combatPlayerCard, "Player HP Bar", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.15f), new Color(0.30f, 0.78f, 0.50f, 1f));
 
-            attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.18f, 0.05f), CombatAction.Attack);
-            defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.05f), CombatAction.Defend);
-            skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "정찰", new Vector2(0.82f, 0.05f), CombatAction.Skill);
+            attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.22f, 0.045f), CombatAction.Attack);
+            defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.045f), CombatAction.Defend);
+            skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "정찰", new Vector2(0.78f, 0.045f), CombatAction.Skill);
             skillButton.interactable = false;
         }
 
@@ -1826,10 +1827,10 @@ namespace HwigiTower.UI
             rect.anchorMax = anchor;
             rect.pivot = new Vector2(0.5f, 0f);
             rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = new Vector2(230f, 92f);
+            rect.sizeDelta = new Vector2(CombatActionButtonSize, CombatActionButtonSize);
 
             var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.13f, 0.18f, 0.22f, 0.98f);
+            image.color = new Color(0.12f, 0.17f, 0.20f, 0.98f);
 
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
@@ -1845,11 +1846,11 @@ namespace HwigiTower.UI
 
             var label = labelObject.AddComponent<Text>();
             label.font = ResolveFont();
-            label.fontSize = ButtonFontSize;
+            label.fontSize = 28;
             label.alignment = TextAnchor.MiddleCenter;
             label.resizeTextForBestFit = true;
             label.resizeTextMinSize = 22;
-            label.resizeTextMaxSize = ButtonFontSize;
+            label.resizeTextMaxSize = 28;
             label.raycastTarget = false;
             label.color = new Color(0.94f, 0.97f, 0.98f, 1f);
             label.text = labelText;
@@ -2602,6 +2603,7 @@ namespace HwigiTower.UI
             if (hasCombat)
             {
                 HideEventCutsceneLayout(restoreRouteText: false);
+                HideMerchantPresentation();
             }
 
             combatPanel.gameObject.SetActive(hasCombat);
@@ -2613,6 +2615,21 @@ namespace HwigiTower.UI
             if (npcPortraitImage != null && hasCombat)
             {
                 npcPortraitImage.gameObject.SetActive(false);
+            }
+
+            if (interactionText != null && !showRawDebugText)
+            {
+                interactionText.gameObject.SetActive(!hasCombat);
+            }
+
+            if (routeText != null && hasCombat && !showRawDebugText)
+            {
+                routeText.gameObject.SetActive(false);
+            }
+
+            if (resultText != null && hasCombat)
+            {
+                resultText.gameObject.SetActive(false);
             }
 
             if (!hasCombat || combatText == null)
