@@ -319,6 +319,22 @@ namespace HwigiTower.Run
             PlayAudioContext(PrototypeAudioContext.Ending);
         }
 
+        public bool OpenQaFloor(int floor)
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            var opened = RunState != null && RunState.OpenQaFloor(floor);
+            if (opened)
+            {
+                hud?.ShowRunState(GetSnapshot());
+            }
+
+            return opened;
+        }
+
         private bool TryFindQaStep(string encounterId, out PrototypeDemoRunStep step)
         {
             step = null;
