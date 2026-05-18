@@ -1764,6 +1764,8 @@ MonoBehaviour:
   roomDefinition: {fileID: 11400000, guid: b7fc2e1baedb4111b932084e957598cf, type: 2}
   encounterRuntimeCatalog: {fileID: 11400000, guid: aa0b8235976974de2a42762d873de12c, type: 2}
   demoPresentationData: {fileID: 11400000, guid: 5703f9a7a30146be840838f928a21ea7, type: 2}
+  audioService: {fileID: 0}
+  audioCueCatalog: {fileID: 11400000, guid: 95761138db21f48459cc63cc8cde0f37, type: 2}
   hud: {fileID: 1703257808}
   autoResolveCombat: 0
   showDemoNodeDebugLabels: 0

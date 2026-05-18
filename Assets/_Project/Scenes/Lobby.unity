@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Lobby.LobbyController
   newGameSceneName: PrototypeRoom
-  audioCueCatalog: {fileID: 0}
+  audioCueCatalog: {fileID: 11400000, guid: 95761138db21f48459cc63cc8cde0f37, type: 2}
   presentationData: {fileID: 11400000, guid: 6776cef79685b4b82b91eaf201b64eb8, type: 2}
 --- !u!4 &165254251
 Transform:

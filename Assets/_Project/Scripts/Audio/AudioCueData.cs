@@ -24,7 +24,16 @@ namespace HwigiTower.Audio
         ShopSfx = 204,
         RestSfx = 205,
         MemorySfx = 206,
-        CutsceneSfx = 207
+        CutsceneSfx = 207,
+        UiTap = 211,
+        UiConfirm = 212,
+        UiDisabled = 213,
+        CombatAttack = 221,
+        CombatDefend = 222,
+        CombatHit = 223,
+        CombatVictory = 224,
+        ShopPurchase = 231,
+        RestSubmit = 241
     }
 
     public enum PrototypeAudioChannel

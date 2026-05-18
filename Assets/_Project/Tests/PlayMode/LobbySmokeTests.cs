@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using HwigiTower.Audio;
 using HwigiTower.Lobby;
 using HwigiTower.Run;
 using NUnit.Framework;
@@ -56,6 +57,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(CanvasScaler.ScaleMode.ScaleWithScreenSize, canvasScaler.uiScaleMode);
             Assert.AreEqual(new Vector2(1080f, 1920f), canvasScaler.referenceResolution);
             Assert.AreEqual(1f, canvasScaler.matchWidthOrHeight);
+            Assert.IsNotNull(PrototypeAudioService.Instance);
+            Assert.AreEqual(PrototypeAudioContext.Lobby, PrototypeAudioService.Instance.LastPlayedBgmContext);
         }
 
         [UnityTest]
@@ -143,6 +146,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual("PrototypeRoom", SceneManager.GetActiveScene().name);
             var controller = Object.FindFirstObjectByType<PrototypeRoomController>();
             Assert.IsNotNull(controller);
+            Assert.IsNotNull(PrototypeAudioService.Instance);
             Assert.IsTrue(PrototypeRunSaveStore.HasSave());
         }
 

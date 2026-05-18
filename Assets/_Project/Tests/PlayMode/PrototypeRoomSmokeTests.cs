@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using HwigiTower.Audio;
 using HwigiTower.Combat;
 using HwigiTower.Core;
 using HwigiTower.Encounters;
@@ -140,10 +141,16 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual("ENEMY_STATUE_01", controller.RunState.LastCombatEnemyId);
             Assert.IsTrue(hud.CombatPanelVisible);
             Assert.IsTrue(hud.CombatPartyDockVisible);
+            Assert.AreEqual("char_player_standing_01", hud.CurrentCombatPlayerPortraitSpriteName);
             StringAssert.Contains("적 HP", hud.CombatMessage);
             StringAssert.Contains("플레이어", hud.CombatPartyMessage);
             StringAssert.Contains("마타이오스", hud.CombatPartyMessage);
             StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
+
+            var attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+            attackButton.onClick.Invoke();
+            yield return null;
+            Assert.AreEqual(PrototypeAudioContext.CombatAttack, PrototypeAudioService.Instance.LastPlayedSfxContext);
         }
 
         [UnityTest]
@@ -183,6 +190,7 @@ namespace HwigiTower.Tests.PlayMode
             yield return ResolveRouteActionRest(hud, "ENC_REST_01", "rest.recover", string.Empty);
 
             Assert.Greater(controller.RunState.PlayerHp, hpBeforeRest);
+            Assert.AreEqual(PrototypeAudioContext.RestSubmit, PrototypeAudioService.Instance.LastPlayedSfxContext);
             Assert.IsFalse(hud.RestInteractionPanelVisible);
             Assert.IsTrue(hud.HasScreenLayerPanels);
             StringAssert.Contains("임시 응답", hud.RestResponseMessage);
@@ -220,6 +228,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNull(FindChoiceButton(hud, "CHOICE_COMBAT_01_ENGAGE"));
             FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM").onClick.Invoke();
             yield return null;
+            Assert.AreEqual(PrototypeAudioContext.ShopPurchase, PrototypeAudioService.Instance.LastPlayedSfxContext);
 
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
 
