@@ -18,6 +18,10 @@ MonoBehaviour:
   selectedNodeRing: {fileID: 21300000, guid: b2af4ad9c78254c1cb6eb8c4834b8980, type: 3}
   lockedNodeOverlay: {fileID: 21300000, guid: db0d9f0cbf2d8469f81705dda90379f3, type: 3}
   currentPositionMarker: {fileID: 21300000, guid: 6346c142b13c444cf9fc46774f3d009c, type: 3}
+  spotlightGradient: {fileID: 21300000, guid: 37bf092b9d144a75b790ec7d23dc7d7e, type: 3}
+  npcDialoguePlate: {fileID: 21300000, guid: 24817435989542f3838450230013d891, type: 3}
+  shopProductCard: {fileID: 21300000, guid: ee0aac75696b4c99a1e2d2781c5da84d, type: 3}
+  shopLockedCard: {fileID: 21300000, guid: fdfe16030e6e4aff8422534df5ca0488, type: 3}
   floorMapBackgroundSlots:
   - floor: 1
     mapBackground: {fileID: 21300000, guid: 3585db00a9b2b4de9a439cc24d4ff154, type: 3}
@@ -70,7 +74,43 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 2564f42e7193451193b5185c00c3800b, type: 3}
   - actionId: rest.recover
     icon: {fileID: 21300000, guid: 7026243fa4f244ff8f400bace00a5e49, type: 3}
+  iconSlots:
+  - key: resource.gold
+    icon: {fileID: 21300000, guid: 7099d5de4322b491283aef1fb31e1d73, type: 3}
+  - key: resource.memory
+    icon: {fileID: 21300000, guid: 2f3736a2819954100aea74408af32ba0, type: 3}
+  - key: resource.affinity
+    icon: {fileID: 21300000, guid: 31b76699a29804d4ea64c5e8873e22d4, type: 3}
+  - key: item.field_bandage
+    icon: {fileID: 21300000, guid: e72a3ae43f6094813b89b79a099f0816, type: 3}
+  - key: item.lantern_oil
+    icon: {fileID: 21300000, guid: bbe28fa1ab70249b6b48a2b9f8d59fa7, type: 3}
+  - key: item.torn_charm
+    icon: {fileID: 21300000, guid: b85124d80b1f948e29eb2952a9ab9dba, type: 3}
+  - key: ability.scout
+    icon: {fileID: 21300000, guid: 5c9ecd4c37aeb4cd49a39347154309ca, type: 3}
+  - key: ability.recall_anchor
+    icon: {fileID: 21300000, guid: e88d1d5f3c08746188ff28c01b4056e0, type: 3}
+  - key: status.training
+    icon: {fileID: 21300000, guid: 9b6759ebbe0834d41af40bcf4346d1dc, type: 3}
+  - key: status.bandage
+    icon: {fileID: 21300000, guid: b8d80fc802b4244df926da3c0a1a5726, type: 3}
+  - key: status.recall_anchor
+    icon: {fileID: 21300000, guid: 3071edd59822441b4830e788f69d5325, type: 3}
   slots:
+  - encounterStableId: ENC_REST_01
+    displayName: Rest
+    backgroundSprite: {fileID: 21300000, guid: 8d3b0d3c81a3f421a9964fddf2711879, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_REST_01_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_REST_01_BODY
+    mataiosPortrait: {fileID: 21300000, guid: d4d720919ed3542a092efc6343e6c716, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
   - encounterStableId: ENC_SHOP_01
     displayName: Shop
     backgroundSprite: {fileID: 21300000, guid: 969e3db55755b46e5beb783cf1e38e3f, type: 3}
@@ -141,6 +181,58 @@ MonoBehaviour:
     backgroundSprite: {fileID: 21300000, guid: 2673fa7f9936d4383b8d9fb694bfd615, type: 3}
     titleTextKey: PLACEHOLDER_ENC_SHOP_02_TITLE
     bodyTextKey: PLACEHOLDER_ENC_SHOP_02_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_F02_SHOP_001
+    displayName: Shop
+    backgroundSprite: {fileID: 21300000, guid: 2673fa7f9936d4383b8d9fb694bfd615, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_F02_SHOP_001_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_F02_SHOP_001_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_SHOP_03
+    displayName: Shop
+    backgroundSprite: {fileID: 21300000, guid: 3921e29078f354fc4a9597a7b90ca423, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_SHOP_03_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_SHOP_03_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_SHOP_04
+    displayName: Shop
+    backgroundSprite: {fileID: 21300000, guid: 31fdfeafa80384a04ba01c0ff744c236, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_SHOP_04_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_SHOP_04_BODY
+    mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
+    enemySprite: {fileID: 0}
+    memoryFragmentSprite: {fileID: 0}
+    sfxCue: {fileID: 0}
+    bgmCue: {fileID: 0}
+    memoryFragmentCutscene: {fileID: 0}
+    combatStartCutscene: {fileID: 0}
+    demoCompleteCutscene: {fileID: 0}
+  - encounterStableId: ENC_SHOP_05
+    displayName: Shop
+    backgroundSprite: {fileID: 21300000, guid: 09d5be60117154bffa29b4b3bad0a234, type: 3}
+    titleTextKey: PLACEHOLDER_ENC_SHOP_05_TITLE
+    bodyTextKey: PLACEHOLDER_ENC_SHOP_05_BODY
     mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
     enemySprite: {fileID: 0}
     memoryFragmentSprite: {fileID: 0}

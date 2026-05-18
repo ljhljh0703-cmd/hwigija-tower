@@ -113,6 +113,36 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void DemoPresentationData_BindsShopRestUiSupportAndIcons()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+
+            Assert.IsNotNull(data);
+            Assert.AreEqual("ui_spotlight_gradient", data.SpotlightGradient.name);
+            Assert.AreEqual("ui_npc_dialogue_plate", data.NpcDialoguePlate.name);
+            Assert.AreEqual("ui_shop_product_card", data.ShopProductCard.name);
+            Assert.AreEqual("ui_shop_locked_card", data.ShopLockedCard.name);
+            AssertSlotSprites(data, "ENC_REST_01", "enc_rest_01_bg", null, "char_mataios_bust_s0_s2", null);
+            AssertSlotSprites(data, "ENC_SHOP_01", "enc_shop_01_bg", null, "char_mataios_bust_s0_s2", null);
+            AssertSlotSprites(data, "ENC_SHOP_02", "enc_shop_02_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "ENC_F02_SHOP_001", "enc_shop_02_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "ENC_SHOP_03", "enc_shop_03_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "ENC_SHOP_04", "enc_shop_04_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "ENC_SHOP_05", "enc_shop_05_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertIconSlot(data, "resource.gold", "icon_gold");
+            AssertIconSlot(data, "resource.memory", "icon_memory");
+            AssertIconSlot(data, "resource.affinity", "icon_affinity");
+            AssertIconSlot(data, "item.field_bandage", "icon_item_field_bandage");
+            AssertIconSlot(data, "item.lantern_oil", "icon_item_lantern_oil");
+            AssertIconSlot(data, "item.torn_charm", "icon_item_torn_charm");
+            AssertIconSlot(data, "ability.scout", "icon_ability_scout");
+            AssertIconSlot(data, "ability.recall_anchor", "icon_ability_recall_anchor");
+            AssertIconSlot(data, "status.training", "icon_status_training");
+            AssertIconSlot(data, "status.bandage", "icon_status_bandage");
+            AssertIconSlot(data, "status.recall_anchor", "icon_status_recall_anchor");
+        }
+
+        [Test]
         public void Hud_RestActionCardLabelsStayPublicAndHideGlitch()
         {
             AssertRestActionCardLabel("rest.ask_mood", "대화", "마타이오스와 대화");
@@ -584,6 +614,13 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(data.TryGetRestActionIcon(actionId, out var icon), actionId);
             Assert.IsNotNull(icon, actionId);
             StringAssert.StartsWith(spriteNamePrefix, icon.name);
+        }
+
+        private static void AssertIconSlot(DemoPresentationData data, string key, string spriteName)
+        {
+            Assert.IsTrue(data.TryGetIcon(key, out var icon), key);
+            Assert.IsNotNull(icon, key);
+            Assert.AreEqual(spriteName, icon.name);
         }
 
         private static void AssertRestActionCardLabel(string actionId, string title, string preview)
