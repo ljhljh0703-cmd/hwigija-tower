@@ -18,6 +18,9 @@ namespace HwigiTower.Audio
         public float AmbienceVolume => ambienceVolume;
         public float SfxVolume => sfxVolume;
         public PrototypeAudioContext LastContext { get; private set; }
+        public PrototypeAudioContext LastPlayedBgmContext { get; private set; }
+        public PrototypeAudioContext LastPlayedSfxContext { get; private set; }
+        public string LastPlayedCueId { get; private set; } = string.Empty;
 
         public static PrototypeAudioService GetOrCreate()
         {
@@ -99,6 +102,8 @@ namespace HwigiTower.Audio
 
             if (cue.Channel == PrototypeAudioChannel.Sfx)
             {
+                LastPlayedSfxContext = cue.Context;
+                LastPlayedCueId = cue.CueId;
                 source.PlayOneShot(cue.Clip, cue.Volume * sfxVolume);
                 return;
             }
@@ -111,6 +116,12 @@ namespace HwigiTower.Audio
             source.clip = cue.Clip;
             source.loop = cue.Loop;
             source.volume = cue.Volume * ResolveChannelVolume(cue.Channel);
+            if (cue.Channel == PrototypeAudioChannel.Bgm)
+            {
+                LastPlayedBgmContext = cue.Context;
+            }
+
+            LastPlayedCueId = cue.CueId;
             source.Play();
         }
 

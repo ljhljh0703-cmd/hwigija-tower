@@ -95,7 +95,8 @@ namespace HwigiTower.Tests.EditMode
             var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
 
             Assert.IsNotNull(data);
-            Assert.IsNull(data.DefaultPlayerPortrait);
+            Assert.IsNotNull(data.DefaultPlayerPortrait);
+            Assert.AreEqual("char_player_standing_01", data.DefaultPlayerPortrait.name);
             AssertCombatActionIcon(data, CombatAction.Attack, "icon_action_attack");
             AssertCombatActionIcon(data, CombatAction.Defend, "icon_action_defend");
             AssertCombatActionIcon(data, CombatAction.Skill, "icon_action_skill_scout");
@@ -321,7 +322,7 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(hud.CombatPanelVisible);
             Assert.IsTrue(hud.CombatPartyDockVisible);
             Assert.IsTrue(hud.CombatPlayerPortraitVisible);
-            Assert.IsEmpty(hud.CurrentCombatPlayerPortraitSpriteName);
+            Assert.AreEqual("char_player_standing_01", hud.CurrentCombatPlayerPortraitSpriteName);
             StringAssert.Contains("icon_action_attack", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("icon_action_defend", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("icon_action_skill_scout", hud.CurrentCombatActionIconNames);

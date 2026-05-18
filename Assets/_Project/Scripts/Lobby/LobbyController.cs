@@ -28,6 +28,7 @@ namespace HwigiTower.Lobby
         private Button _continueButton;
         private RectTransform _safeAreaRoot;
         private bool _uiBuilt;
+        private bool _audioStarted;
 
         public string NewGameSceneName => string.IsNullOrEmpty(newGameSceneName) ? "PrototypeRoom" : newGameSceneName;
         public bool SettingsPanelVisible => _settingsPanel != null && _settingsPanel.activeSelf;
@@ -105,6 +106,7 @@ namespace HwigiTower.Lobby
             _profilePanel = null;
             _statusText = null;
             _continueButton = null;
+            _audioStarted = false;
         }
 
         private void EnsureRuntimeUi()
@@ -114,6 +116,7 @@ namespace HwigiTower.Lobby
                 return;
             }
 
+            EnsureLobbyAudio();
             if (IsRuntimeUiPresent())
             {
                 NormalizeRuntimeUi();
@@ -123,12 +126,6 @@ namespace HwigiTower.Lobby
             }
 
             HidePartialRuntimeUi();
-            if (Application.isPlaying)
-            {
-                PrototypeAudioService.GetOrCreate().Configure(audioCueCatalog);
-                PrototypeAudioService.GetOrCreate().PlayContext(PrototypeAudioContext.Lobby);
-            }
-
             BuildUi();
             _uiBuilt = true;
         }
@@ -160,6 +157,7 @@ namespace HwigiTower.Lobby
 
         public void StartNewGame()
         {
+            PlayUiSfx(PrototypeAudioContext.UiConfirm);
             PrototypeRunSaveRequest.RequestNewGame();
             SceneManager.LoadScene(NewGameSceneName);
         }
@@ -172,12 +170,14 @@ namespace HwigiTower.Lobby
                 return;
             }
 
+            PlayUiSfx(PrototypeAudioContext.UiConfirm);
             PrototypeRunSaveRequest.RequestContinue();
             SceneManager.LoadScene(NewGameSceneName);
         }
 
         public void ShowContinuePlaceholder()
         {
+            PlayUiSfx(PrototypeAudioContext.UiDisabled);
             if (_statusText != null)
             {
                 _statusText.text = ContinueDisabledReason;
@@ -186,6 +186,7 @@ namespace HwigiTower.Lobby
 
         public void OpenProfile()
         {
+            PlayUiSfx(PrototypeAudioContext.UiTap);
             if (_profilePanel != null)
             {
                 _profilePanel.SetActive(true);
@@ -194,6 +195,7 @@ namespace HwigiTower.Lobby
 
         public void CloseProfile()
         {
+            PlayUiSfx(PrototypeAudioContext.UiTap);
             if (_profilePanel != null)
             {
                 _profilePanel.SetActive(false);
@@ -202,6 +204,7 @@ namespace HwigiTower.Lobby
 
         public void OpenSettings()
         {
+            PlayUiSfx(PrototypeAudioContext.UiTap);
             if (_settingsPanel != null)
             {
                 _settingsPanel.SetActive(true);
@@ -210,6 +213,7 @@ namespace HwigiTower.Lobby
 
         public void CloseSettings()
         {
+            PlayUiSfx(PrototypeAudioContext.UiTap);
             if (_settingsPanel != null)
             {
                 _settingsPanel.SetActive(false);
@@ -218,12 +222,38 @@ namespace HwigiTower.Lobby
 
         public void QuitOrShowPlaceholder()
         {
+            PlayUiSfx(PrototypeAudioContext.UiTap);
             if (_statusText != null)
             {
                 _statusText.text = "종료 준비 중";
             }
 
             Application.Quit();
+        }
+
+        private void PlayUiSfx(PrototypeAudioContext context)
+        {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
+            var service = PrototypeAudioService.GetOrCreate();
+            service.Configure(audioCueCatalog);
+            service.PlayContext(context);
+        }
+
+        private void EnsureLobbyAudio()
+        {
+            if (!Application.isPlaying || _audioStarted)
+            {
+                return;
+            }
+
+            var service = PrototypeAudioService.GetOrCreate();
+            service.Configure(audioCueCatalog);
+            service.PlayContext(PrototypeAudioContext.Lobby);
+            _audioStarted = true;
         }
 
         private void BuildUi()

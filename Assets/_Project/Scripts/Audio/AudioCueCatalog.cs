@@ -24,5 +24,21 @@ namespace HwigiTower.Audio
             cue = null;
             return false;
         }
+
+        public bool TryGetCue(string cueId, out AudioCueData cue)
+        {
+            var source = Cues;
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (source[i] != null && source[i].CueId == cueId)
+                {
+                    cue = source[i];
+                    return true;
+                }
+            }
+
+            cue = null;
+            return false;
+        }
     }
 }

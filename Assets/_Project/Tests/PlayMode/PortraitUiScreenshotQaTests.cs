@@ -145,6 +145,7 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.IsTrue(controller.RunState.IsInCombat, "Expected active combat for " + encounterId);
                 hud.ShowRunState(controller.GetSnapshot());
                 StringAssert.Contains("icon_gold", hud.CurrentTopHudIconNames);
+                Assert.AreEqual("char_player_standing_01", hud.CurrentCombatPlayerPortraitSpriteName);
             });
         }
 

@@ -15,6 +15,7 @@ namespace HwigiTower.Run
         [SerializeField] private EncounterRuntimeCatalogData encounterRuntimeCatalog;
         [SerializeField] private DemoPresentationData demoPresentationData;
         [SerializeField] private PrototypeAudioService audioService;
+        [SerializeField] private AudioCueCatalog audioCueCatalog;
         [SerializeField] private PrototypeHud hud;
         [SerializeField] private bool autoResolveCombat;
         [SerializeField] private bool showDemoNodeDebugLabels;
@@ -74,6 +75,15 @@ namespace HwigiTower.Run
         {
             demoPresentationData = data;
             ConfigureHudDemoRoute();
+        }
+
+        public void SetAudioCueCatalog(AudioCueCatalog catalog)
+        {
+            audioCueCatalog = catalog;
+            if (audioService != null)
+            {
+                audioService.Configure(audioCueCatalog);
+            }
         }
 
         public void Configure(PrototypeRoomDefinition definition)
@@ -453,6 +463,7 @@ namespace HwigiTower.Run
             }
 
             var resolution = RunState.ResolveEncounterChoice(CreateActiveContext(), selection.Node.NodeId, selection.Encounter, choiceStableId);
+            PlayChoiceSfx(selection.Encounter, choiceStableId);
             PlayAudioContextForSnapshot(RunState.CreateSnapshot(), selection.Encounter);
             SaveCurrentRun();
             return resolution;
@@ -476,6 +487,7 @@ namespace HwigiTower.Run
             }
 
             var resolution = RunState.ResolveRestInteraction(selection.Node.NodeId, selection.EncounterId, actionId, utterance);
+            PlayAudioSfx(PrototypeAudioContext.RestSubmit);
             PlayAudioContext(PrototypeAudioContext.Rest);
             SaveCurrentRun();
             return resolution;
@@ -564,6 +576,7 @@ namespace HwigiTower.Run
             var hpBefore = RunState.ActiveCombatPlayer?.Hp ?? RunState.PlayerHp;
             var round = RunState.ResolveCombatRoundInteractive(action);
             var snapshot = RunState.CreateSnapshot();
+            PlayCombatSfx(action, round, snapshot);
             PlayAudioContextForSnapshot(snapshot, null);
             var message =
                 "combat " + snapshot.LastCombatResultId +
@@ -743,10 +756,7 @@ namespace HwigiTower.Run
 
         private void PlayAudioContext(PrototypeAudioContext context)
         {
-            if (audioService == null)
-            {
-                audioService = PrototypeAudioService.GetOrCreate();
-            }
+            EnsureAudioServiceConfigured();
 
             audioService.PlayContext(context);
             var floor = RunState == null ? 1 : RunState.CurrentFloor;
@@ -759,6 +769,63 @@ namespace HwigiTower.Run
                 _ => PrototypeAudioContext.Floor01Ambience
             };
             audioService.PlayContext(ambience);
+        }
+
+        private void PlayAudioSfx(PrototypeAudioContext context)
+        {
+            EnsureAudioServiceConfigured();
+            audioService.PlayContext(context);
+        }
+
+        private void EnsureAudioServiceConfigured()
+        {
+            if (audioService == null)
+            {
+                audioService = PrototypeAudioService.GetOrCreate();
+            }
+
+            if (audioCueCatalog != null)
+            {
+                audioService.Configure(audioCueCatalog);
+            }
+        }
+
+        private void PlayChoiceSfx(EncounterData encounter, string choiceStableId)
+        {
+            if (encounter != null &&
+                encounter.Type == EncounterType.Shop &&
+                !string.IsNullOrEmpty(choiceStableId) &&
+                choiceStableId.Contains("_BUY_", System.StringComparison.Ordinal))
+            {
+                PlayAudioSfx(PrototypeAudioContext.ShopPurchase);
+                return;
+            }
+
+            PlayAudioSfx(PrototypeAudioContext.UiConfirm);
+        }
+
+        private void PlayCombatSfx(CombatAction action, CombatRoundResult round, PrototypeRunSnapshot snapshot)
+        {
+            if (!snapshot.IsInCombat && snapshot.LastCombatEnemyDefeated)
+            {
+                PlayAudioSfx(PrototypeAudioContext.CombatVictory);
+                return;
+            }
+
+            switch (action)
+            {
+                case CombatAction.Attack:
+                    PlayAudioSfx(PrototypeAudioContext.CombatAttack);
+                    break;
+                case CombatAction.Defend:
+                    PlayAudioSfx(PrototypeAudioContext.CombatDefend);
+                    break;
+                default:
+                    PlayAudioSfx(round.PlayerDamage > 0 || round.EnemyDamage > 0
+                        ? PrototypeAudioContext.CombatHit
+                        : PrototypeAudioContext.UiConfirm);
+                    break;
+            }
         }
 
         private void RebuildContext()

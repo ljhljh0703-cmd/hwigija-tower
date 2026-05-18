@@ -55,6 +55,48 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void AudioCueCatalog_BindsCoreBgmAndSfxClips()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<AudioCueCatalog>("Assets/_Project/Data/Audio/SO_AudioCueCatalog.asset");
+
+            Assert.IsNotNull(catalog);
+            AssertCue(catalog, PrototypeAudioContext.Lobby, PrototypeAudioChannel.Bgm, "bgm_lobby_main_loop");
+            AssertCue(catalog, PrototypeAudioContext.Combat, PrototypeAudioChannel.Bgm, "bgm_combat_normal_loop");
+            AssertCue(catalog, PrototypeAudioContext.Rest, PrototypeAudioChannel.Bgm, "bgm_rest_companion_loop");
+            AssertCue(catalog, PrototypeAudioContext.UiTap, PrototypeAudioChannel.Sfx, "sfx_ui_tap");
+            AssertCue(catalog, PrototypeAudioContext.UiConfirm, PrototypeAudioChannel.Sfx, "sfx_ui_confirm");
+            AssertCue(catalog, PrototypeAudioContext.CombatAttack, PrototypeAudioChannel.Sfx, "sfx_combat_attack");
+            AssertCue(catalog, PrototypeAudioContext.CombatDefend, PrototypeAudioChannel.Sfx, "sfx_combat_defend");
+            AssertCue(catalog, PrototypeAudioContext.CombatHit, PrototypeAudioChannel.Sfx, "sfx_combat_enemy_hit");
+            AssertCue(catalog, PrototypeAudioContext.CombatVictory, PrototypeAudioChannel.Sfx, "sfx_combat_victory");
+            AssertCue(catalog, PrototypeAudioContext.ShopPurchase, PrototypeAudioChannel.Sfx, "sfx_shop_purchase");
+            AssertCue(catalog, PrototypeAudioContext.RestSubmit, PrototypeAudioChannel.Sfx, "sfx_rest_submit");
+        }
+
+        [Test]
+        public void PlayerAndAudioAssets_UseExpectedImportSettings()
+        {
+            var player = AssetImporter.GetAtPath("Assets/_Project/Art/Characters/char_player_standing_01.png") as TextureImporter;
+            Assert.IsNotNull(player);
+            Assert.AreEqual(TextureImporterType.Sprite, player.textureType);
+            Assert.AreEqual(SpriteImportMode.Single, player.spriteImportMode);
+            Assert.IsTrue(player.alphaIsTransparency);
+            Assert.IsFalse(player.mipmapEnabled);
+
+            AssertAudioLoadType("Assets/_Project/Audio/Music/Lobby/bgm_lobby_main_loop.ogg", AudioClipLoadType.Streaming);
+            AssertAudioLoadType("Assets/_Project/Audio/Music/Combat/bgm_combat_normal_loop.ogg", AudioClipLoadType.Streaming);
+            AssertAudioLoadType("Assets/_Project/Audio/Music/Rest/bgm_rest_companion_loop.ogg", AudioClipLoadType.Streaming);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/UI/sfx_ui_tap.wav", AudioClipLoadType.DecompressOnLoad);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/UI/sfx_ui_confirm.wav", AudioClipLoadType.DecompressOnLoad);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/Combat/sfx_combat_attack.wav", AudioClipLoadType.DecompressOnLoad);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/Combat/sfx_combat_defend.wav", AudioClipLoadType.DecompressOnLoad);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/Combat/sfx_combat_enemy_hit.wav", AudioClipLoadType.DecompressOnLoad);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/Combat/sfx_combat_victory.wav", AudioClipLoadType.DecompressOnLoad);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/Shop/sfx_shop_purchase.wav", AudioClipLoadType.DecompressOnLoad);
+            AssertAudioLoadType("Assets/_Project/Audio/SFX/Rest/sfx_rest_submit.wav", AudioClipLoadType.DecompressOnLoad);
+        }
+
+        [Test]
         public void LobbyPresentationData_ExistsAndHandlesMissingBackground()
         {
             var data = AssetDatabase.LoadAssetAtPath<LobbyPresentationData>("Assets/_Project/Data/Presentation/SO_LobbyPresentationData.asset");
@@ -65,6 +107,22 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsFalse(string.IsNullOrWhiteSpace(data.DefaultProfileName));
             Assert.IsNotNull(data.LogoSprite);
             Assert.AreEqual("lobby_logo_temp", data.LogoSprite.name);
+        }
+
+        private static void AssertCue(AudioCueCatalog catalog, PrototypeAudioContext context, PrototypeAudioChannel channel, string clipName)
+        {
+            Assert.IsTrue(catalog.TryGetCue(context, out var cue), "Missing cue for " + context);
+            Assert.IsNotNull(cue);
+            Assert.AreEqual(channel, cue.Channel);
+            Assert.IsTrue(cue.HasClip, "Missing clip for " + context);
+            Assert.AreEqual(clipName, cue.Clip.name);
+        }
+
+        private static void AssertAudioLoadType(string path, AudioClipLoadType loadType)
+        {
+            var importer = AssetImporter.GetAtPath(path) as AudioImporter;
+            Assert.IsNotNull(importer, path);
+            Assert.AreEqual(loadType, importer.defaultSampleSettings.loadType, path);
         }
     }
 }
