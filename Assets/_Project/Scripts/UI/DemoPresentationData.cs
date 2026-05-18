@@ -103,6 +103,8 @@ namespace HwigiTower.UI
     {
         [SerializeField] private Sprite defaultPlayerPortrait;
         [SerializeField] private Sprite defaultMataiosPortrait;
+        [SerializeField] private Sprite combatMataiosPortrait;
+        [SerializeField] private Sprite combatPortraitFrame;
         [SerializeField] private Sprite completedNodeBackground;
         [SerializeField] private Sprite selectedNodeRing;
         [SerializeField] private Sprite lockedNodeOverlay;
@@ -121,6 +123,8 @@ namespace HwigiTower.UI
 
         public Sprite DefaultPlayerPortrait => defaultPlayerPortrait;
         public Sprite DefaultMataiosPortrait => defaultMataiosPortrait;
+        public Sprite CombatMataiosPortrait => combatMataiosPortrait == null ? defaultMataiosPortrait : combatMataiosPortrait;
+        public Sprite CombatPortraitFrame => combatPortraitFrame;
         public Sprite CompletedNodeBackground => completedNodeBackground;
         public Sprite SelectedNodeRing => selectedNodeRing;
         public Sprite LockedNodeOverlay => lockedNodeOverlay;

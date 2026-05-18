@@ -45,6 +45,8 @@ namespace HwigiTower.UI
         [SerializeField] private Text combatMataiosCardText;
         [SerializeField] private Image combatPlayerPortraitImage;
         [SerializeField] private Image combatMataiosPortraitImage;
+        [SerializeField] private Image combatPlayerPortraitFrameImage;
+        [SerializeField] private Image combatMataiosPortraitFrameImage;
         [SerializeField] private Text combatPlayerPortraitFallbackText;
         [SerializeField] private Image attackActionIconImage;
         [SerializeField] private Image defendActionIconImage;
@@ -170,7 +172,11 @@ namespace HwigiTower.UI
         public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
         public string CurrentCombatEnemySpriteName => combatEnemyImage != null && combatEnemyImage.sprite != null ? combatEnemyImage.sprite.name : string.Empty;
         public string CurrentCombatPlayerPortraitSpriteName => combatPlayerPortraitImage != null && combatPlayerPortraitImage.sprite != null ? combatPlayerPortraitImage.sprite.name : string.Empty;
+        public string CurrentCombatMataiosPortraitSpriteName => combatMataiosPortraitImage != null && combatMataiosPortraitImage.sprite != null ? combatMataiosPortraitImage.sprite.name : string.Empty;
+        public string CurrentCombatPortraitFrameSpriteName => combatPlayerPortraitFrameImage != null && combatPlayerPortraitFrameImage.sprite != null ? combatPlayerPortraitFrameImage.sprite.name : string.Empty;
         public bool CombatPlayerPortraitVisible => combatPlayerPortraitImage != null && combatPlayerPortraitImage.gameObject.activeInHierarchy;
+        public bool CombatMataiosPortraitVisible => combatMataiosPortraitImage != null && combatMataiosPortraitImage.gameObject.activeInHierarchy;
+        public bool CombatPortraitFrameVisible => combatPlayerPortraitFrameImage != null && combatPlayerPortraitFrameImage.gameObject.activeInHierarchy;
         public bool CombatPartyDockVisible => combatPartyDock != null && combatPartyDock.gameObject.activeInHierarchy;
         public string CombatPartyMessage => ((combatPlayerCardText == null ? string.Empty : combatPlayerCardText.text) + "\n" + (combatMataiosCardText == null ? string.Empty : combatMataiosCardText.text)).Trim();
         public string CurrentCombatActionIconNames => string.Join("|", new[]
@@ -2444,6 +2450,8 @@ namespace HwigiTower.UI
             combatMataiosCard = CreateCombatPanelRect(combatPartyDock, "Combat Mataios Card", new Vector2(0.52f, 0.43f), new Vector2(0.96f, 0.94f), new Color(0.055f, 0.064f, 0.083f, 0.96f));
             combatPlayerPortraitImage = CreateCombatPortraitBox(combatPlayerCard, "Combat Player Portrait", new Vector2(0.04f, 0.22f), new Vector2(0.30f, 0.88f), new Color(0.15f, 0.19f, 0.22f, 1f), "P", out combatPlayerPortraitFallbackText);
             combatMataiosPortraitImage = CreateCombatPortraitBox(combatMataiosCard, "Combat Mataios Portrait", new Vector2(0.04f, 0.16f), new Vector2(0.31f, 0.90f), new Color(0.12f, 0.14f, 0.18f, 1f), string.Empty, out _);
+            combatPlayerPortraitFrameImage = CreateCombatPortraitFrame(combatPlayerPortraitImage, "Combat Player Portrait Frame");
+            combatMataiosPortraitFrameImage = CreateCombatPortraitFrame(combatMataiosPortraitImage, "Combat Mataios Portrait Frame");
             combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
             combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.35f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
             combatTrainingStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Training Status Icon", new Vector2(0.76f, 0.72f), new Vector2(0.84f, 0.90f));
@@ -2513,6 +2521,30 @@ namespace HwigiTower.UI
                 fallbackText = label;
             }
 
+            return image;
+        }
+
+        private Image CreateCombatPortraitFrame(Image portraitImage, string name)
+        {
+            if (portraitImage == null)
+            {
+                return null;
+            }
+
+            var frameObject = new GameObject(name);
+            frameObject.transform.SetParent(portraitImage.transform.parent, false);
+
+            var sourceRect = portraitImage.GetComponent<RectTransform>();
+            var rect = frameObject.AddComponent<RectTransform>();
+            rect.anchorMin = sourceRect.anchorMin;
+            rect.anchorMax = sourceRect.anchorMax;
+            rect.offsetMin = sourceRect.offsetMin;
+            rect.offsetMax = sourceRect.offsetMax;
+
+            var image = frameObject.AddComponent<Image>();
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            image.gameObject.SetActive(false);
             return image;
         }
 
@@ -3488,10 +3520,16 @@ namespace HwigiTower.UI
 
             if (combatMataiosPortraitImage != null)
             {
-                combatMataiosPortraitImage.sprite = npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite : mataiosPortrait;
+                var combatMataiosPortrait = presentationData == null ? null : presentationData.CombatMataiosPortrait;
+                combatMataiosPortraitImage.sprite = combatMataiosPortrait != null
+                    ? combatMataiosPortrait
+                    : (npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite : mataiosPortrait);
                 combatMataiosPortraitImage.color = Color.white;
                 combatMataiosPortraitImage.gameObject.SetActive(combatMataiosPortraitImage.sprite != null);
             }
+
+            ApplyCombatPortraitFrame(combatPlayerPortraitFrameImage);
+            ApplyCombatPortraitFrame(combatMataiosPortraitFrameImage);
 
             if (combatPlayerCardText != null)
             {
@@ -3504,6 +3542,18 @@ namespace HwigiTower.UI
             {
                 combatMataiosCardText.text = BuildCombatMataiosCardText(snapshot);
             }
+        }
+
+        private void ApplyCombatPortraitFrame(Image frameImage)
+        {
+            if (frameImage == null)
+            {
+                return;
+            }
+
+            frameImage.sprite = presentationData == null ? null : presentationData.CombatPortraitFrame;
+            frameImage.color = Color.white;
+            frameImage.gameObject.SetActive(frameImage.sprite != null);
         }
 
         private void UpdateCombatActionIcons()

@@ -96,7 +96,10 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsNotNull(data);
             Assert.IsNotNull(data.DefaultPlayerPortrait);
-            Assert.AreEqual("char_player_standing_01", data.DefaultPlayerPortrait.name);
+            Assert.AreEqual("char_player_portrait_01", data.DefaultPlayerPortrait.name);
+            Assert.IsNotNull(data.CombatMataiosPortrait);
+            Assert.AreEqual("char_mataios_portrait_01", data.CombatMataiosPortrait.name);
+            Assert.IsNull(data.CombatPortraitFrame);
             AssertCombatActionIcon(data, CombatAction.Attack, "icon_action_attack");
             AssertCombatActionIcon(data, CombatAction.Defend, "icon_action_defend");
             AssertCombatActionIcon(data, CombatAction.Skill, "icon_action_skill_scout");
@@ -322,7 +325,10 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(hud.CombatPanelVisible);
             Assert.IsTrue(hud.CombatPartyDockVisible);
             Assert.IsTrue(hud.CombatPlayerPortraitVisible);
-            Assert.AreEqual("char_player_standing_01", hud.CurrentCombatPlayerPortraitSpriteName);
+            Assert.AreEqual("char_player_portrait_01", hud.CurrentCombatPlayerPortraitSpriteName);
+            Assert.IsTrue(hud.CombatMataiosPortraitVisible);
+            Assert.AreEqual("char_mataios_portrait_01", hud.CurrentCombatMataiosPortraitSpriteName);
+            Assert.IsFalse(hud.CombatPortraitFrameVisible);
             StringAssert.Contains("icon_action_attack", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("icon_action_defend", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("icon_action_skill_scout", hud.CurrentCombatActionIconNames);

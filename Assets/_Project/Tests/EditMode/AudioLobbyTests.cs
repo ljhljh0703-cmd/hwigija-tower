@@ -76,12 +76,9 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void PlayerAndAudioAssets_UseExpectedImportSettings()
         {
-            var player = AssetImporter.GetAtPath("Assets/_Project/Art/Characters/char_player_standing_01.png") as TextureImporter;
-            Assert.IsNotNull(player);
-            Assert.AreEqual(TextureImporterType.Sprite, player.textureType);
-            Assert.AreEqual(SpriteImportMode.Single, player.spriteImportMode);
-            Assert.IsTrue(player.alphaIsTransparency);
-            Assert.IsFalse(player.mipmapEnabled);
+            AssertSpriteImportSettings("Assets/_Project/Art/Characters/char_player_portrait_01.png");
+            AssertSpriteImportSettings("Assets/_Project/Art/Characters/char_player_bust_01.png");
+            AssertSpriteImportSettings("Assets/_Project/Art/Characters/char_mataios_portrait_01.png");
 
             AssertAudioLoadType("Assets/_Project/Audio/Music/Lobby/bgm_lobby_main_loop.ogg", AudioClipLoadType.Streaming);
             AssertAudioLoadType("Assets/_Project/Audio/Music/Combat/bgm_combat_normal_loop.ogg", AudioClipLoadType.Streaming);
@@ -123,6 +120,16 @@ namespace HwigiTower.Tests.EditMode
             var importer = AssetImporter.GetAtPath(path) as AudioImporter;
             Assert.IsNotNull(importer, path);
             Assert.AreEqual(loadType, importer.defaultSampleSettings.loadType, path);
+        }
+
+        private static void AssertSpriteImportSettings(string path)
+        {
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            Assert.IsNotNull(importer, path);
+            Assert.AreEqual(TextureImporterType.Sprite, importer.textureType, path);
+            Assert.AreEqual(SpriteImportMode.Single, importer.spriteImportMode, path);
+            Assert.IsTrue(importer.alphaIsTransparency, path);
+            Assert.IsFalse(importer.mipmapEnabled, path);
         }
     }
 }
