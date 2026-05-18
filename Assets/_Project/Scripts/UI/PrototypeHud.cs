@@ -86,6 +86,7 @@ namespace HwigiTower.UI
         [SerializeField] private Image restRecoverIconImage;
         [SerializeField] private Button restSubmitButton;
         [SerializeField] private Button restContinueButton;
+        [SerializeField] private RectTransform restResponsePanel;
         [SerializeField] private RectTransform topStatusLayer;
         [SerializeField] private RectTransform objectiveLayer;
         [SerializeField] private RectTransform visualLayer;
@@ -127,9 +128,9 @@ namespace HwigiTower.UI
         private const float ChoiceButtonSpacing = 130f;
         private const float EventChoiceButtonHeight = 104f;
         private const float EventChoiceButtonSpacing = 116f;
-        private const float MapNodeButtonHeight = 118f;
+        private const float MapNodeButtonHeight = 132f;
         private const float MapNodeButtonSpacing = 132f;
-        private const float MapNodeIconSize = 72f;
+        private const float MapNodeIconSize = 90f;
         private const int TitleFontSize = 34;
         private const int SubtitleFontSize = 30;
         private const int BodyFontSize = 28;
@@ -588,6 +589,11 @@ namespace HwigiTower.UI
                 {
                     _eventPresentationActive = false;
                     _shopPresentationActive = true;
+                    SetLayerVisible(objectiveLayer, false);
+                    SetLayerVisible(npcReactionLayer, false);
+                    SetLayerVisible(resultLayer, false);
+                    SetResultVisible(false);
+                    HideLegacyEncounterVisuals(hideBackground: false);
                     ApplyMerchantPresentation(_roomController == null ? 1 : _roomController.GetSnapshot().CurrentFloor);
                     ConfigureChoiceContainerDefault();
                 }
@@ -602,13 +608,17 @@ namespace HwigiTower.UI
                 interactionText.text = showRawDebugText
                     ? $"node: {ResolveEncounterDisplayName(encounter)} | encounter: {encounter.Id} | choices pending"
                     : _eventPresentationActive ? string.Empty : ResolvePresentationDisplayName(encounter);
+                if (!showRawDebugText)
+                {
+                    interactionText.gameObject.SetActive(encounter.Type != EncounterType.Shop && !_eventPresentationActive);
+                }
             }
 
             ShowResultMessage(string.Empty);
             if (!showRawDebugText && encounter != null && encounter.Type == EncounterType.Shop && resultText != null)
             {
-                var gold = _roomController == null ? 0 : _roomController.GetSnapshot().Gold;
-                resultText.text = "상점\n보스 전 준비 | 현재 Gold " + gold + "\n가격과 효과를 보고 구매하세요";
+                resultText.text = string.Empty;
+                SetResultVisible(false);
             }
         }
 
@@ -639,10 +649,11 @@ namespace HwigiTower.UI
             EnsureScreenLayers();
             SetLayerVisible(nodeMapLayer, true);
             SetLayerVisible(actionLayer, false);
-            SetLayerVisible(objectiveLayer, true);
-            SetLayerVisible(visualLayer, true);
-            SetLayerVisible(npcReactionLayer, true);
-            SetLayerVisible(resultLayer, true);
+            SetLayerVisible(objectiveLayer, false);
+            SetLayerVisible(visualLayer, false);
+            SetLayerVisible(npcReactionLayer, false);
+            SetLayerVisible(resultLayer, false);
+            HideMerchantPresentation();
             EnsureEventSystem();
             EnsureChoiceContainer();
             if (choiceContainer == null || nodes == null)
@@ -665,9 +676,12 @@ namespace HwigiTower.UI
             if (interactionText != null)
             {
                 interactionText.text = showRawDebugText ? "map node selection" : "지도";
+                interactionText.gameObject.SetActive(showRawDebugText);
             }
 
             ShowResultMessage(showRawDebugText ? "select map node" : "선택 가능한 길이 밝게 표시됩니다");
+            SetResultVisible(false);
+            HideLegacyEncounterVisuals(hideBackground: true);
         }
 
         private void ClearMapDecorations()
@@ -924,6 +938,7 @@ namespace HwigiTower.UI
             UpdateEndingButtons(snapshot);
             UpdatePresentationState(snapshot);
             UpdateRouteIndicator(snapshot);
+            UpdatePrimaryHeaderVisibility(snapshot);
             UpdateTopHudIcons(snapshot);
             UpdateMemoryAndCombatPanel(snapshot);
             UpdateResultVisibility(snapshot);
@@ -934,14 +949,31 @@ namespace HwigiTower.UI
         private void UpdateScreenLayers(PrototypeRunSnapshot snapshot)
         {
             EnsureScreenLayers();
+            var restVisible = RestInteractionPanelVisible;
+            var mapVisible = IsMapSelectionVisible(snapshot);
+            var shopVisible = !snapshot.IsInCombat && !restVisible && _shopPresentationActive;
+            var eventVisible = _eventPresentationActive;
             SetLayerVisible(topStatusLayer, true);
-            SetLayerVisible(objectiveLayer, !snapshot.IsInCombat && !_eventPresentationActive);
-            SetLayerVisible(visualLayer, !snapshot.IsInCombat && !_eventPresentationActive);
-            SetLayerVisible(nodeMapLayer, snapshot.HasFloorMap && !snapshot.IsInCombat && !snapshot.RunCompleted && _choiceButtons.Count > 0);
-            SetLayerVisible(npcReactionLayer, !snapshot.IsInCombat && !snapshot.EndingChoicePending && !_eventPresentationActive);
-            SetLayerVisible(actionLayer, !snapshot.IsInCombat && !snapshot.RunCompleted);
-            SetLayerVisible(resultLayer, !snapshot.IsInCombat && !_eventPresentationActive && !RestInteractionPanelVisible && resultText != null && resultText.gameObject.activeSelf);
+            SetLayerVisible(objectiveLayer, false);
+            SetLayerVisible(visualLayer, !snapshot.IsInCombat && !eventVisible && !mapVisible);
+            SetLayerVisible(nodeMapLayer, mapVisible);
+            SetLayerVisible(npcReactionLayer, showRawDebugText && !snapshot.IsInCombat && !snapshot.EndingChoicePending && !eventVisible && !mapVisible && !shopVisible && !restVisible);
+            SetLayerVisible(actionLayer, !snapshot.IsInCombat && !snapshot.RunCompleted && !mapVisible);
+            SetLayerVisible(resultLayer, !snapshot.IsInCombat && !eventVisible && !mapVisible && !shopVisible && !restVisible && resultText != null && resultText.gameObject.activeSelf);
             SetLayerVisible(endingLayer, snapshot.EndingChoicePending && !snapshot.IsInCombat);
+        }
+
+        private bool IsMapSelectionVisible(PrototypeRunSnapshot snapshot)
+        {
+            return snapshot.HasFloorMap &&
+                !snapshot.IsInCombat &&
+                !snapshot.RunCompleted &&
+                !RestInteractionPanelVisible &&
+                !_shopPresentationActive &&
+                choiceContainer != null &&
+                nodeMapLayer != null &&
+                choiceContainer.parent == nodeMapLayer &&
+                _choiceButtons.Count > 0;
         }
 
         private void AutoShowMapIfNeeded(PrototypeRunSnapshot snapshot)
@@ -1380,6 +1412,16 @@ namespace HwigiTower.UI
             }
         }
 
+        private void SetResultVisible(bool visible)
+        {
+            if (resultText != null)
+            {
+                resultText.gameObject.SetActive(visible);
+            }
+
+            SetLayerVisible(resultLayer, visible);
+        }
+
         private void NormalizeLayout()
         {
             EnsureScreenLayers();
@@ -1690,11 +1732,12 @@ namespace HwigiTower.UI
             SetLayerVisible(nodeMapLayer, false);
             SetLayerVisible(visualLayer, true);
             SetLayerVisible(npcReactionLayer, false);
-            SetLayerVisible(resultLayer, true);
+            SetLayerVisible(resultLayer, false);
             ApplyPresentationSlot(selection.EncounterId);
             ShowNpcSpotlight(mataiosPortrait, "마타이오스", "잠시 숨을 고른다. 무엇을 건넬지 정하세요.", NpcSpotlightMode.Rest);
             _pendingRestSelection = selection;
             _pendingRestActionId = string.Empty;
+            SetRestActionCardsVisible(true);
             UpdateRestActionCardStates();
             if (restInputField != null)
             {
@@ -1704,24 +1747,19 @@ namespace HwigiTower.UI
 
             if (restResponseText != null)
             {
-                restResponseText.text = "행동을 선택하세요";
+                restResponseText.text = string.Empty;
             }
 
             SetRestActionButtonsInteractable(true);
-            if (restSubmitButton != null)
-            {
-                restSubmitButton.gameObject.SetActive(true);
-                restSubmitButton.interactable = false;
-            }
-
-            if (restContinueButton != null)
-            {
-                restContinueButton.gameObject.SetActive(false);
-            }
+            SetRestInputPhaseVisible(false, false);
 
             if (interactionText != null)
             {
                 interactionText.text = showRawDebugText ? "rest interaction: " + selection.EncounterId : "휴식";
+                if (!showRawDebugText)
+                {
+                    interactionText.gameObject.SetActive(false);
+                }
             }
 
             if (restInteractionPanel != null)
@@ -1730,6 +1768,7 @@ namespace HwigiTower.UI
             }
 
             ShowResultMessage(string.Empty);
+            SetResultVisible(false);
         }
 
         private void EnsureRestInteractionPanel()
@@ -1768,12 +1807,13 @@ namespace HwigiTower.UI
             restContinueButton.onClick.AddListener(ContinueAfterRestInteraction);
             restContinueButton.gameObject.SetActive(false);
 
-            var responsePanel = CreatePanel("Rest Response Bubble", panelObject.transform, new Vector2(0.06f, 0.30f), new Vector2(0.94f, 0.50f), new Color(0.10f, 0.13f, 0.15f, 0.96f));
+            restResponsePanel = CreatePanel("Rest Response Bubble", panelObject.transform, new Vector2(0.06f, 0.30f), new Vector2(0.94f, 0.50f), new Color(0.10f, 0.13f, 0.15f, 0.96f));
             restResponseText = CreateHudText("Rest Response Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), new Vector2(20f, 10f), new Vector2(-20f, -10f), RestBodyFontSize, TextAnchor.MiddleLeft, new Color(0.88f, 0.93f, 0.92f, 1f));
             restResponseText.horizontalOverflow = HorizontalWrapMode.Wrap;
             restResponseText.transform.SetParent(panelObject.transform, false);
-            restResponseText.transform.SetParent(responsePanel, false);
-            restResponseText.text = "행동을 선택하세요";
+            restResponseText.transform.SetParent(restResponsePanel, false);
+            restResponseText.text = string.Empty;
+            restResponsePanel.gameObject.SetActive(false);
             restInteractionPanel.gameObject.SetActive(false);
             ApplyRestActionIcons();
         }
@@ -1990,20 +2030,12 @@ namespace HwigiTower.UI
         {
             _pendingRestActionId = actionId;
             UpdateRestActionCardStates();
-            if (restSubmitButton != null)
-            {
-                restSubmitButton.interactable = true;
-            }
+            SetRestActionCardsVisible(false);
+            SetRestInputPhaseVisible(true, false);
 
             if (restResponseText != null)
             {
-                restResponseText.text = actionId switch
-                {
-                    "rest.ask_mood" => "기분을 묻는다\n마타이오스와 대화",
-                    "rest.train" => "훈련을 진행한다\n다음 전투 피해 +1",
-                    "rest.recover" => "휴식을 취한다\n입력 없이 HP 회복",
-                    _ => "말을 입력한 뒤 전달하세요"
-                };
+                restResponseText.text = string.Empty;
             }
         }
 
@@ -2015,6 +2047,7 @@ namespace HwigiTower.UI
                 {
                     restResponseText.text = "행동을 먼저 선택하세요";
                 }
+                SetRestResponseVisible(true);
                 return;
             }
 
@@ -2026,15 +2059,18 @@ namespace HwigiTower.UI
                 {
                     restResponseText.text = "말을 입력해야 합니다";
                 }
+                SetRestResponseVisible(true);
                 ShowResult(resolution);
                 ShowRunState(_roomController.GetSnapshot());
                 return;
             }
 
             SetRestActionButtonsInteractable(false);
+            SetRestActionCardsVisible(false);
             if (restInputField != null)
             {
                 restInputField.interactable = false;
+                restInputField.gameObject.SetActive(false);
             }
 
             if (restSubmitButton != null)
@@ -2055,6 +2091,7 @@ namespace HwigiTower.UI
                 restResponseText.text = BuildRestCommittedMessage(_pendingRestActionId, response);
             }
 
+            SetRestResponseVisible(true);
             ShowResult(resolution);
             ShowRunState(_roomController.GetSnapshot());
         }
@@ -2088,6 +2125,8 @@ namespace HwigiTower.UI
                 restInteractionPanel.gameObject.SetActive(false);
             }
 
+            SetRestActionCardsVisible(true);
+            SetRestInputPhaseVisible(false, false);
             HideNpcSpotlight();
         }
 
@@ -2106,6 +2145,58 @@ namespace HwigiTower.UI
             if (restRecoverButton != null)
             {
                 restRecoverButton.interactable = interactable;
+            }
+        }
+
+        private void SetRestActionCardsVisible(bool visible)
+        {
+            SetButtonVisible(restAskMoodButton, visible);
+            SetButtonVisible(restTrainButton, visible);
+            SetButtonVisible(restRecoverButton, visible);
+        }
+
+        private void SetRestInputPhaseVisible(bool inputVisible, bool committed)
+        {
+            if (restInputField != null)
+            {
+                restInputField.gameObject.SetActive(inputVisible && !committed);
+                restInputField.interactable = inputVisible && !committed;
+            }
+
+            if (restSubmitButton != null)
+            {
+                restSubmitButton.gameObject.SetActive(inputVisible && !committed);
+                restSubmitButton.interactable = inputVisible && !committed;
+            }
+
+            if (restContinueButton != null)
+            {
+                restContinueButton.gameObject.SetActive(committed);
+                restContinueButton.interactable = committed;
+            }
+
+            SetRestResponseVisible(committed);
+        }
+
+        private void SetRestResponseVisible(bool visible)
+        {
+            if (restResponsePanel != null)
+            {
+                restResponsePanel.gameObject.SetActive(visible);
+                return;
+            }
+
+            if (restResponseText != null && restResponseText.transform.parent != null)
+            {
+                restResponseText.transform.parent.gameObject.SetActive(visible);
+            }
+        }
+
+        private static void SetButtonVisible(Button button, bool visible)
+        {
+            if (button != null)
+            {
+                button.gameObject.SetActive(visible);
             }
         }
 
@@ -2351,6 +2442,19 @@ namespace HwigiTower.UI
             if (npcSpotlightLayer != null)
             {
                 npcSpotlightLayer.gameObject.SetActive(false);
+            }
+        }
+
+        private void HideLegacyEncounterVisuals(bool hideBackground)
+        {
+            if (npcPortraitImage != null)
+            {
+                npcPortraitImage.gameObject.SetActive(false);
+            }
+
+            if (hideBackground && encounterBackgroundImage != null)
+            {
+                encounterBackgroundImage.gameObject.SetActive(false);
             }
         }
 
@@ -3093,8 +3197,10 @@ namespace HwigiTower.UI
                 return;
             }
 
-            routeText.gameObject.SetActive((!snapshot.IsInCombat && !_eventPresentationActive) || showRawDebugText);
-            if ((snapshot.IsInCombat || _eventPresentationActive) && !showRawDebugText)
+            var restVisible = RestInteractionPanelVisible;
+            var shopVisible = _shopPresentationActive && !snapshot.IsInCombat;
+            routeText.gameObject.SetActive((!snapshot.IsInCombat && !_eventPresentationActive && !restVisible && !shopVisible) || showRawDebugText);
+            if ((snapshot.IsInCombat || _eventPresentationActive || restVisible || shopVisible) && !showRawDebugText)
             {
                 routeText.text = string.Empty;
                 return;
@@ -3187,6 +3293,21 @@ namespace HwigiTower.UI
             }
 
             return Mathf.Clamp(snapshot.DemoResolvedStepCount, 0, Mathf.Max(0, _demoRouteLabels.Count - 1));
+        }
+
+        private void UpdatePrimaryHeaderVisibility(PrototypeRunSnapshot snapshot)
+        {
+            if (interactionText == null || showRawDebugText)
+            {
+                return;
+            }
+
+            var hiddenByEncounterState = snapshot.IsInCombat ||
+                _eventPresentationActive ||
+                _shopPresentationActive ||
+                RestInteractionPanelVisible ||
+                IsMapSelectionVisible(snapshot);
+            interactionText.gameObject.SetActive(!hiddenByEncounterState);
         }
 
         private string BuildPublicRouteSummary(PrototypeRunSnapshot snapshot, int currentIndex)
@@ -3308,7 +3429,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            if (_eventPresentationActive && !showRawDebugText)
+            if ((_eventPresentationActive || _shopPresentationActive || RestInteractionPanelVisible || IsMapSelectionVisible(snapshot)) && !showRawDebugText)
             {
                 memoryText.gameObject.SetActive(false);
                 memoryText.text = string.Empty;
@@ -3330,8 +3451,8 @@ namespace HwigiTower.UI
             else
             {
                 memory = string.IsNullOrEmpty(snapshot.LastMemoryFragmentId)
-                    ? "기억의 잔향: 보류"
-                    : "기억의 잔향: 해금";
+                    ? "기억: 대기"
+                    : "기억: 해금";
                 combat = string.IsNullOrEmpty(snapshot.LastCombatId)
                     ? "전투: -"
                     : "전투: " + BuildCombatOutcomeLabel(snapshot);
@@ -3361,7 +3482,7 @@ namespace HwigiTower.UI
                 buff = "회상 닻 보유";
             }
 
-            return "[Player] HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
+            return "플레이어 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
                 "  ATK " + snapshot.PlayerAttack +
                 "  아이템 " + snapshot.ItemCount +
                 "  능력 " + snapshot.AbilityCount +
@@ -3374,7 +3495,7 @@ namespace HwigiTower.UI
                 snapshot.Affinity > 0 ? "신뢰 형성" :
                 snapshot.Affinity < 0 ? "거리감" :
                 "동행 중";
-            return "[Mataios] " + affinity + "  기억 " + snapshot.MemoryFragmentCount + "  안정";
+            return "마타이오스 " + affinity + "  기억 " + snapshot.MemoryFragmentCount + "  안정";
         }
 
         private static string ShortenPublicLine(string value, int maxLength)
@@ -3415,7 +3536,11 @@ namespace HwigiTower.UI
 
             if (interactionText != null && !showRawDebugText)
             {
-                interactionText.gameObject.SetActive(!hasCombat);
+                interactionText.gameObject.SetActive(!hasCombat &&
+                    !_eventPresentationActive &&
+                    !_shopPresentationActive &&
+                    !RestInteractionPanelVisible &&
+                    !IsMapSelectionVisible(snapshot));
             }
 
             if (routeText != null && hasCombat && !showRawDebugText)
@@ -3685,7 +3810,12 @@ namespace HwigiTower.UI
                 return;
             }
 
-            resultText.gameObject.SetActive(!snapshot.IsInCombat && !RestInteractionPanelVisible);
+            var visible = !snapshot.IsInCombat &&
+                !RestInteractionPanelVisible &&
+                !_shopPresentationActive &&
+                !_eventPresentationActive &&
+                !IsMapSelectionVisible(snapshot);
+            SetResultVisible(visible);
         }
 
         private string BuildChoiceLabel(PrototypeEncounterChoiceView view, int index)
@@ -3704,7 +3834,9 @@ namespace HwigiTower.UI
             {
                 label += showRawDebugText && !string.IsNullOrEmpty(view.ReasonTextKey)
                     ? "\n" + view.ReasonTextKey
-                    : "\n" + (string.IsNullOrEmpty(view.HintText) ? "선택 불가" : NormalizePublicHint(view.HintText));
+                    : "\n" + (IsPurchaseChoice(view.ChoiceStableId)
+                        ? NormalizeShopDisabledHint(view.HintText)
+                        : string.IsNullOrEmpty(view.HintText) ? "선택 불가" : NormalizePublicHint(view.HintText));
             }
             else if (!showRawDebugText && !string.IsNullOrEmpty(view.HintText))
             {
@@ -3717,6 +3849,12 @@ namespace HwigiTower.UI
         private static bool IsPurchaseChoice(string choiceStableId)
         {
             return !string.IsNullOrEmpty(choiceStableId) && choiceStableId.Contains("_BUY_", StringComparison.Ordinal);
+        }
+
+        private static string NormalizeShopDisabledHint(string hint)
+        {
+            var normalized = NormalizePublicHint(hint);
+            return normalized.Contains("Gold 부족", StringComparison.Ordinal) ? "Gold 부족" : "구매 불가";
         }
 
         private Sprite ResolveShopCardSprite(bool enabled)
@@ -4418,12 +4556,22 @@ namespace HwigiTower.UI
         {
             if (RestInteractionPanelVisible)
             {
+                HideLegacyEncounterVisuals(hideBackground: false);
                 return;
             }
 
             var slot = ResolveCurrentPresentationSlot(snapshot);
             ApplyPresentationSlot(slot);
-            if (!snapshot.IsInCombat && (_shopPresentationActive || IsShopEncounterId(snapshot.NextDemoEncounterId)))
+            if (IsMapSelectionVisible(snapshot))
+            {
+                HideLegacyEncounterVisuals(hideBackground: true);
+            }
+            else if (_shopPresentationActive || snapshot.IsInCombat || _eventPresentationActive)
+            {
+                HideLegacyEncounterVisuals(hideBackground: false);
+            }
+
+            if (!snapshot.IsInCombat && _shopPresentationActive)
             {
                 ApplyMerchantPresentation(snapshot.CurrentFloor);
             }
