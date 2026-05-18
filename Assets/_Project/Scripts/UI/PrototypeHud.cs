@@ -49,13 +49,20 @@ namespace HwigiTower.UI
         [SerializeField] private Image attackActionIconImage;
         [SerializeField] private Image defendActionIconImage;
         [SerializeField] private Image skillActionIconImage;
+        [SerializeField] private Image combatTrainingStatusIconImage;
+        [SerializeField] private Image combatBandageStatusIconImage;
+        [SerializeField] private Image combatRecallStatusIconImage;
         [SerializeField] private Image merchantVisualImage;
         [SerializeField] private RectTransform npcSpotlightLayer;
         [SerializeField] private Image npcSpotlightBackdropImage;
         [SerializeField] private Image npcSpotlightGlowImage;
         [SerializeField] private Image npcSpotlightShadowImage;
+        [SerializeField] private Image npcDialoguePlateImage;
         [SerializeField] private Text npcSpotlightNameText;
         [SerializeField] private Text npcSpotlightDialogueText;
+        [SerializeField] private Image topGoldIconImage;
+        [SerializeField] private Image topMemoryIconImage;
+        [SerializeField] private Image topAffinityIconImage;
         [SerializeField] private Image enemyHpFill;
         [SerializeField] private Image playerHpFill;
         [SerializeField] private Button attackButton;
@@ -90,6 +97,8 @@ namespace HwigiTower.UI
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<Image> _mapNodeIconImages = new List<Image>();
+        private readonly List<Image> _shopChoiceCardImages = new List<Image>();
+        private readonly List<Image> _shopChoiceIconImages = new List<Image>();
         private readonly List<GameObject> _mapDecorations = new List<GameObject>();
         private readonly List<string> _demoRouteLabels = new List<string>();
         private readonly List<string> _demoRouteEncounterIds = new List<string>();
@@ -169,6 +178,20 @@ namespace HwigiTower.UI
             defendActionIconImage != null && defendActionIconImage.sprite != null ? defendActionIconImage.sprite.name : string.Empty,
             skillActionIconImage != null && skillActionIconImage.sprite != null ? skillActionIconImage.sprite.name : string.Empty
         });
+        public string CurrentCombatStatusIconNames => string.Join("|", new[]
+        {
+            combatTrainingStatusIconImage != null && combatTrainingStatusIconImage.sprite != null ? combatTrainingStatusIconImage.sprite.name : string.Empty,
+            combatBandageStatusIconImage != null && combatBandageStatusIconImage.sprite != null ? combatBandageStatusIconImage.sprite.name : string.Empty,
+            combatRecallStatusIconImage != null && combatRecallStatusIconImage.sprite != null ? combatRecallStatusIconImage.sprite.name : string.Empty
+        });
+        public string CurrentTopHudIconNames => string.Join("|", new[]
+        {
+            topGoldIconImage != null && topGoldIconImage.sprite != null ? topGoldIconImage.sprite.name : string.Empty,
+            topMemoryIconImage != null && topMemoryIconImage.sprite != null ? topMemoryIconImage.sprite.name : string.Empty,
+            topAffinityIconImage != null && topAffinityIconImage.sprite != null ? topAffinityIconImage.sprite.name : string.Empty
+        });
+        public string CurrentShopChoiceCardSpriteNames => JoinImageSpriteNames(_shopChoiceCardImages);
+        public string CurrentShopChoiceIconNames => JoinImageSpriteNames(_shopChoiceIconImages);
         public string CurrentRestActionIconNames => string.Join("|", new[]
         {
             restAskMoodIconImage != null && restAskMoodIconImage.sprite != null ? restAskMoodIconImage.sprite.name : string.Empty,
@@ -186,6 +209,12 @@ namespace HwigiTower.UI
         public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
         public bool NpcSpotlightVisible => npcSpotlightLayer != null && npcSpotlightLayer.gameObject.activeInHierarchy;
         public string CurrentNpcSpotlightSpriteName => merchantVisualImage != null && merchantVisualImage.sprite != null ? merchantVisualImage.sprite.name : string.Empty;
+        public string CurrentNpcSupportSpriteNames => string.Join("|", new[]
+        {
+            npcSpotlightGlowImage != null && npcSpotlightGlowImage.sprite != null ? npcSpotlightGlowImage.sprite.name : string.Empty,
+            npcSpotlightShadowImage != null && npcSpotlightShadowImage.sprite != null ? npcSpotlightShadowImage.sprite.name : string.Empty,
+            npcDialoguePlateImage != null && npcDialoguePlateImage.sprite != null ? npcDialoguePlateImage.sprite.name : string.Empty
+        });
         public string NpcSpotlightMessage => ((npcSpotlightNameText == null ? string.Empty : npcSpotlightNameText.text) + "\n" + (npcSpotlightDialogueText == null ? string.Empty : npcSpotlightDialogueText.text)).Trim();
         public string CurrentNpcSpotlightModeLabel => _npcSpotlightModeLabel;
         public bool HasScreenLayerPanels => topStatusLayer != null && objectiveLayer != null && visualLayer != null && nodeMapLayer != null && npcReactionLayer != null && actionLayer != null && resultLayer != null && endingLayer != null;
@@ -207,6 +236,21 @@ namespace HwigiTower.UI
             }
         }
 
+        private static string JoinImageSpriteNames(List<Image> images)
+        {
+            var names = new List<string>();
+            for (var i = 0; i < images.Count; i++)
+            {
+                var image = images[i];
+                if (image != null && image.sprite != null)
+                {
+                    names.Add(image.sprite.name);
+                }
+            }
+
+            return string.Join("|", names);
+        }
+
         public void BindRoomController(PrototypeRoomController controller)
         {
             _roomController = controller;
@@ -222,11 +266,45 @@ namespace HwigiTower.UI
 
             ApplyPortrait();
             ApplyRestActionIcons();
+            ApplyStaticUiAssetSprites();
         }
 
         public void SetRawDebugTextVisible(bool visible)
         {
             showRawDebugText = visible;
+        }
+
+        private void ApplyStaticUiAssetSprites()
+        {
+            if (npcSpotlightGlowImage != null)
+            {
+                npcSpotlightGlowImage.sprite = presentationData == null ? null : presentationData.SpotlightGradient;
+                npcSpotlightGlowImage.preserveAspect = true;
+                npcSpotlightGlowImage.color = npcSpotlightGlowImage.sprite == null
+                    ? new Color(0.52f, 0.72f, 0.62f, 0.22f)
+                    : new Color(0.86f, 0.96f, 0.86f, 0.72f);
+            }
+
+            if (npcSpotlightShadowImage != null)
+            {
+                npcSpotlightShadowImage.sprite = presentationData == null ? null : presentationData.SpotlightGradient;
+                npcSpotlightShadowImage.preserveAspect = true;
+                npcSpotlightShadowImage.color = npcSpotlightShadowImage.sprite == null
+                    ? new Color(0f, 0f, 0f, 0.42f)
+                    : new Color(0f, 0f, 0f, 0.36f);
+            }
+
+            if (npcDialoguePlateImage != null)
+            {
+                npcDialoguePlateImage.sprite = presentationData == null ? null : presentationData.NpcDialoguePlate;
+                npcDialoguePlateImage.preserveAspect = true;
+                npcDialoguePlateImage.color = npcDialoguePlateImage.sprite == null
+                    ? new Color(0.03f, 0.045f, 0.050f, 0.78f)
+                    : Color.white;
+            }
+
+            ApplyTopHudIconSprites();
+            ApplyCombatStatusIconSprites();
         }
 
         public void SetNpcPortrait(Sprite portrait)
@@ -539,6 +617,8 @@ namespace HwigiTower.UI
 
             _choiceButtons.Clear();
             _mapNodeIconImages.Clear();
+            _shopChoiceCardImages.Clear();
+            _shopChoiceIconImages.Clear();
             ClearMapDecorations();
             _shopPresentationActive = false;
             HideMerchantPresentation();
@@ -837,6 +917,7 @@ namespace HwigiTower.UI
             UpdateEndingButtons(snapshot);
             UpdatePresentationState(snapshot);
             UpdateRouteIndicator(snapshot);
+            UpdateTopHudIcons(snapshot);
             UpdateMemoryAndCombatPanel(snapshot);
             UpdateResultVisibility(snapshot);
             UpdateDemoCompletePanel(snapshot);
@@ -978,6 +1059,7 @@ namespace HwigiTower.UI
                 ? new Color(0.88f, 0.92f, 0.94f, 1f)
                 : new Color(0.58f, 0.62f, 0.66f, 1f);
             label.text = BuildChoiceLabel(view, _choiceButtons.Count);
+            ApplyShopChoiceCard(view, image, label);
 
             var stableId = view.ChoiceStableId;
             button.onClick.AddListener(() =>
@@ -987,6 +1069,61 @@ namespace HwigiTower.UI
             });
 
             return button;
+        }
+
+        private void ApplyShopChoiceCard(PrototypeEncounterChoiceView view, Image background, Text label)
+        {
+            if (showRawDebugText || background == null || label == null || !IsPurchaseChoice(view.ChoiceStableId))
+            {
+                return;
+            }
+
+            var cardSprite = ResolveShopCardSprite(view.Enabled);
+            if (cardSprite != null)
+            {
+                background.sprite = cardSprite;
+                background.type = Image.Type.Simple;
+                background.preserveAspect = false;
+                background.color = view.Enabled
+                    ? new Color(1f, 1f, 1f, 0.92f)
+                    : new Color(0.68f, 0.72f, 0.76f, 0.88f);
+                _shopChoiceCardImages.Add(background);
+            }
+
+            var labelRect = label.GetComponent<RectTransform>();
+            if (labelRect != null)
+            {
+                labelRect.offsetMin = new Vector2(130f, 10f);
+                labelRect.offsetMax = new Vector2(-18f, -10f);
+            }
+
+            label.alignment = TextAnchor.MiddleLeft;
+            label.fontSize = 27;
+            label.resizeTextMinSize = 20;
+            label.resizeTextMaxSize = 27;
+            label.color = view.Enabled
+                ? new Color(0.95f, 0.97f, 0.94f, 1f)
+                : new Color(0.78f, 0.82f, 0.82f, 0.96f);
+
+            var iconSprite = ResolvePurchaseChoiceIcon(view);
+            if (iconSprite == null)
+            {
+                return;
+            }
+
+            var iconObject = new GameObject("Shop Choice Icon");
+            iconObject.transform.SetParent(background.transform, false);
+            var iconRect = iconObject.AddComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0.04f, 0.18f);
+            iconRect.anchorMax = new Vector2(0.18f, 0.82f);
+            iconRect.offsetMin = Vector2.zero;
+            iconRect.offsetMax = Vector2.zero;
+            var icon = iconObject.AddComponent<Image>();
+            icon.sprite = iconSprite;
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            icon.color = view.Enabled ? Color.white : new Color(0.72f, 0.76f, 0.78f, 0.88f);
+            _shopChoiceIconImages.Add(icon);
         }
 
         private Button CreateMapNodeButton(PrototypeFloorMapNodeView node, Action<string> onNodeSelected)
@@ -1172,6 +1309,35 @@ namespace HwigiTower.UI
             nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.305f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.265f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.02f, 0.025f, 0.03f, 0.50f), false);
             endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.30f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.06f, 0.055f, 0.04f, 0.90f), false);
+        }
+
+        private void EnsureTopHudIcons()
+        {
+            EnsureScreenLayers();
+            topGoldIconImage = EnsureHudIcon(topGoldIconImage, "Top Gold Icon", topStatusLayer, new Vector2(0.56f, 0.58f), 34f);
+            topMemoryIconImage = EnsureHudIcon(topMemoryIconImage, "Top Memory Icon", topStatusLayer, new Vector2(0.28f, 0.24f), 32f);
+            topAffinityIconImage = EnsureHudIcon(topAffinityIconImage, "Top Affinity Icon", topStatusLayer, new Vector2(0.48f, 0.24f), 32f);
+        }
+
+        private static Image EnsureHudIcon(Image current, string name, Transform parent, Vector2 anchor, float size)
+        {
+            if (current != null || parent == null)
+            {
+                return current;
+            }
+
+            var iconObject = new GameObject(name);
+            iconObject.transform.SetParent(parent, false);
+            var rect = iconObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(size, size);
+            rect.anchoredPosition = Vector2.zero;
+            var image = iconObject.AddComponent<Image>();
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            return image;
         }
 
         private RectTransform EnsureLayerPanel(RectTransform layer, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size, Color color, bool active)
@@ -2080,13 +2246,15 @@ namespace HwigiTower.UI
             npcSpotlightBackdropImage.gameObject.SetActive(true);
 
             npcSpotlightGlowImage = CreateCombatImage(npcSpotlightLayer, "NPC Spotlight Glow", new Vector2(0.01f, 0.08f), new Vector2(0.52f, 0.98f));
-            npcSpotlightGlowImage.sprite = null;
-            npcSpotlightGlowImage.color = new Color(0.52f, 0.72f, 0.62f, 0.22f);
+            npcSpotlightGlowImage.sprite = presentationData == null ? null : presentationData.SpotlightGradient;
+            npcSpotlightGlowImage.preserveAspect = true;
+            npcSpotlightGlowImage.color = npcSpotlightGlowImage.sprite == null ? new Color(0.52f, 0.72f, 0.62f, 0.22f) : new Color(0.86f, 0.96f, 0.86f, 0.72f);
             npcSpotlightGlowImage.gameObject.SetActive(true);
 
             npcSpotlightShadowImage = CreateCombatImage(npcSpotlightLayer, "NPC Spotlight Shadow", new Vector2(0.04f, 0.05f), new Vector2(0.48f, 0.88f));
-            npcSpotlightShadowImage.sprite = null;
-            npcSpotlightShadowImage.color = new Color(0f, 0f, 0f, 0.42f);
+            npcSpotlightShadowImage.sprite = presentationData == null ? null : presentationData.SpotlightGradient;
+            npcSpotlightShadowImage.preserveAspect = true;
+            npcSpotlightShadowImage.color = npcSpotlightShadowImage.sprite == null ? new Color(0f, 0f, 0f, 0.42f) : new Color(0f, 0f, 0f, 0.36f);
             npcSpotlightShadowImage.gameObject.SetActive(true);
 
             var merchantObject = new GameObject("Merchant Visual");
@@ -2105,6 +2273,14 @@ namespace HwigiTower.UI
             merchantVisualImage.gameObject.SetActive(false);
 
             var plate = CreatePanel("NPC Dialogue Plate", npcSpotlightLayer, new Vector2(0.04f, 0.05f), new Vector2(0.49f, 0.28f), new Color(0.03f, 0.045f, 0.050f, 0.78f));
+            npcDialoguePlateImage = plate.GetComponent<Image>();
+            if (npcDialoguePlateImage != null && presentationData != null && presentationData.NpcDialoguePlate != null)
+            {
+                npcDialoguePlateImage.sprite = presentationData.NpcDialoguePlate;
+                npcDialoguePlateImage.preserveAspect = true;
+                npcDialoguePlateImage.color = Color.white;
+            }
+
             npcSpotlightNameText = CreateCombatChildText(plate, "NPC Spotlight Name", new Vector2(0.06f, 0.60f), new Vector2(0.94f, 0.92f), 25, TextAnchor.MiddleLeft);
             npcSpotlightNameText.color = new Color(0.91f, 0.98f, 0.91f, 1f);
             npcSpotlightDialogueText = CreateCombatChildText(plate, "NPC Spotlight Dialogue", new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.58f), 23, TextAnchor.MiddleLeft);
@@ -2269,12 +2445,16 @@ namespace HwigiTower.UI
             combatMataiosPortraitImage = CreateCombatPortraitBox(combatMataiosCard, "Combat Mataios Portrait", new Vector2(0.04f, 0.16f), new Vector2(0.31f, 0.90f), new Color(0.12f, 0.14f, 0.18f, 1f), string.Empty, out _);
             combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
             combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.35f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
+            combatTrainingStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Training Status Icon", new Vector2(0.76f, 0.72f), new Vector2(0.84f, 0.90f));
+            combatBandageStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Bandage Status Icon", new Vector2(0.84f, 0.72f), new Vector2(0.92f, 0.90f));
+            combatRecallStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Recall Status Icon", new Vector2(0.68f, 0.72f), new Vector2(0.76f, 0.90f));
             playerHpFill = CreateHpBar(combatPlayerCard, "Player HP Bar", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.15f), new Color(0.30f, 0.78f, 0.50f, 1f));
 
             attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.22f, 0.045f), CombatAction.Attack, out attackActionIconImage);
             defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.045f), CombatAction.Defend, out defendActionIconImage);
             skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "정찰", new Vector2(0.78f, 0.045f), CombatAction.Skill, out skillActionIconImage);
             skillButton.interactable = false;
+            ApplyCombatStatusIconSprites();
         }
 
         private RectTransform CreateCombatPanelRect(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Color color)
@@ -3317,6 +3497,8 @@ namespace HwigiTower.UI
                 combatPlayerCardText.text = BuildCombatPlayerCardText(snapshot);
             }
 
+            UpdateCombatStatusIcons(snapshot);
+
             if (combatMataiosCardText != null)
             {
                 combatMataiosCardText.text = BuildCombatMataiosCardText(snapshot);
@@ -3328,6 +3510,66 @@ namespace HwigiTower.UI
             SetCombatActionIcon(attackActionIconImage, CombatAction.Attack, new Color(0.84f, 0.34f, 0.26f, 0.94f));
             SetCombatActionIcon(defendActionIconImage, CombatAction.Defend, new Color(0.38f, 0.58f, 0.82f, 0.94f));
             SetCombatActionIcon(skillActionIconImage, CombatAction.Skill, new Color(0.78f, 0.68f, 0.34f, 0.94f));
+        }
+
+        private void UpdateTopHudIcons(PrototypeRunSnapshot snapshot)
+        {
+            EnsureTopHudIcons();
+            ApplyTopHudIconSprites();
+            var visible = !showRawDebugText && !string.IsNullOrEmpty(snapshot.RunId);
+            SetImageVisible(topGoldIconImage, visible);
+            SetImageVisible(topMemoryIconImage, visible);
+            SetImageVisible(topAffinityIconImage, visible);
+        }
+
+        private void ApplyTopHudIconSprites()
+        {
+            SetStaticIcon(topGoldIconImage, "resource.gold");
+            SetStaticIcon(topMemoryIconImage, "resource.memory");
+            SetStaticIcon(topAffinityIconImage, "resource.affinity");
+        }
+
+        private void ApplyCombatStatusIconSprites()
+        {
+            SetStaticIcon(combatTrainingStatusIconImage, "status.training");
+            SetStaticIcon(combatBandageStatusIconImage, "status.bandage");
+            SetStaticIcon(combatRecallStatusIconImage, "status.recall_anchor");
+        }
+
+        private void UpdateCombatStatusIcons(PrototypeRunSnapshot snapshot)
+        {
+            ApplyCombatStatusIconSprites();
+            var hasTraining = _roomController != null && _roomController.RunState != null && _roomController.RunState.TrainingBuffActive;
+            var hasBandage = _roomController != null && _roomController.RunState != null && _roomController.RunState.GetItemCount("ITEM_FIELD_BANDAGE") > 0;
+            var hasRecall = _roomController != null && _roomController.RunState != null && _roomController.RunState.HasAbilityRef("ABILITY_RECALL_ANCHOR");
+            SetImageVisible(combatTrainingStatusIconImage, snapshot.IsInCombat && hasTraining);
+            SetImageVisible(combatBandageStatusIconImage, snapshot.IsInCombat && hasBandage);
+            SetImageVisible(combatRecallStatusIconImage, snapshot.IsInCombat && hasRecall);
+        }
+
+        private void SetStaticIcon(Image target, string key)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            target.sprite = ResolveIcon(key);
+            target.color = target.sprite == null ? new Color(1f, 1f, 1f, 0f) : Color.white;
+            target.preserveAspect = true;
+        }
+
+        private Sprite ResolveIcon(string key)
+        {
+            return presentationData != null && presentationData.TryGetIcon(key, out var icon) ? icon : null;
+        }
+
+        private static void SetImageVisible(Image target, bool visible)
+        {
+            if (target != null)
+            {
+                target.gameObject.SetActive(visible && target.sprite != null);
+            }
         }
 
         private void SetCombatActionIcon(Image target, CombatAction action, Color fallbackColor)
@@ -3424,6 +3666,39 @@ namespace HwigiTower.UI
         private static bool IsPurchaseChoice(string choiceStableId)
         {
             return !string.IsNullOrEmpty(choiceStableId) && choiceStableId.Contains("_BUY_", StringComparison.Ordinal);
+        }
+
+        private Sprite ResolveShopCardSprite(bool enabled)
+        {
+            if (presentationData == null)
+            {
+                return null;
+            }
+
+            return enabled
+                ? presentationData.ShopProductCard
+                : presentationData.ShopLockedCard != null ? presentationData.ShopLockedCard : presentationData.ShopProductCard;
+        }
+
+        private Sprite ResolvePurchaseChoiceIcon(PrototypeEncounterChoiceView view)
+        {
+            var title = ResolvePurchaseChoiceTitle(view.HintText);
+            var key = title switch
+            {
+                "붕대" => "item.field_bandage",
+                "등유" => "item.lantern_oil",
+                "찢어진 부적" => "item.torn_charm",
+                "정찰" => "ability.scout",
+                "회상 닻" => "ability.recall_anchor",
+                _ => string.Empty
+            };
+
+            if (string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(view.ChoiceStableId) && view.ChoiceStableId.Contains("_BUY_ABILITY", StringComparison.Ordinal))
+            {
+                key = view.HintText.Contains("회상", StringComparison.Ordinal) ? "ability.recall_anchor" : "ability.scout";
+            }
+
+            return ResolveIcon(key);
         }
 
         private static string ResolvePurchaseChoiceTitle(string hint)
@@ -4090,6 +4365,11 @@ namespace HwigiTower.UI
 
         private void UpdatePresentationState(PrototypeRunSnapshot snapshot)
         {
+            if (RestInteractionPanelVisible)
+            {
+                return;
+            }
+
             var slot = ResolveCurrentPresentationSlot(snapshot);
             ApplyPresentationSlot(slot);
             if (!snapshot.IsInCombat && (_shopPresentationActive || IsShopEncounterId(snapshot.NextDemoEncounterId)))

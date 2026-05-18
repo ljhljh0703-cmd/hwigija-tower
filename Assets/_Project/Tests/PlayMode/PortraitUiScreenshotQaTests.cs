@@ -78,6 +78,11 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.IsTrue(hud.NpcSpotlightVisible);
                 Assert.AreEqual("상점", hud.CurrentNpcSpotlightModeLabel);
                 StringAssert.Contains("상인", hud.NpcSpotlightMessage);
+                StringAssert.Contains("ui_spotlight_gradient", hud.CurrentNpcSupportSpriteNames);
+                StringAssert.Contains("ui_npc_dialogue_plate", hud.CurrentNpcSupportSpriteNames);
+                StringAssert.Contains("ui_shop_product_card", hud.CurrentShopChoiceCardSpriteNames);
+                StringAssert.Contains("icon_item_field_bandage", hud.CurrentShopChoiceIconNames);
+                StringAssert.Contains("icon_ability_scout", hud.CurrentShopChoiceIconNames);
             });
         }
 
@@ -92,6 +97,9 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.IsTrue(hud.NpcSpotlightVisible);
                 Assert.AreEqual("휴식", hud.CurrentNpcSpotlightModeLabel);
                 StringAssert.Contains("마타이오스", hud.NpcSpotlightMessage);
+                Assert.AreEqual("enc_rest_01_bg", hud.CurrentBackgroundSpriteName);
+                StringAssert.Contains("ui_spotlight_gradient", hud.CurrentNpcSupportSpriteNames);
+                StringAssert.Contains("ui_npc_dialogue_plate", hud.CurrentNpcSupportSpriteNames);
             });
         }
 
@@ -109,6 +117,7 @@ namespace HwigiTower.Tests.PlayMode
                 button.onClick.Invoke();
                 Assert.IsTrue(controller.RunState.IsInCombat, "Expected active combat for " + encounterId);
                 hud.ShowRunState(controller.GetSnapshot());
+                StringAssert.Contains("icon_gold", hud.CurrentTopHudIconNames);
             });
         }
 

@@ -79,6 +79,16 @@ namespace HwigiTower.UI
     }
 
     [System.Serializable]
+    public sealed class DemoIconSlot
+    {
+        [SerializeField] private string key = string.Empty;
+        [SerializeField] private Sprite icon;
+
+        public string Key => key;
+        public Sprite Icon => icon;
+    }
+
+    [System.Serializable]
     public sealed class DemoFloorMapBackgroundSlot
     {
         [SerializeField, Min(1)] private int floor = 1;
@@ -97,11 +107,16 @@ namespace HwigiTower.UI
         [SerializeField] private Sprite selectedNodeRing;
         [SerializeField] private Sprite lockedNodeOverlay;
         [SerializeField] private Sprite currentPositionMarker;
+        [SerializeField] private Sprite spotlightGradient;
+        [SerializeField] private Sprite npcDialoguePlate;
+        [SerializeField] private Sprite shopProductCard;
+        [SerializeField] private Sprite shopLockedCard;
         [SerializeField] private DemoFloorMapBackgroundSlot[] floorMapBackgroundSlots = new DemoFloorMapBackgroundSlot[0];
         [SerializeField] private DemoMerchantPresentationSlot[] merchantSlots = new DemoMerchantPresentationSlot[0];
         [SerializeField] private DemoNodeIconSlot[] nodeIconSlots = new DemoNodeIconSlot[0];
         [SerializeField] private DemoCombatActionIconSlot[] combatActionIconSlots = new DemoCombatActionIconSlot[0];
         [SerializeField] private DemoRestActionIconSlot[] restActionIconSlots = new DemoRestActionIconSlot[0];
+        [SerializeField] private DemoIconSlot[] iconSlots = new DemoIconSlot[0];
         [SerializeField] private DemoPresentationSlot[] slots = new DemoPresentationSlot[0];
 
         public Sprite DefaultPlayerPortrait => defaultPlayerPortrait;
@@ -110,11 +125,16 @@ namespace HwigiTower.UI
         public Sprite SelectedNodeRing => selectedNodeRing;
         public Sprite LockedNodeOverlay => lockedNodeOverlay;
         public Sprite CurrentPositionMarker => currentPositionMarker;
+        public Sprite SpotlightGradient => spotlightGradient;
+        public Sprite NpcDialoguePlate => npcDialoguePlate;
+        public Sprite ShopProductCard => shopProductCard;
+        public Sprite ShopLockedCard => shopLockedCard;
         public DemoFloorMapBackgroundSlot[] FloorMapBackgroundSlots => floorMapBackgroundSlots ?? new DemoFloorMapBackgroundSlot[0];
         public DemoMerchantPresentationSlot[] MerchantSlots => merchantSlots ?? new DemoMerchantPresentationSlot[0];
         public DemoNodeIconSlot[] NodeIconSlots => nodeIconSlots ?? new DemoNodeIconSlot[0];
         public DemoCombatActionIconSlot[] CombatActionIconSlots => combatActionIconSlots ?? new DemoCombatActionIconSlot[0];
         public DemoRestActionIconSlot[] RestActionIconSlots => restActionIconSlots ?? new DemoRestActionIconSlot[0];
+        public DemoIconSlot[] IconSlots => iconSlots ?? new DemoIconSlot[0];
         public DemoPresentationSlot[] Slots => slots ?? new DemoPresentationSlot[0];
 
         public bool TryGetCombatActionIcon(CombatAction action, out Sprite icon)
@@ -139,6 +159,22 @@ namespace HwigiTower.UI
             for (var i = 0; i < source.Length; i++)
             {
                 if (source[i] != null && source[i].ActionId == actionId && source[i].Icon != null)
+                {
+                    icon = source[i].Icon;
+                    return true;
+                }
+            }
+
+            icon = null;
+            return false;
+        }
+
+        public bool TryGetIcon(string key, out Sprite icon)
+        {
+            var source = IconSlots;
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (source[i] != null && source[i].Key == key && source[i].Icon != null)
                 {
                     icon = source[i].Icon;
                     return true;
