@@ -777,8 +777,8 @@ namespace HwigiTower.UI
             var markerObject = new GameObject("Map Start Marker");
             markerObject.transform.SetParent(nodeMapLayer, false);
             var rect = markerObject.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.93f);
-            rect.anchorMax = new Vector2(0.5f, 0.93f);
+            rect.anchorMin = new Vector2(0.5f, 0.04f);
+            rect.anchorMax = new Vector2(0.5f, 0.04f);
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = new Vector2(MapNodeIconSize * 0.78f, MapNodeIconSize * 0.78f);
@@ -1268,11 +1268,11 @@ namespace HwigiTower.UI
             var fallbackX = node.Index <= 0 ? 0.34f : node.Index == 1 ? 0.66f : 0.50f;
             var fallbackY = node.Layer switch
             {
-                1 => 0.78f,
-                2 => 0.60f,
-                3 => 0.42f,
-                4 => 0.24f,
-                5 => 0.08f,
+                1 => 0.16f,
+                2 => 0.37f,
+                3 => 0.58f,
+                4 => 0.75f,
+                5 => 0.91f,
                 _ => 0.5f
             };
             return new Vector2(fallbackX, fallbackY);
@@ -1345,7 +1345,7 @@ namespace HwigiTower.UI
             visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.49f), new Vector2(0.96f, 0.835f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.52f), false);
             npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, PanelColor, false);
             resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.305f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.90f), false);
-            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.305f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
+            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.09f), new Vector2(0.94f, 0.73f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.265f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.02f, 0.025f, 0.03f, 0.50f), false);
             endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.30f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.06f, 0.055f, 0.04f, 0.90f), false);
         }

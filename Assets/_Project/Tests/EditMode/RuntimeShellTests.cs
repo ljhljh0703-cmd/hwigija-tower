@@ -757,9 +757,13 @@ namespace HwigiTower.Tests.EditMode
                 Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Boss));
                 var shop = nodes.Single(node => node.Type == PrototypeFloorMapNodeType.Shop);
                 var boss = nodes.Single(node => node.Type == PrototypeFloorMapNodeType.Boss);
+                var lastBranchLayer = nodes.Where(node => node.Layer < shop.Layer).Max(node => node.Layer);
                 Assert.AreEqual(4, shop.Layer);
                 Assert.AreEqual(5, boss.Layer);
-                Assert.IsTrue(nodes.Where(node => node.Layer == 3).All(node => node.NextMapNodeIds.Contains(shop.MapNodeId)));
+                Assert.Greater(shop.NormalizedY, nodes.Where(node => node.Layer == lastBranchLayer).Max(node => node.NormalizedY));
+                Assert.Greater(boss.NormalizedY, shop.NormalizedY);
+                Assert.LessOrEqual(nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Rest), 1);
+                Assert.IsTrue(nodes.Where(node => node.Layer == lastBranchLayer).All(node => node.NextMapNodeIds.Contains(shop.MapNodeId)));
                 CollectionAssert.Contains(shop.NextMapNodeIds, boss.MapNodeId);
                 Assert.IsTrue(nodes.Where(node => node.Layer == 1).All(node => node.Selectable));
                 Assert.IsTrue(nodes.Where(node => node.Layer > 1).All(node => !node.Selectable));

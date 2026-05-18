@@ -226,6 +226,7 @@ namespace HwigiTower.Tests.PlayMode
             controller.RunState.ModifyGold(100);
             yield return ResolveRouteActionChoice(hud, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
             yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
+            yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_01", "CHOICE_MEMORY_01_UNLOCK");
 
             if (hud.RouteActionButtonVisible)
             {
