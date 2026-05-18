@@ -94,6 +94,7 @@ namespace HwigiTower.Tests.PlayMode
             yield return CapturePrototypeRoomScreen(fileName, (controller, hud) =>
             {
                 Assert.IsTrue(controller.OpenQaFloor(floor), "Missing QA floor path " + floor);
+                controller.RunState.ModifyGold(100);
                 var selection = controller.CreateQaEncounterSelection(encounterId);
                 Assert.IsTrue(selection.HasEncounter, "Missing QA shop selection " + encounterId);
                 hud.OpenQaRouteStep(selection);

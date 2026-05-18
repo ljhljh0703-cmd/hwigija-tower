@@ -109,6 +109,7 @@ namespace HwigiTower.UI
         private string _lastCombatCutsceneKey = string.Empty;
         private string _lastDemoCompleteCutsceneKey = string.Empty;
         private string _npcSpotlightModeLabel = string.Empty;
+        private string _activePresentationEncounterId = string.Empty;
         private bool _cutsceneFinishedSubscribed;
         private bool _shopPresentationActive;
         private bool _eventPresentationActive;
@@ -4394,6 +4395,14 @@ namespace HwigiTower.UI
                 return null;
             }
 
+            if (!snapshot.IsInCombat &&
+                (_shopPresentationActive || _eventPresentationActive) &&
+                !string.IsNullOrEmpty(_activePresentationEncounterId) &&
+                presentationData.TryGetSlot(_activePresentationEncounterId, out var activeSlot))
+            {
+                return activeSlot;
+            }
+
             var encounterId = snapshot.IsInCombat ? ResolveCombatEncounterId() : snapshot.NextDemoEncounterId;
             if (string.IsNullOrEmpty(encounterId) && snapshot.RunClear)
             {
@@ -4417,6 +4426,7 @@ namespace HwigiTower.UI
         {
             if (presentationData != null && presentationData.TryGetSlot(encounterStableId, out var slot))
             {
+                _activePresentationEncounterId = encounterStableId;
                 ApplyPresentationSlot(slot);
             }
         }
@@ -4964,7 +4974,10 @@ namespace HwigiTower.UI
                 inputModule = eventSystem.gameObject.AddComponent<InputSystemUIInputModule>();
             }
 
-            inputModule.AssignDefaultActions();
+            if (Application.isPlaying)
+            {
+                inputModule.AssignDefaultActions();
+            }
         }
     }
 }

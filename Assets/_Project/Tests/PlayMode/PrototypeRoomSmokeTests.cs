@@ -174,7 +174,7 @@ namespace HwigiTower.Tests.PlayMode
             hud.ShowRunState(controller.GetSnapshot());
             yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
             yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.shop"), "ENC_SHOP_02", "CHOICE_SHOP_02_BUY_ABILITY");
+            yield return ResolveRouteChoice(controller, hud, FindNode("node.shop"), "ENC_SHOP_03", "CHOICE_SHOP_03_BUY_ABILITY");
             yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
             hud.ShowRunState(controller.GetSnapshot());
@@ -306,20 +306,20 @@ namespace HwigiTower.Tests.PlayMode
 
             yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
             yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
-            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_02", "CHOICE_SHOP_02_BUY_ABILITY");
+            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_03", "CHOICE_SHOP_03_BUY_ABILITY");
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return ResolveNextFloorButton(hud);
 
             yield return ResolveRouteActionRest(hud, "ENC_REST_01", "rest.train", "다음 싸움을 준비하자");
             yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
-            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
+            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_04", "CHOICE_SHOP_04_LEAVE");
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             Assert.AreEqual("ENEMY_WRAITH_04", controller.RunState.LastCombatEnemyId);
             yield return ResolveNextFloorButton(hud);
 
             yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
             yield return ResolveRouteActionRest(hud, "ENC_REST_05", "rest.recover", string.Empty);
-            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
+            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_05", "CHOICE_SHOP_05_LEAVE");
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
             hud.ShowRunState(controller.GetSnapshot());
 
@@ -454,14 +454,14 @@ namespace HwigiTower.Tests.PlayMode
 
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_02", "CHOICE_SHOP_02_BUY_ABILITY");
+            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_03", "CHOICE_SHOP_03_BUY_ABILITY");
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
             hud.ShowRunState(controller.GetSnapshot());
 
             yield return ResolveRouteChoice(controller, hud, restNode, "ENC_REST_01", "CHOICE_REST_01_REST");
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
+            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_04", "CHOICE_SHOP_04_LEAVE");
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
             hud.ShowRunState(controller.GetSnapshot());
@@ -469,7 +469,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(5, controller.RunState.CurrentFloor);
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
             yield return ResolveRouteChoice(controller, hud, restNode, "ENC_REST_05", "CHOICE_REST_05_REST");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_02", "CHOICE_SHOP_02_LEAVE");
+            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_05", "CHOICE_SHOP_05_LEAVE");
 
             controller.AutoResolveCombat = false;
             yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");

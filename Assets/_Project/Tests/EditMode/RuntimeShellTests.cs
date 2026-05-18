@@ -723,9 +723,9 @@ namespace HwigiTower.Tests.EditMode
 
             CollectionAssert.AreEqual(new[] { "ENC_SHOP_01", "EVT_F01_JAR_ROOM", "ENC_REST_01", "ENC_MORAL_CHOICE_01", "ENC_MEMORY_FRAGMENT_01", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(1)));
             CollectionAssert.AreEqual(new[] { "ENC_F02_SHOP_001", "ENC_REST_02", "ENC_F02_MORAL_CHOICE_001", "ENC_COMBAT_GATE_02" }, RouteEncounterIds(room.GetRunPathForFloor(2)));
-            CollectionAssert.AreEqual(new[] { "ENC_SHOP_02", "ENC_REST_03", "ENC_MORAL_CHOICE_02", "ENC_MEMORY_FRAGMENT_02", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(3)));
-            CollectionAssert.AreEqual(new[] { "ENC_REST_01", "ENC_MORAL_CHOICE_03", "ENC_SHOP_02", "ENC_MEMORY_FRAGMENT_03", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(4)));
-            CollectionAssert.AreEqual(new[] { "ENC_MEMORY_FRAGMENT_04", "ENC_MEMORY_FRAGMENT_05", "ENC_REST_05", "ENC_SHOP_02", "ENC_COMBAT_GATE_03" }, RouteEncounterIds(room.GetRunPathForFloor(5)));
+            CollectionAssert.AreEqual(new[] { "ENC_SHOP_03", "ENC_REST_03", "ENC_MORAL_CHOICE_02", "ENC_MEMORY_FRAGMENT_02", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(3)));
+            CollectionAssert.AreEqual(new[] { "ENC_REST_01", "ENC_MORAL_CHOICE_03", "ENC_SHOP_04", "ENC_MEMORY_FRAGMENT_03", "ENC_COMBAT_GATE_01" }, RouteEncounterIds(room.GetRunPathForFloor(4)));
+            CollectionAssert.AreEqual(new[] { "ENC_MEMORY_FRAGMENT_04", "ENC_MEMORY_FRAGMENT_05", "ENC_REST_05", "ENC_SHOP_05", "ENC_COMBAT_GATE_03" }, RouteEncounterIds(room.GetRunPathForFloor(5)));
         }
 
         [Test]
@@ -2129,6 +2129,15 @@ namespace HwigiTower.Tests.EditMode
                     break;
                 case "ENC_SHOP_02":
                     preferredChoiceId = "CHOICE_SHOP_02_LEAVE";
+                    break;
+                case "ENC_SHOP_03":
+                    preferredChoiceId = "CHOICE_SHOP_03_LEAVE";
+                    break;
+                case "ENC_SHOP_04":
+                    preferredChoiceId = "CHOICE_SHOP_04_LEAVE";
+                    break;
+                case "ENC_SHOP_05":
+                    preferredChoiceId = "CHOICE_SHOP_05_LEAVE";
                     break;
                 case "ENC_F02_SHOP_001":
                     preferredChoiceId = "CHOICE_F02_SHOP_BUY_ITEM";
