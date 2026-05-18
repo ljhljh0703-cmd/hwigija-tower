@@ -152,16 +152,14 @@ namespace HwigiTower.Run
                 return;
             }
 
-            for (var layer = 1; layer <= 3; layer++)
+            var branchLayers = BuildBranchLayers(branchSteps);
+            for (var layer = 1; layer <= branchLayers.Length; layer++)
             {
-                var count = random.Range(2, 4);
+                var layerSteps = branchLayers[layer - 1];
+                var count = layerSteps.Count;
                 for (var index = 0; index < count; index++)
                 {
-                    var step = branchSteps.Count == 0
-                        ? null
-                        : index == 0 && branchSteps.Count >= layer
-                            ? branchSteps[layer - 1]
-                            : branchSteps[random.Range(0, branchSteps.Count)];
+                    var step = layerSteps[index];
                     if (step == null || !step.IsValid)
                     {
                         continue;
@@ -185,7 +183,7 @@ namespace HwigiTower.Run
                 shopNode = new PrototypeFloorMapNode(BuildMapNodeId(floor, 4, 0, steps[shopIndex]), PrototypeFloorMapNodeType.Shop, floor, 4, 0, steps[shopIndex])
                 {
                     NormalizedX = 0.5f,
-                    NormalizedY = 0.24f
+                    NormalizedY = 0.75f
                 };
                 destination.Add(shopNode);
             }
@@ -196,7 +194,7 @@ namespace HwigiTower.Run
                 bossNode = new PrototypeFloorMapNode(BuildMapNodeId(floor, 5, 0, steps[bossIndex]), PrototypeFloorMapNodeType.Boss, floor, 5, 0, steps[bossIndex])
                 {
                     NormalizedX = 0.5f,
-                    NormalizedY = 0.08f
+                    NormalizedY = 0.91f
                 };
                 destination.Add(bossNode);
             }
@@ -238,7 +236,7 @@ namespace HwigiTower.Run
             var bossNode = new PrototypeFloorMapNode(BuildMapNodeId(floor, 5, 0, bossStep), PrototypeFloorMapNodeType.Boss, floor, 5, 0, bossStep)
             {
                 NormalizedX = 0.5f,
-                NormalizedY = 0.08f
+                NormalizedY = 0.91f
             };
             destination.Add(bossNode);
 
@@ -262,24 +260,88 @@ namespace HwigiTower.Run
             node.NormalizedX = Clamp01(baseX + jitter);
             node.NormalizedY = node.Layer switch
             {
-                1 => random.Range(0.73f, 0.81f),
-                2 => random.Range(0.55f, 0.64f),
-                3 => random.Range(0.37f, 0.46f),
+                1 => random.Range(0.12f, 0.21f),
+                2 => random.Range(0.32f, 0.43f),
+                3 => random.Range(0.53f, 0.64f),
                 _ => 0.5f
             };
         }
 
-        private static void ConnectLayers(List<PrototypeFloorMapNode> nodes)
+        private static List<PrototypeDemoRunStep>[] BuildBranchLayers(List<PrototypeDemoRunStep> branchSteps)
         {
-            for (var layer = 1; layer <= 3; layer++)
+            var layers = new[]
             {
-                var current = CollectLayer(nodes, layer);
-                var next = CollectLayer(nodes, layer + 1);
-                if (layer == 3)
+                new List<PrototypeDemoRunStep>(),
+                new List<PrototypeDemoRunStep>(),
+                new List<PrototypeDemoRunStep>()
+            };
+
+            if (branchSteps == null || branchSteps.Count == 0)
+            {
+                return layers;
+            }
+
+            for (var i = 0; i < branchSteps.Count; i++)
+            {
+                var step = branchSteps[i];
+                if (step == null || !step.IsValid)
                 {
-                    next = CollectLayer(nodes, 4);
+                    continue;
                 }
 
+                var layer = ResolveBranchLayer(i, branchSteps.Count);
+                layers[layer].Add(step);
+            }
+
+            return layers;
+        }
+
+        private static int ResolveBranchLayer(int index, int count)
+        {
+            if (count <= 1)
+            {
+                return 0;
+            }
+
+            if (count == 2)
+            {
+                return index == 0 ? 0 : 1;
+            }
+
+            if (count == 3)
+            {
+                return index;
+            }
+
+            if (index == 0)
+            {
+                return 0;
+            }
+
+            if (index == count - 1)
+            {
+                return 2;
+            }
+
+            return 1;
+        }
+
+        private static void ConnectLayers(List<PrototypeFloorMapNode> nodes)
+        {
+            var nonEmptyLayers = new List<List<PrototypeFloorMapNode>>();
+            for (var layer = 1; layer <= 4; layer++)
+            {
+                var layerNodes = CollectLayer(nodes, layer);
+                if (layerNodes.Count > 0)
+                {
+                    nonEmptyLayers.Add(layerNodes);
+                }
+            }
+
+            for (var layer = 0; layer < nonEmptyLayers.Count - 1; layer++)
+            {
+                var current = nonEmptyLayers[layer];
+                var next = nonEmptyLayers[layer + 1];
                 for (var i = 0; i < current.Count; i++)
                 {
                     for (var n = 0; n < next.Count; n++)

@@ -1976,7 +1976,7 @@ namespace HwigiTower.Run
             var lastCompleted = GetLastCompletedMapNode();
             if (lastCompleted == null)
             {
-                return node.Layer == 1;
+                return node.Layer == activeLayer;
             }
 
             return lastCompleted.NextMapNodeIds.Contains(node.MapNodeId);
