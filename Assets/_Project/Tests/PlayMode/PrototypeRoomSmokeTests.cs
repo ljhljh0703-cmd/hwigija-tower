@@ -141,7 +141,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual("ENEMY_STATUE_01", controller.RunState.LastCombatEnemyId);
             Assert.IsTrue(hud.CombatPanelVisible);
             Assert.IsTrue(hud.CombatPartyDockVisible);
-            Assert.AreEqual("char_player_standing_01", hud.CurrentCombatPlayerPortraitSpriteName);
+            Assert.AreEqual("char_player_portrait_01", hud.CurrentCombatPlayerPortraitSpriteName);
+            Assert.AreEqual("char_mataios_portrait_01", hud.CurrentCombatMataiosPortraitSpriteName);
             StringAssert.Contains("적 HP", hud.CombatMessage);
             StringAssert.Contains("플레이어", hud.CombatPartyMessage);
             StringAssert.Contains("마타이오스", hud.CombatPartyMessage);
