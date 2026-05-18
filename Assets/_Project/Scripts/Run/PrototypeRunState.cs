@@ -842,6 +842,25 @@ namespace HwigiTower.Run
 
             return views.ToArray();
         }
+
+        public bool OpenQaFloor(int floor)
+        {
+            if (floor < 1 || !HasFloorRunPath(floor))
+            {
+                return false;
+            }
+
+            _currentFloor = floor;
+            _stairUnlocked = false;
+            _runClear = false;
+            _runFailed = false;
+            _restartReady = false;
+            _resolvedDemoSteps.Clear();
+            _selectedMapNodeId = string.Empty;
+            AttachDemoRunPath(GetFloorRunPath(_currentFloor, null));
+            SetNpcReaction("NPC_REACT_FLOOR_" + _currentFloor);
+            return true;
+        }
 #endif
 
         public bool TrySelectMapNode(string mapNodeId, out PrototypeDemoRunStep step)

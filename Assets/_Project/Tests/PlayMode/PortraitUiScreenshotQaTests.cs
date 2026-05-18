@@ -32,6 +32,9 @@ namespace HwigiTower.Tests.PlayMode
             yield return CaptureEncounterScreen("03_event_jar_room.png", "EVT_F01_JAR_ROOM");
             yield return CaptureRestScreen();
             yield return CaptureShopScreen();
+            yield return CaptureFloorShopScreen("09_shop_floor3.png", 3, "ENC_SHOP_03", "enc_shop_03_bg", "merchant_human");
+            yield return CaptureFloorShopScreen("10_shop_floor4.png", 4, "ENC_SHOP_04", "enc_shop_04_bg", "merchant_otherworld");
+            yield return CaptureFloorShopScreen("11_shop_floor5.png", 5, "ENC_SHOP_05", "enc_shop_05_bg", "merchant_otherworld");
             yield return CaptureCombatScreen("06_normal_combat.png", "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return CaptureCombatScreen("07_boss_combat.png", "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
             yield return CaptureEndingChoice();
@@ -83,6 +86,29 @@ namespace HwigiTower.Tests.PlayMode
                 StringAssert.Contains("ui_shop_product_card", hud.CurrentShopChoiceCardSpriteNames);
                 StringAssert.Contains("icon_item_field_bandage", hud.CurrentShopChoiceIconNames);
                 StringAssert.Contains("icon_ability_scout", hud.CurrentShopChoiceIconNames);
+            });
+        }
+
+        private static IEnumerator CaptureFloorShopScreen(string fileName, int floor, string encounterId, string expectedBackground, string expectedMerchant)
+        {
+            yield return CapturePrototypeRoomScreen(fileName, (controller, hud) =>
+            {
+                Assert.IsTrue(controller.OpenQaFloor(floor), "Missing QA floor path " + floor);
+                var selection = controller.CreateQaEncounterSelection(encounterId);
+                Assert.IsTrue(selection.HasEncounter, "Missing QA shop selection " + encounterId);
+                hud.OpenQaRouteStep(selection);
+
+                var merchantVisual = GameObject.Find("Merchant Visual");
+                Assert.IsNotNull(merchantVisual, "Missing merchant spotlight visual for floor " + floor);
+                var image = merchantVisual.GetComponent<Image>();
+                Assert.IsNotNull(image);
+                Assert.IsNotNull(image.sprite);
+                Assert.AreEqual(expectedMerchant, image.sprite.name);
+                Assert.AreEqual(expectedBackground, hud.CurrentBackgroundSpriteName);
+                Assert.IsTrue(hud.NpcSpotlightVisible);
+                Assert.AreEqual("상점", hud.CurrentNpcSpotlightModeLabel);
+                StringAssert.Contains("ui_spotlight_gradient", hud.CurrentNpcSupportSpriteNames);
+                StringAssert.Contains("ui_shop_product_card", hud.CurrentShopChoiceCardSpriteNames);
             });
         }
 
@@ -315,6 +341,9 @@ namespace HwigiTower.Tests.PlayMode
             "03_event_jar_room.png",
             "04_rest_mataios.png",
             "05_shop.png",
+            "09_shop_floor3.png",
+            "10_shop_floor4.png",
+            "11_shop_floor5.png",
             "06_normal_combat.png",
             "07_boss_combat.png",
             "08_ending_choice.png"

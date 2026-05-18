@@ -94,6 +94,16 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void RoomDefinition_FloorThreeFiveShopRoutesUseDedicatedShopEncounters()
+        {
+            var room = LoadRoom();
+
+            AssertFloorShop(room, 3, "ENC_SHOP_03");
+            AssertFloorShop(room, 4, "ENC_SHOP_04");
+            AssertFloorShop(room, 5, "ENC_SHOP_05");
+        }
+
+        [Test]
         public void SaveData_ExplicitlyExcludesReflectionAndLlmCache()
         {
             var state = new PrototypeRunState("run-save-policy", new GameFlowEventBus()) { AutoResolveCombat = true };
@@ -126,6 +136,31 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsNotNull(encounter.Choices);
             Assert.Greater(encounter.Choices.Length, 0);
             return encounter.Choices[0].stableId;
+        }
+
+        private static void AssertFloorShop(PrototypeRoomDefinition room, int floor, string expectedEncounterId)
+        {
+            var steps = room.GetRunPathForFloor(floor);
+            Assert.IsNotNull(steps, "Missing floor path " + floor);
+
+            var shopCount = 0;
+            EncounterData shop = null;
+            for (var i = 0; i < steps.Count; i++)
+            {
+                var encounter = steps[i] == null ? null : steps[i].Encounter;
+                if (encounter != null && encounter.Type == EncounterType.Shop)
+                {
+                    shopCount++;
+                    shop = encounter;
+                }
+            }
+
+            Assert.AreEqual(1, shopCount, "Expected exactly one shop on floor " + floor);
+            Assert.IsNotNull(shop);
+            Assert.AreEqual(expectedEncounterId, shop.Id);
+            Assert.AreEqual(floor, shop.Floor);
+            Assert.IsNotNull(shop.Choices);
+            Assert.GreaterOrEqual(shop.Choices.Length, 3);
         }
 
         private static bool HasCompletedMapNode(PrototypeRunSnapshot snapshot, string mapNodeId)

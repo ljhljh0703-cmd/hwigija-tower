@@ -1,0 +1,277 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_ENC_SHOP_03
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: ENC_SHOP_03
+  type: 2
+  floor: 3
+  weight: 1
+  deterministicSeedKey: SEED_ENC_SHOP_03
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_03.asset
+  sourceHash: sha256:3333333333333333333333333333333333333333333333333333333333333303
+  contentCategory: GeneralEncounter
+  npcStage: S4_COLLAPSE
+  bodyTextKey: PLACEHOLDER_ENC_SHOP_03_BODY
+  writerStatus: placeholder
+  glitchLevel: 22
+  timeLimitSeconds: 60
+  choiceStableIds:
+  - CHOICE_SHOP_03_BUY_ITEM
+  - CHOICE_SHOP_03_BUY_ABILITY
+  - CHOICE_SHOP_03_LEAVE
+  choices:
+  - stableId: CHOICE_SHOP_03_BUY_ITEM
+    textKey: PLACEHOLDER_CHOICE_SHOP_03_BUY_ITEM
+    requirementMode: All
+    requirements:
+    - kind: StatAtLeast
+      stat: gold
+      op:
+      value: 7
+      flag:
+      expected: 0
+      itemRef:
+      minCount: 0
+      abilityRef:
+      min: 0
+      max: 0
+      minFloor: 0
+      maxFloor: 0
+      memoryFragmentId:
+    effects:
+    - kind: ModifyGold
+      amount: -7
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: ITEM_LANTERN_OIL
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyAffinity
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey: PLACEHOLDER_REASON_NOT_ENOUGH_GOLD
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_03_BUY_ITEM
+  - stableId: CHOICE_SHOP_03_BUY_ABILITY
+    textKey: PLACEHOLDER_CHOICE_SHOP_03_BUY_ABILITY
+    requirementMode: All
+    requirements:
+    - kind: StatAtLeast
+      stat: gold
+      op:
+      value: 14
+      flag:
+      expected: 0
+      itemRef:
+      minCount: 0
+      abilityRef:
+      min: 0
+      max: 0
+      minFloor: 0
+      maxFloor: 0
+      memoryFragmentId:
+    effects:
+    - kind: ModifyGold
+      amount: -14
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddAbility
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef: ABILITY_RECALL_ANCHOR
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyGlitchLevel
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey: PLACEHOLDER_REASON_NOT_ENOUGH_GOLD
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_03_BUY_ABILITY
+  - stableId: CHOICE_SHOP_03_LEAVE
+    textKey: PLACEHOLDER_CHOICE_SHOP_03_LEAVE
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: Hidden
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_03_LEAVE
