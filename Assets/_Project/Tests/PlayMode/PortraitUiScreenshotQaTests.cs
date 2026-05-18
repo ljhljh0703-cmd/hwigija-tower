@@ -16,6 +16,18 @@ namespace HwigiTower.Tests.PlayMode
         private const int ScreenshotHeight = 1920;
         private const string ScreenshotDirectory = "/private/tmp/hwigi-portrait-ui-v3-screenshots";
 
+        [SetUp]
+        public void SetUp()
+        {
+            ResetRunStateIsolation();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ResetRunStateIsolation();
+        }
+
         [UnityTest]
         public IEnumerator PortraitUiV3_CapturesRequiredQaScreens()
         {
@@ -292,6 +304,13 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(ScreenshotWidth, texture.width, "Unexpected screenshot width: " + path);
             Assert.AreEqual(ScreenshotHeight, texture.height, "Unexpected screenshot height: " + path);
             Object.Destroy(texture);
+        }
+
+        private static void ResetRunStateIsolation()
+        {
+            PrototypeRunSaveStore.Delete();
+            PrototypeRunSaveRequest.RequestNewGame();
+            Time.timeScale = 1f;
         }
 
         private static Button FindChoiceButton(PrototypeHud hud, string choiceStableId)

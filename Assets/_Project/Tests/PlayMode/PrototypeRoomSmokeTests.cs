@@ -16,6 +16,18 @@ namespace HwigiTower.Tests.PlayMode
 {
     public sealed class PrototypeRoomSmokeTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            ResetRunStateIsolation();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ResetRunStateIsolation();
+        }
+
         [UnityTest]
         public IEnumerator PrototypeRoom_LoadsRuntimeAndPlayer()
         {
@@ -721,6 +733,13 @@ namespace HwigiTower.Tests.PlayMode
             var encounter = ScriptableObject.CreateInstance<EncounterData>();
             JsonUtility.FromJsonOverwrite(json, encounter);
             return encounter;
+        }
+
+        private static void ResetRunStateIsolation()
+        {
+            PrototypeRunSaveStore.Delete();
+            PrototypeRunSaveRequest.RequestNewGame();
+            Time.timeScale = 1f;
         }
 
         private static InteractableNode FindNode(string nodeId)
