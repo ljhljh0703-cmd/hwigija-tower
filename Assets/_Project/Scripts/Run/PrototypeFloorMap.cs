@@ -152,7 +152,7 @@ namespace HwigiTower.Run
                 return;
             }
 
-            var branchLayers = BuildBranchLayers(branchSteps);
+            var branchLayers = BuildFixedBranchLayers(BuildFixedBranchSteps(branchSteps, random));
             for (var layer = 1; layer <= branchLayers.Length; layer++)
             {
                 var layerSteps = branchLayers[layer - 1];
@@ -294,6 +294,98 @@ namespace HwigiTower.Run
             }
 
             return layers;
+        }
+
+        private static List<PrototypeDemoRunStep> BuildFixedBranchSteps(List<PrototypeDemoRunStep> branchSteps, DeterministicRandom random)
+        {
+            var combat = CollectStepsOfType(branchSteps, PrototypeFloorMapNodeType.Combat);
+            var events = CollectStepsOfType(branchSteps, PrototypeFloorMapNodeType.Event);
+            var rests = CollectStepsOfType(branchSteps, PrototypeFloorMapNodeType.Rest);
+            var fallback = branchSteps ?? new List<PrototypeDemoRunStep>();
+            var results = new List<PrototypeDemoRunStep>(10);
+            AddRepeated(results, events, fallback, 4);
+            AddRepeated(results, combat, fallback, 4);
+            AddRepeated(results, rests, fallback, 2);
+            Shuffle(results, random);
+            return results;
+        }
+
+        private static List<PrototypeDemoRunStep>[] BuildFixedBranchLayers(List<PrototypeDemoRunStep> branchSteps)
+        {
+            var layers = new[]
+            {
+                new List<PrototypeDemoRunStep>(),
+                new List<PrototypeDemoRunStep>(),
+                new List<PrototypeDemoRunStep>()
+            };
+
+            if (branchSteps == null || branchSteps.Count == 0)
+            {
+                return layers;
+            }
+
+            var layerSizes = new[] { 3, 4, 3 };
+            var cursor = 0;
+            for (var layer = 0; layer < layers.Length; layer++)
+            {
+                var count = layerSizes[layer];
+                for (var i = 0; i < count && cursor < branchSteps.Count; i++, cursor++)
+                {
+                    layers[layer].Add(branchSteps[cursor]);
+                }
+            }
+
+            return layers;
+        }
+
+        private static List<PrototypeDemoRunStep> CollectStepsOfType(List<PrototypeDemoRunStep> branchSteps, PrototypeFloorMapNodeType type)
+        {
+            var results = new List<PrototypeDemoRunStep>();
+            if (branchSteps == null)
+            {
+                return results;
+            }
+
+            for (var i = 0; i < branchSteps.Count; i++)
+            {
+                var step = branchSteps[i];
+                if (step != null && step.IsValid && Classify(step, false) == type)
+                {
+                    results.Add(step);
+                }
+            }
+
+            return results;
+        }
+
+        private static void AddRepeated(List<PrototypeDemoRunStep> destination, List<PrototypeDemoRunStep> preferred, List<PrototypeDemoRunStep> fallback, int count)
+        {
+            var source = preferred != null && preferred.Count > 0 ? preferred : fallback;
+            if (destination == null || source == null || source.Count == 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < count; i++)
+            {
+                destination.Add(source[i % source.Count]);
+            }
+        }
+
+        private static void Shuffle(List<PrototypeDemoRunStep> steps, DeterministicRandom random)
+        {
+            if (steps == null || random == null)
+            {
+                return;
+            }
+
+            for (var i = steps.Count - 1; i > 0; i--)
+            {
+                var swap = random.Range(0, i + 1);
+                var temp = steps[i];
+                steps[i] = steps[swap];
+                steps[swap] = temp;
+            }
         }
 
         private static int ResolveBranchLayer(int index, int count)

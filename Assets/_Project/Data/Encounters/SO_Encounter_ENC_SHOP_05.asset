@@ -28,11 +28,132 @@ MonoBehaviour:
   timeLimitSeconds: 60
   choiceStableIds:
   - CHOICE_SHOP_05_BUY_ITEM
+  - CHOICE_SHOP_05_BUY_OIL
+  - CHOICE_SHOP_05_BUY_CHARM
   - CHOICE_SHOP_05_BUY_ABILITY
+  - CHOICE_SHOP_05_BUY_RECALL
   - CHOICE_SHOP_05_LEAVE
   choices:
   - stableId: CHOICE_SHOP_05_BUY_ITEM
     textKey: PLACEHOLDER_CHOICE_SHOP_05_BUY_ITEM
+    requirementMode: All
+    requirements:
+    - kind: StatAtLeast
+      stat: gold
+      op:
+      value: 5
+      flag:
+      expected: 0
+      itemRef:
+      minCount: 0
+      abilityRef:
+      min: 0
+      max: 0
+      minFloor: 0
+      maxFloor: 0
+      memoryFragmentId:
+    effects:
+    - kind: ModifyGold
+      amount: -5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: ITEM_FIELD_BANDAGE
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyAffinity
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey: PLACEHOLDER_REASON_NOT_ENOUGH_GOLD
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_05_BUY_ITEM
+  - stableId: CHOICE_SHOP_05_BUY_OIL
+    textKey: PLACEHOLDER_CHOICE_SHOP_05_BUY_OIL
     requirementMode: All
     requirements:
     - kind: StatAtLeast
@@ -114,7 +235,7 @@ MonoBehaviour:
         npcReactionKey:
         promptHash:
         cacheKey:
-    - kind: ModifyAffinity
+    - kind: ModifyMental
       amount: 1
       flag:
       value: 0
@@ -148,9 +269,181 @@ MonoBehaviour:
         cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey: PLACEHOLDER_REASON_NOT_ENOUGH_GOLD
-    npcReactionKey: NPC_REACT_CHOICE_SHOP_05_BUY_ITEM
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_05_BUY_OIL
+  - stableId: CHOICE_SHOP_05_BUY_CHARM
+    textKey: PLACEHOLDER_CHOICE_SHOP_05_BUY_CHARM
+    requirementMode: All
+    requirements:
+    - kind: StatAtLeast
+      stat: gold
+      op:
+      value: 9
+      flag:
+      expected: 0
+      itemRef:
+      minCount: 0
+      abilityRef:
+      min: 0
+      max: 0
+      minFloor: 0
+      maxFloor: 0
+      memoryFragmentId:
+    effects:
+    - kind: ModifyGold
+      amount: -9
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: ITEM_TORN_CHARM
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey: PLACEHOLDER_REASON_NOT_ENOUGH_GOLD
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_05_BUY_CHARM
   - stableId: CHOICE_SHOP_05_BUY_ABILITY
     textKey: PLACEHOLDER_CHOICE_SHOP_05_BUY_ABILITY
+    requirementMode: All
+    requirements:
+    - kind: StatAtLeast
+      stat: gold
+      op:
+      value: 12
+      flag:
+      expected: 0
+      itemRef:
+      minCount: 0
+      abilityRef:
+      min: 0
+      max: 0
+      minFloor: 0
+      maxFloor: 0
+      memoryFragmentId:
+    effects:
+    - kind: ModifyGold
+      amount: -12
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddAbility
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef: ABILITY_SCOUT
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey: PLACEHOLDER_REASON_NOT_ENOUGH_GOLD
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_05_BUY_ABILITY
+  - stableId: CHOICE_SHOP_05_BUY_RECALL
+    textKey: PLACEHOLDER_CHOICE_SHOP_05_BUY_RECALL
     requirementMode: All
     requirements:
     - kind: StatAtLeast
@@ -232,8 +525,8 @@ MonoBehaviour:
         npcReactionKey:
         promptHash:
         cacheKey:
-    - kind: ModifyGlitchLevel
-      amount: -1
+    - kind: ModifyAffinity
+      amount: 1
       flag:
       value: 0
       itemRef:
@@ -266,7 +559,7 @@ MonoBehaviour:
         cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey: PLACEHOLDER_REASON_NOT_ENOUGH_GOLD
-    npcReactionKey: NPC_REACT_CHOICE_SHOP_05_BUY_ABILITY
+    npcReactionKey: NPC_REACT_CHOICE_SHOP_05_BUY_RECALL
   - stableId: CHOICE_SHOP_05_LEAVE
     textKey: PLACEHOLDER_CHOICE_SHOP_05_LEAVE
     requirementMode: All

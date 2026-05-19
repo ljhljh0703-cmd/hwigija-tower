@@ -24,6 +24,7 @@ MonoBehaviour:
   npcDialoguePlate: {fileID: 21300000, guid: 24817435989542f3838450230013d891, type: 3}
   shopProductCard: {fileID: 21300000, guid: ee0aac75696b4c99a1e2d2781c5da84d, type: 3}
   shopLockedCard: {fileID: 21300000, guid: fdfe16030e6e4aff8422534df5ca0488, type: 3}
+  completeBackgroundSprite: {fileID: 21300000, guid: 9b4e0b36c4d34efb8f82c80473eb5ca7, type: 3}
   floorMapBackgroundSlots:
   - floor: 1
     mapBackground: {fileID: 21300000, guid: 3585db00a9b2b4de9a439cc24d4ff154, type: 3}
@@ -336,7 +337,7 @@ MonoBehaviour:
     demoCompleteCutscene: {fileID: 0}
   - encounterStableId: run.clear
     displayName: Ending
-    backgroundSprite: {fileID: 21300000, guid: e806dd29dd2234dfc99708dc3b67689e, type: 3}
+    backgroundSprite: {fileID: 21300000, guid: 9b4e0b36c4d34efb8f82c80473eb5ca7, type: 3}
     titleTextKey: PLACEHOLDER_ENDING_CHOICE_TITLE
     bodyTextKey: PLACEHOLDER_ENDING_CHOICE_BODY
     mataiosPortrait: {fileID: 21300000, guid: 2486990e6519645a8b01883389e9a81f, type: 3}
