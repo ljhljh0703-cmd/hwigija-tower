@@ -113,6 +113,7 @@ namespace HwigiTower.UI
         [SerializeField] private Sprite npcDialoguePlate;
         [SerializeField] private Sprite shopProductCard;
         [SerializeField] private Sprite shopLockedCard;
+        [SerializeField] private Sprite completeBackgroundSprite;
         [SerializeField] private DemoFloorMapBackgroundSlot[] floorMapBackgroundSlots = new DemoFloorMapBackgroundSlot[0];
         [SerializeField] private DemoMerchantPresentationSlot[] merchantSlots = new DemoMerchantPresentationSlot[0];
         [SerializeField] private DemoNodeIconSlot[] nodeIconSlots = new DemoNodeIconSlot[0];
@@ -133,6 +134,7 @@ namespace HwigiTower.UI
         public Sprite NpcDialoguePlate => npcDialoguePlate;
         public Sprite ShopProductCard => shopProductCard;
         public Sprite ShopLockedCard => shopLockedCard;
+        public Sprite CompleteBackgroundSprite => completeBackgroundSprite;
         public DemoFloorMapBackgroundSlot[] FloorMapBackgroundSlots => floorMapBackgroundSlots ?? new DemoFloorMapBackgroundSlot[0];
         public DemoMerchantPresentationSlot[] MerchantSlots => merchantSlots ?? new DemoMerchantPresentationSlot[0];
         public DemoNodeIconSlot[] NodeIconSlots => nodeIconSlots ?? new DemoNodeIconSlot[0];

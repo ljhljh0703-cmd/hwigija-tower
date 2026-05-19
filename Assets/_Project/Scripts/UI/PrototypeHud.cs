@@ -54,6 +54,7 @@ namespace HwigiTower.UI
         [SerializeField] private Image combatTrainingStatusIconImage;
         [SerializeField] private Image combatBandageStatusIconImage;
         [SerializeField] private Image combatRecallStatusIconImage;
+        [SerializeField] private RectTransform skillPickerPanel;
         [SerializeField] private Image merchantVisualImage;
         [SerializeField] private RectTransform npcSpotlightLayer;
         [SerializeField] private Image npcSpotlightBackdropImage;
@@ -65,6 +66,8 @@ namespace HwigiTower.UI
         [SerializeField] private Image topGoldIconImage;
         [SerializeField] private Image topMemoryIconImage;
         [SerializeField] private Image topAffinityIconImage;
+        [SerializeField] private Image topPlayerProfileImage;
+        [SerializeField] private Image topMataiosProfileImage;
         [SerializeField] private Image enemyHpFill;
         [SerializeField] private Image playerHpFill;
         [SerializeField] private Button attackButton;
@@ -98,10 +101,13 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform portraitRoot;
         [SerializeField] private Image floorMapBackgroundImage;
         [SerializeField] private RectTransform utilityPanel;
+        [SerializeField] private Image utilityPortraitImage;
         [SerializeField] private Text utilityText;
         [SerializeField] private Button utilityStatusButton;
         [SerializeField] private Button utilityMapButton;
         [SerializeField] private Button utilityLoadoutButton;
+        [SerializeField] private Button utilityPlayerTabButton;
+        [SerializeField] private Button utilityMataiosTabButton;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<Image> _mapNodeIconImages = new List<Image>();
@@ -122,6 +128,7 @@ namespace HwigiTower.UI
         private bool _shopPresentationActive;
         private bool _eventPresentationActive;
         private string _utilityMode = string.Empty;
+        private string _utilityCharacterMode = "player";
         private PrototypeRunSnapshot _lastSnapshot;
 
         private enum NpcSpotlightMode
@@ -630,7 +637,7 @@ namespace HwigiTower.UI
                     SetResultVisible(false);
                     HideLegacyEncounterVisuals(hideBackground: false);
                     ApplyMerchantPresentation(_roomController == null ? 1 : _roomController.GetSnapshot().CurrentFloor);
-                    ConfigureChoiceContainerDefault();
+                    ConfigureChoiceContainerForShop();
                 }
                 else
                 {
@@ -969,7 +976,7 @@ namespace HwigiTower.UI
             }
 
             EnsureEventSystem();
-            AutoShowMapIfNeeded(snapshot);
+            // Map selection is user-driven from the persistent map button.
             UpdateScreenLayers(snapshot);
             UpdateNextFloorButton(snapshot);
             UpdateRouteActionButton(snapshot);
@@ -1404,6 +1411,8 @@ namespace HwigiTower.UI
             topGoldIconImage = EnsureHudIcon(topGoldIconImage, "Top Gold Icon", topStatusLayer, new Vector2(0.56f, 0.58f), 34f);
             topMemoryIconImage = EnsureHudIcon(topMemoryIconImage, "Top Memory Icon", topStatusLayer, new Vector2(0.28f, 0.24f), 32f);
             topAffinityIconImage = EnsureHudIcon(topAffinityIconImage, "Top Affinity Icon", topStatusLayer, new Vector2(0.48f, 0.24f), 32f);
+            topPlayerProfileImage = EnsureHudIcon(topPlayerProfileImage, "Top Player Profile", topStatusLayer, new Vector2(0.055f, 0.50f), 56f);
+            topMataiosProfileImage = EnsureHudIcon(topMataiosProfileImage, "Top Mataios Profile", topStatusLayer, new Vector2(0.125f, 0.50f), 56f);
         }
 
         private void EnsureUtilityUi()
@@ -1411,7 +1420,8 @@ namespace HwigiTower.UI
             EnsureScreenLayers();
             utilityStatusButton = EnsureUtilityButton(utilityStatusButton, "Utility Button Status", "상태", new Vector2(0.74f, 0.50f), () => ToggleUtilityPanel("status"));
             utilityMapButton = EnsureUtilityButton(utilityMapButton, "Utility Button Map", "지도", new Vector2(0.84f, 0.50f), OpenUtilityMap);
-            utilityLoadoutButton = EnsureUtilityButton(utilityLoadoutButton, "Utility Button Loadout", "정비", new Vector2(0.94f, 0.50f), () => ToggleUtilityPanel("loadout"));
+            utilityLoadoutButton = EnsureUtilityButton(utilityLoadoutButton, "Utility Button Loadout", "장비", new Vector2(0.94f, 0.50f), () => ToggleUtilityPanel("equipment"));
+            SetButtonLabel(utilityLoadoutButton, "장비");
 
             if (utilityPanel != null)
             {
@@ -1421,18 +1431,51 @@ namespace HwigiTower.UI
             var panelObject = new GameObject("Utility Panel");
             panelObject.transform.SetParent(HudParent, false);
             utilityPanel = panelObject.AddComponent<RectTransform>();
-            utilityPanel.anchorMin = new Vector2(0.58f, 0.735f);
-            utilityPanel.anchorMax = new Vector2(0.96f, 0.90f);
+            utilityPanel.anchorMin = new Vector2(0.10f, 0.16f);
+            utilityPanel.anchorMax = new Vector2(0.90f, 0.86f);
             utilityPanel.offsetMin = Vector2.zero;
             utilityPanel.offsetMax = Vector2.zero;
 
             var image = panelObject.AddComponent<Image>();
-            image.color = new Color(0.025f, 0.034f, 0.042f, 0.94f);
+            image.color = new Color(0.018f, 0.022f, 0.026f, 0.97f);
             image.raycastTarget = false;
 
-            utilityText = CreateCombatChildText(utilityPanel, "Utility Panel Text", new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.92f), 24, TextAnchor.MiddleLeft);
+            utilityPlayerTabButton = CreateUtilityTabButton(utilityPanel, "Utility Player Tab", "플레이어", new Vector2(0.10f, 0.88f), () =>
+            {
+                _utilityCharacterMode = "player";
+                RefreshUtilityPanel(_roomController == null ? _lastSnapshot : _roomController.GetSnapshot());
+            });
+            utilityMataiosTabButton = CreateUtilityTabButton(utilityPanel, "Utility Mataios Tab", "마타이오스", new Vector2(0.36f, 0.88f), () =>
+            {
+                _utilityCharacterMode = "mataios";
+                RefreshUtilityPanel(_roomController == null ? _lastSnapshot : _roomController.GetSnapshot());
+            });
+            utilityPortraitImage = CreateCombatImage(utilityPanel, "Utility Portrait", new Vector2(0.08f, 0.30f), new Vector2(0.46f, 0.78f));
+            utilityText = CreateCombatChildText(utilityPanel, "Utility Panel Text", new Vector2(0.50f, 0.18f), new Vector2(0.94f, 0.80f), 25, TextAnchor.MiddleLeft);
             utilityText.color = new Color(0.88f, 0.94f, 0.95f, 1f);
             utilityPanel.gameObject.SetActive(false);
+        }
+
+        private Button CreateUtilityTabButton(Transform parent, string name, string label, Vector2 anchor, UnityEngine.Events.UnityAction action)
+        {
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.sizeDelta = new Vector2(220f, 58f);
+            rect.anchoredPosition = Vector2.zero;
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.10f, 0.14f, 0.17f, 0.96f);
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(action);
+
+            var text = CreateCombatChildText(buttonObject.transform, "Label", Vector2.zero, Vector2.one, 24, TextAnchor.MiddleCenter);
+            text.text = label;
+            return button;
         }
 
         private Button EnsureUtilityButton(Button current, string name, string label, Vector2 anchor, UnityEngine.Events.UnityAction action)
@@ -1513,9 +1556,6 @@ namespace HwigiTower.UI
             if (!snapshot.IsInCombat &&
                 !snapshot.RunCompleted &&
                 !snapshot.StairUnlocked &&
-                !RestInteractionPanelVisible &&
-                !_shopPresentationActive &&
-                !_eventPresentationActive &&
                 snapshot.HasFloorMap)
             {
                 _roomController.CancelCurrentRouteSelection();
@@ -1552,10 +1592,12 @@ namespace HwigiTower.UI
             {
                 "status" => BuildUtilityStatus(snapshot),
                 "map" => BuildUtilityMapSummary(snapshot),
-                "loadout" => BuildUtilityLoadout(snapshot),
+                "equipment" => BuildUtilityEquipment(snapshot),
                 _ => string.Empty
             };
             utilityPanel.gameObject.SetActive(!string.IsNullOrEmpty(utilityText.text));
+            RefreshUtilityPortrait(snapshot);
+            RefreshUtilityTabs();
         }
 
         private void HideUtilityPanel()
@@ -1567,12 +1609,21 @@ namespace HwigiTower.UI
             }
         }
 
-        private static string BuildUtilityStatus(PrototypeRunSnapshot snapshot)
+        private string BuildUtilityStatus(PrototypeRunSnapshot snapshot)
         {
-            return "상태\nHP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
-                " | Gold " + snapshot.Gold +
-                "\n정신 " + snapshot.Mental + " | 신뢰 " + snapshot.Affinity +
-                "\n아이템 " + snapshot.ItemCount + " | 능력 " + snapshot.AbilityCount;
+            if (_utilityCharacterMode == "mataios")
+            {
+                return "마타이오스\nHP " + BuildMataiosHp(snapshot) +
+                    "\nATK " + BuildMataiosAttack(snapshot) +
+                    "\n버프 " + BuildMataiosBuffLine(snapshot) +
+                    "\n스킬 지원 / 대화";
+            }
+
+            return "플레이어\nHP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
+                "\nATK " + snapshot.PlayerAttack +
+                "\n정신 " + snapshot.Mental +
+                "\n스킬 " + BuildOwnedSkillLine() +
+                "\n버프 " + BuildPlayerBuffChipLine(snapshot);
         }
 
         private static string BuildUtilityMapSummary(PrototypeRunSnapshot snapshot)
@@ -1597,13 +1648,45 @@ namespace HwigiTower.UI
                 "\n전투 중에는 요약만 표시";
         }
 
-        private static string BuildUtilityLoadout(PrototypeRunSnapshot snapshot)
+        private string BuildUtilityEquipment(PrototypeRunSnapshot snapshot)
         {
-            var buff = snapshot.LastCombatComboDamage > 0 ? "콤보 준비" : "없음";
-            return "정비\n아이템 " + snapshot.ItemCount +
-                " | 능력 " + snapshot.AbilityCount +
-                "\n버프 " + buff +
-                "\n소비 아이템 관리는 이후 단계";
+            return "장비\n" + BuildOwnedItemLine() +
+                "\n\n능력\n" + BuildOwnedSkillLine();
+        }
+
+        private void RefreshUtilityPortrait(PrototypeRunSnapshot snapshot)
+        {
+            if (utilityPortraitImage == null)
+            {
+                return;
+            }
+
+            utilityPortraitImage.sprite = _utilityMode == "equipment"
+                ? presentationData == null ? null : ResolveIcon("item.field_bandage")
+                : _utilityCharacterMode == "mataios"
+                    ? presentationData == null ? null : presentationData.CombatMataiosPortrait
+                    : presentationData == null ? null : presentationData.DefaultPlayerPortrait;
+            utilityPortraitImage.color = utilityPortraitImage.sprite == null ? new Color(1f, 1f, 1f, 0f) : Color.white;
+            utilityPortraitImage.gameObject.SetActive(utilityPortraitImage.sprite != null);
+        }
+
+        private void RefreshUtilityTabs()
+        {
+            var showCharacterTabs = _utilityMode == "status";
+            SetButtonVisible(utilityPlayerTabButton, showCharacterTabs);
+            SetButtonVisible(utilityMataiosTabButton, showCharacterTabs);
+            TintUtilityTab(utilityPlayerTabButton, _utilityCharacterMode == "player");
+            TintUtilityTab(utilityMataiosTabButton, _utilityCharacterMode == "mataios");
+        }
+
+        private static void TintUtilityTab(Button button, bool selected)
+        {
+            if (button != null && button.targetGraphic is Image image)
+            {
+                image.color = selected
+                    ? new Color(0.28f, 0.20f, 0.10f, 0.98f)
+                    : new Color(0.10f, 0.14f, 0.17f, 0.96f);
+            }
         }
 
         private static Image EnsureHudIcon(Image current, string name, Transform parent, Vector2 anchor, float size)
@@ -1792,6 +1875,63 @@ namespace HwigiTower.UI
             }
         }
 
+        private void ConfigureChoiceContainerForShop()
+        {
+            EnsureChoiceContainer();
+            if (choiceContainer == null)
+            {
+                return;
+            }
+
+            choiceContainer.SetParent(HudParent, false);
+            choiceContainer.anchorMin = new Vector2(0.08f, 0f);
+            choiceContainer.anchorMax = new Vector2(0.92f, 0f);
+            choiceContainer.pivot = new Vector2(0.5f, 0f);
+            choiceContainer.sizeDelta = new Vector2(0f, 700f);
+            choiceContainer.anchoredPosition = new Vector2(0f, 78f);
+
+            var purchaseIndex = 0;
+            for (var i = 0; i < _choiceButtons.Count; i++)
+            {
+                var button = _choiceButtons[i];
+                if (button == null)
+                {
+                    continue;
+                }
+
+                var rect = button.GetComponent<RectTransform>();
+                var isPurchase = IsPurchaseChoice(ExtractChoiceId(button.name));
+                if (rect == null)
+                {
+                    continue;
+                }
+
+                if (isPurchase)
+                {
+                    var column = purchaseIndex % 2;
+                    var row = purchaseIndex / 2;
+                    rect.anchorMin = new Vector2(column == 0 ? 0f : 0.52f, 1f);
+                    rect.anchorMax = new Vector2(column == 0 ? 0.48f : 1f, 1f);
+                    rect.pivot = new Vector2(0.5f, 1f);
+                    rect.sizeDelta = new Vector2(0f, 146f);
+                    rect.anchoredPosition = new Vector2(0f, -row * 160f);
+                    purchaseIndex++;
+                    continue;
+                }
+
+                rect.anchorMin = new Vector2(0f, 1f);
+                rect.anchorMax = new Vector2(1f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.sizeDelta = new Vector2(0f, 102f);
+                rect.anchoredPosition = new Vector2(0f, -Mathf.Max(2, (purchaseIndex + 1) / 2) * 160f - 26f);
+            }
+        }
+
+        private static string ExtractChoiceId(string buttonName)
+        {
+            return string.IsNullOrEmpty(buttonName) ? string.Empty : buttonName.Replace("Choice Button ", string.Empty, StringComparison.Ordinal);
+        }
+
         private void ConfigureChoiceContainerForBossGate()
         {
             EnsureChoiceContainer();
@@ -1836,28 +1976,29 @@ namespace HwigiTower.UI
             panelObject.transform.SetParent(HudParent, false);
 
             eventCutscenePanel = panelObject.AddComponent<RectTransform>();
-            eventCutscenePanel.anchorMin = new Vector2(0.06f, 0.255f);
-            eventCutscenePanel.anchorMax = new Vector2(0.94f, 0.835f);
+            eventCutscenePanel.anchorMin = new Vector2(0.06f, 0.20f);
+            eventCutscenePanel.anchorMax = new Vector2(0.94f, 0.84f);
             eventCutscenePanel.offsetMin = Vector2.zero;
             eventCutscenePanel.offsetMax = Vector2.zero;
 
             var image = panelObject.AddComponent<Image>();
-            image.color = new Color(0.015f, 0.018f, 0.022f, 0.86f);
+            image.color = new Color(0.006f, 0.007f, 0.009f, 0.94f);
             image.raycastTarget = false;
 
-            eventHeaderText = CreateCombatChildText(eventCutscenePanel, "Event Header Text", new Vector2(0.04f, 0.88f), new Vector2(0.96f, 0.99f), 30, TextAnchor.MiddleCenter);
+            eventHeaderText = CreateCombatChildText(eventCutscenePanel, "Event Header Text", new Vector2(0.05f, 0.84f), new Vector2(0.95f, 0.97f), 30, TextAnchor.MiddleLeft);
             eventHeaderText.color = new Color(0.92f, 0.95f, 0.94f, 1f);
 
-            var imageFrame = CreateCombatPanelRect(eventCutscenePanel, "Event Image Frame", new Vector2(0.07f, 0.36f), new Vector2(0.93f, 0.86f), new Color(0.035f, 0.040f, 0.046f, 0.95f));
-            eventCutsceneImage = CreateCombatImage(imageFrame, "Event Cutscene Image", new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.98f));
+            var imageFrame = CreateCombatPanelRect(eventCutscenePanel, "Event Image Frame", new Vector2(0.24f, 0.42f), new Vector2(0.76f, 0.80f), new Color(0.020f, 0.022f, 0.025f, 0.95f));
+            eventCutsceneImage = CreateCombatImage(imageFrame, "Event Cutscene Image", new Vector2(0.03f, 0.03f), new Vector2(0.97f, 0.97f));
             eventCutsceneImage.color = Color.white;
 
-            eventBodyText = CreateCombatChildText(eventCutscenePanel, "Event Body Text", new Vector2(0.06f, 0.10f), new Vector2(0.94f, 0.33f), 29, TextAnchor.MiddleLeft);
+            eventBodyText = CreateCombatChildText(eventCutscenePanel, "Event Body Text", new Vector2(0.06f, 0.10f), new Vector2(0.94f, 0.34f), 29, TextAnchor.MiddleLeft);
             eventBodyText.lineSpacing = 0.94f;
 
             eventUtilityText = CreateCombatChildText(eventCutscenePanel, "Event Utility Text", new Vector2(0.08f, 0.01f), new Vector2(0.92f, 0.07f), 24, TextAnchor.MiddleCenter);
             eventUtilityText.color = new Color(0.76f, 0.82f, 0.84f, 1f);
-            eventUtilityText.text = "기록    정보    설정";
+            eventUtilityText.text = string.Empty;
+            eventUtilityText.gameObject.SetActive(false);
             eventCutscenePanel.gameObject.SetActive(false);
         }
 
@@ -1915,7 +2056,7 @@ namespace HwigiTower.UI
 
             if (eventUtilityText != null)
             {
-                eventUtilityText.gameObject.SetActive(true);
+                eventUtilityText.gameObject.SetActive(false);
             }
         }
 
@@ -1998,7 +2139,7 @@ namespace HwigiTower.UI
             SetLayerVisible(npcReactionLayer, false);
             SetLayerVisible(resultLayer, false);
             ApplyPresentationSlot(selection.EncounterId);
-            ShowNpcSpotlight(mataiosPortrait, "마타이오스", "잠시 숨을 고른다. 무엇을 건넬지 정하세요.", NpcSpotlightMode.Rest);
+            HideNpcSpotlight();
             _pendingRestSelection = selection;
             _pendingRestActionId = string.Empty;
             SetRestActionCardsVisible(true);
@@ -2047,22 +2188,22 @@ namespace HwigiTower.UI
             panelObject.transform.SetParent(HudParent, false);
 
             restInteractionPanel = panelObject.AddComponent<RectTransform>();
-            restInteractionPanel.anchorMin = new Vector2(0.08f, 0f);
-            restInteractionPanel.anchorMax = new Vector2(0.92f, 0f);
-            restInteractionPanel.pivot = new Vector2(0.5f, 0f);
-            restInteractionPanel.anchoredPosition = new Vector2(0f, 54f);
-            restInteractionPanel.sizeDelta = new Vector2(0f, 730f);
+            restInteractionPanel.anchorMin = new Vector2(0.06f, 0.08f);
+            restInteractionPanel.anchorMax = new Vector2(0.94f, 0.66f);
+            restInteractionPanel.pivot = new Vector2(0.5f, 0.5f);
+            restInteractionPanel.anchoredPosition = Vector2.zero;
+            restInteractionPanel.sizeDelta = Vector2.zero;
 
             var image = panelObject.AddComponent<Image>();
-            image.color = new Color(0.045f, 0.055f, 0.070f, 0.97f);
+            image.color = new Color(0.025f, 0.032f, 0.040f, 0.58f);
 
             var title = CreateHudText("Rest Interaction Title", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-36f, 56f), TitleFontSize, TextAnchor.MiddleCenter, new Color(0.92f, 0.96f, 0.94f, 1f));
             title.transform.SetParent(panelObject.transform, false);
             title.text = "휴식";
 
-            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", new Vector2(0.17f, 0.81f), "rest.ask_mood");
-            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", new Vector2(0.50f, 0.81f), "rest.train");
-            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", new Vector2(0.83f, 0.81f), "rest.recover");
+            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", new Vector2(0.17f, 0.77f), "rest.ask_mood");
+            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", new Vector2(0.50f, 0.77f), "rest.train");
+            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", new Vector2(0.83f, 0.77f), "rest.recover");
 
             restInputField = CreateRestInputField(panelObject.transform);
             restSubmitButton = CreateRestButton(panelObject.transform, "Rest Submit Button", "전달", new Vector2(0.16f, 0.13f), new Vector2(0.46f, 0.26f));
@@ -2733,10 +2874,10 @@ namespace HwigiTower.UI
             var plateRect = npcSpotlightNameText == null ? null : npcSpotlightNameText.transform.parent.GetComponent<RectTransform>();
             if (mode == NpcSpotlightMode.Shop)
             {
-                ApplyRect(characterRect, new Vector2(0.02f, -0.08f), new Vector2(0.43f, 0.99f));
-                ApplyRect(plateRect, new Vector2(0.04f, 0.05f), new Vector2(0.44f, 0.29f));
-                ApplyRect(npcSpotlightGlowImage == null ? null : npcSpotlightGlowImage.GetComponent<RectTransform>(), new Vector2(0.00f, 0.05f), new Vector2(0.47f, 0.98f));
-                ApplyRect(npcSpotlightShadowImage == null ? null : npcSpotlightShadowImage.GetComponent<RectTransform>(), new Vector2(0.03f, 0.00f), new Vector2(0.45f, 0.88f));
+                ApplyRect(characterRect, new Vector2(0.23f, -0.08f), new Vector2(0.77f, 0.99f));
+                ApplyRect(plateRect, new Vector2(0.12f, 0.04f), new Vector2(0.88f, 0.22f));
+                ApplyRect(npcSpotlightGlowImage == null ? null : npcSpotlightGlowImage.GetComponent<RectTransform>(), new Vector2(0.18f, 0.03f), new Vector2(0.82f, 0.98f));
+                ApplyRect(npcSpotlightShadowImage == null ? null : npcSpotlightShadowImage.GetComponent<RectTransform>(), new Vector2(0.22f, 0.00f), new Vector2(0.78f, 0.88f));
                 return;
             }
 
@@ -2829,9 +2970,31 @@ namespace HwigiTower.UI
 
             attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.22f, 0.045f), CombatAction.Attack, out attackActionIconImage);
             defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.045f), CombatAction.Defend, out defendActionIconImage);
-            skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "정찰", new Vector2(0.78f, 0.045f), CombatAction.Skill, out skillActionIconImage);
+            skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "스킬", new Vector2(0.78f, 0.045f), CombatAction.Skill, out skillActionIconImage);
             skillButton.interactable = false;
+            EnsureSkillPickerPanel();
             ApplyCombatStatusIconSprites();
+        }
+
+        private void EnsureSkillPickerPanel()
+        {
+            if (skillPickerPanel != null || combatPartyDock == null)
+            {
+                return;
+            }
+
+            var panelObject = new GameObject("Combat Skill Picker");
+            panelObject.transform.SetParent(combatPartyDock, false);
+            skillPickerPanel = panelObject.AddComponent<RectTransform>();
+            skillPickerPanel.anchorMin = new Vector2(0.56f, 0.22f);
+            skillPickerPanel.anchorMax = new Vector2(0.96f, 0.42f);
+            skillPickerPanel.offsetMin = Vector2.zero;
+            skillPickerPanel.offsetMax = Vector2.zero;
+
+            var image = panelObject.AddComponent<Image>();
+            image.color = new Color(0.02f, 0.025f, 0.03f, 0.97f);
+            image.raycastTarget = false;
+            skillPickerPanel.gameObject.SetActive(false);
         }
 
         private RectTransform CreateCombatPanelRect(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Color color)
@@ -2985,7 +3148,17 @@ namespace HwigiTower.UI
 
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
-            button.onClick.AddListener(() => ResolveCombatAction(action));
+            button.onClick.AddListener(() =>
+            {
+                if (action == CombatAction.Skill)
+                {
+                    ToggleSkillPicker();
+                    return;
+                }
+
+                HideSkillPicker();
+                ResolveCombatAction(action);
+            });
 
             var iconObject = new GameObject("Icon");
             iconObject.transform.SetParent(buttonObject.transform, false);
@@ -3827,6 +4000,7 @@ namespace HwigiTower.UI
 
             if (!hasCombat || combatText == null)
             {
+                HideSkillPicker();
                 return;
             }
 
@@ -3858,9 +4032,9 @@ namespace HwigiTower.UI
 
             if (skillButton != null)
             {
-                var scoutSkillReady = HasScoutSkill(snapshot);
-                skillButton.interactable = canAct && scoutSkillReady;
-                SetButtonLabel(skillButton, scoutSkillReady ? "정찰" : "정찰 잠김");
+                var skillReady = HasAnyCombatSkill();
+                skillButton.interactable = canAct && skillReady;
+                SetButtonLabel(skillButton, "스킬");
             }
         }
 
@@ -3968,6 +4142,8 @@ namespace HwigiTower.UI
             SetImageVisible(topGoldIconImage, visible);
             SetImageVisible(topMemoryIconImage, visible);
             SetImageVisible(topAffinityIconImage, visible);
+            SetImageVisible(topPlayerProfileImage, visible);
+            SetImageVisible(topMataiosProfileImage, visible);
         }
 
         private void ApplyTopHudIconSprites()
@@ -3975,6 +4151,19 @@ namespace HwigiTower.UI
             SetStaticIcon(topGoldIconImage, "resource.gold");
             SetStaticIcon(topMemoryIconImage, "resource.memory");
             SetStaticIcon(topAffinityIconImage, "resource.affinity");
+            if (topPlayerProfileImage != null)
+            {
+                topPlayerProfileImage.sprite = presentationData == null ? null : presentationData.DefaultPlayerPortrait;
+                topPlayerProfileImage.color = Color.white;
+                topPlayerProfileImage.preserveAspect = true;
+            }
+
+            if (topMataiosProfileImage != null)
+            {
+                topMataiosProfileImage.sprite = presentationData == null ? null : presentationData.CombatMataiosPortrait;
+                topMataiosProfileImage.color = Color.white;
+                topMataiosProfileImage.preserveAspect = true;
+            }
         }
 
         private void ApplyCombatStatusIconSprites()
@@ -4040,9 +4229,79 @@ namespace HwigiTower.UI
                 return;
             }
 
+            HideSkillPicker();
             var resolution = _roomController.ResolveCombatAction(action);
             ShowResult(resolution);
             ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void ToggleSkillPicker()
+        {
+            EnsureSkillPickerPanel();
+            if (skillPickerPanel == null)
+            {
+                return;
+            }
+
+            var visible = !skillPickerPanel.gameObject.activeSelf;
+            if (!visible)
+            {
+                HideSkillPicker();
+                return;
+            }
+
+            PopulateSkillPicker();
+            skillPickerPanel.gameObject.SetActive(true);
+        }
+
+        private void HideSkillPicker()
+        {
+            if (skillPickerPanel != null)
+            {
+                skillPickerPanel.gameObject.SetActive(false);
+            }
+        }
+
+        private void PopulateSkillPicker()
+        {
+            EnsureSkillPickerPanel();
+            if (skillPickerPanel == null)
+            {
+                return;
+            }
+
+            for (var i = skillPickerPanel.childCount - 1; i >= 0; i--)
+            {
+                Destroy(skillPickerPanel.GetChild(i).gameObject);
+            }
+
+            var skills = BuildOwnedCombatSkillNames();
+            if (skills.Count == 0)
+            {
+                skills.Add("사용 가능한 스킬 없음");
+            }
+
+            for (var i = 0; i < skills.Count; i++)
+            {
+                var buttonObject = new GameObject("Skill Option " + i);
+                buttonObject.transform.SetParent(skillPickerPanel, false);
+                var rect = buttonObject.AddComponent<RectTransform>();
+                rect.anchorMin = new Vector2(0f, 1f);
+                rect.anchorMax = new Vector2(1f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.sizeDelta = new Vector2(0f, 64f);
+                rect.anchoredPosition = new Vector2(0f, -i * 70f);
+
+                var image = buttonObject.AddComponent<Image>();
+                image.color = new Color(0.12f, 0.17f, 0.20f, 0.98f);
+                var button = buttonObject.AddComponent<Button>();
+                button.targetGraphic = image;
+                button.interactable = HasAnyCombatSkill();
+                button.onClick.AddListener(() => ResolveCombatAction(CombatAction.Skill));
+
+                var text = CreateCombatChildText(buttonObject.transform, "Label", Vector2.zero, Vector2.one, 22, TextAnchor.MiddleCenter);
+                text.text = skills[i];
+            }
         }
 
         private void UpdateDemoCompletePanel(PrototypeRunSnapshot snapshot)
@@ -4698,12 +4957,9 @@ namespace HwigiTower.UI
 
         private string BuildCombatMataiosCardText(PrototypeRunSnapshot snapshot)
         {
-            var reaction = string.IsNullOrEmpty(snapshot.LastNpcReactionKey)
-                ? "반응 대기"
-                : ShortenPublicLine(ResolvePublicNpcReaction(snapshot.LastNpcReactionKey), 16);
             return "마타이오스\n" +
-                BuildMataiosChipLine(snapshot) + "\n" +
-                reaction;
+                "HP " + BuildMataiosHp(snapshot) + "  ATK " + BuildMataiosAttack(snapshot) + "\n" +
+                "버프 " + BuildMataiosBuffLine(snapshot);
         }
 
         private string BuildPlayerBuffChipLine(PrototypeRunSnapshot snapshot)
@@ -4734,6 +4990,34 @@ namespace HwigiTower.UI
                 snapshot.Affinity < 0 ? "거리감" :
                 "동행 중";
             return affinity + "  기억 " + snapshot.MemoryFragmentCount + "  안정";
+        }
+
+        private static string BuildMataiosHp(PrototypeRunSnapshot snapshot)
+        {
+            var max = Mathf.Max(1, snapshot.PlayerMaxHp - 4);
+            var current = Mathf.Clamp(snapshot.PlayerHp - 4, 1, max);
+            return current + "/" + max;
+        }
+
+        private static int BuildMataiosAttack(PrototypeRunSnapshot snapshot)
+        {
+            return Mathf.Max(1, snapshot.PlayerAttack - 1);
+        }
+
+        private static string BuildMataiosBuffLine(PrototypeRunSnapshot snapshot)
+        {
+            var buffs = new List<string>();
+            if (snapshot.Affinity > 0)
+            {
+                buffs.Add("지원");
+            }
+
+            if (snapshot.MemoryFragmentCount > 0)
+            {
+                buffs.Add("기억");
+            }
+
+            return buffs.Count == 0 ? "없음" : string.Join("  ", buffs);
         }
 
         private static string BuildCombatFeedback(string roundResult)
@@ -4792,6 +5076,75 @@ namespace HwigiTower.UI
             }
 
             return snapshot.AbilityCount > 0;
+        }
+
+        private bool HasAnyCombatSkill()
+        {
+            return HasScoutSkill(_roomController == null ? _lastSnapshot : _roomController.GetSnapshot());
+        }
+
+        private List<string> BuildOwnedCombatSkillNames()
+        {
+            var skills = new List<string>();
+            if (_roomController != null && _roomController.RunState != null)
+            {
+                if (_roomController.RunState.HasAbilityRef("ABILITY_SCOUT"))
+                {
+                    skills.Add("정찰");
+                }
+            }
+            else if (_lastSnapshot.AbilityCount > 0)
+            {
+                skills.Add("스킬");
+            }
+
+            return skills;
+        }
+
+        private string BuildOwnedSkillLine()
+        {
+            var skills = new List<string>();
+            if (_roomController != null && _roomController.RunState != null)
+            {
+                if (_roomController.RunState.HasAbilityRef("ABILITY_SCOUT"))
+                {
+                    skills.Add("정찰");
+                }
+
+                if (_roomController.RunState.HasAbilityRef("ABILITY_RECALL_ANCHOR"))
+                {
+                    skills.Add("회상 닻");
+                }
+            }
+            else if (_lastSnapshot.AbilityCount > 0)
+            {
+                skills.Add("스킬");
+            }
+
+            return skills.Count == 0 ? "없음" : string.Join("  ", skills);
+        }
+
+        private string BuildOwnedItemLine()
+        {
+            if (_roomController == null || _roomController.RunState == null)
+            {
+                return "아이템 " + _lastSnapshot.ItemCount;
+            }
+
+            var items = new List<string>();
+            AddOwnedItemLine(items, "ITEM_FIELD_BANDAGE", "붕대");
+            AddOwnedItemLine(items, "ITEM_LANTERN_OIL", "등유");
+            AddOwnedItemLine(items, "ITEM_TORN_CHARM", "찢어진 부적");
+            return items.Count == 0 ? "보유 아이템 없음" : string.Join("\n", items);
+        }
+
+        private void AddOwnedItemLine(List<string> items, string itemRef, string label)
+        {
+            var count = _roomController == null || _roomController.RunState == null ? 0 : _roomController.RunState.GetItemCount(itemRef);
+            if (count > 0)
+            {
+                items.Add(label + " x" + count);
+            }
         }
 
         private static string ExtractRoundNumber(string source, string token)
@@ -5330,7 +5683,9 @@ namespace HwigiTower.UI
                 .Replace("선택 불가: Gold 부족", "구매 불가: Gold 부족", StringComparison.Ordinal)
                 .Replace("Combat start", "전투 시작", StringComparison.Ordinal)
                 .Replace("Memory unlock", "기억의 잔향 해금", StringComparison.Ordinal)
-                .Replace("Ability 필요", "능력 필요", StringComparison.Ordinal);
+                .Replace("Ability 필요", "능력 필요", StringComparison.Ordinal)
+                .Replace("Glitch -1", "불안 감소", StringComparison.Ordinal)
+                .Replace("Glitch +1", "불안 증가", StringComparison.Ordinal);
 
             return ReplacePublicRefs(normalized);
         }
