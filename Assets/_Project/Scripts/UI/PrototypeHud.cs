@@ -97,6 +97,11 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform endingLayer;
         [SerializeField] private RectTransform portraitRoot;
         [SerializeField] private Image floorMapBackgroundImage;
+        [SerializeField] private RectTransform utilityPanel;
+        [SerializeField] private Text utilityText;
+        [SerializeField] private Button utilityStatusButton;
+        [SerializeField] private Button utilityMapButton;
+        [SerializeField] private Button utilityLoadoutButton;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<Image> _mapNodeIconImages = new List<Image>();
@@ -116,6 +121,8 @@ namespace HwigiTower.UI
         private bool _cutsceneFinishedSubscribed;
         private bool _shopPresentationActive;
         private bool _eventPresentationActive;
+        private string _utilityMode = string.Empty;
+        private PrototypeRunSnapshot _lastSnapshot;
 
         private enum NpcSpotlightMode
         {
@@ -149,6 +156,7 @@ namespace HwigiTower.UI
         private const int RestActionCardFontSize = 24;
         private const int ResultLineLimit = 3;
         private const float DenseLineSpacing = 0.92f;
+        private const string BossReturnChoiceId = "CHOICE_BOSS_RETURN";
         private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
         private static readonly Color ResultTextColor = new Color(0.88f, 0.93f, 0.95f, 1f);
         private static readonly Color PanelColor = new Color(0.035f, 0.045f, 0.055f, 0.88f);
@@ -214,6 +222,14 @@ namespace HwigiTower.UI
         });
         public bool EventCutsceneVisible => eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy;
         public string EventCutsceneMessage => ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
+        public bool UtilityPanelVisible => utilityPanel != null && utilityPanel.gameObject.activeInHierarchy;
+        public string UtilityPanelMessage => utilityText == null ? string.Empty : utilityText.text;
+        public string UtilityButtonLabels => string.Join("|", new[]
+        {
+            ResolveButtonLabel(utilityStatusButton),
+            ResolveButtonLabel(utilityMapButton),
+            ResolveButtonLabel(utilityLoadoutButton)
+        });
         public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
         public bool NpcSpotlightVisible => npcSpotlightLayer != null && npcSpotlightLayer.gameObject.activeInHierarchy;
         public string CurrentNpcSpotlightSpriteName => merchantVisualImage != null && merchantVisualImage.sprite != null ? merchantVisualImage.sprite.name : string.Empty;
@@ -536,6 +552,17 @@ namespace HwigiTower.UI
             return restContinueButton;
         }
 
+        public Button GetUtilityButton(string mode)
+        {
+            return mode switch
+            {
+                "status" => utilityStatusButton,
+                "map" => utilityMapButton,
+                "loadout" => utilityLoadoutButton,
+                _ => null
+            };
+        }
+
 #if UNITY_EDITOR || UNITY_INCLUDE_TESTS
         public void OpenQaRouteStep(EncounterSelection selection)
         {
@@ -549,6 +576,7 @@ namespace HwigiTower.UI
             HideRestInteractionPanel();
             EnsureScreenLayers();
             HideEventCutsceneLayout();
+            HideUtilityPanel();
             SetLayerVisible(actionLayer, true);
             SetLayerVisible(nodeMapLayer, false);
             SetLayerVisible(objectiveLayer, true);
@@ -561,6 +589,13 @@ namespace HwigiTower.UI
             if (choiceContainer == null || choiceViews == null)
             {
                 return;
+            }
+
+            var bossGate = IsBossGateEncounter(encounter);
+            if (bossGate)
+            {
+                choiceViews = BuildBossGateChoiceViews(choiceViews);
+                ConfigureChoiceContainerForBossGate();
             }
 
             for (var i = 0; i < choiceViews.Length; i++)
@@ -602,7 +637,10 @@ namespace HwigiTower.UI
                     _eventPresentationActive = false;
                     _shopPresentationActive = false;
                     HideMerchantPresentation();
-                    ConfigureChoiceContainerDefault();
+                    if (!bossGate)
+                    {
+                        ConfigureChoiceContainerDefault();
+                    }
                 }
 
                 interactionText.text = showRawDebugText
@@ -889,6 +927,7 @@ namespace HwigiTower.UI
 
         public void ShowRunState(PrototypeRunSnapshot snapshot)
         {
+            _lastSnapshot = snapshot;
             if (runStateText == null)
             {
                 return;
@@ -940,6 +979,7 @@ namespace HwigiTower.UI
             UpdateRouteIndicator(snapshot);
             UpdatePrimaryHeaderVisibility(snapshot);
             UpdateTopHudIcons(snapshot);
+            UpdateUtilityUi(snapshot);
             UpdateMemoryAndCombatPanel(snapshot);
             UpdateResultVisibility(snapshot);
             UpdateDemoCompletePanel(snapshot);
@@ -1104,6 +1144,14 @@ namespace HwigiTower.UI
             button.onClick.AddListener(() =>
             {
                 ClearChoices();
+                if (stableId == BossReturnChoiceId && _roomController != null)
+                {
+                    var resolution = _roomController.CancelCurrentRouteSelection();
+                    ShowResult(resolution);
+                    ShowRunState(_roomController.GetSnapshot());
+                    return;
+                }
+
                 onChoiceSelected?.Invoke(stableId);
             });
 
@@ -1358,6 +1406,206 @@ namespace HwigiTower.UI
             topAffinityIconImage = EnsureHudIcon(topAffinityIconImage, "Top Affinity Icon", topStatusLayer, new Vector2(0.48f, 0.24f), 32f);
         }
 
+        private void EnsureUtilityUi()
+        {
+            EnsureScreenLayers();
+            utilityStatusButton = EnsureUtilityButton(utilityStatusButton, "Utility Button Status", "상태", new Vector2(0.74f, 0.50f), () => ToggleUtilityPanel("status"));
+            utilityMapButton = EnsureUtilityButton(utilityMapButton, "Utility Button Map", "지도", new Vector2(0.84f, 0.50f), OpenUtilityMap);
+            utilityLoadoutButton = EnsureUtilityButton(utilityLoadoutButton, "Utility Button Loadout", "정비", new Vector2(0.94f, 0.50f), () => ToggleUtilityPanel("loadout"));
+
+            if (utilityPanel != null)
+            {
+                return;
+            }
+
+            var panelObject = new GameObject("Utility Panel");
+            panelObject.transform.SetParent(HudParent, false);
+            utilityPanel = panelObject.AddComponent<RectTransform>();
+            utilityPanel.anchorMin = new Vector2(0.58f, 0.735f);
+            utilityPanel.anchorMax = new Vector2(0.96f, 0.90f);
+            utilityPanel.offsetMin = Vector2.zero;
+            utilityPanel.offsetMax = Vector2.zero;
+
+            var image = panelObject.AddComponent<Image>();
+            image.color = new Color(0.025f, 0.034f, 0.042f, 0.94f);
+            image.raycastTarget = false;
+
+            utilityText = CreateCombatChildText(utilityPanel, "Utility Panel Text", new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.92f), 24, TextAnchor.MiddleLeft);
+            utilityText.color = new Color(0.88f, 0.94f, 0.95f, 1f);
+            utilityPanel.gameObject.SetActive(false);
+        }
+
+        private Button EnsureUtilityButton(Button current, string name, string label, Vector2 anchor, UnityEngine.Events.UnityAction action)
+        {
+            if (current != null)
+            {
+                return current;
+            }
+
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(topStatusLayer == null ? HudParent : topStatusLayer, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(86f, 54f);
+            rect.anchoredPosition = Vector2.zero;
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.10f, 0.14f, 0.17f, 0.96f);
+
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(action);
+
+            var labelObject = new GameObject("Label");
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            var labelRect = labelObject.AddComponent<RectTransform>();
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(6f, 3f);
+            labelRect.offsetMax = new Vector2(-6f, -3f);
+
+            var text = labelObject.AddComponent<Text>();
+            text.font = ResolveFont();
+            text.fontSize = 22;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 16;
+            text.resizeTextMaxSize = 22;
+            text.raycastTarget = false;
+            text.color = new Color(0.94f, 0.97f, 0.98f, 1f);
+            text.text = label;
+            return button;
+        }
+
+        private void UpdateUtilityUi(PrototypeRunSnapshot snapshot)
+        {
+            EnsureUtilityUi();
+            var visible = !string.IsNullOrEmpty(snapshot.RunId) && !snapshot.RunCompleted;
+            SetButtonVisible(utilityStatusButton, visible);
+            SetButtonVisible(utilityMapButton, visible);
+            SetButtonVisible(utilityLoadoutButton, visible);
+
+            if (!visible)
+            {
+                HideUtilityPanel();
+                return;
+            }
+
+            RefreshUtilityPanel(snapshot);
+        }
+
+        private void ToggleUtilityPanel(string mode)
+        {
+            _utilityMode = _utilityMode == mode ? string.Empty : mode;
+            RefreshUtilityPanel(_roomController == null ? _lastSnapshot : _roomController.GetSnapshot());
+        }
+
+        private void OpenUtilityMap()
+        {
+            if (_roomController == null)
+            {
+                return;
+            }
+
+            var snapshot = _roomController.GetSnapshot();
+            if (!snapshot.IsInCombat &&
+                !snapshot.RunCompleted &&
+                !snapshot.StairUnlocked &&
+                !RestInteractionPanelVisible &&
+                !_shopPresentationActive &&
+                !_eventPresentationActive &&
+                snapshot.HasFloorMap)
+            {
+                _roomController.CancelCurrentRouteSelection();
+                HideUtilityPanel();
+                ClearChoices();
+                ShowMapChoices(_roomController.GetFloorMapNodes(), mapNodeId =>
+                {
+                    var selected = _roomController.SelectMapNode(mapNodeId);
+                    OpenSelectedRouteStep(selected);
+                });
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
+            _utilityMode = "map";
+            RefreshUtilityPanel(snapshot);
+        }
+
+        private void RefreshUtilityPanel(PrototypeRunSnapshot snapshot)
+        {
+            EnsureUtilityUi();
+            if (utilityPanel == null || utilityText == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_utilityMode))
+            {
+                utilityPanel.gameObject.SetActive(false);
+                return;
+            }
+
+            utilityText.text = _utilityMode switch
+            {
+                "status" => BuildUtilityStatus(snapshot),
+                "map" => BuildUtilityMapSummary(snapshot),
+                "loadout" => BuildUtilityLoadout(snapshot),
+                _ => string.Empty
+            };
+            utilityPanel.gameObject.SetActive(!string.IsNullOrEmpty(utilityText.text));
+        }
+
+        private void HideUtilityPanel()
+        {
+            _utilityMode = string.Empty;
+            if (utilityPanel != null)
+            {
+                utilityPanel.gameObject.SetActive(false);
+            }
+        }
+
+        private static string BuildUtilityStatus(PrototypeRunSnapshot snapshot)
+        {
+            return "상태\nHP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
+                " | Gold " + snapshot.Gold +
+                "\n정신 " + snapshot.Mental + " | 신뢰 " + snapshot.Affinity +
+                "\n아이템 " + snapshot.ItemCount + " | 능력 " + snapshot.AbilityCount;
+        }
+
+        private static string BuildUtilityMapSummary(PrototypeRunSnapshot snapshot)
+        {
+            var selectable = 0;
+            var completed = 0;
+            for (var i = 0; i < snapshot.FloorMapNodes.Length; i++)
+            {
+                if (snapshot.FloorMapNodes[i].Selectable)
+                {
+                    selectable++;
+                }
+
+                if (snapshot.FloorMapNodes[i].Completed)
+                {
+                    completed++;
+                }
+            }
+
+            return "지도\nFloor " + snapshot.CurrentFloor +
+                "\n선택 가능 " + selectable + " | 완료 " + completed +
+                "\n전투 중에는 요약만 표시";
+        }
+
+        private static string BuildUtilityLoadout(PrototypeRunSnapshot snapshot)
+        {
+            var buff = snapshot.LastCombatComboDamage > 0 ? "콤보 준비" : "없음";
+            return "정비\n아이템 " + snapshot.ItemCount +
+                " | 능력 " + snapshot.AbilityCount +
+                "\n버프 " + buff +
+                "\n소비 아이템 관리는 이후 단계";
+        }
+
         private static Image EnsureHudIcon(Image current, string name, Transform parent, Vector2 anchor, float size)
         {
             if (current != null || parent == null)
@@ -1542,6 +1790,22 @@ namespace HwigiTower.UI
                     rect.anchoredPosition = new Vector2(0f, -i * EventChoiceButtonSpacing);
                 }
             }
+        }
+
+        private void ConfigureChoiceContainerForBossGate()
+        {
+            EnsureChoiceContainer();
+            if (choiceContainer == null)
+            {
+                return;
+            }
+
+            choiceContainer.SetParent(HudParent, false);
+            choiceContainer.anchorMin = new Vector2(0.10f, 0f);
+            choiceContainer.anchorMax = new Vector2(0.90f, 0f);
+            choiceContainer.pivot = new Vector2(0.5f, 0f);
+            choiceContainer.sizeDelta = new Vector2(0f, 290f);
+            choiceContainer.anchoredPosition = new Vector2(0f, 118f);
         }
 
         private void ConfigureChoiceContainerForMap()
@@ -3098,6 +3362,14 @@ namespace HwigiTower.UI
                 var views = _roomController.BuildEncounterChoiceViews(selection);
                 ShowChoices(selection.Encounter, views, choiceStableId =>
                 {
+                    if (choiceStableId == BossReturnChoiceId)
+                    {
+                        var returnResolution = _roomController.CancelCurrentRouteSelection();
+                        ShowResult(returnResolution);
+                        ShowRunState(_roomController.GetSnapshot());
+                        return;
+                    }
+
                     var resolution = _roomController.ResolveCurrentRouteChoice(selection, choiceStableId);
                     ShowResult(resolution);
                     ShowRunState(_roomController.GetSnapshot());
@@ -4826,6 +5098,50 @@ namespace HwigiTower.UI
             return cutscenePlayer != null && cutscenePlayer.gameObject.activeInHierarchy && cutscenePlayer.IsPlaying;
         }
 
+        private static bool IsBossGateEncounter(EncounterData encounter)
+        {
+            return encounter != null &&
+                (encounter.Id == "ENC_COMBAT_GATE_01" ||
+                 encounter.Id == "ENC_COMBAT_GATE_02" ||
+                 encounter.Id == "ENC_COMBAT_GATE_03");
+        }
+
+        private static PrototypeEncounterChoiceView[] BuildBossGateChoiceViews(PrototypeEncounterChoiceView[] sourceViews)
+        {
+            PrototypeEncounterChoiceView engage = default;
+            var hasEngage = false;
+            if (sourceViews != null)
+            {
+                for (var i = 0; i < sourceViews.Length; i++)
+                {
+                    var view = sourceViews[i];
+                    if (view.Visible && view.ChoiceStableId.Contains("_ENGAGE", StringComparison.Ordinal))
+                    {
+                        engage = new PrototypeEncounterChoiceView(
+                            view.ChoiceStableId,
+                            view.TextKey,
+                            true,
+                            view.Enabled,
+                            view.ReasonTextKey,
+                            string.Empty);
+                        hasEngage = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasEngage)
+            {
+                engage = new PrototypeEncounterChoiceView("CHOICE_COMBAT_02_ENGAGE", string.Empty, true, true, string.Empty, string.Empty);
+            }
+
+            return new[]
+            {
+                engage,
+                new PrototypeEncounterChoiceView(BossReturnChoiceId, string.Empty, true, true, string.Empty, string.Empty)
+            };
+        }
+
         private static bool IsCombatEncounterId(string encounterId)
         {
             return encounterId == "ENC_COMBAT_GATE_01" || encounterId == "ENC_COMBAT_GATE_02" || encounterId == "ENC_COMBAT_GATE_03";
@@ -4835,6 +5151,11 @@ namespace HwigiTower.UI
         {
             if (!string.IsNullOrEmpty(choiceStableId))
             {
+                if (choiceStableId == BossReturnChoiceId)
+                {
+                    return "돌아간다";
+                }
+
                 if (choiceStableId == "CHOICE_EVT_F01_JAR_PATTERNED")
                 {
                     return "신기한 문양이 각인된 항아리";
@@ -4874,7 +5195,7 @@ namespace HwigiTower.UI
 
                 if (choiceStableId.Contains("_ENGAGE", StringComparison.Ordinal))
                 {
-                    return "전투";
+                    return "전투 시작";
                 }
 
                 if (choiceStableId.Contains("_PREPARE", StringComparison.Ordinal))
@@ -4916,7 +5237,6 @@ namespace HwigiTower.UI
                 "CHOICE_MEMORY_01_UNLOCK" => "기억의 잔향",
                 "CHOICE_MEMORY_01_WITHDRAW" => "보류",
                 "CHOICE_COMBAT_01_ENGAGE" => "전투",
-                "CHOICE_COMBAT_01_PREPARE" => "준비",
                 "CHOICE_F02_SHOP_BUY_ITEM" => "구매",
                 "CHOICE_F02_SHOP_BUY_ABILITY" => "구매",
                 "CHOICE_F02_SHOP_LEAVE" => "지나간다",
@@ -4924,9 +5244,7 @@ namespace HwigiTower.UI
                 "CHOICE_F02_MORAL_LEAVE" => "거절한다",
                 "CHOICE_F02_MORAL_BARGAIN" => "거래한다",
                 "CHOICE_COMBAT_02_ENGAGE" => "전투",
-                "CHOICE_COMBAT_02_PREPARE" => "준비",
                 "CHOICE_COMBAT_03_ENGAGE" => "전투",
-                "CHOICE_COMBAT_03_PREPARE" => "준비",
                 _ => "선택 " + (index + 1)
             };
         }

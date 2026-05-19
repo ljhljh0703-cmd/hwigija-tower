@@ -881,6 +881,17 @@ namespace HwigiTower.Run
             return false;
         }
 
+        public bool CancelSelectedMapNode()
+        {
+            if (string.IsNullOrEmpty(_selectedMapNodeId))
+            {
+                return false;
+            }
+
+            _selectedMapNodeId = string.Empty;
+            return true;
+        }
+
         public bool CanAdvanceToNextFloor => _stairUnlocked && HasFloorRunPath(_currentFloor + 1);
 
         public PrototypeNodeResolution ResolveNextFloor()
