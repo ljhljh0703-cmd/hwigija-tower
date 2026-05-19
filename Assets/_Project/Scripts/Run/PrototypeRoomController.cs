@@ -469,6 +469,23 @@ namespace HwigiTower.Run
             return resolution;
         }
 
+        public PrototypeNodeResolution CancelCurrentRouteSelection()
+        {
+            if (RunState == null)
+            {
+                BeginRun();
+            }
+
+            if (RunState == null || RunState.RunCompleted)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", RunState != null && RunState.RunCompleted);
+            }
+
+            var canceled = RunState.CancelSelectedMapNode();
+            SaveCurrentRun();
+            return new PrototypeNodeResolution("node.map", canceled ? "return" : string.Empty, canceled ? "returned to map" : "map already open", false);
+        }
+
         public PrototypeNodeResolution ResolveCurrentRouteRestInteraction(EncounterSelection selection, string actionId, string utterance)
         {
             if (RunState == null)

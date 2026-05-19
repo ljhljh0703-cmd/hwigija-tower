@@ -252,6 +252,47 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PrototypeRoom_BossGateShowsFightAndReturnOnly()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+
+            controller.AutoResolveCombat = true;
+            controller.RunState.ModifyGold(100);
+            yield return ResolveRouteActionChoice(hud, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
+            yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
+            yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_01", "CHOICE_MEMORY_01_UNLOCK");
+            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_01", "CHOICE_SHOP_01_LEAVE");
+            yield return AdvanceMapUntilEncounterSelectable(hud, "ENC_COMBAT_GATE_01");
+
+            var bossMapButton = FindMapChoiceButton(hud, "ENC_COMBAT_GATE_01");
+            Assert.IsNotNull(bossMapButton, DescribeChoiceButtons(hud));
+            bossMapButton.onClick.Invoke();
+            yield return null;
+
+            Assert.AreEqual(2, hud.ChoiceButtonCount, DescribeChoiceButtons(hud));
+            Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_COMBAT_01_ENGAGE"), DescribeChoiceButtons(hud));
+            Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_BOSS_RETURN"), DescribeChoiceButtons(hud));
+            StringAssert.Contains("전투 시작", DescribeChoiceButtons(hud));
+            StringAssert.Contains("돌아간다", DescribeChoiceButtons(hud));
+            StringAssert.DoesNotContain("준비", DescribeChoiceButtons(hud));
+            StringAssert.DoesNotContain("정비", DescribeChoiceButtons(hud));
+
+            FindChoiceButton(hud, "CHOICE_BOSS_RETURN").onClick.Invoke();
+            yield return null;
+
+            Assert.IsFalse(controller.RunState.StairUnlocked);
+            Assert.IsFalse(controller.RunState.RunClear);
+            Assert.IsFalse(controller.RunState.IsInCombat);
+            Assert.IsNotNull(FindMapChoiceButton(hud, "ENC_COMBAT_GATE_01"), DescribeChoiceButtons(hud));
+        }
+
+        [UnityTest]
         public IEnumerator PrototypeRoom_FloorFiveEliteAndFinalBossPoolsResolve()
         {
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);

@@ -218,6 +218,65 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void BossGateChoices_ShowOnlyFightAndReturn()
+        {
+            var boss = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset");
+            Assert.IsNotNull(boss);
+            var state = new PrototypeRunState("run-ui-boss", new GameFlowEventBus());
+            var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, boss);
+            var hud = CreateHud(out _);
+
+            hud.ShowChoices(boss, views, _ => { });
+
+            Assert.AreEqual(2, hud.ChoiceButtonCount);
+            var fight = hud.GetChoiceButton(0).GetComponentInChildren<Text>();
+            var back = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
+            Assert.IsNotNull(fight);
+            Assert.IsNotNull(back);
+            StringAssert.Contains("전투 시작", fight.text);
+            StringAssert.Contains("돌아간다", back.text);
+            StringAssert.DoesNotContain("준비", fight.text + back.text);
+            StringAssert.DoesNotContain("정비", fight.text + back.text);
+            StringAssert.DoesNotContain("CHOICE_", fight.text + back.text);
+        }
+
+        [Test]
+        public void Hud_UtilityButtonsExposeStatusMapAndLoadoutWithoutGlitch()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-utility",
+                18,
+                24,
+                5,
+                6,
+                30,
+                9,
+                3,
+                1,
+                0,
+                2,
+                false,
+                "demo.active",
+                currentFloor: 2,
+                itemCount: 1);
+
+            hud.ShowRunState(snapshot);
+
+            StringAssert.Contains("상태", hud.UtilityButtonLabels);
+            StringAssert.Contains("지도", hud.UtilityButtonLabels);
+            StringAssert.Contains("정비", hud.UtilityButtonLabels);
+            hud.GetUtilityButton("status").onClick.Invoke();
+            Assert.IsTrue(hud.UtilityPanelVisible);
+            StringAssert.Contains("HP 18/24", hud.UtilityPanelMessage);
+            StringAssert.Contains("신뢰 3", hud.UtilityPanelMessage);
+            StringAssert.DoesNotContain("Glitch", hud.UtilityPanelMessage);
+            hud.GetUtilityButton("loadout").onClick.Invoke();
+            StringAssert.Contains("아이템 1", hud.UtilityPanelMessage);
+            StringAssert.DoesNotContain("Glitch", hud.UtilityPanelMessage);
+        }
+
+        [Test]
         public void Hud_MapScreenShowsNodeIconsAndHidesRawIds()
         {
             var hud = CreateHud(out var result);
