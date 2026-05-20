@@ -97,6 +97,7 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform npcReactionLayer;
         [SerializeField] private RectTransform actionLayer;
         [SerializeField] private RectTransform resultLayer;
+        [SerializeField] private RectTransform resultIconStrip;
         [SerializeField] private RectTransform endingLayer;
         [SerializeField] private RectTransform portraitRoot;
         [SerializeField] private Image floorMapBackgroundImage;
@@ -113,6 +114,12 @@ namespace HwigiTower.UI
         private readonly List<Image> _mapNodeIconImages = new List<Image>();
         private readonly List<Image> _shopChoiceCardImages = new List<Image>();
         private readonly List<Image> _shopChoiceIconImages = new List<Image>();
+        private readonly List<GameObject> _resultSummaryChips = new List<GameObject>();
+        private readonly List<Image> _resultSummaryIconImages = new List<Image>();
+        private readonly List<Text> _resultSummaryValueTexts = new List<Text>();
+        private readonly List<Text> _resultSummaryFallbackTexts = new List<Text>();
+        private readonly List<string> _activeResultSummaryLabels = new List<string>();
+        private readonly List<string> _activeResultSummaryValues = new List<string>();
         private readonly List<GameObject> _mapDecorations = new List<GameObject>();
         private readonly List<string> _demoRouteLabels = new List<string>();
         private readonly List<string> _demoRouteEncounterIds = new List<string>();
@@ -129,6 +136,7 @@ namespace HwigiTower.UI
         private bool _eventPresentationActive;
         private string _utilityMode = string.Empty;
         private string _utilityCharacterMode = "player";
+        private string _lastResultMessage = string.Empty;
         private PrototypeRunSnapshot _lastSnapshot;
 
         private enum NpcSpotlightMode
@@ -136,6 +144,22 @@ namespace HwigiTower.UI
             Shop,
             Rest,
             Event
+        }
+
+        private readonly struct ResultSummaryEntry
+        {
+            public ResultSummaryEntry(string label, string value, string iconKey, Color fallbackColor)
+            {
+                Label = label;
+                Value = value;
+                IconKey = iconKey;
+                FallbackColor = fallbackColor;
+            }
+
+            public string Label { get; }
+            public string Value { get; }
+            public string IconKey { get; }
+            public Color FallbackColor { get; }
         }
 
         private const float ChoiceButtonHeight = 118f;
@@ -162,6 +186,7 @@ namespace HwigiTower.UI
         private const float RestActionCardHeight = 190f;
         private const int RestActionCardFontSize = 24;
         private const int ResultLineLimit = 3;
+        private const int ResultIconChipCount = 6;
         private const float DenseLineSpacing = 0.92f;
         private const string BossReturnChoiceId = "CHOICE_BOSS_RETURN";
         private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
@@ -215,6 +240,9 @@ namespace HwigiTower.UI
         });
         public string CurrentShopChoiceCardSpriteNames => JoinImageSpriteNames(_shopChoiceCardImages);
         public string CurrentShopChoiceIconNames => JoinImageSpriteNames(_shopChoiceIconImages);
+        public string CurrentResultSummaryIconNames => JoinImageSpriteNames(_resultSummaryIconImages);
+        public string CurrentResultSummaryLabels => string.Join("|", _activeResultSummaryLabels);
+        public string CurrentResultSummaryValues => string.Join("|", _activeResultSummaryValues);
         public string CurrentRestActionIconNames => string.Join("|", new[]
         {
             restAskMoodIconImage != null && restAskMoodIconImage.sprite != null ? restAskMoodIconImage.sprite.name : string.Empty,
@@ -298,6 +326,7 @@ namespace HwigiTower.UI
             ApplyPortrait();
             ApplyRestActionIcons();
             ApplyStaticUiAssetSprites();
+            RefreshResultSummaryIcons(_lastResultMessage);
         }
 
         public void SetRawDebugTextVisible(bool visible)
@@ -336,6 +365,7 @@ namespace HwigiTower.UI
 
             ApplyTopHudIconSprites();
             ApplyCombatStatusIconSprites();
+            RefreshResultSummaryIcons(_lastResultMessage);
         }
 
         public void SetNpcPortrait(Sprite portrait)
@@ -922,6 +952,8 @@ namespace HwigiTower.UI
         public void ShowResultMessage(string message)
         {
             EnsureResultText();
+            EnsureResultIconStrip();
+            _lastResultMessage = message ?? string.Empty;
             if (resultText == null)
             {
                 return;
@@ -930,6 +962,7 @@ namespace HwigiTower.UI
             resultText.text = string.IsNullOrEmpty(message)
                 ? "결과\n-"
                 : BuildResultSummary(message);
+            RefreshResultSummaryIcons(_lastResultMessage);
         }
 
         public void ShowRunState(PrototypeRunSnapshot snapshot)
@@ -1399,7 +1432,7 @@ namespace HwigiTower.UI
             objectiveLayer = EnsureLayerPanel(objectiveLayer, "Screen Layer Objective", new Vector2(0.04f, 0.84f), new Vector2(0.96f, 0.915f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, new Color(0.05f, 0.07f, 0.09f, 0.82f), false);
             visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.49f), new Vector2(0.96f, 0.835f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.52f), false);
             npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, PanelColor, false);
-            resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.305f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.90f), false);
+            resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.285f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.90f), false);
             nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.09f), new Vector2(0.94f, 0.73f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.265f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.02f, 0.025f, 0.03f, 0.50f), false);
             endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.30f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.06f, 0.055f, 0.04f, 0.90f), false);
@@ -1750,6 +1783,11 @@ namespace HwigiTower.UI
                 resultText.gameObject.SetActive(visible);
             }
 
+            if (resultIconStrip != null)
+            {
+                resultIconStrip.gameObject.SetActive(visible && _activeResultSummaryValues.Count > 0);
+            }
+
             SetLayerVisible(resultLayer, visible);
         }
 
@@ -1763,11 +1801,13 @@ namespace HwigiTower.UI
             ApplyTextRect(focusText, new Vector2(0.06f, 0.965f), new Vector2(0.94f, 0.995f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, SubtitleFontSize, TextAnchor.UpperCenter);
             ApplyTextRect(interactionText, new Vector2(0.06f, 0.89f), new Vector2(0.94f, 0.925f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, TitleFontSize, TextAnchor.MiddleCenter);
             ApplyTextRect(runStateText, new Vector2(0.06f, 0.925f), new Vector2(0.94f, 0.965f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, BodyFontSize, TextAnchor.MiddleCenter);
-            ApplyTextRect(resultText, new Vector2(0.08f, 0.315f), new Vector2(0.92f, 0.395f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, ResultFontSize, TextAnchor.MiddleCenter);
+            ApplyTextRect(resultText, new Vector2(0.08f, 0.292f), new Vector2(0.92f, 0.345f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, ResultFontSize, TextAnchor.MiddleCenter);
             if (resultText != null)
             {
                 resultText.lineSpacing = DenseLineSpacing;
             }
+
+            ApplyResultIconStripRect();
         }
 
         private void MoveTextUnderPortraitRoot(Text text)
@@ -2635,6 +2675,112 @@ namespace HwigiTower.UI
             resultText.color = ResultTextColor;
             resultText.lineSpacing = DenseLineSpacing;
             NormalizeLayout();
+        }
+
+        private void EnsureResultIconStrip()
+        {
+            if (resultIconStrip != null)
+            {
+                return;
+            }
+
+            EnsurePortraitRoot();
+            if (portraitRoot == null)
+            {
+                return;
+            }
+
+            var stripObject = new GameObject("Encounter Result Icon Strip");
+            stripObject.transform.SetParent(portraitRoot, false);
+            resultIconStrip = stripObject.AddComponent<RectTransform>();
+            ApplyResultIconStripRect();
+
+            for (var i = 0; i < ResultIconChipCount; i++)
+            {
+                CreateResultSummaryChip(i);
+            }
+
+            resultIconStrip.gameObject.SetActive(false);
+        }
+
+        private void ApplyResultIconStripRect()
+        {
+            if (resultIconStrip == null)
+            {
+                return;
+            }
+
+            resultIconStrip.anchorMin = new Vector2(0.10f, 0.350f);
+            resultIconStrip.anchorMax = new Vector2(0.90f, 0.397f);
+            resultIconStrip.pivot = new Vector2(0.5f, 0.5f);
+            resultIconStrip.anchoredPosition = Vector2.zero;
+            resultIconStrip.sizeDelta = Vector2.zero;
+        }
+
+        private void CreateResultSummaryChip(int index)
+        {
+            var chipObject = new GameObject("Result Summary Chip " + index);
+            chipObject.transform.SetParent(resultIconStrip, false);
+            var rect = chipObject.AddComponent<RectTransform>();
+            var min = index / (float)ResultIconChipCount;
+            var max = (index + 1) / (float)ResultIconChipCount;
+            rect.anchorMin = new Vector2(min, 0f);
+            rect.anchorMax = new Vector2(max, 1f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(-8f, 0f);
+
+            var background = chipObject.AddComponent<Image>();
+            background.color = new Color(0.06f, 0.075f, 0.085f, 0.88f);
+            background.raycastTarget = false;
+
+            var iconObject = new GameObject("Icon");
+            iconObject.transform.SetParent(chipObject.transform, false);
+            var iconRect = iconObject.AddComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0.06f, 0.18f);
+            iconRect.anchorMax = new Vector2(0.38f, 0.82f);
+            iconRect.pivot = new Vector2(0.5f, 0.5f);
+            iconRect.anchoredPosition = Vector2.zero;
+            iconRect.sizeDelta = Vector2.zero;
+            var icon = iconObject.AddComponent<Image>();
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+
+            var fallbackText = CreateResultChipText(chipObject.transform, "Icon Fallback", new Vector2(0.06f, 0.18f), new Vector2(0.38f, 0.82f), 17, TextAnchor.MiddleCenter);
+            fallbackText.color = Color.white;
+
+            var valueText = CreateResultChipText(chipObject.transform, "Value", new Vector2(0.39f, 0f), new Vector2(0.98f, 1f), 24, TextAnchor.MiddleLeft);
+
+            _resultSummaryChips.Add(chipObject);
+            _resultSummaryIconImages.Add(icon);
+            _resultSummaryFallbackTexts.Add(fallbackText);
+            _resultSummaryValueTexts.Add(valueText);
+        }
+
+        private Text CreateResultChipText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, int fontSize, TextAnchor alignment)
+        {
+            var textObject = new GameObject(name);
+            textObject.transform.SetParent(parent, false);
+            var rect = textObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = Vector2.zero;
+
+            var text = textObject.AddComponent<Text>();
+            text.font = ResolveFont();
+            text.fontSize = fontSize;
+            text.alignment = alignment;
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 13;
+            text.resizeTextMaxSize = fontSize;
+            text.supportRichText = false;
+            text.raycastTarget = false;
+            text.color = ResultTextColor;
+            return text;
         }
 
         private void EnsureRouteText()
@@ -4546,6 +4692,252 @@ namespace HwigiTower.UI
             return showRawDebugText ? ResolveEncounterDisplayName(encounter) : ResolvePublicEncounterLabel(string.Empty, encounter);
         }
 
+        private void RefreshResultSummaryIcons(string message)
+        {
+            _activeResultSummaryLabels.Clear();
+            _activeResultSummaryValues.Clear();
+
+            if (showRawDebugText || string.IsNullOrEmpty(message))
+            {
+                if (resultIconStrip != null)
+                {
+                    resultIconStrip.gameObject.SetActive(false);
+                }
+
+                return;
+            }
+
+            EnsureResultIconStrip();
+            if (resultIconStrip == null)
+            {
+                return;
+            }
+
+            var entries = BuildResultSummaryEntries(message);
+            for (var i = 0; i < _resultSummaryChips.Count; i++)
+            {
+                var visible = i < entries.Count;
+                _resultSummaryChips[i].SetActive(visible);
+                if (!visible)
+                {
+                    ClearResultSummaryEntry(i);
+                    continue;
+                }
+
+                ApplyResultSummaryEntry(i, entries[i]);
+                _activeResultSummaryLabels.Add(entries[i].Label);
+                _activeResultSummaryValues.Add(entries[i].Value);
+            }
+
+            resultIconStrip.gameObject.SetActive(entries.Count > 0 && (resultText == null || resultText.gameObject.activeSelf));
+        }
+
+        private void ClearResultSummaryEntry(int index)
+        {
+            if (index < _resultSummaryIconImages.Count && _resultSummaryIconImages[index] != null)
+            {
+                _resultSummaryIconImages[index].sprite = null;
+            }
+
+            if (index < _resultSummaryFallbackTexts.Count && _resultSummaryFallbackTexts[index] != null)
+            {
+                _resultSummaryFallbackTexts[index].text = string.Empty;
+            }
+
+            if (index < _resultSummaryValueTexts.Count && _resultSummaryValueTexts[index] != null)
+            {
+                _resultSummaryValueTexts[index].text = string.Empty;
+            }
+        }
+
+        private void ApplyResultSummaryEntry(int index, ResultSummaryEntry entry)
+        {
+            var icon = index < _resultSummaryIconImages.Count ? _resultSummaryIconImages[index] : null;
+            var fallback = index < _resultSummaryFallbackTexts.Count ? _resultSummaryFallbackTexts[index] : null;
+            var value = index < _resultSummaryValueTexts.Count ? _resultSummaryValueTexts[index] : null;
+
+            var sprite = ResolveIcon(entry.IconKey);
+            if (icon != null)
+            {
+                icon.sprite = sprite;
+                icon.color = sprite == null ? entry.FallbackColor : Color.white;
+                icon.gameObject.SetActive(true);
+            }
+
+            if (fallback != null)
+            {
+                fallback.text = sprite == null ? ShortResultLabel(entry.Label) : string.Empty;
+                fallback.gameObject.SetActive(sprite == null);
+            }
+
+            if (value != null)
+            {
+                value.text = entry.Value;
+            }
+        }
+
+        private static List<ResultSummaryEntry> BuildResultSummaryEntries(string message)
+        {
+            var entries = new List<ResultSummaryEntry>();
+            var hpChange = ExtractHpChange(message);
+            if (hpChange.StartsWith("HP ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "HP", hpChange.Substring("HP ".Length).Trim(), string.Empty, new Color(0.62f, 0.22f, 0.22f, 0.95f));
+            }
+
+            if (string.IsNullOrEmpty(message))
+            {
+                return entries;
+            }
+
+            var tokens = message.Split(new[] { '|', ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            for (var i = 0; i < tokens.Length; i++)
+            {
+                AppendResultSummaryEntryFromToken(entries, tokens[i].Trim());
+                if (entries.Count >= ResultIconChipCount)
+                {
+                    break;
+                }
+            }
+
+            return entries;
+        }
+
+        private static void AppendResultSummaryEntryFromToken(List<ResultSummaryEntry> entries, string token)
+        {
+            if (string.IsNullOrEmpty(token) || token.StartsWith("Glitch ", StringComparison.Ordinal) || token.StartsWith("glitch ", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            if (token.StartsWith("HP ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "HP", token.Substring("HP ".Length).Trim(), string.Empty, new Color(0.62f, 0.22f, 0.22f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("Gold ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "Gold", token.Substring("Gold ".Length).Trim(), "resource.gold", new Color(0.82f, 0.62f, 0.22f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("gold reward ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "Gold", "+" + token.Substring("gold reward ".Length).Trim().TrimStart('+'), "resource.gold", new Color(0.82f, 0.62f, 0.22f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("Affinity ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "Affinity", token.Substring("Affinity ".Length).Trim(), "resource.affinity", new Color(0.55f, 0.34f, 0.72f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("affinity ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "Affinity", token.Substring("affinity ".Length).Trim(), "resource.affinity", new Color(0.55f, 0.34f, 0.72f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("item ", StringComparison.Ordinal))
+            {
+                var payload = token.Substring("item ".Length).Trim();
+                AppendResultSummaryEntry(entries, "Item", ExtractRefDeltaValue(payload), ResultIconKeyForRef(ExtractRefId(payload)), new Color(0.30f, 0.48f, 0.42f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("ability ", StringComparison.Ordinal))
+            {
+                var payload = token.Substring("ability ".Length).Trim();
+                AppendResultSummaryEntry(entries, "Ability", ExtractRefDeltaValue(payload), ResultIconKeyForRef(ExtractRefId(payload)), new Color(0.55f, 0.50f, 0.25f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("memory unlocked ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "Memory", "+1", "resource.memory", new Color(0.30f, 0.50f, 0.68f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("jar outcome: Gold +8", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "Gold", "+8", "resource.gold", new Color(0.82f, 0.62f, 0.22f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("jar outcome: HP +5", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "HP", "+5", string.Empty, new Color(0.62f, 0.22f, 0.22f, 0.95f));
+            }
+        }
+
+        private static void AppendResultSummaryEntry(List<ResultSummaryEntry> entries, string label, string value, string iconKey, Color fallbackColor)
+        {
+            if (entries.Count >= ResultIconChipCount || string.IsNullOrEmpty(value) || IsNoOpDelta(value))
+            {
+                return;
+            }
+
+            for (var i = 0; i < entries.Count; i++)
+            {
+                if (entries[i].Label == label && entries[i].Value == value)
+                {
+                    return;
+                }
+            }
+
+            entries.Add(new ResultSummaryEntry(label, value, iconKey, fallbackColor));
+        }
+
+        private static string ExtractRefId(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            var parts = value.Split(' ');
+            return parts.Length == 0 ? string.Empty : parts[0];
+        }
+
+        private static string ExtractRefDeltaValue(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return "+1";
+            }
+
+            var parts = value.Split(' ');
+            return parts.Length > 1 ? parts[parts.Length - 1] : "+1";
+        }
+
+        private static string ResultIconKeyForRef(string reference)
+        {
+            return reference switch
+            {
+                "ITEM_FIELD_BANDAGE" => "item.field_bandage",
+                "ITEM_LANTERN_OIL" => "item.lantern_oil",
+                "ITEM_TORN_CHARM" => "item.torn_charm",
+                "ABILITY_SCOUT" => "ability.scout",
+                "ABILITY_RECALL_ANCHOR" => "ability.recall_anchor",
+                _ => string.Empty
+            };
+        }
+
+        private static string ShortResultLabel(string label)
+        {
+            return label switch
+            {
+                "Gold" => "G",
+                "Affinity" => "신",
+                "Item" => "I",
+                "Ability" => "A",
+                "Memory" => "기",
+                _ => label
+            };
+        }
+
         private string BuildResultSummary(string message)
         {
             if (showRawDebugText)
@@ -4724,12 +5116,12 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("item ", StringComparison.Ordinal))
             {
-                return NormalizeRefDelta(token.Substring("item ".Length).Trim()) + " 획득";
+                return "아이템 " + ExtractRefDeltaValue(token.Substring("item ".Length).Trim());
             }
 
             if (token.StartsWith("ability ", StringComparison.Ordinal))
             {
-                return NormalizeRefDelta(token.Substring("ability ".Length).Trim()) + " 획득";
+                return "능력 " + ExtractRefDeltaValue(token.Substring("ability ".Length).Trim());
             }
 
             if (token.StartsWith("reward ", StringComparison.Ordinal))
@@ -4739,7 +5131,7 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("memory unlocked ", StringComparison.Ordinal))
             {
-                return "기억의 잔향 해금";
+                return "기억 +1";
             }
 
             if (token.StartsWith("action ", StringComparison.Ordinal))
@@ -4749,7 +5141,7 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("jar outcome: Gold +8", StringComparison.Ordinal))
             {
-                return "골드 획득: Gold +8";
+                return "Gold +8";
             }
 
             if (token.StartsWith("jar outcome: elite combat", StringComparison.Ordinal))
