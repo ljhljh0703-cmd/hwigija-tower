@@ -49,6 +49,7 @@ namespace HwigiTower.Tests.PlayMode
             yield return CaptureFloorShopScreen("11_shop_floor5.png", 5, "ENC_SHOP_05", "enc_shop_05_bg", "merchant_otherworld");
             yield return CaptureCombatScreen("06_normal_combat.png", "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return CaptureCombatScreen("07_boss_combat.png", "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
+            yield return CaptureBossGateChoices();
             yield return CaptureEndingChoice();
 
             AssertRequiredScreenshots();
@@ -98,6 +99,7 @@ namespace HwigiTower.Tests.PlayMode
                 StringAssert.Contains("ui_shop_product_card", hud.CurrentShopChoiceCardSpriteNames);
                 StringAssert.Contains("icon_item_field_bandage", hud.CurrentShopChoiceIconNames);
                 StringAssert.Contains("icon_ability_scout", hud.CurrentShopChoiceIconNames);
+                Assert.GreaterOrEqual(hud.ChoiceButtonCount, 6, "Expected five shop products plus leave.");
             });
         }
 
@@ -133,12 +135,11 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.IsTrue(selection.HasEncounter, "Missing QA rest selection");
                 hud.OpenQaRouteStep(selection);
                 Assert.IsTrue(hud.RestInteractionPanelVisible);
-                Assert.IsTrue(hud.NpcSpotlightVisible);
-                Assert.AreEqual("휴식", hud.CurrentNpcSpotlightModeLabel);
-                StringAssert.Contains("마타이오스", hud.NpcSpotlightMessage);
+                Assert.IsFalse(hud.NpcSpotlightVisible);
                 Assert.AreEqual("enc_rest_01_bg", hud.CurrentBackgroundSpriteName);
-                StringAssert.Contains("ui_spotlight_gradient", hud.CurrentNpcSupportSpriteNames);
-                StringAssert.Contains("ui_npc_dialogue_plate", hud.CurrentNpcSupportSpriteNames);
+                StringAssert.Contains("icon_rest_talk", hud.CurrentRestActionIconNames);
+                StringAssert.Contains("icon_rest_train", hud.CurrentRestActionIconNames);
+                StringAssert.Contains("icon_rest_recover", hud.CurrentRestActionIconNames);
             });
         }
 
@@ -171,6 +172,19 @@ namespace HwigiTower.Tests.PlayMode
                 hud.ShowRunState(controller.GetSnapshot());
                 Assert.IsTrue(hud.EndingRestButtonVisible);
                 Assert.IsTrue(hud.EndingContinueButtonVisible);
+            });
+        }
+
+        private static IEnumerator CaptureBossGateChoices()
+        {
+            yield return CapturePrototypeRoomScreen("12_boss_gate_choices.png", (controller, hud) =>
+            {
+                var selection = controller.CreateQaEncounterSelection("ENC_COMBAT_GATE_03");
+                Assert.IsTrue(selection.HasEncounter, "Missing QA boss gate selection");
+                hud.OpenQaRouteStep(selection);
+                Assert.AreEqual(2, hud.ChoiceButtonCount);
+                Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_COMBAT_03_ENGAGE"));
+                Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_BOSS_RETURN"));
             });
         }
 
@@ -369,6 +383,7 @@ namespace HwigiTower.Tests.PlayMode
             "11_shop_floor5.png",
             "06_normal_combat.png",
             "07_boss_combat.png",
+            "12_boss_gate_choices.png",
             "08_ending_choice.png"
         };
     }

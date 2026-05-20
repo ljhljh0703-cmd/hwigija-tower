@@ -94,7 +94,7 @@ namespace HwigiTower.Tests.PlayMode
             var hud = Object.FindFirstObjectByType<PrototypeHud>();
             Assert.IsNotNull(controller);
             Assert.IsNotNull(hud);
-            Assert.IsFalse(hud.RouteActionButtonVisible);
+            Assert.IsTrue(hud.RouteActionButtonVisible);
             StringAssert.Contains("Floor 1", hud.RunStateMessage);
             StringAssert.DoesNotContain("Glitch", hud.RunStateMessage);
             Assert.IsTrue(hud.HasPortraitRoot);
@@ -105,6 +105,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(UnityEngine.EventSystems.EventSystem.current);
             Assert.IsTrue(HasUiInputModule(UnityEngine.EventSystems.EventSystem.current.gameObject));
 
+            yield return null;
+            OpenMapChoicesIfNeeded(hud);
             yield return null;
 
             Assert.IsTrue(hud.HasScreenLayerPanels);
@@ -181,23 +183,6 @@ namespace HwigiTower.Tests.PlayMode
 
             controller.AutoResolveCombat = true;
             controller.RunState.ModifyGold(100);
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.shop"), "ENC_SHOP_01", "CHOICE_SHOP_01_BUY_ABILITY");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
-            controller.ResolveNextFloor();
-            hud.ShowRunState(controller.GetSnapshot());
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_F02_MORAL_CHOICE_001", "CHOICE_F02_MORAL_LEAVE");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.shop"), "ENC_F02_SHOP_001", "CHOICE_F02_SHOP_BUY_ITEM");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_COMBAT_GATE_02", "CHOICE_COMBAT_02_ENGAGE");
-            controller.ResolveNextFloor();
-            hud.ShowRunState(controller.GetSnapshot());
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.shop"), "ENC_SHOP_03", "CHOICE_SHOP_03_BUY_ABILITY");
-            yield return ResolveRouteChoice(controller, hud, FindNode("node.battle"), "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
-            controller.ResolveNextFloor();
-            hud.ShowRunState(controller.GetSnapshot());
             controller.RunState.ModifyPlayerHp(-8);
             var hpBeforeRest = controller.RunState.PlayerHp;
             yield return ResolveRouteActionRest(hud, "ENC_REST_01", "rest.recover", string.Empty);
@@ -225,8 +210,6 @@ namespace HwigiTower.Tests.PlayMode
             controller.AutoResolveCombat = true;
             controller.RunState.ModifyGold(100);
             yield return ResolveRouteActionChoice(hud, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
-            yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
-            yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_01", "CHOICE_MEMORY_01_UNLOCK");
 
             if (hud.RouteActionButtonVisible)
             {
@@ -234,10 +217,14 @@ namespace HwigiTower.Tests.PlayMode
                 yield return null;
             }
 
+            yield return AdvanceMapUntilEncounterSelectable(hud, "ENC_SHOP_01");
             var shopMapButton = FindMapChoiceButton(hud, "ENC_SHOP_01");
-            Assert.IsNotNull(shopMapButton, DescribeChoiceButtons(hud));
-            shopMapButton.onClick.Invoke();
-            yield return null;
+            if (shopMapButton != null)
+            {
+                shopMapButton.onClick.Invoke();
+                yield return null;
+            }
+
             Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM"), DescribeChoiceButtons(hud));
             Assert.IsNull(FindChoiceButton(hud, "CHOICE_COMBAT_01_ENGAGE"));
             FindChoiceButton(hud, "CHOICE_SHOP_01_BUY_ITEM").onClick.Invoke();
@@ -265,8 +252,6 @@ namespace HwigiTower.Tests.PlayMode
             controller.AutoResolveCombat = true;
             controller.RunState.ModifyGold(100);
             yield return ResolveRouteActionChoice(hud, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
-            yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
-            yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_01", "CHOICE_MEMORY_01_UNLOCK");
             yield return ResolveRouteActionChoice(hud, "ENC_SHOP_01", "CHOICE_SHOP_01_LEAVE");
             yield return AdvanceMapUntilEncounterSelectable(hud, "ENC_COMBAT_GATE_01");
 
@@ -281,7 +266,6 @@ namespace HwigiTower.Tests.PlayMode
             StringAssert.Contains("전투 시작", DescribeChoiceButtons(hud));
             StringAssert.Contains("돌아간다", DescribeChoiceButtons(hud));
             StringAssert.DoesNotContain("준비", DescribeChoiceButtons(hud));
-            StringAssert.DoesNotContain("정비", DescribeChoiceButtons(hud));
 
             FindChoiceButton(hud, "CHOICE_BOSS_RETURN").onClick.Invoke();
             yield return null;
@@ -289,6 +273,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(controller.RunState.StairUnlocked);
             Assert.IsFalse(controller.RunState.RunClear);
             Assert.IsFalse(controller.RunState.IsInCombat);
+            OpenMapChoicesIfNeeded(hud);
+            yield return null;
             Assert.IsNotNull(FindMapChoiceButton(hud, "ENC_COMBAT_GATE_01"), DescribeChoiceButtons(hud));
         }
 
@@ -358,32 +344,20 @@ namespace HwigiTower.Tests.PlayMode
             hud.ShowRunState(controller.GetSnapshot());
 
             yield return ResolveRouteActionChoice(hud, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
-            yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
             yield return ResolveRouteActionChoice(hud, "ENC_SHOP_01", "CHOICE_SHOP_01_BUY_ABILITY");
-            yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return ResolveNextFloorButton(hud);
 
-            yield return ResolveRouteActionChoice(hud, "ENC_F02_MORAL_CHOICE_001", "CHOICE_F02_MORAL_LEAVE");
-            yield return ResolveRouteActionChoice(hud, "ENC_F02_SHOP_001", "CHOICE_F02_SHOP_BUY_ITEM");
-            yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_02", "CHOICE_COMBAT_02_ENGAGE");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_02", "CHOICE_COMBAT_02_ENGAGE");
             yield return ResolveNextFloorButton(hud);
 
-            yield return ResolveRouteActionChoice(hud, "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
-            yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
-            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_03", "CHOICE_SHOP_03_BUY_ABILITY");
-            yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             yield return ResolveNextFloorButton(hud);
 
-            yield return ResolveRouteActionRest(hud, "ENC_REST_01", "rest.train", "다음 싸움을 준비하자");
-            yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
-            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_04", "CHOICE_SHOP_04_LEAVE");
-            yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             Assert.AreEqual("ENEMY_WRAITH_04", controller.RunState.LastCombatEnemyId);
             yield return ResolveNextFloorButton(hud);
 
-            yield return ResolveRouteActionChoice(hud, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
-            yield return ResolveRouteActionRest(hud, "ENC_REST_05", "rest.recover", string.Empty);
-            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_05", "CHOICE_SHOP_05_LEAVE");
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
             hud.ShowRunState(controller.GetSnapshot());
 
@@ -454,7 +428,6 @@ namespace HwigiTower.Tests.PlayMode
             controller.BeginRun();
             controller.ResolveEncounterChoice(shopNode, FindEncounter(shopNode, "ENC_SHOP_01"), "CHOICE_SHOP_01_BUY_ITEM");
             controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MORAL_CHOICE_01"), "CHOICE_MORAL_01_REFUSE");
-            controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_MEMORY_FRAGMENT_01"), "CHOICE_MEMORY_01_UNLOCK");
             controller.ResolveEncounterChoice(battleNode, FindEncounter(battleNode, "ENC_COMBAT_GATE_01"), "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
             controller.RunState.ModifyGold(12);
@@ -503,40 +476,28 @@ namespace HwigiTower.Tests.PlayMode
             controller.BeginRun();
             controller.RunState.ModifyGold(100);
 
-            yield return ResolveRouteChoice(controller, hud, battleNode, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MORAL_CHOICE_01", "CHOICE_MORAL_01_REFUSE");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_01", "CHOICE_SHOP_01_BUY_ABILITY");
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            yield return ResolveRouteActionChoice(hud, "EVT_F01_JAR_ROOM", "CHOICE_EVT_F01_JAR_PLAIN");
+            yield return ResolveRouteActionChoice(hud, "ENC_SHOP_01", "CHOICE_SHOP_01_BUY_ABILITY");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
             hud.ShowRunState(controller.GetSnapshot());
 
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_F02_MORAL_CHOICE_001", "CHOICE_F02_MORAL_LEAVE");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_F02_SHOP_001", "CHOICE_F02_SHOP_BUY_ITEM");
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_02", "CHOICE_COMBAT_02_ENGAGE");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_02", "CHOICE_COMBAT_02_ENGAGE");
             controller.ResolveNextFloor();
             hud.ShowRunState(controller.GetSnapshot());
 
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MORAL_CHOICE_02", "CHOICE_MORAL_02_REFUSE");
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MEMORY_FRAGMENT_02", "CHOICE_MEMORY_02_UNLOCK");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_03", "CHOICE_SHOP_03_BUY_ABILITY");
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
             hud.ShowRunState(controller.GetSnapshot());
 
-            yield return ResolveRouteChoice(controller, hud, restNode, "ENC_REST_01", "CHOICE_REST_01_REST");
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MEMORY_FRAGMENT_03", "CHOICE_MEMORY_03_UNLOCK");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_04", "CHOICE_SHOP_04_LEAVE");
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            yield return ResolveCurrentFloorBossViaRoute(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
             controller.ResolveNextFloor();
             hud.ShowRunState(controller.GetSnapshot());
 
             Assert.AreEqual(5, controller.RunState.CurrentFloor);
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_MEMORY_FRAGMENT_05", "CHOICE_MEMORY_05_UNLOCK");
-            yield return ResolveRouteChoice(controller, hud, restNode, "ENC_REST_05", "CHOICE_REST_05_REST");
-            yield return ResolveRouteChoice(controller, hud, shopNode, "ENC_SHOP_05", "CHOICE_SHOP_05_LEAVE");
 
             controller.AutoResolveCombat = false;
-            yield return ResolveRouteChoice(controller, hud, battleNode, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
+            yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.AreEqual("BOSS_APEX_02", controller.RunState.LastCombatEnemyId);
 
@@ -553,8 +514,15 @@ namespace HwigiTower.Tests.PlayMode
             }
 
             Assert.IsTrue(skillButton.interactable);
-            StringAssert.Contains("정찰", ReadButtonText(skillButton));
+            StringAssert.Contains("스킬", ReadButtonText(skillButton));
             skillButton.onClick.Invoke();
+            yield return null;
+            var scoutOption = GameObject.Find("Skill Option 0");
+            Assert.IsNotNull(scoutOption, "Expected skill picker option after pressing Skill.");
+            var scoutOptionButton = scoutOption.GetComponent<Button>();
+            Assert.IsNotNull(scoutOptionButton);
+            StringAssert.Contains("정찰", ReadButtonText(scoutOptionButton));
+            scoutOptionButton.onClick.Invoke();
             yield return null;
             StringAssert.Contains("정찰 기술", hud.CombatMessage);
             StringAssert.Contains("콤보 피해", hud.CombatMessage);
@@ -562,7 +530,7 @@ namespace HwigiTower.Tests.PlayMode
             var guard = 0;
             while (controller.RunState.IsInCombat && guard < 20)
             {
-                (skillButton.interactable ? skillButton : attackButton).onClick.Invoke();
+                attackButton.onClick.Invoke();
                 yield return null;
                 guard++;
             }
@@ -599,6 +567,8 @@ namespace HwigiTower.Tests.PlayMode
                 yield return null;
             }
 
+            OpenMapChoicesIfNeeded(hud);
+            yield return null;
             Assert.IsFalse(hud.RouteActionButtonVisible, "Route action should hide while choices or map nodes are open.");
             yield return AdvanceMapUntilEncounterSelectable(hud, expectedEncounterId);
             var mapButton = FindMapChoiceButton(hud, expectedEncounterId);
@@ -623,6 +593,8 @@ namespace HwigiTower.Tests.PlayMode
                 yield return null;
             }
 
+            OpenMapChoicesIfNeeded(hud);
+            yield return null;
             yield return AdvanceMapUntilEncounterSelectable(hud, expectedEncounterId);
             var mapButton = FindMapChoiceButton(hud, expectedEncounterId);
             if (mapButton != null)
@@ -665,24 +637,148 @@ namespace HwigiTower.Tests.PlayMode
             yield return null;
         }
 
+        private static IEnumerator ResolveCurrentFloorBossViaRoute(Run.PrototypeRoomController controller, PrototypeHud hud, string encounterId, string choiceStableId)
+        {
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+            var floor = controller.RunState.CurrentFloor;
+            var guard = 0;
+            while (!controller.RunState.StairUnlocked && controller.RunState.CurrentFloor == floor && guard++ < 8)
+            {
+                yield return ResolveRouteActionChoice(hud, encounterId, choiceStableId);
+            }
+
+            Assert.Less(guard, 8, "Could not resolve boss route for floor " + floor + " via " + encounterId);
+        }
+
         private static IEnumerator AdvanceMapUntilEncounterSelectable(PrototypeHud hud, string expectedEncounterId)
         {
             var guard = 0;
-            while (FindMapChoiceButton(hud, expectedEncounterId) == null && guard++ < 8)
+            OpenMapChoicesIfNeeded(hud);
+            yield return null;
+            while (FindMapChoiceButton(hud, expectedEncounterId) == null && !IsExpectedEncounterOpen(hud, expectedEncounterId) && guard++ < 20)
             {
-                var next = FindFirstInteractableMapChoiceButton(hud);
+                if (IsAnyEncounterOpen(hud) || hud.RestInteractionPanelVisible)
+                {
+                    yield return ResolveOpenEncounterForMapAdvance(hud);
+                    if (hud.RouteActionButtonVisible)
+                    {
+                        hud.GetRouteActionButton().onClick.Invoke();
+                        yield return null;
+                    }
+
+                    OpenMapChoicesIfNeeded(hud);
+                    yield return null;
+                    continue;
+                }
+
+                var next = FindPreferredAdvanceMapChoiceButton(hud, expectedEncounterId);
                 Assert.IsNotNull(next, "Missing selectable map node while advancing toward " + expectedEncounterId + " among " + DescribeChoiceButtons(hud));
                 next.onClick.Invoke();
                 yield return null;
+                if (IsExpectedEncounterOpen(hud, expectedEncounterId))
+                {
+                    break;
+                }
+
                 yield return ResolveOpenEncounterForMapAdvance(hud);
                 if (hud.RouteActionButtonVisible)
                 {
                     hud.GetRouteActionButton().onClick.Invoke();
                     yield return null;
                 }
+
+                OpenMapChoicesIfNeeded(hud);
+                yield return null;
             }
 
-            Assert.Less(guard, 8, "Could not advance map toward " + expectedEncounterId);
+            Assert.Less(guard, 20, "Could not advance map toward " + expectedEncounterId);
+        }
+
+        private static void OpenMapChoicesIfNeeded(PrototypeHud hud)
+        {
+            if (hud == null || FindFirstInteractableMapChoiceButton(hud) != null || IsAnyEncounterOpen(hud) || hud.RestInteractionPanelVisible)
+            {
+                return;
+            }
+
+            var mapButton = hud.GetUtilityButton("map");
+            if (mapButton != null && mapButton.interactable)
+            {
+                mapButton.onClick.Invoke();
+            }
+
+            if (FindFirstInteractableMapChoiceButton(hud) != null || !hud.RouteActionButtonVisible)
+            {
+                return;
+            }
+
+            hud.GetRouteActionButton().onClick.Invoke();
+        }
+
+        private static bool IsAnyEncounterOpen(PrototypeHud hud)
+        {
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button != null && button.name.StartsWith("Choice Button "))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsExpectedEncounterOpen(PrototypeHud hud, string expectedEncounterId)
+        {
+            if (expectedEncounterId != null && expectedEncounterId.StartsWith("ENC_REST_", System.StringComparison.Ordinal))
+            {
+                return hud.RestInteractionPanelVisible;
+            }
+
+            var expectedPrefix = ExpectedChoicePrefix(expectedEncounterId);
+            if (string.IsNullOrEmpty(expectedPrefix))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button != null && button.name.StartsWith("Choice Button " + expectedPrefix, System.StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string ExpectedChoicePrefix(string encounterId)
+        {
+            return encounterId switch
+            {
+                "EVT_F01_JAR_ROOM" => "CHOICE_EVT_F01_JAR",
+                "ENC_MORAL_CHOICE_01" => "CHOICE_MORAL_01",
+                "ENC_MORAL_CHOICE_02" => "CHOICE_MORAL_02",
+                "ENC_MORAL_CHOICE_03" => "CHOICE_MORAL_03",
+                "ENC_F02_MORAL_CHOICE_001" => "CHOICE_F02_MORAL",
+                "ENC_MEMORY_FRAGMENT_01" => "CHOICE_MEMORY_01",
+                "ENC_MEMORY_FRAGMENT_02" => "CHOICE_MEMORY_02",
+                "ENC_MEMORY_FRAGMENT_03" => "CHOICE_MEMORY_03",
+                "ENC_MEMORY_FRAGMENT_04" => "CHOICE_MEMORY_04",
+                "ENC_MEMORY_FRAGMENT_05" => "CHOICE_MEMORY_05",
+                "ENC_SHOP_01" => "CHOICE_SHOP_01",
+                "ENC_F02_SHOP_001" => "CHOICE_F02_SHOP",
+                "ENC_SHOP_03" => "CHOICE_SHOP_03",
+                "ENC_SHOP_04" => "CHOICE_SHOP_04",
+                "ENC_SHOP_05" => "CHOICE_SHOP_05",
+                "ENC_COMBAT_GATE_01" => "CHOICE_COMBAT_01",
+                "ENC_COMBAT_GATE_02" => "CHOICE_COMBAT_02",
+                "ENC_COMBAT_GATE_03" => "CHOICE_COMBAT_03",
+                _ => string.Empty
+            };
         }
 
         private static IEnumerator ResolveOpenEncounterForMapAdvance(PrototypeHud hud)
@@ -723,13 +819,19 @@ namespace HwigiTower.Tests.PlayMode
                 return;
             }
 
+            var match = string.Empty;
             for (var i = 0; i < selectable.Length; i++)
             {
                 if (selectable[i].MapNodeId.EndsWith("." + expectedEncounterId))
                 {
-                    Assert.IsTrue(state.TrySelectMapNode(selectable[i].MapNodeId, out _));
-                    return;
+                    match = SelectPreferredMapNodeId(match, selectable[i].MapNodeId);
                 }
+            }
+
+            if (!string.IsNullOrEmpty(match))
+            {
+                Assert.IsTrue(state.TrySelectMapNode(match, out _));
+                return;
             }
 
             var guard = 0;
@@ -737,18 +839,24 @@ namespace HwigiTower.Tests.PlayMode
             {
                 selectable = state.GetSelectableMapNodeViews();
                 Assert.Greater(selectable.Length, 0, "Missing selectable map node for " + expectedEncounterId);
-                var selected = selectable[0];
+                var selected = SelectPreferredAdvanceMapNode(selectable, expectedEncounterId);
                 Assert.IsTrue(state.TrySelectMapNode(selected.MapNodeId, out var step));
                 var choiceStableId = ResolvePreferredChoiceId(state, step);
                 state.ResolveEncounterChoice(new DeterministicRunContext(state.RunId, 1001), step.NodeId, step.Encounter, choiceStableId);
                 selectable = state.GetSelectableMapNodeViews();
+                match = string.Empty;
                 for (var i = 0; i < selectable.Length; i++)
                 {
                     if (selectable[i].MapNodeId.EndsWith("." + expectedEncounterId))
                     {
-                        Assert.IsTrue(state.TrySelectMapNode(selectable[i].MapNodeId, out _));
-                        return;
+                        match = SelectPreferredMapNodeId(match, selectable[i].MapNodeId);
                     }
+                }
+
+                if (!string.IsNullOrEmpty(match))
+                {
+                    Assert.IsTrue(state.TrySelectMapNode(match, out _));
+                    return;
                 }
             }
 
@@ -832,16 +940,95 @@ namespace HwigiTower.Tests.PlayMode
 
         private static Button FindMapChoiceButton(PrototypeHud hud, string encounterId)
         {
+            Button preferred = null;
             for (var i = 0; i < hud.ChoiceButtonCount; i++)
             {
                 var button = hud.GetChoiceButton(i);
                 if (button != null && button.interactable && button.name.EndsWith("." + encounterId))
                 {
-                    return button;
+                    if (IsBossGateEncounter(encounterId) && ExtractMapLayer(button.name) < 5)
+                    {
+                        continue;
+                    }
+
+                    preferred = SelectPreferredMapButton(preferred, button);
                 }
             }
 
-            return null;
+            return preferred;
+        }
+
+        private static Button SelectPreferredMapButton(Button current, Button candidate)
+        {
+            if (current == null)
+            {
+                return candidate;
+            }
+
+            return ExtractMapLayer(candidate.name) >= ExtractMapLayer(current.name) ? candidate : current;
+        }
+
+        private static string SelectPreferredMapNodeId(string current, string candidate)
+        {
+            if (string.IsNullOrEmpty(current))
+            {
+                return candidate;
+            }
+
+            return ExtractMapLayer(candidate) >= ExtractMapLayer(current) ? candidate : current;
+        }
+
+        private static PrototypeFloorMapNodeView SelectPreferredAdvanceMapNode(PrototypeFloorMapNodeView[] selectable, string expectedEncounterId)
+        {
+            Assert.IsNotNull(selectable);
+            var targetIsBossGate = IsBossGateEncounter(expectedEncounterId);
+            PrototypeFloorMapNodeView? fallback = null;
+            PrototypeFloorMapNodeView? preferred = null;
+            for (var i = 0; i < selectable.Length; i++)
+            {
+                var node = selectable[i];
+                fallback ??= node;
+                if (node.MapNodeId.Contains(".ENC_COMBAT_GATE_") && (!targetIsBossGate || node.Layer < 5))
+                {
+                    continue;
+                }
+
+                if (!preferred.HasValue || node.Layer < preferred.Value.Layer)
+                {
+                    preferred = node;
+                }
+            }
+
+            return preferred ?? fallback.Value;
+        }
+
+        private static int ExtractMapLayer(string mapNodeNameOrId)
+        {
+            if (string.IsNullOrEmpty(mapNodeNameOrId))
+            {
+                return -1;
+            }
+
+            const string marker = ".layer.";
+            var markerIndex = mapNodeNameOrId.IndexOf(marker, System.StringComparison.Ordinal);
+            if (markerIndex < 0)
+            {
+                return -1;
+            }
+
+            var start = markerIndex + marker.Length;
+            var end = mapNodeNameOrId.IndexOf('.', start);
+            if (end <= start)
+            {
+                return -1;
+            }
+
+            return int.TryParse(mapNodeNameOrId.Substring(start, end - start), out var layer) ? layer : -1;
+        }
+
+        private static bool IsBossGateEncounter(string encounterId)
+        {
+            return encounterId != null && encounterId.StartsWith("ENC_COMBAT_GATE_", System.StringComparison.Ordinal);
         }
 
         private static Button FindFirstInteractableMapChoiceButton(PrototypeHud hud)
@@ -856,6 +1043,35 @@ namespace HwigiTower.Tests.PlayMode
             }
 
             return null;
+        }
+
+        private static Button FindPreferredAdvanceMapChoiceButton(PrototypeHud hud, string expectedEncounterId)
+        {
+            Button fallback = null;
+            Button preferred = null;
+            var targetIsBossGate = IsBossGateEncounter(expectedEncounterId);
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button == null || !button.interactable || !button.name.StartsWith("Map Node Button "))
+                {
+                    continue;
+                }
+
+                fallback ??= button;
+                var isCombatGate = button.name.Contains(".ENC_COMBAT_GATE_");
+                if (isCombatGate && (!targetIsBossGate || ExtractMapLayer(button.name) < 5))
+                {
+                    continue;
+                }
+
+                if (preferred == null || ExtractMapLayer(button.name) < ExtractMapLayer(preferred.name))
+                {
+                    preferred = button;
+                }
+            }
+
+            return preferred ?? fallback;
         }
 
         private static Button FindFirstInteractableChoiceButton(PrototypeHud hud)

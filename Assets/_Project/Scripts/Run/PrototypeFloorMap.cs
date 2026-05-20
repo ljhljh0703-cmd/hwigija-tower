@@ -152,7 +152,8 @@ namespace HwigiTower.Run
                 return;
             }
 
-            var branchLayers = BuildFixedBranchLayers(BuildFixedBranchSteps(branchSteps, random));
+            var bossStep = bossIndex >= 0 ? steps[bossIndex] : null;
+            var branchLayers = BuildFixedBranchLayers(BuildFixedBranchSteps(branchSteps, bossStep, random));
             for (var layer = 1; layer <= branchLayers.Length; layer++)
             {
                 var layerSteps = branchLayers[layer - 1];
@@ -296,11 +297,16 @@ namespace HwigiTower.Run
             return layers;
         }
 
-        private static List<PrototypeDemoRunStep> BuildFixedBranchSteps(List<PrototypeDemoRunStep> branchSteps, DeterministicRandom random)
+        private static List<PrototypeDemoRunStep> BuildFixedBranchSteps(List<PrototypeDemoRunStep> branchSteps, PrototypeDemoRunStep bossStep, DeterministicRandom random)
         {
             var combat = CollectStepsOfType(branchSteps, PrototypeFloorMapNodeType.Combat);
             var events = CollectStepsOfType(branchSteps, PrototypeFloorMapNodeType.Event);
             var rests = CollectStepsOfType(branchSteps, PrototypeFloorMapNodeType.Rest);
+            if (combat.Count == 0 && bossStep != null && bossStep.IsValid)
+            {
+                combat.Add(bossStep);
+            }
+
             var fallback = branchSteps ?? new List<PrototypeDemoRunStep>();
             var results = new List<PrototypeDemoRunStep>(10);
             AddRepeated(results, events, fallback, 4);
@@ -525,6 +531,11 @@ namespace HwigiTower.Run
             if (step == null || step.Encounter == null)
             {
                 return PrototypeFloorMapNodeType.Event;
+            }
+
+            if (HasStartCombatEffect(step.Encounter))
+            {
+                return PrototypeFloorMapNodeType.Combat;
             }
 
             return step.Encounter.Type switch

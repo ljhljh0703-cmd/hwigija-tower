@@ -752,7 +752,16 @@ namespace HwigiTower.Tests.EditMode
                 CollectionAssert.AreNotEqual(
                     BuildMapSignature(nodes),
                     BuildMapSignature(different.CreateSnapshot().FloorMapNodes));
-                Assert.GreaterOrEqual(nodes.Count(node => node.Selectable), 1);
+                var branchNodes = nodes.Where(node => node.Layer >= 1 && node.Layer <= 3).ToArray();
+                Assert.AreEqual(12, nodes.Length, "Expected 10 branch nodes plus shop and boss on floor " + floor);
+                Assert.AreEqual(10, branchNodes.Length, "Expected fixed 10 branch nodes on floor " + floor);
+                Assert.AreEqual(3, nodes.Count(node => node.Layer == 1), "Expected three-way branch start on floor " + floor);
+                Assert.AreEqual(4, nodes.Count(node => node.Layer == 2), "Expected four middle branch nodes on floor " + floor);
+                Assert.AreEqual(3, nodes.Count(node => node.Layer == 3), "Expected three branch nodes before shop on floor " + floor);
+                Assert.AreEqual(4, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Event), "Expected 4 event branch nodes on floor " + floor);
+                Assert.AreEqual(4, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Combat), "Expected 4 combat branch nodes on floor " + floor);
+                Assert.AreEqual(2, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Rest), "Expected reduced 2 rest branch nodes on floor " + floor);
+                Assert.GreaterOrEqual(nodes.Count(node => node.Selectable), 3);
                 Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Shop));
                 Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Boss));
                 var shop = nodes.Single(node => node.Type == PrototypeFloorMapNodeType.Shop);
@@ -762,7 +771,7 @@ namespace HwigiTower.Tests.EditMode
                 Assert.AreEqual(5, boss.Layer);
                 Assert.Greater(shop.NormalizedY, nodes.Where(node => node.Layer == lastBranchLayer).Max(node => node.NormalizedY));
                 Assert.Greater(boss.NormalizedY, shop.NormalizedY);
-                Assert.LessOrEqual(nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Rest), 1);
+                Assert.IsTrue(branchNodes.All(node => node.NormalizedY < shop.NormalizedY), "Branch nodes should sit below shop on floor " + floor);
                 Assert.IsTrue(nodes.Where(node => node.Layer == lastBranchLayer).All(node => node.NextMapNodeIds.Contains(shop.MapNodeId)));
                 CollectionAssert.Contains(shop.NextMapNodeIds, boss.MapNodeId);
                 Assert.IsTrue(nodes.Where(node => node.Layer == 1).All(node => node.Selectable));
