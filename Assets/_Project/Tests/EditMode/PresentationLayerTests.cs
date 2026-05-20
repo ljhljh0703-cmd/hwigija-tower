@@ -59,7 +59,7 @@ namespace HwigiTower.Tests.EditMode
             AssertSlotSprites(data, "ENEMY_FRACTURE_HOUND", null, "enemy_fracture_hound", null, null);
             AssertSlotSprites(data, "ENEMY_LAMPLIGHTER_01", null, "enemy_lamplighter_01", null, null);
             AssertSlotSprites(data, "BOSS_APEX_02", null, "enemy_boss_apex_02", null, null);
-            AssertSlotSprites(data, "run.clear", "ending_choice_bg", null, "char_mataios_bust_s3_s4", null);
+            AssertSlotSprites(data, "run.clear", "enc_complete_bg", null, "char_mataios_bust_s3_s4", null);
         }
 
         [Test]
@@ -236,7 +236,6 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("전투 시작", fight.text);
             StringAssert.Contains("돌아간다", back.text);
             StringAssert.DoesNotContain("준비", fight.text + back.text);
-            StringAssert.DoesNotContain("정비", fight.text + back.text);
             StringAssert.DoesNotContain("CHOICE_", fight.text + back.text);
         }
 
@@ -265,11 +264,12 @@ namespace HwigiTower.Tests.EditMode
 
             StringAssert.Contains("상태", hud.UtilityButtonLabels);
             StringAssert.Contains("지도", hud.UtilityButtonLabels);
-            StringAssert.Contains("정비", hud.UtilityButtonLabels);
+            StringAssert.Contains("장비", hud.UtilityButtonLabels);
             hud.GetUtilityButton("status").onClick.Invoke();
             Assert.IsTrue(hud.UtilityPanelVisible);
             StringAssert.Contains("HP 18/24", hud.UtilityPanelMessage);
-            StringAssert.Contains("신뢰 3", hud.UtilityPanelMessage);
+            StringAssert.Contains("ATK 5", hud.UtilityPanelMessage);
+            StringAssert.Contains("스킬", hud.UtilityPanelMessage);
             StringAssert.DoesNotContain("Glitch", hud.UtilityPanelMessage);
             hud.GetUtilityButton("loadout").onClick.Invoke();
             StringAssert.Contains("아이템 1", hud.UtilityPanelMessage);
