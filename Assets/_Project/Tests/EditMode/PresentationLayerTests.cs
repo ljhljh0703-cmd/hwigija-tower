@@ -409,8 +409,10 @@ namespace HwigiTower.Tests.EditMode
             hud.ShowResultMessage("choice applied: CHOICE_SHOP_01_BUY_ITEM; effects=2; ignored=0 | Gold -5, item ITEM_FIELD_BANDAGE +1 | memory unlocked MEM_FRAGMENT_03 | stair unlocked");
 
             StringAssert.Contains("Gold -5", result.text);
-            StringAssert.Contains("붕대 +1 획득", result.text);
-            StringAssert.Contains("기억의 잔향 해금", result.text);
+            StringAssert.Contains("아이템 +1", result.text);
+            StringAssert.Contains("기억 +1", result.text);
+            Assert.AreEqual("Gold|Item|Memory", hud.CurrentResultSummaryLabels);
+            Assert.AreEqual("-5|+1|+1", hud.CurrentResultSummaryValues);
             StringAssert.DoesNotContain("기억 파편", result.text);
             Assert.LessOrEqual(result.text.Split('\n').Length, 4);
             StringAssert.DoesNotContain("choice applied", result.text);
@@ -425,7 +427,9 @@ namespace HwigiTower.Tests.EditMode
 
             hud.ShowResultMessage("choice applied: CHOICE_EVT_F01_JAR_PATTERNED; effects=1; ignored=0 | jar outcome: Gold +8 | Glitch -2");
 
-            StringAssert.Contains("골드 획득: Gold +8", result.text);
+            StringAssert.Contains("Gold +8", result.text);
+            Assert.AreEqual("Gold", hud.CurrentResultSummaryLabels);
+            Assert.AreEqual("+8", hud.CurrentResultSummaryValues);
             StringAssert.DoesNotContain("CHOICE_EVT_F01_JAR_PATTERNED", result.text);
             StringAssert.DoesNotContain("jar outcome", result.text);
             StringAssert.DoesNotContain("Glitch", result.text);
