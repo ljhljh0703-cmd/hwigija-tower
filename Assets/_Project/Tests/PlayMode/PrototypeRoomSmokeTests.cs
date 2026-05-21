@@ -166,6 +166,8 @@ namespace HwigiTower.Tests.PlayMode
             attackButton.onClick.Invoke();
             yield return null;
             Assert.AreEqual(PrototypeAudioContext.CombatAttack, PrototypeAudioService.Instance.LastPlayedSfxContext);
+            StringAssert.Contains("선택 공격", hud.CombatMessage);
+            StringAssert.Contains("받은 피해", hud.CombatMessage);
         }
 
         [UnityTest]
@@ -524,7 +526,7 @@ namespace HwigiTower.Tests.PlayMode
             StringAssert.Contains("정찰", ReadButtonText(scoutOptionButton));
             scoutOptionButton.onClick.Invoke();
             yield return null;
-            StringAssert.Contains("정찰 기술", hud.CombatMessage);
+            StringAssert.Contains("선택 스킬", hud.CombatMessage);
             StringAssert.Contains("콤보 피해", hud.CombatMessage);
 
             var guard = 0;

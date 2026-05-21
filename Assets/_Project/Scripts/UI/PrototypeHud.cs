@@ -5441,20 +5441,23 @@ namespace HwigiTower.UI
                 return ready;
             }
 
+            var enemyDamage = ExtractRoundNumber(roundResult, "enemyDamage ").Trim();
             if (roundResult.Contains("Defend", StringComparison.Ordinal))
             {
-                return "방어: 받은 피해 " + ExtractRoundNumber(roundResult, "enemyDamage ").Trim() + " | 피해 절반 감소";
+                return "선택 방어 | 받은 피해 " + enemyDamage + " | 절반 감소";
             }
 
             if (roundResult.Contains("Attack", StringComparison.Ordinal))
             {
-                return "공격: 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim();
+                return "선택 공격 | 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim() +
+                    " | 받은 피해 " + enemyDamage;
             }
 
             if (roundResult.Contains("Skill", StringComparison.Ordinal))
             {
-                return "정찰 기술: 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim() +
-                    " + 추가 " + ExtractRoundNumber(roundResult, "combo ").Trim();
+                return "선택 스킬 | 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim() +
+                    " + 추가 " + ExtractRoundNumber(roundResult, "combo ").Trim() +
+                    " | 받은 피해 " + enemyDamage;
             }
 
             return "라운드 처리";
