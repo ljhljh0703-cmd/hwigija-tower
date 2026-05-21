@@ -146,7 +146,14 @@ namespace HwigiTower.Run
             if (!requirementsMet)
             {
                 var reason = BuildUnavailableReason(choice);
-                return string.IsNullOrEmpty(reason) ? "Unavailable" : "Unavailable: " + reason;
+                var unavailable = string.IsNullOrEmpty(reason) ? "Unavailable" : "Unavailable: " + reason;
+                if (encounter != null && encounter.Type == EncounterType.Shop)
+                {
+                    var summary = BuildChoiceEffectSummary(choice);
+                    return string.IsNullOrEmpty(summary) ? unavailable : summary + "\n" + unavailable;
+                }
+
+                return unavailable;
             }
 
             if (encounter != null && encounter.Id == "EVT_F01_JAR_ROOM")
@@ -154,6 +161,11 @@ namespace HwigiTower.Run
                 return BuildJarRoomChoiceHint(choice.stableId);
             }
 
+            return BuildChoiceEffectSummary(choice);
+        }
+
+        private static string BuildChoiceEffectSummary(EncounterChoiceRuntimeData choice)
+        {
             var summary = string.Empty;
             var effects = choice.effects ?? new EncounterEffectRuntimeData[0];
             for (var i = 0; i < effects.Length; i++)
