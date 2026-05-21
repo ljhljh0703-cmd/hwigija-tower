@@ -188,8 +188,29 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("Gold -5", views[0].HintText);
             StringAssert.Contains("ITEM_FIELD_BANDAGE", views[0].HintText);
             Assert.IsFalse(views[1].Enabled);
+            StringAssert.Contains("Gold -20", views[1].HintText);
+            StringAssert.Contains("ABILITY_SCOUT", views[1].HintText);
             StringAssert.Contains("Unavailable: Gold 부족", views[1].HintText);
             StringAssert.Contains("Combat start", views[2].HintText);
+        }
+
+        [Test]
+        public void Hud_ShopDisabledCardsKeepProductComparisonDetails()
+        {
+            var state = new PrototypeRunState("run-ui-shop-disabled", new GameFlowEventBus());
+            state.ModifyGold(5);
+            var encounter = CreateChoiceEncounter();
+            var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, encounter);
+            var hud = CreateHud(out _);
+
+            hud.ShowChoices(encounter, views, _ => { });
+
+            var disabledLabel = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
+            Assert.IsNotNull(disabledLabel);
+            StringAssert.Contains("정찰", disabledLabel.text);
+            StringAssert.Contains("Gold -20", disabledLabel.text);
+            StringAssert.Contains("Gold 부족", disabledLabel.text);
+            StringAssert.DoesNotContain("ABILITY_SCOUT", disabledLabel.text);
         }
 
         [Test]

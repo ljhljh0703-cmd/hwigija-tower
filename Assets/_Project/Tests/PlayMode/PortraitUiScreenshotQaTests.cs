@@ -99,7 +99,12 @@ namespace HwigiTower.Tests.PlayMode
                 StringAssert.Contains("ui_shop_product_card", hud.CurrentShopChoiceCardSpriteNames);
                 StringAssert.Contains("icon_item_field_bandage", hud.CurrentShopChoiceIconNames);
                 StringAssert.Contains("icon_ability_scout", hud.CurrentShopChoiceIconNames);
-                Assert.GreaterOrEqual(hud.ChoiceButtonCount, 6, "Expected five shop products plus leave.");
+                Assert.GreaterOrEqual(hud.ChoiceButtonCount, 3, "Expected opening shop products plus leave.");
+                var disabledAbility = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
+                Assert.IsNotNull(disabledAbility);
+                StringAssert.Contains("정찰", disabledAbility.text);
+                StringAssert.Contains("Gold -12", disabledAbility.text);
+                StringAssert.Contains("Gold 부족", disabledAbility.text);
             });
         }
 

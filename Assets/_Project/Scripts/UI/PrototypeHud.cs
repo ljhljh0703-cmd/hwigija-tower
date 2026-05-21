@@ -4531,7 +4531,12 @@ namespace HwigiTower.UI
         private static string NormalizeShopDisabledHint(string hint)
         {
             var normalized = NormalizePublicHint(hint);
-            return normalized.Contains("Gold 부족", StringComparison.Ordinal) ? "Gold 부족" : "구매 불가";
+            if (normalized.Contains("Gold 부족", StringComparison.Ordinal))
+            {
+                return normalized.Replace("구매 불가: Gold 부족", "Gold 부족", StringComparison.Ordinal);
+            }
+
+            return string.IsNullOrEmpty(normalized) ? "구매 불가" : normalized.Replace("선택 불가:", "구매 불가:", StringComparison.Ordinal);
         }
 
         private Sprite ResolveShopCardSprite(bool enabled)
