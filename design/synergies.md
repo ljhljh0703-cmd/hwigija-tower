@@ -24,24 +24,15 @@
 
 ## 광폭 (Frenzy) — 검×3
 
-**기본 효과**: 공격 시 매번 추가 공격 1회 (ATK × 0.5).  
-**심화 로직 (Glitch 연동, P1)**: 붕괴할수록 강해지는 역설.
-
-| 조건 | 추가 공격 배율 | 부작용 |
-|------|--------------|--------|
-| Glitch 0~2 | × 0.5 | 없음 |
-| Glitch 3~5 | × 0.75 | 없음 |
-| Glitch 6+ | × 1.0 | 전투 시작 시 HP -2 |
+**기본 효과**: Attack 시 추가타 ATK×0.5.  
+**심화 로직**: 직전 플레이어 액션도 Attack이면 추가타 ATK×0.75. Defend/Skill 선택 시 공격 연쇄 초기화. 기존 Glitch 배율 분기와 HP 부작용은 D-029로 폐기 유지하며, 단순 무한 배율 증폭은 금지. 수치는 OQ-020 1차 플레이테스트 기준값.
 
 | NumericParam 키 | 값 | 상태 |
 |----------------|-----|------|
 | `player.attack_bonus` | 0 | ✅ 확정 (기본 ATK 보너스 없음, 추가타 로직으로 처리) |
-| `synergy.extra_atk_multiplier_low` | 0.5 | 🟡 (임시) — Glitch 0~2 |
-| `synergy.extra_atk_multiplier_mid` | 0.75 | 🟡 (임시) — Glitch 3~5 |
-| `synergy.extra_atk_multiplier_high` | 1.0 | 🟡 (임시) — Glitch 6+ |
-| `glitch_threshold_mid` | 3 | 🟡 (임시) |
-| `glitch_threshold_high` | 6 | 🟡 (임시) |
-| `player.hp_cost_on_combat_start` | 2 | 🟡 (임시) — Glitch 6+ 조건에서만 |
+| `synergy.extra_atk_multiplier` | 0.5 | 🟡 OQ-020 1차 기준값 |
+| `synergy.attack_chain_break_actions` | `defend`, `skill` | 🔒 D-031 effect contract |
+| `synergy.attack_chain_extra_atk_multiplier` | 0.75 | 🟡 OQ-020 1차 기준값 |
 
 ---
 
@@ -87,26 +78,19 @@
 
 ## 반사 (Reflection) — 결×3
 
-**기본 효과**: 방어 선택 시 받은 피해(GUARD_01 감소 후)의 50% 반사.  
-**심화 로직 (Affinity 연동, P1·P5)**: 마타이오스와의 관계가 전투 수치에 직결.
-
-| 조건 | 효과 |
-|------|------|
-| Affinity ≥ +3 | 반사 피해 +2 + 마타이오스 발화 1줄 트리거 |
-| Affinity ≤ -3 | 반사 -1 대신 GUARD_03 쿨타임 리셋 |
+**기본 효과**: Defend 시 받은 피해의 50% 반사.  
+**심화 로직**: 방어 후 다음 Attack 1회 피해×1.5. 반격 창은 1회 소비한다. 반격 보상은 검 다타수와 겹치지 않는 강한 반격 1회 방향이다. 기존 Affinity 전투 연동과 방어 누적 요새화안은 채택하지 않는다. 수치는 OQ-020 1차 플레이테스트 기준값.
 
 | NumericParam 키 | 값 | 상태 |
 |----------------|-----|------|
-| `synergy.reflect_ratio` | 0.5 | 🟡 (임시) — 기본 반사 비율 |
-| `synergy.reflect_bonus_high_affinity` | 2 | 🟡 (임시) — Affinity ≥ +3 |
-| `synergy.reflect_penalty_low_affinity` | -1 | 🟡 (임시) — Affinity ≤ -3 |
-| `affinity_threshold_high` | 3 | 🟡 (임시) |
-| `affinity_threshold_low` | -3 | 🟡 (임시) |
-| `synergy.resets_guard03_cooldown` | 1 | 🟡 (임시) — 1 = true |
+| `synergy.reflect_ratio` | 0.5 | 🟡 OQ-020 1차 기준값 |
+| `synergy.counter_window_source` | `defend` | 🔒 D-031 effect contract |
+| `synergy.counter_window_consumes_on` | `next_attack_once` | 🔒 D-031 effect contract |
+| `synergy.counter_attack_multiplier` | 1.5 | 🟡 OQ-020 1차 기준값 |
 
 ---
 
 ## 미결 사항
 
-- 시너지 심화 로직 전체: Glitch/Affinity/방어 횟수/HP 비율을 전투 시스템이 추적해야 함 — Codex 구현 시 키 네이밍 확정 후 본 문서 갱신
+- 시너지 심화 로직 전체: 붕괴도/Affinity는 D-029/D-030 이후 전투 조건으로 추적하지 않음. `광폭` 공격 연쇄와 `반사` 반격 창 effect contract는 D-031, 1차 기준값은 OQ-020
 - `SynergyDetector.cs` 현재 구조 확인 필요 — 심화 조건 분기가 `SynergyData` NumericParams만으로 처리되는지, 별도 로직 클래스가 필요한지
