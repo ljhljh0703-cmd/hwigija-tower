@@ -18,7 +18,7 @@
 | 필드 | 설명 | 상태 |
 |------|------|------|
 | `cost_gold` | 상점 구매 가격 — 기본 20G, 동일 태그 3번째 30G | ✅ OQ-013 확정 |
-| `trigger` | 발동 조건 (`on_attack` / `on_defend` / `on_skill` / `on_parry` / `on_hp_threshold` / `on_glitch_threshold` / `passive`) | 🟡 (임시) |
+| `trigger` | 발동 조건 (`on_attack` / `on_defend` / `on_skill` / `on_parry` / `on_hp_threshold` / `passive`) | 🟡 (임시) |
 
 ---
 
@@ -51,14 +51,13 @@
 
 ### ABILITY_SWORD_03 | 검 | 피의 서약
 
-**효과**: 공격 선택 시, Glitch ≥ 3 조건에서 ATK +5 영구 + HP -3 즉시 차감. 조건 미충족 시 일반 공격.
+**효과**: Attack 선택 시 HP 3 비용을 지불하고 해당 공격 피해 +5. HP 비용은 그 비용만으로 플레이어가 자살하지 않게 적용한다. 기존 "Glitch ≥ 3에서 ATK +5 + HP -3" 전투 조건은 D-029로 폐기 유지. 수치는 OQ-020 1차 플레이테스트 기준값이며 최종 밸런스 잠금이 아니다.
 
 | NumericParam 키 | 값 | 상태 |
 |----------------|-----|------|
-| `trigger` | `on_attack` | 🟡 (임시) |
-| `player.attack_bonus` | 5 | ✅ 확정 (조건부 발동 로직은 임시) |
-| `glitch_threshold` | 3 | 🟡 (임시) |
-| `player.hp_cost` | 3 | 🟡 (임시) |
+| `trigger` | `on_attack` | 🔒 D-031 effect contract |
+| `attack_strike_bonus` | 5 | 🟡 OQ-020 1차 기준값 |
+| `player.hp_cost_nonlethal` | 3 | 🟡 OQ-020 1차 기준값 |
 | `cost_gold` | 20 | ✅ OQ-013 확정 |
 
 ---

@@ -145,11 +145,11 @@
 
 ### ITEM_07
 - **임시 이름**: 얼어붙은 심장
-- **효과**: Glitch +1마다 ATK +1 (붕괴 연동, per P1)
+- **효과**: 적 패턴 대응 보조 축으로 예약. 기존 Glitch 증가당 ATK 보너스는 D-029로 폐기 유지. 구체 효과와 resolver 입력 계약은 OQ-019.
 - **NumericParams**:
-  - `trigger`: `glitch_increased` 🟡
-  - `atk_per_glitch`: `1` 🟡
-- **서사 의도**: 탑이 깊어질수록 강해지는 역설 — P1 직접 구현
+  - `trigger`: OQ-019 ❓
+  - `pattern_result_params`: OQ-019 ❓
+- **서사 의도**: 일반 아이템 표면에서 flat ATK/HP/Gold 대신 적 패턴 대응 보조 축 확보
 
 ---
 
@@ -211,7 +211,7 @@
 | `damage_reduce` | ITEM_04, ITEM_09 | 🟡 임시 |
 | `poison_damage_per_round` | ITEM_05 | 🟡 임시 |
 | `gold_bonus` | ITEM_06, ITEM_08 | 🟡 임시 |
-| `atk_per_glitch` | ITEM_07 | 🟡 임시 |
+| `atk_per_glitch` | ITEM_07 | ⛔ D-029 이후 폐기. OQ-019 패턴 대응 계약으로 대체 필요 |
 | `hp_restore` | ITEM_12, RELIC_GENERIC_01 | 🟡 임시 |
 | `atk_per_trigger` | RELIC_SWORD_01 | 🟡 임시 |
 | `def_per_trigger` | RELIC_GUARD_01 | 🟡 임시 |
