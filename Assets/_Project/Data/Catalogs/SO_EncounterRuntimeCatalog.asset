@@ -13,6 +13,13 @@ MonoBehaviour:
   m_Name: SO_EncounterRuntimeCatalog
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterRuntimeCatalogData
   items:
+  - {fileID: 11400000, guid: 3c8b9b4074ffe4bbe99da758dd20cf8c, type: 2}
+  - {fileID: 11400000, guid: 1e3b6260846f748dc97c3038300561a5, type: 2}
+  - {fileID: 11400000, guid: ee0b4e0bcd4c54663904315e4eac5903, type: 2}
+  - {fileID: 11400000, guid: 9b414d8666f944c08ba49cd7a478098d, type: 2}
+  - {fileID: 11400000, guid: a0199b6db9e8240158ca3de3517183cf, type: 2}
+  - {fileID: 11400000, guid: 1ee5e188a7d7c4fa5803bb4d6e14088d, type: 2}
+  - {fileID: 11400000, guid: 2ff16a1113a8b4add886120f7e365ac7, type: 2}
   - {fileID: 11400000, guid: 67386d8b61a4c4abcb54cebabeff46ce, type: 2}
   - {fileID: 11400000, guid: e84639d80adfa470181f7840e17d162c, type: 2}
   - {fileID: 11400000, guid: 0bad0857033784f79bfb7df39e013df8, type: 2}
@@ -20,8 +27,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7757078df03474964a5ca69439953ef3, type: 2}
   - {fileID: 11400000, guid: 6daef0d45282f4eacb7af756cfa233a4, type: 2}
   abilities:
+  - {fileID: 11400000, guid: 1b62013fa3bb48e79c1ddb151243e101, type: 2}
+  - {fileID: 11400000, guid: 25bec798035d49a6940d3303c7979112, type: 2}
+  - {fileID: 11400000, guid: 23ea7c1d0e374ad6b931cb6f25c8b803, type: 2}
+  - {fileID: 11400000, guid: a5b178bc4b314a319f6665ed906cc303, type: 2}
+  - {fileID: 11400000, guid: 7819beaceefd48b780f386709c9bd201, type: 2}
   - {fileID: 11400000, guid: 33e6a52b926604baeb54441b81db2d5f, type: 2}
   - {fileID: 11400000, guid: d026bba7a3664455c8c92a4f6bc2f9cd, type: 2}
+  synergies:
+  - {fileID: 11400000, guid: 21d4e2ad9a2c49c086d7a56294bdb4f1, type: 2}
   enemies:
   - {fileID: 11400000, guid: d86f6aa37810647699ffdd66a9edf731, type: 2}
   - {fileID: 11400000, guid: 4bf12e379723748489746c15e9bba379, type: 2}

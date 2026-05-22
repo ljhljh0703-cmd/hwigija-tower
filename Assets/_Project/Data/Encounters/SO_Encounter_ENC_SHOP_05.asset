@@ -89,7 +89,7 @@ MonoBehaviour:
       amount: 0
       flag:
       value: 0
-      itemRef: ITEM_FIELD_BANDAGE
+      itemRef: ITEM_09
       count: 1
       abilityRef:
       rewardBundleRef:
@@ -207,7 +207,7 @@ MonoBehaviour:
       amount: 0
       flag:
       value: 0
-      itemRef: ITEM_LANTERN_OIL
+      itemRef: ITEM_10
       count: 1
       abilityRef:
       rewardBundleRef:
@@ -325,7 +325,7 @@ MonoBehaviour:
       amount: 0
       flag:
       value: 0
-      itemRef: ITEM_TORN_CHARM
+      itemRef: ITEM_01
       count: 1
       abilityRef:
       rewardBundleRef:
@@ -413,7 +413,7 @@ MonoBehaviour:
       value: 0
       itemRef:
       count: 0
-      abilityRef: ABILITY_SCOUT
+      abilityRef: ABILITY_ARTS_03
       rewardBundleRef:
       memoryFragmentId:
       memoryFragmentTextKey:
@@ -499,7 +499,7 @@ MonoBehaviour:
       value: 0
       itemRef:
       count: 0
-      abilityRef: ABILITY_RECALL_ANCHOR
+      abilityRef: ABILITY_SWORD_01
       rewardBundleRef:
       memoryFragmentId:
       memoryFragmentTextKey:

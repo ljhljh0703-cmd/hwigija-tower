@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Rewards.RewardBundleData
   stableId: REWARD_CACHE_MEMORY
   entries:
-  - itemRef: ITEM_TORN_CHARM
+  - itemRef: ITEM_09
     itemCount: 1
     abilityRef:

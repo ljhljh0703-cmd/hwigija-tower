@@ -89,6 +89,10 @@ namespace HwigiTower.Run
         private int _lastCombatAffinityDelta;
         private bool _lastCombatEnemyDefeated;
         private int _lastCombatComboDamage;
+        private int _combatAttackCount;
+        private int _arts03CooldownRounds;
+        private bool _lastCombatActionWasAttack;
+        private bool _firstHitMitigationAvailable;
         private int _crackedJarBuffCombats;
         private bool _trainingBuffActive;
         private string _pendingRestNodeId = string.Empty;
@@ -609,6 +613,7 @@ namespace HwigiTower.Run
                 _abilityRefs.Add(abilityRef);
             }
 
+            EvaluateCatalogSynergies();
             RecalculatePlayerStats();
             return true;
         }
@@ -720,6 +725,8 @@ namespace HwigiTower.Run
         public void AttachEncounterCatalog(EncounterRuntimeCatalogData catalog)
         {
             EncounterCatalog = catalog;
+            EvaluateCatalogSynergies();
+            RecalculatePlayerStats();
         }
 
         public void AttachDemoRunPath(IReadOnlyList<PrototypeDemoRunStep> demoRunPath)
@@ -1261,15 +1268,35 @@ namespace HwigiTower.Run
 
             if (action == CombatAction.Skill && !HasPlayableSkill())
             {
-                _lastCombatRoundResult = "round " + _combatRound + " | action Skill | skill unavailable | scout required";
+                _lastCombatRoundResult = "round " + _combatRound + " | action Skill | skill unavailable";
                 return new CombatRoundResult(0, 0, false, false);
             }
 
             var enemyHpBefore = _activeCombatEnemy.Hp;
             var playerHpBefore = _activeCombatPlayer.Hp;
-            var secondAction = action == CombatAction.Skill && HasPlayableSkill() ? (CombatAction?)CombatAction.Attack : null;
-            var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action, secondAction);
+            var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData());
+            var poisonDamage = ApplyRoundStartPoison(modifiers);
+            if (_activeCombatEnemy.IsDefeated)
+            {
+                _combatRound++;
+                _lastCombatRoundResult = "round " + _combatRound + " | poison " + poisonDamage + " | action " + action;
+                FinalizeCombat();
+                return new CombatRoundResult(0, 0, false, true);
+            }
+
+            var artsSkillUsed = action == CombatAction.Skill && HasReadyArts03Skill();
+            var secondAction = action == CombatAction.Skill && !artsSkillUsed && HasAbilityRef("ABILITY_SCOUT")
+                ? (CombatAction?)CombatAction.Attack
+                : null;
+            var skillDamage = artsSkillUsed ? (int?)GetAbilityParam("ABILITY_ARTS_03", "skill.direct_damage") : null;
+            var sword03HpCost = action == CombatAction.Attack ? PaySword03AttackCost() : 0;
+            var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action, secondAction, skillDamage);
             _combatRound++;
+            var itemStrikeDamage = ApplyAttackItemDamage(action, modifiers);
+            var abilityStrikeDamage = ApplySwordAttackEffects(action);
+            var frenzyDamage = ApplyFrenzyAttackEffect(action);
+            var firstHitMitigation = ApplyFirstHitMitigation(result.EnemyDamage, modifiers);
+            AdvanceArts03Cooldown(artsSkillUsed);
             var crackedJarBonus = 0;
             if (_crackedJarBuffCombats > 0 && result.PlayerDamage > 0 && !_activeCombatEnemy.IsDefeated)
             {
@@ -1301,11 +1328,17 @@ namespace HwigiTower.Run
                 " | playerHp " + playerHpBefore + "->" + _activeCombatPlayer.Hp +
                 (crackedJarBonus > 0 ? " | cracked jar +" + crackedJarBonus : string.Empty) +
                 (trainingBonus > 0 ? " | training +" + trainingBonus : string.Empty) +
-                (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty);
+                (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty) +
+                (poisonDamage > 0 ? " | poison " + poisonDamage : string.Empty) +
+                (itemStrikeDamage > 0 ? " | item strike " + itemStrikeDamage : string.Empty) +
+                (sword03HpCost > 0 ? " | blood cost " + sword03HpCost : string.Empty) +
+                (abilityStrikeDamage > 0 ? " | sword strike " + abilityStrikeDamage : string.Empty) +
+                (frenzyDamage > 0 ? " | frenzy " + frenzyDamage : string.Empty) +
+                (firstHitMitigation > 0 ? " | first hit guard " + firstHitMitigation : string.Empty);
 
             if (action == CombatAction.Skill)
             {
-                _lastCombatRoundResult += " | scout skill";
+                _lastCombatRoundResult += artsSkillUsed ? " | arts skill" : " | scout skill";
             }
 
             if (action == CombatAction.Defend)
@@ -1320,13 +1353,15 @@ namespace HwigiTower.Run
 
             if (action == CombatAction.Defend)
             {
-                var defendReduce = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData()).DefendDamageReduce;
+                var defendReduce = modifiers.DefendDamageReduce;
                 if (defendReduce > 0 && result.EnemyDamage > 0)
                 {
                     _activeCombatPlayer.RestoreHp(defendReduce);
                     _lastCombatRoundResult += " | item guard " + defendReduce;
                 }
             }
+
+            _lastCombatActionWasAttack = action == CombatAction.Attack;
 
             if (result.IsComplete || _activeCombatEnemy.IsDefeated || _activeCombatPlayer.IsDefeated)
             {
@@ -1408,6 +1443,7 @@ namespace HwigiTower.Run
             }
 
             RecalculatePlayerStats();
+            EvaluateCatalogSynergies();
             var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData());
             var player = new CombatantState("player", _playerMaxHp, _playerAttack, _playerHp);
             var combatStartRestore = modifiers.CombatStartHpRestore;
@@ -1441,6 +1477,10 @@ namespace HwigiTower.Run
             _lastCombatAffinityDelta = 0;
             _lastCombatEnemyDefeated = false;
             _lastCombatComboDamage = 0;
+            _combatAttackCount = 0;
+            _arts03CooldownRounds = 0;
+            _lastCombatActionWasAttack = false;
+            _firstHitMitigationAvailable = true;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
 
             // Initialize interactive state
@@ -1635,6 +1675,14 @@ namespace HwigiTower.Run
             _activeSynergies.AddRange(_synergyDetector.Evaluate(Abilities.Abilities, trackedSynergies));
         }
 
+        private void EvaluateCatalogSynergies()
+        {
+            if (EncounterCatalog != null && EncounterCatalog.Synergies != null)
+            {
+                EvaluateSynergies(EncounterCatalog.Synergies);
+            }
+        }
+
         private void RecalculatePlayerStats()
         {
             var previousMaxHp = _playerMaxHp;
@@ -1676,7 +1724,161 @@ namespace HwigiTower.Run
 
         private bool HasPlayableSkill()
         {
-            return HasAbilityRef("ABILITY_SCOUT");
+            return HasAbilityRef("ABILITY_SCOUT") || HasReadyArts03Skill();
+        }
+
+        private bool HasReadyArts03Skill()
+        {
+            return HasAbilityRef("ABILITY_ARTS_03") && _arts03CooldownRounds <= 0;
+        }
+
+        private void AdvanceArts03Cooldown(bool artsSkillUsed)
+        {
+            if (artsSkillUsed)
+            {
+                _arts03CooldownRounds = System.Math.Max(0, (int)GetAbilityParam("ABILITY_ARTS_03", "skill.cooldown_rounds"));
+                return;
+            }
+
+            if (_arts03CooldownRounds > 0)
+            {
+                _arts03CooldownRounds--;
+            }
+        }
+
+        private int PaySword03AttackCost()
+        {
+            if (!HasAbilityRef("ABILITY_SWORD_03") || _activeCombatPlayer == null || _activeCombatPlayer.Hp <= 1)
+            {
+                return 0;
+            }
+
+            var requested = System.Math.Max(0, (int)GetAbilityParam("ABILITY_SWORD_03", "player.hp_cost_nonlethal"));
+            var applied = System.Math.Min(requested, _activeCombatPlayer.Hp - 1);
+            _activeCombatPlayer.ApplyDamage(applied);
+            return applied;
+        }
+
+        private int ApplySwordAttackEffects(CombatAction action)
+        {
+            if (action != CombatAction.Attack || _activeCombatEnemy == null || _activeCombatEnemy.IsDefeated)
+            {
+                return 0;
+            }
+
+            _combatAttackCount++;
+            var damage = 0;
+            if (HasAbilityRef("ABILITY_SWORD_03"))
+            {
+                damage += System.Math.Max(0, (int)GetAbilityParam("ABILITY_SWORD_03", "attack_strike_bonus"));
+            }
+
+            if (HasAbilityRef("ABILITY_SWORD_02"))
+            {
+                var interval = System.Math.Max(1, (int)GetAbilityParam("ABILITY_SWORD_02", "attack.rounds_interval"));
+                if (_combatAttackCount % interval == 0)
+                {
+                    damage += MultipliedAttackDamage(GetAbilityParam("ABILITY_SWORD_02", "attack.extra_atk_multiplier"));
+                }
+            }
+
+            _activeCombatEnemy.ApplyDamage(damage);
+            return damage;
+        }
+
+        private int ApplyAttackItemDamage(CombatAction action, CombatAbilityModifiers modifiers)
+        {
+            if (action != CombatAction.Attack ||
+                modifiers.FlatDamageBonus <= 0 ||
+                _activeCombatEnemy == null ||
+                _activeCombatEnemy.IsDefeated)
+            {
+                return 0;
+            }
+
+            _activeCombatEnemy.ApplyDamage(modifiers.FlatDamageBonus);
+            return modifiers.FlatDamageBonus;
+        }
+
+        private int ApplyRoundStartPoison(CombatAbilityModifiers modifiers)
+        {
+            if (modifiers.PoisonDamagePerRound <= 0 || _activeCombatEnemy == null || _activeCombatEnemy.IsDefeated)
+            {
+                return 0;
+            }
+
+            _activeCombatEnemy.ApplyDamage(modifiers.PoisonDamagePerRound);
+            return modifiers.PoisonDamagePerRound;
+        }
+
+        private int ApplyFirstHitMitigation(int enemyDamage, CombatAbilityModifiers modifiers)
+        {
+            if (!_firstHitMitigationAvailable ||
+                enemyDamage <= 0 ||
+                modifiers.FirstHitDamageReduce <= 0 ||
+                _activeCombatPlayer == null)
+            {
+                return 0;
+            }
+
+            _firstHitMitigationAvailable = false;
+            var restored = System.Math.Min(enemyDamage, modifiers.FirstHitDamageReduce);
+            _activeCombatPlayer.RestoreHp(restored);
+            return restored;
+        }
+
+        private int ApplyFrenzyAttackEffect(CombatAction action)
+        {
+            if (action != CombatAction.Attack || _activeCombatEnemy == null || _activeCombatEnemy.IsDefeated)
+            {
+                return 0;
+            }
+
+            var frenzy = FindActiveSynergy("검");
+            if (frenzy == null)
+            {
+                return 0;
+            }
+
+            var key = _lastCombatActionWasAttack
+                ? "synergy.attack_chain_extra_atk_multiplier"
+                : "synergy.extra_atk_multiplier";
+            var damage = MultipliedAttackDamage(NumericParamLookup.Sum(frenzy.NumericParams, key));
+            _activeCombatEnemy.ApplyDamage(damage);
+            return damage;
+        }
+
+        private SynergyData FindActiveSynergy(string tag)
+        {
+            for (var i = 0; i < _activeSynergies.Count; i++)
+            {
+                var state = _activeSynergies[i];
+                if (state.Active && state.Synergy != null && state.Synergy.Tag == tag)
+                {
+                    return state.Synergy;
+                }
+            }
+
+            return null;
+        }
+
+        private int MultipliedAttackDamage(float multiplier)
+        {
+            return _activeCombatPlayer == null ? 0 : System.Math.Max(0, (int)System.Math.Round(_activeCombatPlayer.Attack * multiplier));
+        }
+
+        private float GetAbilityParam(string abilityRef, string key)
+        {
+            for (var i = 0; i < Abilities.Abilities.Count; i++)
+            {
+                var ability = Abilities.Abilities[i];
+                if (ability != null && ability.Id == abilityRef)
+                {
+                    return NumericParamLookup.Sum(ability.NumericParams, key);
+                }
+            }
+
+            return 0f;
         }
 
         private EnemyData ResolveCombatEnemyData(DeterministicRunContext context, EnemyPoolRank rank, string seedKey, string fallbackEnemyId)

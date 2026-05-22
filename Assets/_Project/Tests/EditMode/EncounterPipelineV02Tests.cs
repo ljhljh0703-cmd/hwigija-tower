@@ -38,10 +38,22 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(catalog.TryGetItem("ITEM_FIELD_BANDAGE", out _));
             Assert.IsTrue(catalog.TryGetItem("ITEM_LANTERN_OIL", out _));
             Assert.IsTrue(catalog.TryGetItem("ITEM_TORN_CHARM", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_01", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_02", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_03", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_04", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_05", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_09", out _));
+            Assert.IsTrue(catalog.TryGetItem("ITEM_10", out _));
             Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_MEMORY", out _));
             Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_SMALL", out _));
             Assert.IsTrue(catalog.TryGetAbility("ABILITY_SCOUT", out _));
             Assert.IsTrue(catalog.TryGetAbility("ABILITY_RECALL_ANCHOR", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_SWORD_01", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_SWORD_02", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_SWORD_03", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_ARTS_03", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_GUARD_01", out _));
             Assert.IsTrue(catalog.TryGetEnemy("ENEMY_COLLAPSE_ECHO", out _));
             Assert.IsTrue(catalog.TryGetEnemy("ENEMY_EMPTY_ARMOR", out _));
             Assert.IsTrue(catalog.TryGetEnemy("ENEMY_FRACTURE_HOUND", out _));
@@ -192,8 +204,10 @@ namespace HwigiTower.Tests.EditMode
             var bossGate = AssetDatabase.LoadAssetAtPath<EncounterData>(EncounterRuntimeCatalogBuilder.PrototypeBossGateEncounterPath);
             Assert.AreEqual("BOSS_GATE_01", bossGate.Choices[0].effects[0].combatHandoff.enemyRefs[0]);
             var floorTwoShop = AssetDatabase.LoadAssetAtPath<EncounterData>(EncounterRuntimeCatalogBuilder.PrototypeFloorTwoShopEncounterPath);
-            Assert.AreEqual("ITEM_FIELD_BANDAGE", floorTwoShop.Choices[0].effects[1].itemRef);
-            Assert.AreEqual("ABILITY_RECALL_ANCHOR", floorTwoShop.Choices[1].effects[1].abilityRef);
+            var itemChoice = floorTwoShop.Choices.First(choice => choice.stableId == "CHOICE_F02_SHOP_BUY_ITEM");
+            var abilityChoice = floorTwoShop.Choices.First(choice => choice.stableId == "CHOICE_F02_SHOP_BUY_ABILITY");
+            Assert.AreEqual("ITEM_04", itemChoice.effects[1].itemRef);
+            Assert.AreEqual("ABILITY_SWORD_02", abilityChoice.effects[1].abilityRef);
         }
 
         [Test]

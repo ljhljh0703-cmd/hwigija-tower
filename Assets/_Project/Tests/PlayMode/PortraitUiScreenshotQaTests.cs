@@ -102,7 +102,7 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.GreaterOrEqual(hud.ChoiceButtonCount, 3, "Expected opening shop products plus leave.");
                 var disabledAbility = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
                 Assert.IsNotNull(disabledAbility);
-                StringAssert.Contains("정찰", disabledAbility.text);
+                StringAssert.Contains("예리한 감각", disabledAbility.text);
                 StringAssert.Contains("Gold -12", disabledAbility.text);
                 StringAssert.Contains("Gold 부족", disabledAbility.text);
             });

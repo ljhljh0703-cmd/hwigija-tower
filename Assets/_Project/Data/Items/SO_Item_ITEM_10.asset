@@ -17,7 +17,7 @@ MonoBehaviour:
   descriptionKey: PLACEHOLDER_ITEM_10_DESC
   maxStack: 99
   tier: 0
-  passiveTrigger: 
+  passiveTrigger:
   numericParams:
   - key: max_hp_penalty
     value: -5

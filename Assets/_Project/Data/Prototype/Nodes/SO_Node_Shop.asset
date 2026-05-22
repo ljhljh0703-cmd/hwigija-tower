@@ -19,9 +19,6 @@ MonoBehaviour:
   possibleEncounters:
   - {fileID: 11400000, guid: ff39a529854a5432d94a3dd9b33505b5, type: 2}
   fallbackEnemy: {fileID: 0}
-  grantedAbility: {fileID: 11400000, guid: 1acbd827c2af040d8bfdf793bd938216, type: 2}
+  grantedAbility: {fileID: 11400000, guid: 1b62013fa3bb48e79c1ddb151243e101, type: 2}
   trackedSynergies:
-  - {fileID: 11400000, guid: fb55be6d20d2d4941821b5f56355f4cb, type: 2}
-  - {fileID: 11400000, guid: 5392e895f6aa3463ab5f0a16264b0833, type: 2}
-  - {fileID: 11400000, guid: 958683e43d74949afabbba7960347947, type: 2}
-  - {fileID: 11400000, guid: 78c73a652a9fc4167b48589d2a3350ec, type: 2}
+  - {fileID: 11400000, guid: 21d4e2ad9a2c49c086d7a56294bdb4f1, type: 2}

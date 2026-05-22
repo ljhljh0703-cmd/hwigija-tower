@@ -17,7 +17,7 @@ MonoBehaviour:
   descriptionKey: PLACEHOLDER_ITEM_02_DESC
   maxStack: 99
   tier: 0
-  passiveTrigger: 
+  passiveTrigger:
   numericParams:
   - key: atk_bonus
     value: 1
