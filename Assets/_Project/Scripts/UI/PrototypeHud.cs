@@ -5456,7 +5456,10 @@ namespace HwigiTower.UI
 
             if (roundResult.Contains("Attack", StringComparison.Ordinal))
             {
-                return "선택 공격 | 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim() +
+                var prefix = roundResult.Contains("blood overload", StringComparison.Ordinal)
+                    ? "피의 서약 과부하 | "
+                    : string.Empty;
+                return prefix + "선택 공격 | 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim() +
                     " | 받은 피해 " + enemyDamage;
             }
 

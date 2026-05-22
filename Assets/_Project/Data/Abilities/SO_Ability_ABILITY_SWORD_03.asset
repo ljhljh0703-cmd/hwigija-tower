@@ -20,5 +20,5 @@ MonoBehaviour:
   numericParams:
   - key: attack_strike_bonus
     value: 5
-  - key: player.hp_cost_nonlethal
+  - key: player.hp_cost
     value: 3

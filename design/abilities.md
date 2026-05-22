@@ -51,13 +51,14 @@
 
 ### ABILITY_SWORD_03 | 검 | 피의 서약
 
-**효과**: Attack 선택 시 HP 3 비용을 지불하고 해당 공격 피해 +5. HP 비용은 그 비용만으로 플레이어가 자살하지 않게 적용한다. 기존 "Glitch ≥ 3에서 ATK +5 + HP -3" 전투 조건은 D-029로 폐기 유지. 수치는 OQ-020 1차 플레이테스트 기준값이며 최종 밸런스 잠금이 아니다.
+**효과**: Attack 선택 시 HP 3 비용을 지불하고 해당 공격 피해 +5. 현재 HP가 3 이하이면 전투당 1회 과부하로 강공을 허용하며, 공격 피해를 먼저 적용한 뒤 HP 비용 사망을 판정한다. 과부하 사용 후 같은 전투의 HP 3 이하 Attack은 일반 Attack으로 처리하고, 다음 전투에서 과부하 1회가 다시 열린다. 기존 "Glitch ≥ 3에서 ATK +5 + HP -3" 전투 조건은 D-029로 폐기 유지. 수치는 OQ-020 1차 플레이테스트 기준값이며 최종 밸런스 잠금이 아니다.
 
 | NumericParam 키 | 값 | 상태 |
 |----------------|-----|------|
 | `trigger` | `on_attack` | 🔒 D-031 effect contract |
 | `attack_strike_bonus` | 5 | 🟡 OQ-020 1차 기준값 |
-| `player.hp_cost_nonlethal` | 3 | 🟡 OQ-020 1차 기준값 |
+| `player.hp_cost` | 3 | 🟡 OQ-020 1차 기준값 |
+| `overload_uses_per_combat` | 1 | 🔒 D-031 revised contract |
 | `cost_gold` | 20 | ✅ OQ-013 확정 |
 
 ---

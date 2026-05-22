@@ -33,7 +33,9 @@ namespace HwigiTower.Combat
             CombatantState enemy,
             CombatAction playerAction,
             CombatAction? secondAction = null,
-            int? skillDamageOverride = null)
+            int? skillDamageOverride = null,
+            int preEnemyDamageBonus = 0,
+            int preEnemyPlayerHpCost = 0)
         {
             if (player == null || enemy == null || player.IsDefeated || enemy.IsDefeated)
             {
@@ -49,6 +51,7 @@ namespace HwigiTower.Combat
                 playerDamage = playerAction == CombatAction.Skill && skillDamageOverride.HasValue
                     ? System.Math.Max(0, skillDamageOverride.Value)
                     : DamageRoll(player.Attack);
+                playerDamage += System.Math.Max(0, preEnemyDamageBonus);
                 enemy.ApplyDamage(playerDamage);
             }
 
@@ -60,7 +63,12 @@ namespace HwigiTower.Combat
                 enemy.ApplyDamage(comboDamage);
             }
 
-            if (!enemy.IsDefeated)
+            if (preEnemyPlayerHpCost > 0)
+            {
+                player.ApplyDamage(preEnemyPlayerHpCost);
+            }
+
+            if (!enemy.IsDefeated && !player.IsDefeated)
             {
                 enemyDamage = DamageRoll(enemy.Attack);
                 if (playerAction == CombatAction.Defend)

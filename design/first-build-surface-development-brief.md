@@ -44,7 +44,7 @@
 |---|---|
 | `ABILITY_SWORD_01` | 검 공격 기반 |
 | `ABILITY_SWORD_02` | 검 공격 주기 추가타 |
-| `ABILITY_SWORD_03` | D-031/OQ-020: Attack HP 3 비자살 비용, 해당 공격 피해 +5 |
+| `ABILITY_SWORD_03` | D-031/OQ-020: Attack HP 3 비용, 해당 공격 피해 +5, HP 3 이하 전투당 1회 과부하 |
 | `광폭` | D-031/OQ-020: 검 x3, Attack 추가타 ATK×0.5, 직전 Attack이면 ATK×0.75, Defend/Skill break |
 
 `SWORD_03`와 `광폭`의 effect contract와 첫 플레이테스트 기준값은 D-031/OQ-020으로 입력됐다. 이 값은 최종 밸런스 잠금이 아니다.
@@ -76,7 +76,7 @@
 
 ## 5. Non-Negotiable Contracts
 
-- D-031 `SWORD_03`: HP cost cannot kill the player by itself.
+- D-031 `SWORD_03`: Attack damage and +5 bonus resolve before HP cost death; HP 3 이하 과부하는 전투당 1회.
 - D-031 `광폭`: defense or skill choice breaks attack chain.
 - D-031 `광폭`: do not implement as unbounded multiplier ramp.
 - D-031 `반사`: reserved direction is one strong counter opportunity on next attack after defend, not sword-like multi-hit.
@@ -93,6 +93,6 @@
 
 - Dead-pick catalog contamination listed in 2.1 is removed from first build-choice surface.
 - Controlled items listed in 2.2 are reachable and apply their supported effects.
-- `SWORD_01` + `SWORD_02` + `SWORD_03` can form the 검 x3 path and activate target `광폭` using the OQ-020 first-playtest baseline.
+- `SWORD_01` + `SWORD_02` + `SWORD_03` can form the 검 x3 path and activate target `광폭` using the OQ-020 first-playtest baseline, including SWORD_03 overload semantics.
 - Skill choice is no longer only a SCOUT-specific axis when `ARTS_03` is owned.
 - Deferred scope stays out of the batch.

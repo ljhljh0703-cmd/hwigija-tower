@@ -368,7 +368,7 @@ namespace HwigiTower.Encounters
                     return new[]
                     {
                         new NumericParamSpec("attack_strike_bonus", 5f),
-                        new NumericParamSpec("player.hp_cost_nonlethal", 3f)
+                        new NumericParamSpec("player.hp_cost", 3f)
                     };
                 case "ABILITY_ARTS_03":
                     return new[]

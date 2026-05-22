@@ -1080,6 +1080,113 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void SwordThree_RegularAttackPaysHpCostBeforeEnemyResponse()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-sword-three-regular", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AddAbilityRef("ABILITY_SWORD_01");
+            state.AddAbilityRef("ABILITY_SWORD_03");
+            state.ModifyPlayerHp(-20);
+            var encounter = CreateRuntimeEncounter(
+                "ENC_SWORD_THREE_REGULAR",
+                CreateChoice(
+                    "CHOICE_SWORD_THREE_REGULAR",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_SWORD_THREE_REGULAR", "ENEMY_SWORD_THREE_REGULAR", new EncounterPostCombatEffectRuntimeData[0]) }));
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-sword-three-regular", 1001), "node.sword.regular", encounter, "CHOICE_SWORD_THREE_REGULAR");
+            var round = state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var result = state.CreateSnapshot().LastCombatRoundResult;
+
+            Assert.IsTrue(round.EnemyDefeated);
+            Assert.IsFalse(round.PlayerDefeated);
+            Assert.AreEqual(1, state.PlayerHp);
+            StringAssert.Contains("blood cost 3", result);
+            StringAssert.Contains("sword strike 5", result);
+            StringAssert.DoesNotContain("blood overload", result);
+        }
+
+        [Test]
+        public void SwordThree_OverloadAppliesAttackBeforeHpCostDeath()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-sword-three-overload", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AddAbilityRef("ABILITY_SWORD_01");
+            state.AddAbilityRef("ABILITY_SWORD_03");
+            state.ModifyPlayerHp(-23);
+            var encounter = CreateRuntimeEncounter(
+                "ENC_SWORD_THREE_OVERLOAD",
+                CreateChoice(
+                    "CHOICE_SWORD_THREE_OVERLOAD",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_SWORD_THREE_OVERLOAD", "ENEMY_SWORD_THREE_OVERLOAD", new EncounterPostCombatEffectRuntimeData[0]) }));
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-sword-three-overload", 1001), "node.sword.overload", encounter, "CHOICE_SWORD_THREE_OVERLOAD");
+            var round = state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var result = state.CreateSnapshot().LastCombatRoundResult;
+
+            Assert.IsTrue(round.EnemyDefeated);
+            Assert.IsTrue(round.PlayerDefeated);
+            Assert.AreEqual(0, state.PlayerHp);
+            Assert.AreEqual("victory", state.LastCombatResultId);
+            StringAssert.Contains("blood cost 3", result);
+            StringAssert.Contains("blood overload", result);
+            StringAssert.Contains("sword strike 5", result);
+        }
+
+        [Test]
+        public void SwordThree_OverloadIsOncePerCombatAndResetsNextCombat()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var state = new PrototypeRunState("run-sword-three-overload-reset", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AddAbilityRef("ABILITY_SWORD_03");
+            state.AddAbilityRef("ABILITY_RECALL_ANCHOR");
+            state.ModifyPlayerHp(-23);
+            var first = CreateRuntimeEncounter(
+                "ENC_SWORD_THREE_OVERLOAD_ONCE",
+                CreateChoice(
+                    "CHOICE_SWORD_THREE_OVERLOAD_ONCE",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_SWORD_THREE_OVERLOAD_ONCE", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-sword-three-overload-reset", 1001), "node.sword.once", first, "CHOICE_SWORD_THREE_OVERLOAD_ONCE");
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            StringAssert.Contains("blood overload", state.CreateSnapshot().LastCombatRoundResult);
+            Assert.IsTrue(state.IsInCombat);
+
+            var guard = 0;
+            while (state.IsInCombat && state.ActiveCombatPlayer.Hp > 3 && guard < 4)
+            {
+                state.ResolveCombatRoundInteractive(CombatAction.Defend);
+                guard++;
+            }
+
+            Assert.IsTrue(state.IsInCombat);
+            Assert.LessOrEqual(state.ActiveCombatPlayer.Hp, 3);
+
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var repeatedLowHpAttack = state.CreateSnapshot().LastCombatRoundResult;
+            StringAssert.DoesNotContain("blood cost", repeatedLowHpAttack);
+            StringAssert.DoesNotContain("blood overload", repeatedLowHpAttack);
+            StringAssert.DoesNotContain("sword strike", repeatedLowHpAttack);
+            Assert.AreEqual("victory", state.LastCombatResultId);
+
+            var second = CreateRuntimeEncounter(
+                "ENC_SWORD_THREE_OVERLOAD_RESET",
+                CreateChoice(
+                    "CHOICE_SWORD_THREE_OVERLOAD_RESET",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_SWORD_THREE_OVERLOAD_RESET", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-sword-three-overload-reset", 1001), "node.sword.reset", second, "CHOICE_SWORD_THREE_OVERLOAD_RESET");
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            StringAssert.Contains("blood overload", state.CreateSnapshot().LastCombatRoundResult);
+        }
+
+        [Test]
         public void FinalBoss_PreparedPlayerWinsInThreeToSixMeaningfulTurns()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
