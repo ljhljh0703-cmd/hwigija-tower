@@ -5290,7 +5290,9 @@ namespace HwigiTower.UI
 
         private string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
-            var skill = HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" : "기술 불가: 정찰 필요";
+            var skill = HasArtsSkill() ? "번개 방출: 직접 피해" :
+                HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" :
+                "기술 불가: 보유 스킬 필요";
             var extra = BuildCombatExtraLine(snapshot);
             var state = string.IsNullOrEmpty(extra) ? skill :
                 extra.StartsWith("콤보 피해", StringComparison.Ordinal) ? "정찰 기술 | " + extra : extra;
@@ -5426,7 +5428,7 @@ namespace HwigiTower.UI
 
             if (roundResult.Contains("skill unavailable", StringComparison.Ordinal))
             {
-                return "기술 불가: 정찰 필요";
+                return "기술 불가: 보유 스킬 필요";
             }
 
             if (roundResult.Contains("recall anchor", StringComparison.Ordinal))
@@ -5480,7 +5482,7 @@ namespace HwigiTower.UI
 
         private bool HasAnyCombatSkill()
         {
-            return HasScoutSkill(_roomController == null ? _lastSnapshot : _roomController.GetSnapshot());
+            return HasScoutSkill(_roomController == null ? _lastSnapshot : _roomController.GetSnapshot()) || HasArtsSkill();
         }
 
         private List<string> BuildOwnedCombatSkillNames()
@@ -5491,6 +5493,11 @@ namespace HwigiTower.UI
                 if (_roomController.RunState.HasAbilityRef("ABILITY_SCOUT"))
                 {
                     skills.Add("정찰");
+                }
+
+                if (_roomController.RunState.HasAbilityRef("ABILITY_ARTS_03"))
+                {
+                    skills.Add("번개 방출");
                 }
             }
             else if (_lastSnapshot.AbilityCount > 0)
@@ -5515,6 +5522,11 @@ namespace HwigiTower.UI
                 {
                     skills.Add("회상 닻");
                 }
+
+                if (_roomController.RunState.HasAbilityRef("ABILITY_ARTS_03"))
+                {
+                    skills.Add("번개 방출");
+                }
             }
             else if (_lastSnapshot.AbilityCount > 0)
             {
@@ -5533,9 +5545,21 @@ namespace HwigiTower.UI
 
             var items = new List<string>();
             AddOwnedItemLine(items, "ITEM_FIELD_BANDAGE", "붕대");
-            AddOwnedItemLine(items, "ITEM_LANTERN_OIL", "등유");
-            AddOwnedItemLine(items, "ITEM_TORN_CHARM", "찢어진 부적");
+            AddOwnedItemLine(items, "ITEM_01", "붕대 뭉치");
+            AddOwnedItemLine(items, "ITEM_02", "작은 룬석");
+            AddOwnedItemLine(items, "ITEM_03", "날카로운 숫돌");
+            AddOwnedItemLine(items, "ITEM_04", "낡은 방패 조각");
+            AddOwnedItemLine(items, "ITEM_05", "독침");
+            AddOwnedItemLine(items, "ITEM_09", "마모된 부적");
+            AddOwnedItemLine(items, "ITEM_10", "피의 계약서");
             return items.Count == 0 ? "보유 아이템 없음" : string.Join("\n", items);
+        }
+
+        private bool HasArtsSkill()
+        {
+            return _roomController != null &&
+                _roomController.RunState != null &&
+                _roomController.RunState.HasAbilityRef("ABILITY_ARTS_03");
         }
 
         private void AddOwnedItemLine(List<string> items, string itemRef, string label)
@@ -6101,8 +6125,20 @@ namespace HwigiTower.UI
                 .Replace("ITEM_FIELD_BANDAGE", PublicRefName("ITEM_FIELD_BANDAGE"), StringComparison.Ordinal)
                 .Replace("ITEM_LANTERN_OIL", PublicRefName("ITEM_LANTERN_OIL"), StringComparison.Ordinal)
                 .Replace("ITEM_TORN_CHARM", PublicRefName("ITEM_TORN_CHARM"), StringComparison.Ordinal)
+                .Replace("ITEM_10", PublicRefName("ITEM_10"), StringComparison.Ordinal)
+                .Replace("ITEM_01", PublicRefName("ITEM_01"), StringComparison.Ordinal)
+                .Replace("ITEM_02", PublicRefName("ITEM_02"), StringComparison.Ordinal)
+                .Replace("ITEM_03", PublicRefName("ITEM_03"), StringComparison.Ordinal)
+                .Replace("ITEM_04", PublicRefName("ITEM_04"), StringComparison.Ordinal)
+                .Replace("ITEM_05", PublicRefName("ITEM_05"), StringComparison.Ordinal)
+                .Replace("ITEM_09", PublicRefName("ITEM_09"), StringComparison.Ordinal)
                 .Replace("ABILITY_SCOUT", PublicRefName("ABILITY_SCOUT"), StringComparison.Ordinal)
                 .Replace("ABILITY_RECALL_ANCHOR", PublicRefName("ABILITY_RECALL_ANCHOR"), StringComparison.Ordinal)
+                .Replace("ABILITY_SWORD_01", PublicRefName("ABILITY_SWORD_01"), StringComparison.Ordinal)
+                .Replace("ABILITY_SWORD_02", PublicRefName("ABILITY_SWORD_02"), StringComparison.Ordinal)
+                .Replace("ABILITY_SWORD_03", PublicRefName("ABILITY_SWORD_03"), StringComparison.Ordinal)
+                .Replace("ABILITY_ARTS_03", PublicRefName("ABILITY_ARTS_03"), StringComparison.Ordinal)
+                .Replace("ABILITY_GUARD_01", PublicRefName("ABILITY_GUARD_01"), StringComparison.Ordinal)
                 .Replace("REWARD_CACHE_SMALL", PublicRefName("REWARD_CACHE_SMALL"), StringComparison.Ordinal)
                 .Replace("REWARD_CACHE_MEMORY", PublicRefName("REWARD_CACHE_MEMORY"), StringComparison.Ordinal);
         }
@@ -6119,8 +6155,20 @@ namespace HwigiTower.UI
                 "ITEM_FIELD_BANDAGE" => "붕대",
                 "ITEM_LANTERN_OIL" => "등유",
                 "ITEM_TORN_CHARM" => "찢어진 부적",
+                "ITEM_01" => "붕대 뭉치",
+                "ITEM_02" => "작은 룬석",
+                "ITEM_03" => "날카로운 숫돌",
+                "ITEM_04" => "낡은 방패 조각",
+                "ITEM_05" => "독침",
+                "ITEM_09" => "마모된 부적",
+                "ITEM_10" => "피의 계약서",
                 "ABILITY_SCOUT" => "정찰",
                 "ABILITY_RECALL_ANCHOR" => "회상 닻",
+                "ABILITY_SWORD_01" => "예리한 감각",
+                "ABILITY_SWORD_02" => "연속베기",
+                "ABILITY_SWORD_03" => "피의 서약",
+                "ABILITY_ARTS_03" => "번개 방출",
+                "ABILITY_GUARD_01" => "철벽의 태세",
                 "REWARD_CACHE_SMALL" => "작은 보급품",
                 "REWARD_CACHE_MEMORY" => "기억 보급품",
                 _ => LooksLikeInternalLabel(reference) || reference.Contains("_", StringComparison.Ordinal) ? "획득물" : reference

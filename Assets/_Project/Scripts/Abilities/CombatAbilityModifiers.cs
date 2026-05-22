@@ -61,6 +61,7 @@ namespace HwigiTower.Abilities
 
                     hpBonus += NumericParamLookup.Sum(ability.NumericParams, "player.max_hp_bonus");
                     attackBonus += NumericParamLookup.Sum(ability.NumericParams, "player.attack_bonus");
+                    defendReduce += NumericParamLookup.Sum(ability.NumericParams, "player.damage_reduction");
                 }
             }
 

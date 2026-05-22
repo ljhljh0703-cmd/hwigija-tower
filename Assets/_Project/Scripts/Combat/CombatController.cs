@@ -32,7 +32,8 @@ namespace HwigiTower.Combat
             CombatantState player,
             CombatantState enemy,
             CombatAction playerAction,
-            CombatAction? secondAction = null)
+            CombatAction? secondAction = null,
+            int? skillDamageOverride = null)
         {
             if (player == null || enemy == null || player.IsDefeated || enemy.IsDefeated)
             {
@@ -45,7 +46,9 @@ namespace HwigiTower.Combat
 
             if (playerAction == CombatAction.Attack || playerAction == CombatAction.Skill)
             {
-                playerDamage = DamageRoll(player.Attack);
+                playerDamage = playerAction == CombatAction.Skill && skillDamageOverride.HasValue
+                    ? System.Math.Max(0, skillDamageOverride.Value)
+                    : DamageRoll(player.Attack);
                 enemy.ApplyDamage(playerDamage);
             }
 

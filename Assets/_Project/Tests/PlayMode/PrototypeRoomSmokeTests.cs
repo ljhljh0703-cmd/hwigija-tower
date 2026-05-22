@@ -497,6 +497,7 @@ namespace HwigiTower.Tests.PlayMode
             hud.ShowRunState(controller.GetSnapshot());
 
             Assert.AreEqual(5, controller.RunState.CurrentFloor);
+            controller.RunState.AddAbilityRef("ABILITY_ARTS_03");
 
             controller.AutoResolveCombat = false;
             yield return ResolveRouteActionChoice(hud, "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
@@ -523,11 +524,11 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(scoutOption, "Expected skill picker option after pressing Skill.");
             var scoutOptionButton = scoutOption.GetComponent<Button>();
             Assert.IsNotNull(scoutOptionButton);
-            StringAssert.Contains("정찰", ReadButtonText(scoutOptionButton));
+            StringAssert.Contains("번개 방출", ReadButtonText(scoutOptionButton));
             scoutOptionButton.onClick.Invoke();
             yield return null;
             StringAssert.Contains("선택 스킬", hud.CombatMessage);
-            StringAssert.Contains("콤보 피해", hud.CombatMessage);
+            StringAssert.Contains("직접 피해", hud.CombatMessage);
 
             var guard = 0;
             while (controller.RunState.IsInCombat && guard < 20)

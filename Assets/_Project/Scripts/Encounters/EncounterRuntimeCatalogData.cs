@@ -13,6 +13,7 @@ namespace HwigiTower.Encounters
         [SerializeField] private ItemData[] items = new ItemData[0];
         [SerializeField] private RewardBundleData[] rewardBundles = new RewardBundleData[0];
         [SerializeField] private AbilityData[] abilities = new AbilityData[0];
+        [SerializeField] private SynergyData[] synergies = new SynergyData[0];
         [SerializeField] private EnemyData[] enemies = new EnemyData[0];
         [SerializeField] private FloorEnemyPoolData floorEnemyPools;
         [SerializeField] private MemoryFragmentData[] memoryFragments = new MemoryFragmentData[0];
@@ -20,6 +21,7 @@ namespace HwigiTower.Encounters
         public ItemData[] Items => items;
         public RewardBundleData[] RewardBundles => rewardBundles;
         public AbilityData[] Abilities => abilities;
+        public SynergyData[] Synergies => synergies;
         public EnemyData[] Enemies => enemies;
         public FloorEnemyPoolData FloorEnemyPools => floorEnemyPools;
         public MemoryFragmentData[] MemoryFragments => memoryFragments;

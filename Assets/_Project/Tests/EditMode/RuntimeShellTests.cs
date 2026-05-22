@@ -475,9 +475,12 @@ namespace HwigiTower.Tests.EditMode
 
             var resolution = state.ResolveEncounterChoice("node.reward.catalog", encounter, "choice.reward");
 
+            Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_SMALL", out var smallReward));
+            Assert.AreEqual("ITEM_01", smallReward.Entries[0].ItemRef);
+            Assert.IsTrue(catalog.TryGetItem(smallReward.Entries[0].ItemRef, out _));
             Assert.AreEqual("choice.reward", resolution.PayloadId);
             Assert.IsTrue(state.HasRewardBundleRef("REWARD_CACHE_SMALL"));
-            Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.AreEqual(1, state.GetItemCount("ITEM_01"), "FieldBandage=" + state.GetItemCount("ITEM_FIELD_BANDAGE"));
         }
 
         [Test]
@@ -1048,6 +1051,35 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void CombatBuildSurface_SwordThreeActivatesFrenzyAndArtsSkill()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset");
+            var node = CreateNode("node.build.surface", encounter);
+            var state = new PrototypeRunState("run-build-surface", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(catalog);
+            state.AddAbilityRef("ABILITY_SWORD_01");
+            state.AddAbilityRef("ABILITY_SWORD_02");
+            state.AddAbilityRef("ABILITY_SWORD_03");
+            state.AddAbilityRef("ABILITY_ARTS_03");
+            state.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, encounter) });
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-build-surface", 1001), node.NodeId, encounter, "CHOICE_COMBAT_03_ENGAGE");
+
+            var attack = state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var attackResult = state.CreateSnapshot().LastCombatRoundResult;
+            var arts = state.ResolveCombatRoundInteractive(CombatAction.Skill);
+            var skillResult = state.CreateSnapshot().LastCombatRoundResult;
+
+            Assert.Greater(attack.PlayerDamage, 0);
+            StringAssert.Contains("blood cost", attackResult);
+            StringAssert.Contains("sword strike", attackResult);
+            StringAssert.Contains("frenzy", attackResult);
+            Assert.Greater(arts.PlayerDamage, 0);
+            Assert.AreEqual(0, arts.ComboDamage);
+            StringAssert.Contains("arts skill", skillResult);
+        }
+
+        [Test]
         public void FinalBoss_PreparedPlayerWinsInThreeToSixMeaningfulTurns()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
@@ -1391,10 +1423,12 @@ namespace HwigiTower.Tests.EditMode
             var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset");
             Assert.IsNotNull(catalog);
             Assert.IsNotNull(encounter);
-            Assert.IsTrue(catalog.TryGetItem("ITEM_FIELD_BANDAGE", out _));
-            Assert.IsTrue(catalog.TryGetAbility("ABILITY_RECALL_ANCHOR", out _));
-            Assert.AreEqual("ITEM_FIELD_BANDAGE", encounter.Choices[0].effects[1].itemRef);
-            Assert.AreEqual("ABILITY_RECALL_ANCHOR", encounter.Choices[1].effects[1].abilityRef);
+            Assert.IsTrue(catalog.TryGetItem("ITEM_04", out _));
+            Assert.IsTrue(catalog.TryGetAbility("ABILITY_SWORD_02", out _));
+            var itemChoice = encounter.Choices.First(choice => choice.stableId == "CHOICE_F02_SHOP_BUY_ITEM");
+            var abilityChoice = encounter.Choices.First(choice => choice.stableId == "CHOICE_F02_SHOP_BUY_ABILITY");
+            Assert.AreEqual("ITEM_04", itemChoice.effects[1].itemRef);
+            Assert.AreEqual("ABILITY_SWORD_02", abilityChoice.effects[1].abilityRef);
 
             var itemState = new PrototypeRunState("run-f2-shop-item", new GameFlowEventBus());
             itemState.AttachEncounterCatalog(catalog);
@@ -1402,7 +1436,7 @@ namespace HwigiTower.Tests.EditMode
             var itemResult = itemState.ResolveEncounterChoice(new DeterministicRunContext("run-f2-shop-item", 1001), "node.f2.shop.item", encounter, "CHOICE_F02_SHOP_BUY_ITEM");
             Assert.AreEqual("CHOICE_F02_SHOP_BUY_ITEM", itemResult.PayloadId);
             Assert.AreEqual(0, itemState.Gold);
-            Assert.AreEqual(1, itemState.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.AreEqual(1, itemState.GetItemCount("ITEM_04"));
 
             var abilityState = new PrototypeRunState("run-f2-shop-ability", new GameFlowEventBus());
             abilityState.AttachEncounterCatalog(catalog);
@@ -1410,7 +1444,49 @@ namespace HwigiTower.Tests.EditMode
             var abilityResult = abilityState.ResolveEncounterChoice(new DeterministicRunContext("run-f2-shop-ability", 1001), "node.f2.shop.ability", encounter, "CHOICE_F02_SHOP_BUY_ABILITY");
             Assert.AreEqual("CHOICE_F02_SHOP_BUY_ABILITY", abilityResult.PayloadId);
             Assert.AreEqual(0, abilityState.Gold);
-            Assert.IsTrue(abilityState.HasAbilityRef("ABILITY_RECALL_ANCHOR"));
+            Assert.IsTrue(abilityState.HasAbilityRef("ABILITY_SWORD_02"));
+        }
+
+        [Test]
+        public void BuildSurface_ShopsExposeControlledItemsWithoutDeadPicks()
+        {
+            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var controlledItems = new[] { "ITEM_01", "ITEM_02", "ITEM_03", "ITEM_04", "ITEM_05", "ITEM_09", "ITEM_10" };
+            var shopPaths = new[]
+            {
+                "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_01.asset",
+                "Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset",
+                "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_02.asset",
+                "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_03.asset",
+                "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_04.asset",
+                "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_05.asset"
+            };
+
+            for (var i = 0; i < controlledItems.Length; i++)
+            {
+                Assert.IsTrue(catalog.TryGetItem(controlledItems[i], out _), controlledItems[i]);
+            }
+
+            for (var i = 0; i < shopPaths.Length; i++)
+            {
+                var shop = AssetDatabase.LoadAssetAtPath<EncounterData>(shopPaths[i]);
+                Assert.IsNotNull(shop, shopPaths[i]);
+                var itemRefs = shop.Choices
+                    .SelectMany(choice => choice.effects)
+                    .Where(effect => effect.kind == "AddItem")
+                    .Select(effect => effect.itemRef)
+                    .ToArray();
+
+                CollectionAssert.DoesNotContain(itemRefs, "ITEM_LANTERN_OIL", shop.Id);
+                CollectionAssert.DoesNotContain(itemRefs, "ITEM_TORN_CHARM", shop.Id);
+                CollectionAssert.DoesNotContain(itemRefs, "ITEM_07", shop.Id);
+                Assert.IsTrue(itemRefs.All(controlledItems.Contains), shop.Id + ": " + string.Join(", ", itemRefs));
+            }
+
+            Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_SMALL", out var smallReward));
+            Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_MEMORY", out var memoryReward));
+            Assert.AreEqual("ITEM_01", smallReward.Entries[0].ItemRef);
+            Assert.AreEqual("ITEM_09", memoryReward.Entries[0].ItemRef);
         }
 
         [Test]

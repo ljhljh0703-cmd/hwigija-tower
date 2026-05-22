@@ -41,6 +41,13 @@ namespace HwigiTower.Encounters
 
         private static readonly string[] ItemIds =
         {
+            "ITEM_01",
+            "ITEM_02",
+            "ITEM_03",
+            "ITEM_04",
+            "ITEM_05",
+            "ITEM_09",
+            "ITEM_10",
             "ITEM_FIELD_BANDAGE",
             "ITEM_LANTERN_OIL",
             "ITEM_TORN_CHARM"
@@ -48,8 +55,18 @@ namespace HwigiTower.Encounters
 
         private static readonly string[] AbilityIds =
         {
+            "ABILITY_SWORD_01",
+            "ABILITY_SWORD_02",
+            "ABILITY_SWORD_03",
+            "ABILITY_ARTS_03",
+            "ABILITY_GUARD_01",
             "ABILITY_SCOUT",
             "ABILITY_RECALL_ANCHOR"
+        };
+
+        private static readonly string[] SynergyIds =
+        {
+            "FRENZY"
         };
 
         private static readonly string[] RewardBundleIds =
@@ -111,6 +128,16 @@ namespace HwigiTower.Encounters
             "S5_REST_OR_CONTINUE"
         };
 
+        private static readonly string[] ShopEncounterPaths =
+        {
+            "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_01.asset",
+            PrototypeFloorTwoShopEncounterPath,
+            "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_02.asset",
+            "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_03.asset",
+            "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_04.asset",
+            "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_05.asset"
+        };
+
         [MenuItem("Hwigi Tower/Encounter Pipeline v0.2/Build Runtime StableId Catalog")]
         public static void BuildDefaultCatalogMenu()
         {
@@ -137,6 +164,14 @@ namespace HwigiTower.Encounters
                 var path = "Assets/_Project/Data/Abilities/SO_Ability_" + AbilityIds[i] + ".asset";
                 abilities[i] = EnsureAsset<AbilityData>(path, result);
                 ApplyAbility(abilities[i], AbilityIds[i]);
+            }
+
+            var synergies = new SynergyData[SynergyIds.Length];
+            for (var i = 0; i < SynergyIds.Length; i++)
+            {
+                var path = "Assets/_Project/Data/Synergies/SO_Synergy_" + SynergyIds[i] + ".asset";
+                synergies[i] = EnsureAsset<SynergyData>(path, result);
+                ApplySynergy(synergies[i], SynergyIds[i]);
             }
 
             var enemies = new EnemyData[EnemyIds.Length];
@@ -167,7 +202,7 @@ namespace HwigiTower.Encounters
             }
 
             var catalog = EnsureAsset<EncounterRuntimeCatalogData>(CatalogPath, result);
-            ApplyCatalog(catalog, items, rewardBundles, abilities, enemies, memoryFragments);
+            ApplyCatalog(catalog, items, rewardBundles, abilities, synergies, enemies, memoryFragments);
             result.SetCatalog(catalog);
             ApplyPrototypeRuntimeOverrides(result);
 
@@ -187,12 +222,17 @@ namespace HwigiTower.Encounters
                 result?.AddAssetPath(PrototypeBossGateEncounterPath);
             }
 
-            var floorTwoShop = AssetDatabase.LoadAssetAtPath<EncounterData>(PrototypeFloorTwoShopEncounterPath);
-            if (floorTwoShop != null)
+            for (var i = 0; i < ShopEncounterPaths.Length; i++)
             {
-                ApplyPrototypeFloorTwoShopOverride(floorTwoShop);
-                EditorUtility.SetDirty(floorTwoShop);
-                result?.AddAssetPath(PrototypeFloorTwoShopEncounterPath);
+                var shop = AssetDatabase.LoadAssetAtPath<EncounterData>(ShopEncounterPaths[i]);
+                if (shop == null)
+                {
+                    continue;
+                }
+
+                ApplyPrototypeShopBuildSurfaceOverride(shop);
+                EditorUtility.SetDirty(shop);
+                result?.AddAssetPath(ShopEncounterPaths[i]);
             }
 
             var finalBoss = AssetDatabase.LoadAssetAtPath<EncounterData>(PrototypeFinalBossEncounterPath);
@@ -225,11 +265,8 @@ namespace HwigiTower.Encounters
             serialized.FindProperty("displayNameKey").stringValue = "PLACEHOLDER_" + stableId + "_NAME";
             serialized.FindProperty("descriptionKey").stringValue = "PLACEHOLDER_" + stableId + "_DESC";
             serialized.FindProperty("maxStack").intValue = 99;
-            serialized.FindProperty("passiveTrigger").stringValue = stableId == "ITEM_FIELD_BANDAGE" ? "combat_start" : string.Empty;
-            SetNumericParams(serialized.FindProperty("numericParams"),
-                stableId == "ITEM_FIELD_BANDAGE"
-                    ? new[] { new NumericParamSpec("max_hp_bonus", 2f), new NumericParamSpec("hp_restore", 4f) }
-                    : new NumericParamSpec[0]);
+            serialized.FindProperty("passiveTrigger").stringValue = ResolveItemTrigger(stableId);
+            SetNumericParams(serialized.FindProperty("numericParams"), ResolveItemParams(stableId));
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(item);
         }
@@ -239,16 +276,135 @@ namespace HwigiTower.Encounters
             var serialized = new SerializedObject(ability);
             serialized.FindProperty("id").stringValue = stableId;
             serialized.FindProperty("displayName").stringValue = "PLACEHOLDER_" + stableId + "_NAME";
-            serialized.FindProperty("tag").stringValue = string.Empty;
+            serialized.FindProperty("tag").stringValue = ResolveAbilityTag(stableId);
             serialized.FindProperty("description").stringValue = "PLACEHOLDER_" + stableId + "_DESC";
-            SetNumericParams(serialized.FindProperty("numericParams"),
-                stableId == "ABILITY_SCOUT"
-                    ? new[] { new NumericParamSpec("player.attack_bonus", 1f) }
-                    : stableId == "ABILITY_RECALL_ANCHOR"
-                        ? new[] { new NumericParamSpec("recall_anchor_restore", 6f) }
-                        : new NumericParamSpec[0]);
+            SetNumericParams(serialized.FindProperty("numericParams"), ResolveAbilityParams(stableId));
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(ability);
+        }
+
+        private static string ResolveItemTrigger(string stableId)
+        {
+            switch (stableId)
+            {
+                case "ITEM_03":
+                    return "player_attack";
+                case "ITEM_04":
+                    return "player_defend";
+                case "ITEM_05":
+                    return "round_start";
+                case "ITEM_09":
+                    return "first_hit_per_combat";
+                case "ITEM_FIELD_BANDAGE":
+                    return "combat_start";
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static NumericParamSpec[] ResolveItemParams(string stableId)
+        {
+            switch (stableId)
+            {
+                case "ITEM_01":
+                    return new[] { new NumericParamSpec("max_hp_bonus", 4f) };
+                case "ITEM_02":
+                    return new[] { new NumericParamSpec("atk_bonus", 1f) };
+                case "ITEM_03":
+                    return new[] { new NumericParamSpec("flat_damage_bonus", 1f) };
+                case "ITEM_04":
+                    return new[] { new NumericParamSpec("damage_reduce", 1f) };
+                case "ITEM_05":
+                    return new[] { new NumericParamSpec("poison_damage_per_round", 1f) };
+                case "ITEM_09":
+                    return new[] { new NumericParamSpec("damage_reduce", 3f) };
+                case "ITEM_10":
+                    return new[]
+                    {
+                        new NumericParamSpec("max_hp_penalty", -5f),
+                        new NumericParamSpec("atk_bonus", 3f)
+                    };
+                case "ITEM_FIELD_BANDAGE":
+                    return new[]
+                    {
+                        new NumericParamSpec("max_hp_bonus", 2f),
+                        new NumericParamSpec("hp_restore", 4f)
+                    };
+                default:
+                    return new NumericParamSpec[0];
+            }
+        }
+
+        private static string ResolveAbilityTag(string stableId)
+        {
+            switch (stableId)
+            {
+                case "ABILITY_SWORD_01":
+                case "ABILITY_SWORD_02":
+                case "ABILITY_SWORD_03":
+                    return "검";
+                case "ABILITY_ARTS_03":
+                    return "술";
+                case "ABILITY_GUARD_01":
+                    return "결";
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static NumericParamSpec[] ResolveAbilityParams(string stableId)
+        {
+            switch (stableId)
+            {
+                case "ABILITY_SWORD_01":
+                    return new[] { new NumericParamSpec("player.attack_bonus", 3f) };
+                case "ABILITY_SWORD_02":
+                    return new[]
+                    {
+                        new NumericParamSpec("attack.extra_atk_multiplier", 0.5f),
+                        new NumericParamSpec("attack.rounds_interval", 3f)
+                    };
+                case "ABILITY_SWORD_03":
+                    return new[]
+                    {
+                        new NumericParamSpec("attack_strike_bonus", 5f),
+                        new NumericParamSpec("player.hp_cost_nonlethal", 3f)
+                    };
+                case "ABILITY_ARTS_03":
+                    return new[]
+                    {
+                        new NumericParamSpec("skill.direct_damage", 8f),
+                        new NumericParamSpec("skill.cooldown_rounds", 4f)
+                    };
+                case "ABILITY_GUARD_01":
+                    return new[] { new NumericParamSpec("player.damage_reduction", 3f) };
+                case "ABILITY_SCOUT":
+                    return new[] { new NumericParamSpec("player.attack_bonus", 1f) };
+                case "ABILITY_RECALL_ANCHOR":
+                    return new[] { new NumericParamSpec("recall_anchor_restore", 6f) };
+                default:
+                    return new NumericParamSpec[0];
+            }
+        }
+
+        private static void ApplySynergy(SynergyData synergy, string stableId)
+        {
+            var serialized = new SerializedObject(synergy);
+            serialized.FindProperty("tag").stringValue = stableId == "FRENZY" ? "검" : string.Empty;
+            serialized.FindProperty("requiredCount").intValue = stableId == "FRENZY" ? 3 : 0;
+            serialized.FindProperty("effectDescription").stringValue = stableId == "FRENZY"
+                ? "검 x3: Attack extra hit; chain bonus after Attack."
+                : string.Empty;
+            SetNumericParams(serialized.FindProperty("numericParams"),
+                stableId == "FRENZY"
+                    ? new[]
+                    {
+                        new NumericParamSpec("synergy.extra_atk_multiplier", 0.5f),
+                        new NumericParamSpec("synergy.attack_chain_extra_atk_multiplier", 0.75f)
+                    }
+                    : new NumericParamSpec[0]);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(synergy);
         }
 
         private static void ApplyEnemy(EnemyData enemy, string stableId)
@@ -442,7 +598,7 @@ namespace HwigiTower.Encounters
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void ApplyPrototypeFloorTwoShopOverride(EncounterData encounter)
+        private static void ApplyPrototypeShopBuildSurfaceOverride(EncounterData encounter)
         {
             var serialized = new SerializedObject(encounter);
             var choices = serialized.FindProperty("choices");
@@ -451,17 +607,62 @@ namespace HwigiTower.Encounters
                 var choice = choices.GetArrayElementAtIndex(i);
                 var stableId = choice.FindPropertyRelative("stableId").stringValue;
                 var effects = choice.FindPropertyRelative("effects");
-                if (stableId == "CHOICE_F02_SHOP_BUY_ITEM")
-                {
-                    SetEffectRef(effects, "AddItem", "itemRef", "ITEM_FIELD_BANDAGE");
-                }
-                else if (stableId == "CHOICE_F02_SHOP_BUY_ABILITY")
-                {
-                    SetEffectRef(effects, "AddAbility", "abilityRef", "ABILITY_RECALL_ANCHOR");
-                }
+                ApplyShopChoiceRef(encounter.Id, stableId, effects);
             }
 
             serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ApplyShopChoiceRef(string encounterId, string stableId, SerializedProperty effects)
+        {
+            if (stableId.EndsWith("_BUY_ITEM"))
+            {
+                SetEffectRef(effects, "AddItem", "itemRef", ResolveShopItemRef(encounterId, 0));
+            }
+            else if (stableId.EndsWith("_BUY_OIL"))
+            {
+                SetEffectRef(effects, "AddItem", "itemRef", ResolveShopItemRef(encounterId, 1));
+            }
+            else if (stableId.EndsWith("_BUY_CHARM"))
+            {
+                SetEffectRef(effects, "AddItem", "itemRef", ResolveShopItemRef(encounterId, 2));
+            }
+            else if (stableId.EndsWith("_BUY_ABILITY"))
+            {
+                SetEffectRef(effects, "AddAbility", "abilityRef", ResolveShopAbilityRef(encounterId, 0));
+            }
+            else if (stableId.EndsWith("_BUY_RECALL"))
+            {
+                SetEffectRef(effects, "AddAbility", "abilityRef", ResolveShopAbilityRef(encounterId, 1));
+            }
+        }
+
+        private static string ResolveShopItemRef(string encounterId, int slot)
+        {
+            var refs = encounterId switch
+            {
+                "ENC_SHOP_01" => new[] { "ITEM_01", "ITEM_02", "ITEM_03" },
+                "ENC_F02_SHOP_001" => new[] { "ITEM_04", "ITEM_05", "ITEM_09" },
+                "ENC_SHOP_02" => new[] { "ITEM_04", "ITEM_05", "ITEM_09" },
+                "ENC_SHOP_03" => new[] { "ITEM_10", "ITEM_01", "ITEM_02" },
+                "ENC_SHOP_04" => new[] { "ITEM_03", "ITEM_04", "ITEM_05" },
+                _ => new[] { "ITEM_09", "ITEM_10", "ITEM_01" }
+            };
+            return refs[slot];
+        }
+
+        private static string ResolveShopAbilityRef(string encounterId, int slot)
+        {
+            var refs = encounterId switch
+            {
+                "ENC_SHOP_01" => new[] { "ABILITY_SWORD_01", "ABILITY_ARTS_03" },
+                "ENC_F02_SHOP_001" => new[] { "ABILITY_SWORD_02", "ABILITY_GUARD_01" },
+                "ENC_SHOP_02" => new[] { "ABILITY_SWORD_02", "ABILITY_GUARD_01" },
+                "ENC_SHOP_03" => new[] { "ABILITY_SWORD_03", "ABILITY_ARTS_03" },
+                "ENC_SHOP_04" => new[] { "ABILITY_SWORD_03", "ABILITY_GUARD_01" },
+                _ => new[] { "ABILITY_ARTS_03", "ABILITY_SWORD_01" }
+            };
+            return refs[slot];
         }
 
         private static void SetEffectRef(SerializedProperty effects, string kind, string propertyName, string stableId)
@@ -533,7 +734,7 @@ namespace HwigiTower.Encounters
             var entries = serialized.FindProperty("entries");
             entries.arraySize = 1;
             var entry = entries.GetArrayElementAtIndex(0);
-            entry.FindPropertyRelative("itemRef").stringValue = stableId == "REWARD_CACHE_MEMORY" ? "ITEM_TORN_CHARM" : "ITEM_FIELD_BANDAGE";
+            entry.FindPropertyRelative("itemRef").stringValue = stableId == "REWARD_CACHE_MEMORY" ? "ITEM_09" : "ITEM_01";
             entry.FindPropertyRelative("itemCount").intValue = 1;
             entry.FindPropertyRelative("abilityRef").stringValue = string.Empty;
             serialized.ApplyModifiedPropertiesWithoutUndo();
@@ -556,6 +757,7 @@ namespace HwigiTower.Encounters
             ItemData[] items,
             RewardBundleData[] rewardBundles,
             AbilityData[] abilities,
+            SynergyData[] synergies,
             EnemyData[] enemies,
             MemoryFragmentData[] memoryFragments)
         {
@@ -563,6 +765,7 @@ namespace HwigiTower.Encounters
             SetObjectArray(serialized.FindProperty("items"), items);
             SetObjectArray(serialized.FindProperty("rewardBundles"), rewardBundles);
             SetObjectArray(serialized.FindProperty("abilities"), abilities);
+            SetObjectArray(serialized.FindProperty("synergies"), synergies);
             SetObjectArray(serialized.FindProperty("enemies"), enemies);
             SetObjectArray(serialized.FindProperty("memoryFragments"), memoryFragments);
             serialized.FindProperty("floorEnemyPools").objectReferenceValue =
@@ -620,6 +823,7 @@ namespace HwigiTower.Encounters
             EnsureFolder("Assets/_Project/Data", "Items");
             EnsureFolder("Assets/_Project/Data", "Rewards");
             EnsureFolder("Assets/_Project/Data", "Abilities");
+            EnsureFolder("Assets/_Project/Data", "Synergies");
             EnsureFolder("Assets/_Project/Data", "Enemies");
             EnsureFolder("Assets/_Project/Data", "Catalogs");
             EnsureFolder("Assets/_Project/Data", "MemoryFragments");
