@@ -92,6 +92,7 @@ namespace HwigiTower.Run
         private int _combatAttackCount;
         private int _arts03CooldownRounds;
         private bool _lastCombatActionWasAttack;
+        private bool _sword03OverloadUsed;
         private bool _firstHitMitigationAvailable;
         private int _crackedJarBuffCombats;
         private bool _trainingBuffActive;
@@ -1289,11 +1290,18 @@ namespace HwigiTower.Run
                 ? (CombatAction?)CombatAction.Attack
                 : null;
             var skillDamage = artsSkillUsed ? (int?)GetAbilityParam("ABILITY_ARTS_03", "skill.direct_damage") : null;
-            var sword03HpCost = action == CombatAction.Attack ? PaySword03AttackCost() : 0;
-            var result = _activeCombatController.ResolveRound(_activeCombatPlayer, _activeCombatEnemy, action, secondAction, skillDamage);
+            var sword03 = PrepareSword03Attack(action);
+            var result = _activeCombatController.ResolveRound(
+                _activeCombatPlayer,
+                _activeCombatEnemy,
+                action,
+                secondAction,
+                skillDamage,
+                sword03.DamageBonus,
+                sword03.HpCost);
             _combatRound++;
             var itemStrikeDamage = ApplyAttackItemDamage(action, modifiers);
-            var abilityStrikeDamage = ApplySwordAttackEffects(action);
+            var abilityStrikeDamage = sword03.DamageBonus + ApplySwordAttackEffects(action);
             var frenzyDamage = ApplyFrenzyAttackEffect(action);
             var firstHitMitigation = ApplyFirstHitMitigation(result.EnemyDamage, modifiers);
             AdvanceArts03Cooldown(artsSkillUsed);
@@ -1331,7 +1339,8 @@ namespace HwigiTower.Run
                 (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty) +
                 (poisonDamage > 0 ? " | poison " + poisonDamage : string.Empty) +
                 (itemStrikeDamage > 0 ? " | item strike " + itemStrikeDamage : string.Empty) +
-                (sword03HpCost > 0 ? " | blood cost " + sword03HpCost : string.Empty) +
+                (sword03.HpCost > 0 ? " | blood cost " + sword03.HpCost : string.Empty) +
+                (sword03.Overload ? " | blood overload" : string.Empty) +
                 (abilityStrikeDamage > 0 ? " | sword strike " + abilityStrikeDamage : string.Empty) +
                 (frenzyDamage > 0 ? " | frenzy " + frenzyDamage : string.Empty) +
                 (firstHitMitigation > 0 ? " | first hit guard " + firstHitMitigation : string.Empty);
@@ -1480,6 +1489,7 @@ namespace HwigiTower.Run
             _combatAttackCount = 0;
             _arts03CooldownRounds = 0;
             _lastCombatActionWasAttack = false;
+            _sword03OverloadUsed = false;
             _firstHitMitigationAvailable = true;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
 
@@ -1746,17 +1756,46 @@ namespace HwigiTower.Run
             }
         }
 
-        private int PaySword03AttackCost()
+        private readonly struct Sword03AttackResolution
         {
-            if (!HasAbilityRef("ABILITY_SWORD_03") || _activeCombatPlayer == null || _activeCombatPlayer.Hp <= 1)
+            public Sword03AttackResolution(int damageBonus, int hpCost, bool overload)
             {
-                return 0;
+                DamageBonus = damageBonus;
+                HpCost = hpCost;
+                Overload = overload;
             }
 
-            var requested = System.Math.Max(0, (int)GetAbilityParam("ABILITY_SWORD_03", "player.hp_cost_nonlethal"));
-            var applied = System.Math.Min(requested, _activeCombatPlayer.Hp - 1);
-            _activeCombatPlayer.ApplyDamage(applied);
-            return applied;
+            public int DamageBonus { get; }
+            public int HpCost { get; }
+            public bool Overload { get; }
+        }
+
+        private Sword03AttackResolution PrepareSword03Attack(CombatAction action)
+        {
+            if (action != CombatAction.Attack || !HasAbilityRef("ABILITY_SWORD_03") || _activeCombatPlayer == null)
+            {
+                return new Sword03AttackResolution(0, 0, false);
+            }
+
+            var requestedCost = System.Math.Max(0, (int)GetAbilityParam("ABILITY_SWORD_03", "player.hp_cost"));
+            var damageBonus = System.Math.Max(0, (int)GetAbilityParam("ABILITY_SWORD_03", "attack_strike_bonus"));
+            if (damageBonus <= 0)
+            {
+                return new Sword03AttackResolution(0, 0, false);
+            }
+
+            if (requestedCost <= 0 || _activeCombatPlayer.Hp > requestedCost)
+            {
+                return new Sword03AttackResolution(damageBonus, requestedCost, false);
+            }
+
+            if (_sword03OverloadUsed)
+            {
+                return new Sword03AttackResolution(0, 0, false);
+            }
+
+            _sword03OverloadUsed = true;
+            return new Sword03AttackResolution(damageBonus, requestedCost, true);
         }
 
         private int ApplySwordAttackEffects(CombatAction action)
@@ -1768,11 +1807,6 @@ namespace HwigiTower.Run
 
             _combatAttackCount++;
             var damage = 0;
-            if (HasAbilityRef("ABILITY_SWORD_03"))
-            {
-                damage += System.Math.Max(0, (int)GetAbilityParam("ABILITY_SWORD_03", "attack_strike_bonus"));
-            }
-
             if (HasAbilityRef("ABILITY_SWORD_02"))
             {
                 var interval = System.Math.Max(1, (int)GetAbilityParam("ABILITY_SWORD_02", "attack.rounds_interval"));

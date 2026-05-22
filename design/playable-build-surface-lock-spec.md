@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|---|---|
 | `ABILITY_SWORD_01` 예리한 감각 | 검 기반 공격 성장 | 공격 선택 ATK 보너스 | direct attack | 검 | unreachable; formal asset absent; base ATK key applied only if asset exists | GDD ability asset/pool 필요 | 없음 |
 | `ABILITY_SWORD_02` 연속베기 | 반복 공격 보상 | 공격 주기 추가타 | attack cadence | 검 | unreachable; effect unsupported | 공격 횟수/라운드 트리거 계약 필요 | 없음 |
-| `ABILITY_SWORD_03` 피의 서약 | 리스크 강공 | Attack HP 3 비자살 비용, 해당 공격 피해 +5 | HP for tempo | 검; D-031; OQ-020 | unreachable; effect unsupported | OQ-020은 1차 기준값, 붕괴도 조건 폐기 유지 | D-031 반영 |
+| `ABILITY_SWORD_03` 피의 서약 | 리스크 강공 | Attack HP 3 비용, 해당 공격 피해 +5, HP 3 이하 전투당 1회 과부하 | HP for tempo | 검; D-031; OQ-020 | unreachable; effect unsupported | OQ-020은 1차 기준값, 붕괴도 조건 폐기 유지 | D-031 revised 반영 |
 | `ABILITY_ARTS_01` 화염 인장 | 지속 피해 | 화염 DoT | status damage | 술 | unreachable; effect unsupported | 상태 지속 resolver 필요 | 없음 |
 | `ABILITY_ARTS_02` 냉기 장막 | 방어와 약화 | 피해 감소 + 적 ATK 약화 | mitigation/debuff | 술 | unreachable; effect unsupported | 적 debuff duration 계약 필요 | 없음 |
 | `ABILITY_ARTS_03` 번개 방출 | 명시 skill damage | skill 직접 피해 + cooldown | skill burst | 술 | unreachable; effect unsupported | SCOUT 독점 깨는 1차 skill 후보 | 없음 |
