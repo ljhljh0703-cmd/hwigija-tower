@@ -7,13 +7,17 @@ namespace HwigiTower.Combat
             int enemyDamage,
             bool playerDefeated,
             bool enemyDefeated,
-            int comboDamage = 0)
+            int comboDamage = 0,
+            int allyDamage = 0,
+            int playerDamagePrevented = 0)
         {
             PlayerDamage = playerDamage;
             EnemyDamage = enemyDamage;
             PlayerDefeated = playerDefeated;
             EnemyDefeated = enemyDefeated;
             ComboDamage = comboDamage;
+            AllyDamage = allyDamage;
+            PlayerDamagePrevented = playerDamagePrevented;
         }
 
         public int PlayerDamage { get; }
@@ -22,6 +26,8 @@ namespace HwigiTower.Combat
         public bool EnemyDefeated { get; }
         // per GDD D-023 / TRAIT_OFFENSE_04: 복합행동 2번째 공격 피해 (0 = 콤보 없음)
         public int ComboDamage { get; }
+        public int AllyDamage { get; }
+        public int PlayerDamagePrevented { get; }
         public bool IsComplete => PlayerDefeated || EnemyDefeated;
     }
 }
