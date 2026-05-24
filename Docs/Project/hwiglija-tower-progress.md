@@ -32,716 +32,899 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
-### 2026-05-18 00:24 — NPC spotlight encounter layout added
+### 2026-05-24 23:18 — Two-Actor Combat Batch 1 착수 차단
+- **Phase**: Core Combat Rebuild
+- **Done**:
+  - 최신 `origin/Proto` 기준 clean worktree `/private/tmp/hwigi-two-actor-baseline`를 생성하고 baseline `ce83e10` 확인
+  - CodeGraph 0.9.3 preflight를 실행해 127 files / 9,333 nodes / 23,187 edges, index up-to-date 상태 확인
+  - `PrototypeRunState`, `CombatController`, `CombatRoundResult`, `PrototypeRunSnapshot`, `ResolveCombatRoundInteractive`, `ResolveRestInteraction` 심볼을 query/context로 확인
+  - 필수 설계 문서 `design/two-actor-party-combat-lock-spec.md`, `design/combat-core-rebuild-spec.md`가 clean 최신 worktree에 없어 구현을 시작하지 않음
+- **Files**: repo 변경 없음 (`.codegraph/` untracked only, commit 제외)
+- **GDD impact**: 없음 — D-032/D-033 문서 기준 확인 전 구현 보류
+- **Blockers**: 필수 design brief 2개가 최신 `origin/Proto` clean worktree에 없음. 메인 dirty worktree에는 존재하지만 stage/push 여부 미확인이라 기준 문서로 사용할 수 없음
+- **Next**: 설계 문서를 `origin/Proto`에 반영한 뒤 Batch 1 구현 재개
+- **Agent**: Codex
+
+### 2026-05-24 22:44 — Combat Core Rebuild Spec 작성
+- **Phase**: Core Combat Design / Combat Core Rebuild
+- **Done**:
+  - Attack spam damage race를 끊기 위한 enemy intent + action counterplay 상위 전투 구조를 D-033으로 잠금
+  - normal/heavy/guard/charge/weak/special intent와 Attack/Defend/Skill/Mataios 대응 관계를 설계
+  - SFX/VFX trigger map, 긴장감 설계, 1차 balance target, 개발 Batch 1~4 분해를 repo spec으로 작성
+  - enemy별 exact intent deck/payload 숫자는 OQ-025로 분리하고 OQ-019/광폭 defer 금지선을 유지
+- **Files**: 변경/추가 4개 (`hwiglija-tower-gdd.md`, `hwiglija-tower-design-journal.md`, `hwiglija-tower-progress.md`, `design/combat-core-rebuild-spec.md`)
+- **GDD impact**: GDD v0.13.0 / D-033 추가 / OQ-025 추가 / OQ-019 open 유지
+- **Blockers**: Batch 2 전 OQ-025 enemy별 intent deck 확정 필요. `ITEM_07` 구현은 OQ-019 전까지 금지
+- **Next**: 개발 세션은 Batch 1 Two-Actor baseline부터 착수하고, Batch 2 전에 OQ-025를 닫을 것
+- **Agent**: Codex
+
+### 2026-05-24 22:35 — Two-Actor Combat OQ 보정 반영
+- **Phase**: Core Combat Design / Two-Actor Party Baseline
+- **Done**:
+  - OQ-021/OQ-024를 1차 구현값으로 close하고 Mataios HP/action power/recovery/policy rule table을 문서화
+  - OQ-022를 final lock이 아닌 temporary implementation contract로 partial-close 처리
+  - OQ-023을 future combat expansion stage로 defer하고 1차 구현은 기존 `광폭/FRENZY` Player chain 유지로 제한
+  - 개발 brief와 QA checklist를 hard-coded collapse/modal 금지, 광폭 리팩터링 금지 기준으로 보정
+- **Files**: 변경 3개 (`hwiglija-tower-gdd.md`, `hwiglija-tower-design-journal.md`, `design/two-actor-party-combat-lock-spec.md`)
+- **GDD impact**: GDD v0.12.1 / OQ-021 close / OQ-022 partial-close temporary / OQ-023 defer / OQ-024 close
+- **Blockers**: OQ-019 open 유지. Down/collapse temporary 값은 플레이 후 교체 가능 구조로 구현해야 함
+- **Next**: 개발 세션은 2인 전투 actor/policy/down event를 구현하되 광폭 리팩터링과 collapse hard-code를 금지
+- **Agent**: Codex
+
+### 2026-05-24 22:26 — Two-Actor Party Combat Lock Spec 작성
+- **Phase**: Core Combat Design / Two-Actor Party Baseline
+- **Done**:
+  - `Player + Mataios vs Enemy` 2인 파티 전투 기준선을 D-032로 잠금
+  - 마타이오스 deterministic automatic policy, down/collapse, post-combat/Rest recovery 경계를 설계
+  - `SWORD_03`, `광폭`, `ARTS_03`, `GUARD_01`, controlled item pool과의 상호작용을 player-owned build surface 기준으로 정리
+  - 개발 1차 구현 brief, QA checklist, AI QA metric contract를 repo design spec으로 작성
+- **Files**: 변경/추가 3개 (`hwiglija-tower-gdd.md`, `hwiglija-tower-design-journal.md`, `design/two-actor-party-combat-lock-spec.md`)
+- **GDD impact**: D-032 추가 / OQ-021~OQ-024 추가 / OQ-019 open 유지
+- **Blockers**: OQ-021~024 PM 결정 전 exact 수치·down 표시·FRENZY chain scope·policy constants 구현 금지
+- **Next**: PM이 OQ-021~024를 닫은 뒤 Two-Actor Combat 1차 개발 세션으로 actor state/policy/down event 구현 brief 전달
+- **Agent**: Codex
+
+### 2026-05-24 20:41 — 최신 Proto 전체 CodeGraph 인덱스 생성
+- **Phase**: Post-deadline / Tooling
+- **Done**:
+  - main worktree dirty/diverged 상태를 피해 `/private/tmp/hwigi-codegraph-current-ce83e10` clean worktree를 생성
+  - 최신 `origin/Proto@ce83e102f94a1cae72885b4aaa47b65ad5f1b1f7` 기준으로 `codegraph init -i` 완료
+  - `codegraph status .` 기준 127 files / 9,333 nodes / 23,187 edges / index up-to-date 확인
+  - `PrototypeRunState`, `CombatController`, `FRENZY`, `Sword` query smoke로 전투/빌드 표면 분석에 쓸 수 있음을 확인
+  - `codegraph affected`는 현재 repo에서 test impact를 잘 잡지 못해 보조 지표로만 쓰고, `query/context` + `rg` 병행을 표준으로 정리
+- **Files**: repo 변경 1개 (`Docs/.bkit-memory.json`) + 외부 `hwiglija-tower-codegraph-brief.md` / PROGRESS 기록
+- **GDD impact**: 없음 (도구/운영 기준선 갱신)
+- **Next**: 핵심 C# runtime 작업은 CodeGraph preflight를 표준으로 사용하되, docs/SO 단순 변경은 생략 가능하게 운영
+- **Agent**: Codex
+
+### 2026-05-24 20:45 — Progress/Memory/CodeGraph 토큰 효율 운영 규칙 갱신
+- **Phase**: Post-deadline / Tooling
+- **Done**:
+  - CodeGraph brief를 v0.9.3 실제 명령 체계와 MCP/CLI fallback 기준에 맞춰 갱신
+  - CodeGraph 사용을 매 작업 강제가 아니라 핵심 C# runtime 변경 trigger 기반으로 제한
+  - Progress는 최신 3개, Memory는 주간 최신 5개 중심으로 읽고 Memory 기록은 세션당 1-3개 재사용 교훈만 남기는 토큰 절약 규칙을 문서화
+  - screenshot harness는 기본 검증에서 제외하고 UI layout/배포 smoke/사용자 요청 때만 수행하도록 운영 기준을 명시
+- **Files**: 변경 2개 (`hwiglija-tower-codegraph-brief.md`, `Docs/.bkit-memory.json`)
+- **GDD impact**: 없음 (운영/도구 규칙 갱신)
+- **Next**: 다음 핵심 C# 작업 전 current `origin/Proto` clean 기준으로 CodeGraph status/sync 확인 후 필요한 symbol만 조회
+- **Agent**: Codex
+
+### 2026-05-24 20:05 — CodeGraph 분석 흐름 bootstrap
+- **Phase**: Post-deadline / Tooling
+- **Done**:
+  - `codegraph --version` = 0.9.3 확인
+  - 원본 dirty worktree를 건드리지 않기 위해 `/private/tmp/hwigi-codegraph-bootstrap-20260524` clean clone에서 `codegraph init -i` 실행
+  - `codegraph status .` 기준 119 files / 9,036 nodes / 22,356 edges / index up-to-date 확인
+  - `.gitignore`가 Unity generated folders 및 Addressables/VisualScripting generated content를 제외하는지 `git check-ignore -v`로 검증
+  - Combat 핵심 경로(`PrototypeRunState`, `CombatController`, `CombatAbilityModifiers`, `EncounterRuntimeCatalogBuilder`)를 CodeGraph context/query와 직접 파일 read로 분석
+- **Files**: 변경 2개 (`Docs/Project/hwiglija-tower-progress.md`, `Docs/.bkit-memory.json`) + 외부 PROGRESS 기록
+- **GDD impact**: 없음 (분석/운영 규칙 기록, 게임 결정 변경 없음; OQ-019 open 유지)
+- **Next**: 후속 CodeGraph 사용 시 clean worktree/clone 기준으로 `query`/`context`를 먼저 돌리고, `.codegraph/`는 commit 후보에서 제외
+- **Agent**: Codex
+
+### 2026-05-22 23:04 — AI QA Seed Replay skeleton 커밋 및 Proto 푸시
+- **Phase**: AI QA / Balance Lab
+- **Done**:
+  - clean worktree에서 의도 파일 15개만 stage하고 generated output은 ignore 상태로 유지
+  - `Add AI QA seed replay skeleton` 커밋을 생성
+  - `origin/Proto`에 push하고 local HEAD와 origin/Proto HEAD가 동일 commit을 가리키는지 확인
+  - commit diff whitespace check와 본편 runtime/package 변경 없음 상태를 재확인
+- **Files**: 추가 15개 (`Tools/RoguelikeSim`, `Tools/RoguelikeSimPython`, `Docs/Portfolio`)
+- **GDD impact**: 없음 (AI QA 도구/포트폴리오 트랙, 본편 결정 아님)
+- **Next**: 후속 AI QA 작업은 Unity SO exporter 또는 seed range 확장 실험으로 진행
+- **Agent**: Codex
+
+### 2026-05-22 22:54 — AI QA skeleton 기준선을 SWORD_03 과부하 commit에 재정렬
+- **Phase**: AI QA / Balance Lab
+- **Done**:
+  - clean worktree `/private/tmp/hwigi-first-build-surface`에서 base commit `ed30e9f` 기준으로 AI QA 파일만 적용
+  - Seed Replay 문서 기준선을 First Build Surface + `SWORD_03` 과부하 반영 완료 commit으로 갱신
+  - 생성 CSV/summary는 검증 산출물로만 두고 commit 후보에서 제외되도록 ignore 처리
+  - `dotnet run`, Python summary, AI QA 경로 `git diff --check`, 본편 runtime/package 변경 없음 검증을 완료
+- **Files**: 추가 15개 (`Tools/RoguelikeSim`, `Tools/RoguelikeSimPython`, `Docs/Portfolio`)
+- **GDD impact**: 없음 (AI QA 도구 기준선 정리, 본편 결정 아님)
+- **Next**: 필요 시 이 clean worktree 변경만 별도 commit/push하고, 후속으로 Unity SO exporter를 설계
+- **Agent**: Codex
+
+### 2026-05-22 22:26 — AI QA Seed Replay skeleton 추가
+- **Phase**: AI QA / Balance Lab
+- **Done**:
+  - First Build Surface 기준 commit `2bc2cbc`를 문서에 명시하고 본편 runtime과 분리된 AI QA 트랙 경계를 정리
+  - `Tools/RoguelikeSim` 독립 C# console skeleton을 추가해 seed replay CSV를 생성
+  - `RandomPolicy`, `GreedyPolicy`, `SurvivalPolicy`와 필수 CSV metric schema를 구현
+  - `Tools/RoguelikeSimPython` 표준 라이브러리 기반 분석/시각화 skeleton을 추가하고 샘플 replay 90 rows를 검증
+  - 포트폴리오 문서 2종에 실험 목적, 가드레일, P1-P5 정합성, 해석 규칙을 기록
+- **Files**: 추가 19개 (`Tools/RoguelikeSim`, `Tools/RoguelikeSimPython`, `Docs/Portfolio`)
+- **GDD impact**: 없음 (AI QA 도구/포트폴리오 트랙, 본편 결정 아님)
+- **Next**: Unity Editor exporter로 First Build Surface SO 데이터를 neutral JSON으로 내보내 hand-authored fixture를 대체
+- **Agent**: Codex
+
+### 2026-05-22 19:25 — 본편 개발/AI QA 투트랙 병행 운영안 정리
+- **Phase**: Portfolio / Balance Tooling Strategy
+- **Done**:
+  - 현재 First Build Surface 구현/검증 세션과 병행 가능한 방식으로 Game Track과 AI QA Track의 책임 경계를 분리
+  - Game Track은 플레이어 경험, 빌드 표면, UI/QA/데모 완성도를 유지하고 AI QA Track은 결정적 재현/시뮬레이션/리포트/RL baseline을 담당하는 구조로 제안
+  - AI QA 산출물은 본편 런타임에 직접 섞지 않고 `Tools/RoguelikeSim`, `Docs/Portfolio`, Python analysis로 분리하는 방향을 정리
+  - 주간 병행 cadence와 Track 간 handoff 규칙을 제안해 게임 완성도 개선 과정이 포트폴리오 증거로 남도록 설계
+- **Files**: 변경 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (운영/포트폴리오 전략)
+- **Next**: Game Track은 First Build Surface 검증, AI QA Track은 seed replay simulator skeleton 설계부터 착수
+- **Agent**: Codex
+
+### 2026-05-22 19:17 — 게임 개발과 AI QA 트랙 분리 포트폴리오 전략 확정
+- **Phase**: Portfolio / Balance Tooling Strategy
+- **Done**:
+  - 게임 본편 개발과 별개로, 본편 완성도를 높이기 위한 AI QA/시뮬레이션/RL 실험 트랙을 병렬 산출물로 잡는 방향을 정리
+  - 포트폴리오 서사는 "로그라이크 게임을 만들며 수동 QA 한계를 발견했고, 결정적 재현/Monte Carlo/RL 실험 환경으로 밸런스 개선 루프를 구축했다"로 설정
+  - 구현 산출물은 Unity 본편, RoguelikeSim, Python analysis/RL baseline, 실험 리포트 4개 축으로 분리 제안
+  - 완성도 개선 과정을 before/after 지표와 디자인 수정 근거로 남기는 방식이 AI_MODEL 직무 어필에 가장 적합하다고 판단
+- **Files**: 변경 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (포트폴리오/QA 트랙 전략)
+- **Next**: 첫 포트폴리오 리포트 목차와 `RoguelikeSim` 구현 체크리스트 작성
+- **Agent**: Codex
+
+### 2026-05-22 19:06 — AI_MODEL 직무 요건 기반 포트폴리오 어필 전략 분석
+- **Phase**: Portfolio / Balance Tooling Strategy
+- **Done**:
+  - AI MODEL 팀의 RL 시뮬레이터, 밸런스 테스트 자동화, 시뮬레이션 실험 프레임워크 요구사항과 현재 프로젝트 자산을 매핑
+  - AI NPC보다 결정적 로그라이크 시뮬레이션과 밸런스 자동화 파이프라인을 포트폴리오 중심축으로 세우는 전략을 정리
+  - 현재 부족한 RL/PyTorch 실구현 증거를 `RoguelikeSim` + Monte Carlo + DQN/PPO baseline으로 보완하는 방향을 제안
+  - 자기소개서/포트폴리오에서 어필할 문제정의, 기술 구조, 산출 지표, 인터뷰 설명 포인트를 도출
+- **Files**: 변경 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (지원 전략/도구 제안이며 게임 규칙 결정 없음)
+- **Next**: `Tools/RoguelikeSim` 최소 구현 범위를 확정하고, 1차 실험 리포트 샘플을 포트폴리오 문서로 작성
+- **Agent**: Codex
+
+### 2026-05-22 18:55 — 로그라이크 한정 실험 프레임워크 범위 재판단
+- **Phase**: Core Run Design & Balance Tooling Review
+- **Done**:
+  - 사용자가 "다양한 장르"가 아니라 로그라이크 프레임워크로 한정할 경우의 적합성을 재검토
+  - 범용 장르 프레임워크가 아닌 런 생성/정책/지표/파라미터 스윕 중심의 `RoguelikeSim`/밸런스 랩이면 프로젝트 구조와 정합성이 높다고 판단
+  - 기존 결정적 run context, ScriptableObject data, AutoResolveCombat, EditMode 테스트를 재사용하는 방향을 권고
+- **Files**: 변경 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (도구 범위 판단만 기록)
+- **Next**: 구현 시 `IRunPolicy`, `RunSimulationResult`, `BalanceSimulationRunner`를 최소 단위로 시작하고 외부 RL 의존성은 보류
+- **Agent**: Codex
+
+### 2026-05-22 18:53 — RL/AI 밸런스 시뮬레이션 반영 가능성 검토
+- **Phase**: Core Run Design & Balance Tooling Review
+- **Done**:
+  - GDD P3/P4/D-029/OQ-019 제약을 기준으로 RL 시뮬레이터, AI 밸런스 테스트, 범용 실험 프레임워크 반영 가능성을 점검
+  - 현재 repo의 Unity 6000.4.3f1, 런타임/테스트 asmdef, 결정적 RNG, AutoResolveCombat, catalog 기반 테스트 구조를 확인
+  - 세 항목 모두 본편 기능이 아니라 오프라인 밸런스/QA 도구로 제한할 때 정합성이 높다고 판단
+  - 강화학습은 즉시 구현보다 seed replay + scripted/heuristic policy + Monte Carlo 리포트 이후 후속 단계로 권고
+- **Files**: 변경 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (새 게임 규칙/밸런스 결정 없음)
+- **Next**: First Build Surface 직접 플레이/테스트 확인 후, 순수 C# 시뮬레이션 runner와 지표 CSV부터 작게 추가
+- **Agent**: Codex
+
+### 2026-05-22 15:20 — SWORD_03 피의 서약 과부하 계약 반영
+- **Phase**: Core Run Design & Build Surface
+- **Done**:
+  - D-031/OQ-020의 기존 비자살 HP 비용 계약을 HP 3 이하 전투당 1회 과부하 계약으로 갱신
+  - SWORD_03 Attack 보너스와 HP 비용 판정을 적 반격 전 순서로 정리하고, 과부하 사용 상태를 전투 시작마다 reset
+  - 전투 feedback에 `blood overload`/`피의 서약 과부하` 표시를 추가하고 관련 EditMode 테스트를 보강
+  - repo design docs와 GDD v0.11.2에 변경 계약을 반영, OQ-019는 open 유지
+- **Files**: 변경 9개+SSOT (`PrototypeRunState.cs`, `CombatController.cs`, `RuntimeShellTests.cs`, `design/abilities.md`)
+- **GDD impact**: D-031 갱신 / GDD v0.11.2 / OQ-019 open 유지
+- **Blockers**: Unity batchmode가 LicenseClient channel timeout으로 테스트 실행 전에 중단되어 GUI Test Runner 확인 필요
+- **Next**: GUI EditMode/PlayMode에서 SWORD_03 테스트와 전투 smoke를 확인한 뒤 커밋/push 판단
+- **Agent**: Codex
+
+### 2026-05-22 14:09 — First Build Surface runtime subset 구현
+- **Phase**: Core Run Design & Build Surface
+- **Done**:
+  - 런 reachable build surface에서 dead pick 노출을 차단하고 controlled item pool을 catalog/shop/reward 경로에 연결
+  - `SWORD_01/02/03`, `ARTS_03`, `GUARD_01` 능력 asset과 `FRENZY` 검 x3 시너지 asset/runtime 효과를 추가
+  - `SWORD_03` HP 비용/추가 피해, `광폭` Attack 추가타/연쇄 보너스, `ARTS_03` skill direct damage를 전투 resolver에 반영
+  - Shop/combat/harness 테스트를 새 build surface 기준으로 갱신하고 PlayMode 및 screenshot harness를 확인
+- **Files**: 변경/추가 37개 내외 (`PrototypeRunState.cs`, `EncounterRuntimeCatalogBuilder.cs`, Ability/Synergy SO assets, RuntimeShellTests 등)
+- **GDD impact**: SSOT 변경 없음 — D-031/OQ-020 구현 반영, OQ-019 open 유지
+- **Blockers**: Unity GUI EditMode는 직접 창 조작이 불안정했고 batch `-runTests` XML 생성이 동작하지 않아 기존 GUI pass와 PlayMode/screenshot/정적 검증으로 보완
+- **Next**: 직접 플레이로 검 x3 체감, `광폭`, `ARTS_03`, controlled item 선택감을 확인한 뒤 Balance Pass 범위를 정한다.
+- **Agent**: Codex
+
+### 2026-05-22 11:23 — First Build Surface design docs를 Proto 기준선에 반영
+- **Phase**: Core Run Design & Balance Lock
+- **Done**:
+  - First Build Surface 개발 brief와 Playable Build Surface Lock spec을 repo design docs 기준선에 포함
+  - D-031/OQ-020 기준값 정합을 위해 능력/아이템/시너지 design docs 변경만 분리
+  - dirty main worktree의 비문서 변경을 제외하고 clean `origin/Proto` 기준선 위 문서 커밋만 push
+  - clean 개발 worktree에서 brief/spec 파일 가시성을 재검증
+- **Files**: repo 변경 5개 (`design/first-build-surface-development-brief.md`, `design/playable-build-surface-lock-spec.md`, `design/abilities.md`)
+- **GDD impact**: 없음 (D-031/OQ-020 반영분의 repo 기준선 publish)
+- **Next**: 개발 세션은 `origin/Proto`에서 first Build Surface brief를 읽고 첫 구현 배치 착수
+- **Agent**: Codex
+
+### 2026-05-22 10:49 — OQ-020 첫 플레이테스트 기준값 입력
+- **Phase**: Core Run Design & Balance Lock
+- **Done**:
+  - `SWORD_03` Attack HP 3 비자살 비용과 해당 공격 피해 +5 기준값을 GDD/design 명세에 반영
+  - `광폭` Attack 추가타 ATK×0.5, 직전 Attack 연쇄 시 ATK×0.75, Defend/Skill chain reset 기준값을 반영
+  - `반사` Defend 받은 피해 50% 반사와 방어 후 다음 Attack 1회 ×1.5 반격 창 기준값을 반영
+  - Build Surface Lock spec과 첫 개발 brief에서 OQ-020 numeric blocker 표기를 기준값 입력 완료 상태로 갱신
+- **Files**: 변경 7개 (`hwiglija-tower-gdd.md`, `design/abilities.md`, `design/synergies.md`)
+- **GDD impact**: OQ-020 close / GDD v0.11.1 기준값 patch
+- **Next**: 개발 세션은 first Build Surface brief 범위로 구현 착수, `ITEM_07`은 OQ-019 전까지 보류
+- **Agent**: Codex
+
+### 2026-05-22 10:35 — OQ-018 효과 계약과 첫 개발 brief 확정
+- **Phase**: Core Run Design & Balance Lock
+- **Done**:
+  - D-031로 `SWORD_03` 비자살 HP-cost 강공, `광폭` 공격 연쇄 break, `반사` 다음 공격 1회 강반격 창 계약을 기록
+  - OQ-018을 effect contract 기준으로 close하고 숫자 입력은 첫 플레이테스트 baseline OQ-020으로 분리
+  - Build Surface Lock spec에서 OQ-018 대기 상태를 D-031 계약 잠금/OQ-020 숫자 대기로 갱신
+  - dead pick 차단, controlled item pool, 검 x3 surface, `ARTS_03` skill 축을 첫 개발 brief로 확정
+- **Files**: 변경 7개 (`hwiglija-tower-gdd.md`, `design/first-build-surface-development-brief.md`, `design/playable-build-surface-lock-spec.md`)
+- **GDD impact**: D-031 추가 / OQ-018 close / OQ-020 추가
+- **Next**: PM이 OQ-020 기준값을 입력하면 개발 세션이 첫 Build Surface brief 범위로 구현 착수
+- **Agent**: Codex
+
+### 2026-05-22 10:12 — OQ-017 축 잠금과 Build Surface Lock Spec 작성
+- **Phase**: Core Run Design & Balance Lock
+- **Done**:
+  - D-030으로 `SWORD_03`, `광폭`, `반사`, `ITEM_07`의 관계 비의존 대체 빌드 축을 잠금
+  - OQ-017을 close하고 exact 효과/수치 OQ-018, `ITEM_07` 적 패턴 결과 계약 OQ-019로 분리
+  - 능력 12 / 일반 아이템 12 / 유물 6 / 시너지 4의 target role과 current runtime status를 Build Surface Lock spec에 정리
+  - Runtime support matrix, gap list, dead-pick 차단 원칙, 1차 개발 배치 초안을 Balance Pass 전 handoff로 분리
+- **Files**: 변경 7개 (`hwiglija-tower-gdd.md`, `hwiglija-tower-design-journal.md`, `design/playable-build-surface-lock-spec.md`)
+- **GDD impact**: D-030 추가 / OQ-017 close / OQ-018·OQ-019 추가
+- **Next**: 개발 세션은 dead pick pool 차단과 최소 작동 빌드 표면 노출부터 착수하고, OQ-018/OQ-019는 계약 확정 후 이어서 구현
+- **Agent**: Codex
+
+### 2026-05-22 09:55 — OQ-017 대체 빌드 축 후보 정리
+- **Phase**: Core Run Design & Balance Lock
+- **Done**:
+  - 최신 D-029/D-022/D-025/OQ-017 기준으로 관계 상태 전투 modifier 재도입 금지선을 재확인
+  - `ABILITY_SWORD_03`, `ITEM_07`, 검 `광폭`, 결 `반사` 심화 슬롯별 대체 빌드 축 후보를 비교
+  - 검은 공격 연쇄/반격 타이밍, 결은 방어→반격 전환, `ITEM_07`은 패턴 대응 보조 축을 추천 조합으로 정리
+  - 효과 수치와 SO/런타임 변경은 사용자 확정 전 미확정으로 유지
+- **Files**: 변경 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (OQ-017 설계 후보 단계, 확정 전)
+- **Next**: PM이 OQ-017 추천 조합 또는 대안을 고른 뒤 GDD/design 명세 갱신
+- **Agent**: Codex
+
+### 2026-05-22 09:41 — 붕괴도 비전투화와 빌드 표면 우선 결정 잠금
+- **Phase**: Core Run Design & Balance Lock
+- **Done**:
+  - Glitch 설계 용어를 플레이어 직관의 붕괴도로 치환하고 관계·회복 압박 축으로 남기는 D-029를 GDD에 기록
+  - D-022 적 턴 붕괴 연동 타이머 축소를 철회하고 D-025 정서적 전투 modifier 원리를 재고 상태로 갱신
+  - `ABILITY_SWORD_03`, `ITEM_07`, 검 시너지 `광폭`, 결 시너지 `반사`의 관계 상태 전투 심화 로직을 OQ-017 대체 설계 대상으로 분리
+  - 로컬 능력/아이템/시너지/밸런스 명세가 붕괴도 전투 키를 그대로 구현 지시하지 않도록 정리
+- **Files**: 변경 7개 (`hwiglija-tower-gdd.md`, `hwiglija-tower-design-journal.md`, `design/synergies.md`)
+- **GDD impact**: D-029 추가 / D-022·D-025 갱신 / OQ-017 추가
+- **Next**: 시스템 디자인 세션에서 OQ-017 대체 빌드 축과 Playable Build Surface Lock Spec을 확정
+- **Agent**: Codex
+
+### 2026-05-22 01:04 — Shop disabled card clarity polish
 - **Phase**: W3-2
 - **Done**:
-  - `PrototypeHud`에 공통 NPC spotlight layer를 추가해 background overlay, glow, shadow, character visual, dialogue plate를 한 묶음으로 표시
-  - Shop 화면의 merchant visual을 좌측 spotlight 구조로 이동하고 Floor 1-3 human / Floor 4-5 otherworld mapping을 유지
-  - Rest 화면에서 Mataios portrait도 같은 spotlight framing을 사용하도록 연결하고 기존 natural-language input/action flow는 유지
-  - EditMode/PlayMode screenshot harness에 spotlight visibility, public mode label, shop/rest visual framing 검증을 추가
-  - 1080x1920 screenshot harness 8종을 재생성해 `04_rest_mataios`, `05_shop` 중심으로 overlap을 확인
-- **Files**: 변경/추가 4개 (주요: `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `RuntimeShellTests.cs`, `PortraitUiScreenshotQaTests.cs`)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: text sharpness/contrast와 product card density를 actual device 또는 Editor GameView에서 최종 polish
+  - Shop unavailable-choice hints now preserve price and one-line reward/effect summaries before the disabled state.
+  - Locked Shop cards keep public product title, Gold cost, effect copy, and `Gold 부족` feedback on the same comparison axis as purchasable cards.
+  - Added EditMode coverage for disabled Shop card public copy and tightened the opening Shop screenshot QA fixture around low-Gold comparison details.
+  - Revalidated GUI EditMode, GUI PlayMode, and the 01-12 portrait screenshot harness from the clean result-polish worktree.
+- **Files**: 변경 4개 (`PrototypeEncounterRuntimeResolver.cs`, `PrototypeHud.cs`, `PresentationLayerTests.cs`, `PortraitUiScreenshotQaTests.cs`)
+- **GDD impact**: 없음 (상점 경제/상품 수 변경 없음, P3/P5 정렬 UI polish)
+- **Next**: QA 확인 후 Top HUD density 진단
 - **Agent**: Codex
 
-### 2026-05-18 00:08 — Merchant spotlight sprites bound
+### 2026-05-21 23:54 — Shop clarity 우선 UI 진단
 - **Phase**: W3-2
 - **Done**:
-  - `Assets/_Project/Art/Characters/Merchants/` merchant sprites imported as Sprite/Single with alpha transparency
-  - `SO_DemoPresentationData` merchant slots updated: Floors 1-3 use human merchant, Floors 4-5 use otherworld merchant
-  - Shop merchant visual moved into the visual layer as a spotlight character so it remains separate from shop cards/actions
-  - EditMode/PlayMode coverage added for merchant floor mapping and shop screenshot spotlight visibility
-- **Files**: 변경/추가 10개 (주요: `SO_DemoPresentationData.asset`, `PrototypeHud.cs`, `Assets/_Project/Art/Characters/Merchants/**`)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: 1080x1920 shop screenshot에서 merchant/card overlap 최종 육안 QA
+  - `69fa803` 기준 Shop Prototype 화면과 1080x1920 portrait QA 캡처를 검토
+  - 5상품 카드 구조와 기존 구매 흐름을 유지하는 범위에서 상품 비교/구매 가능성/구매 결과 가독성 문제를 분리
+  - Rest companion feel과 Top HUD density를 후속 후보로 비교해 개발 세션 handoff 우선순위를 정리
+- **Files**: 변경 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (상점 경제/전투 규칙 변경 없음, P3/P5 정렬 UI 진단)
+- **Next**: 개발 세션에서 Shop disabled card 정보 위계와 구매 후 변화 피드백을 먼저 polish
 - **Agent**: Codex
 
-### 2026-05-17 23:34 — Randomized floor map graph added
+### 2026-05-21 23:54 — Result/Combat 승인 후 UI 전용 진단 방향 확정
+- **Phase**: 운영
+- **Done**:
+  - PM 세션에서 `e647b7368ac9e0a7deb2e6e3f4d10729f4b7e2d9` 개발 보고 승인: Result summary icon polish
+  - QA 세션에서 `69fa803bee49cc5850431fbbcfad886728285436` 검증 승인: Combat decision feedback
+  - QA verdict를 `ship blocker no`로 기록하고, 공격/방어/스킬 post-action feedback 전용 visual screenshot coverage 부재를 P2 메모로 보존
+  - 배포 세션은 사용자 OK 전까지 보류하며, 다음 운영 방향은 UI 전용 세션에서 Shop clarity부터 진단하기로 확정
+- **Files**: 기록만 갱신
+- **GDD impact**: 없음
+- **Next**: UI 전용 세션에서 Shop clarity를 먼저 진단하고, 배포 재개는 사용자 OK를 새 trigger로 대기
+- **Agent**: Codex
+
+### 2026-05-21 22:42 — Combat decision feedback polish
 - **Phase**: W3-2
 - **Done**:
-  - Floor 1-5 map background/marker assets imported and bound through `DemoPresentationData`
-  - `PrototypeFloorMapBuilder` upgraded to deterministic seeded graph generation with positioned nodes, edges, selectable/completed/skipped/locked state
-  - Map UI now draws floor background, route lines, selected/current/locked/completed overlays, and graph-positioned node buttons
-  - Save/restore keeps seed-regenerated graph stable while restoring completed/skipped map node ids
-  - Tests updated for deterministic graph rules, connected-node selection, save restore, map presentation assets, and branching-map PlayMode traversal
-- **Files**: 변경/추가 28개 (주요: `Assets/_Project/Scripts/Run/PrototypeFloorMap.cs`, `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `Assets/_Project/Art/Map/**`)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: 1080x1920 map text sharpness/contrast polish 또는 actual device touch QA
+  - Reordered combat feedback copy around selected action and immediate result for attack, defend, and skill.
+  - Added received-damage context for attack/skill and kept defend reduction visible in the compact combat log.
+  - Updated EditMode and PlayMode public-copy assertions for the combat feedback contract.
+  - Revalidated GUI EditMode, GUI PlayMode, and the 01-12 portrait screenshot harness from the result-polish worktree.
+- **Files**: 변경 3개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`, `PrototypeRoomSmokeTests.cs`)
+- **GDD impact**: 없음 (D-022/D-025 전투 규칙 유지, P3/P5 정렬 UI polish)
+- **Next**: QA 확인 후 Shop clarity polish
 - **Agent**: Codex
 
-### 2026-05-17 22:23 — Final presentation art drop-ins bound
+### 2026-05-20 23:40 — Result summary icon polish
 - **Phase**: W3-2
 - **Done**:
-  - 신규 PNG import/meta 정상화 후 combat action icon 3종과 lobby logo를 presentation data에 바인딩
-  - completed node badge slot을 추가하고 `node_back_cleared`를 floor map 완료 상태에 표시
-  - `ENEMY_MERCENARY_CAPTAIN_SAGAN_01` presentation/catalog를 `boss_mercenary_captain_sagan_01` 아트로 교체
-  - 매칭 stableId가 없는 신규 enemy art 11종은 catalog intake 후보로 문서화
-  - 1080x1920 screenshot harness 8종 재생성 및 Lobby/Map/Combat 중심 육안 QA
-- **Files**: 변경/추가 44개 (주요: SO_DemoPresentationData, SO_LobbyPresentationData, PrototypeHud, 신규 Art PNG/meta)
-- **GDD impact**: 없음
-- **Blockers**: player portrait `char_player_bust_01.png`, merchant 전용 sprite, 실제 audio clip 파일은 아직 없음. Unity CLI `-runTests`는 XML 미생성이라 임시 TestRunner wrapper로 검증 후 제거.
-- **Next**: player/merchant/audio 실제 에셋 수령 시 동일 슬롯에 바인딩하고, 신규 map art는 별도 map presentation 목표에서 연결
-- **Agent**: Codex
-
-### 2026-05-17 19:24 — Memory fragment public terminology rename
-- **Phase**: W3-2
-- **Done**:
-  - Public UI/result/save summary에서 `Memory Fragment`/`기억 파편` 노출을 `기억의 잔향` 또는 `기억`으로 교체
-  - `MEM_FRAGMENT_*` stableId와 내부 `MemoryFragment` 타입/저장 정책은 유지
-  - DemoPresentationData memory encounter displayName과 asset intake 문구를 memory echo / 기억의 잔향 기준으로 정리
-  - EditMode 120/120 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
-- **Files**: 변경 9개 (`PrototypeHud.cs`, `PrototypeEncounterRuntimeResolver.cs`, `PrototypeRunSaveData.cs`, presentation asset, tests, docs)
-- **GDD impact**: 없음
-- **Next**: writer-approved 기억의 잔향 본문/타이틀이 들어오면 placeholder key copyfit 재검수
-- **Agent**: Codex
-
-### 2026-05-17 17:34 — Combat action icon drop-in folder
-- **Phase**: W3-2
-- **Done**:
-  - 전용 combat action icon 드롭인 폴더 `Assets/_Project/Art/UI/CombatActions/` 추가
-  - Attack/Defend/Skill 권장 파일명과 import 규칙 문서화
-  - 기존 `DemoPresentationData` 슬롯과 임시 node icon 바인딩 정책을 art README에 연결
-- **Files**: 변경/추가 4개 (`Assets/_Project/Art/UI/CombatActions/**`, `Assets/_Project/Art/_README.md`, progress)
-- **GDD impact**: 없음
-- **Blockers**: 실제 `icon_action_attack/defend/skill_scout` 에셋은 아직 없음
-- **Next**: 전용 아이콘/플레이어 portrait 에셋 수급 후 `SO_DemoPresentationData` 슬롯 교체
-- **Agent**: Codex
-
-### 2026-05-17 17:19 — Player portrait slot and combat action icons
-- **Phase**: W3-2
-- **Done**:
-  - `DemoPresentationData`에 player portrait slot과 CombatAction icon slots 추가
-  - 전투 하단 player card가 실제 portrait slot 또는 fallback silhouette를 표시하도록 정리
-  - Attack/Defend/Skill 버튼을 icon + short label 구조로 바꾸고 임시 node icon을 바인딩
-  - EditMode 120/120 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
-- **Files**: 변경 7개 (`PrototypeHud.cs`, `DemoPresentationData.cs`, `SO_DemoPresentationData.asset`, tests, QA/progress docs)
-- **GDD impact**: 없음
-- **Blockers**: 실제 player portrait와 전용 action icon art는 아직 없음
-- **Next**: dedicated player portrait/action icon art 수급 후 슬롯 교체, font sharpness polish
-- **Agent**: Codex
-
-### 2026-05-17 14:53 — Combat party layout v4 follow-up
-- **Phase**: W3-2
-- **Done**:
-  - 전투 중 objective/route/result/merchant/event 잔상 노출을 차단
-  - Combat panel을 top enemy stage / middle combat log / bottom party dock 구조로 확장
-  - Player/Mataios card를 하단 dock에 고정하고 action buttons를 compact square 형태로 재배치
-  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
-- **Files**: 변경 3개 (`PrototypeHud.cs`, `Portrait_UI_v3_Screenshot_QA_2026-05-16.md`, progress)
-- **GDD impact**: 없음
-- **Blockers**: font sharpness/player portrait/action icon final art는 후속 polish 필요
-- **Next**: player portrait/action icon art binding, font rendering polish, final copyfit pass
-- **Agent**: Codex
-
-### 2026-05-17 11:19 — Event cutscene layout reference pass
-- **Phase**: W3-2
-- **Done**:
-  - 이벤트 화면을 top status / central cutscene image / event text / bottom choice buttons 구조로 분리
-  - Jar Room 이벤트에서 probability hint 선택지는 유지하면서 route/debug-like text와 raw stableId 노출을 차단
-  - 이벤트 진입 중 기존 route/memory/result/portrait 잔상 노출을 정리
-  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
-- **Files**: 변경/추가 5개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`, `PrototypeRoomSmokeTests.cs`, `Docs/QA/**`, progress)
-- **GDD impact**: 없음
-- **Blockers**: event screen font sharpness/final copyfit은 writer-approved text 이후 추가 polish 필요
-- **Next**: player portrait/action icon art binding, event/font rendering polish, final copyfit pass
-- **Agent**: Codex
-
-### 2026-05-17 09:00 — Combat party layout v4
-- **Phase**: W3-2
-- **Done**:
-  - 전투 화면을 top enemy stage / middle combat log / bottom party dock 구조로 재배치
-  - Player card placeholder, HP bar, ATK/buff chips와 Mataios card, affinity/memory/reaction line을 combat dock에 통합
-  - Attack/Defend/Skill을 하단 square action row로 고정하고 전투 중 기존 route/debug-like text 노출을 차단
-  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
-- **Files**: 변경/추가 5개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`, `PrototypeRoomSmokeTests.cs`, `Docs/QA/**`, progress)
-- **GDD impact**: 없음
-- **Blockers**: 실제 player portrait asset은 아직 없어 placeholder card 사용
-- **Next**: player portrait asset 바인딩, combat action icon art, boss/enemy intent icon polish
-- **Agent**: Codex
-
-### 2026-05-17 07:25 — Text density and companion panel polish
-- **Phase**: W3-2
-- **Done**:
-  - `PrototypeHud`의 title/body/button/result/stat/caption 텍스트 크기와 dense line spacing을 상수로 정리
-  - Result summary를 핵심 3줄 중심으로 압축하고 Mental/Affinity/Memory/Item 라벨을 player-facing 한국어로 정리
-  - Companion strip을 Mataios portrait 옆 고정 영역으로 옮기고 NPC reaction을 1줄 축약 표시로 제한
-  - Combat feedback을 enemy/player HP와 최신 action consequence 중심의 2-3줄로 줄이고 action button 위치를 유지
-  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
-- **Files**: 변경/추가 4개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`, `Docs/QA/**`, progress)
-- **GDD impact**: 없음
-- **Blockers**: Unity `-runTests` 직접 XML 출력이 불안정해 임시 TestRunner wrapper로 fresh 검증했고 wrapper는 커밋에서 제거
-- **Next**: 최종 폰트 선명도, writer-approved label copyfit, selected/focus animation polish
-- **Agent**: Codex
-
-### 2026-05-17 01:27 — Merchant/Rest/Map presentation polish
-- **Phase**: W3-2
-- **Done**:
-  - 기존 `DemoPresentationData` merchant floor slots를 HUD shop 화면에 실제 visual로 연결
-  - Shop 구매 카드를 상품명/가격·효과/불가 이유 중심으로 정리하고 보스 전 준비 맥락을 강화
-  - Rest interaction을 action 효과 요약, 큰 입력창, response bubble, commit 결과 요약으로 분리
-  - Floor Map 선택 가능/완료/잠김 상태의 색 대비와 아이콘/텍스트 크기를 보강
-  - EditMode 119/119 pass, PlayMode 19/19 pass, screenshot 8종 1080x1920 확인
-- **Files**: 변경/추가 4개 (`PrototypeHud.cs`, `DemoPresentationData.cs`, `Docs/QA/**`, progress)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: 최종 폰트/텍스트 스타일, merchant art variants, selected/focus animation polish
-- **Agent**: Codex
-
-### 2026-05-17 00:28 — Portrait UI v3 readability polish
-- **Phase**: W3-2
-- **Done**:
-  - Floor Map을 2열 노드 카드로 재배치하고 선택 가능/완료/잠김 상태 문구를 player-facing하게 정리
-  - Shop 화면에 현재 Gold와 보스 전 준비 맥락을 표시하고 구매/부족/지나가기 선택 가독성을 보강
-  - Top HUD, Rest input, Combat feedback 텍스트 크기와 영역을 조정해 1080x1920 캡처 기준 판독성을 개선
-  - screenshot harness로 8종 PNG를 `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 재생성하고 1080x1920 dimensions 확인
-  - EditMode 119/119 pass, PlayMode 19/19 pass, skipped 0 확인
-- **Files**: 변경/추가 3개 (`PrototypeHud.cs`, `Docs/QA/Portrait_UI_v3_Screenshot_QA_2026-05-16.md`, progress)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: merchant 전용 presentation과 최종 폰트/텍스트 스타일 정리로 P1/P2 visual polish 진행
-- **Agent**: Codex
-
-### 2026-05-16 16:20 — Portrait UI v3 screenshot harness QA
-- **Phase**: W3-2
-- **Done**:
-  - `PrototypeHud`/`PrototypeRoomController`/`PrototypeRunState`에 `UNITY_EDITOR || UNITY_INCLUDE_TESTS` 범위 QA 진입 hook 추가
-  - PlayMode screenshot harness로 Lobby/Floor Map/Event/Rest/Shop/Combat/Boss/Ending 8종을 실제 runtime UI 상태에서 1080x1920 PNG로 생성
-  - `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 필수 screenshot 8개 생성 및 PNG dimensions 1080x1920 확인
-  - `Docs/QA/Portrait_UI_v3_Screenshot_QA_2026-05-16.md`에 pass/needs polish 판정과 남은 P1 polish 기록
-  - EditMode 119/119 pass, PlayMode 19/19 pass, skipped 0 확인
-- **Files**: 변경/추가 7개 (`PrototypeHud.cs`, `PrototypeRoomController.cs`, `PrototypeRunState.cs`, `PortraitUiScreenshotQaTests.cs`, `Docs/QA/**`, progress)
-- **GDD impact**: 없음
-- **Blockers**: 없음. Unity `-runTests` 직접 XML 출력은 여전히 불안정해 임시 TestRunner wrapper로 fresh PlayMode를 검증했으며 wrapper는 커밋 제외 예정.
-- **Next**: harness 커밋/푸시 후 P1로 텍스트 선명도, top HUD 밀도, shop/rest focus polish 진행.
-- **Agent**: Codex
-
-### 2026-05-16 11:38 — Portrait gameplay UI v3 shell
-- **Phase**: W3-2
-- **Done**:
-  - `PrototypeHud`에 1080x1920 `PortraitRoot`와 landscape dark gutter를 추가하고 top/objective/visual/companion/result/map/action/ending 레이어를 분리
-  - PrototypeRoom 시작 화면을 단일 `진행` 버튼이 아닌 branching node map 중심으로 전환하고 normal HUD에서 Glitch/raw id 노출을 줄임
-  - Top HUD/companion strip/combat panel을 portrait 기준으로 재배치하고 enemy visual, HP, action feedback, skill/buff 상태가 크게 읽히도록 정리
-  - Lobby scene bootstrap을 `sceneLoaded` 경로까지 보강하고 `Lobby.unity`에 Canvas/EventSystem을 저장해 black Game View를 직접 해소
-  - EditMode 119/119 pass, PlayMode 18/18 pass, skipped 0 확인
-- **Files**: 변경/추가 6개 (`Lobby.unity`, `PrototypeHud.cs`, `LobbyController.cs`, `PresentationLayerTests.cs`, `PrototypeRoomSmokeTests.cs`, progress)
-- **GDD impact**: 없음
-- **Blockers**: 전체 8-screen 수동 캡처는 미완료. Lobby visible screenshot만 `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 저장.
-- **Next**: 1080x1920 수동 화면 캡처로 Lobby/Map/Event/Rest/Shop/Combat/Boss/Ending 가독성 확인 후 P1 visual polish
-- **Agent**: Codex
-
-### 2026-05-16 10:37 — First boss manual playtest blocked by Lobby/input P0s
-- **Phase**: W3-2
-- **Done**:
-  - Unity `6000.4.3f1` GUI 실행 후 `Lobby.unity` Play Mode 재확인
-  - Lobby black Game View 재현: New Game 버튼이 보이지 않아 정식 진입 불가
-  - `PrototypeRoom.unity` 직접 우회 실행으로 배경/Mataios/HUD/`진행` 버튼 렌더링 확인
-  - `진행` 버튼 클릭, Return, Space 입력을 시도했으나 노드/전투 흐름으로 진행되지 않음
-  - 개발용 first-boss playtest QA 리포트 작성
-- **Files**: 변경/추가 2개 (`Docs/QA/FirstBoss_Playtest_2026-05-16.md`, `Docs/Project/hwiglija-tower-progress.md`)
-- **GDD impact**: 없음 (QA/개발 인계 기록만, 신규 디자인 결정 없음)
-- **Blockers**: 첫 보스 수동 클리어 실패. `Lobby` black screen + `PrototypeRoom` runtime button input 미동작이 P0.
-- **Next**: Lobby actual Play Mode visibility와 EventSystem/Button input path를 먼저 수정한 뒤 첫 보스 클리어 QA 재시도
-- **Agent**: Codex
-
-### 2026-05-15 21:18 — Lobby Play Mode black screen fix
-- **Phase**: W3-2
-- **Done**:
-  - Lobby Play Mode black Game View 원인을 stale `_uiBuilt` 상태와 실제 runtime Canvas 누락 불일치로 좁힘
-  - `LobbyController`가 `_uiBuilt` 플래그만 믿지 않고 `Lobby Canvas`/title/buttons 존재를 확인해 누락 시 UI를 재생성하도록 수정
-  - PlayMode smoke에 Canvas active/render mode/GraphicRaycaster 검증과 Canvas 누락 후 자동 재생성 회귀 테스트 추가
-  - 2026-05-15 QA report/handoff 문서를 repo 내부 `Docs/QA/`에 보존
-  - `git diff --check` 통과, forbidden search 신규 코드 위반 없음, EditMode 116/116 pass, PlayMode 18/18 pass, skipped 0 확인
-- **Files**: 변경/추가 5개 (LobbyController.cs, LobbySmokeTests.cs, Docs/QA/**, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: Codex manual Editor 세션은 이전 임시 wrapper compile error 이후 stale 상태가 섞여 육안 판정이 불안정했음. PlayMode 회귀 테스트로 Canvas 누락 재생성을 고정.
-- **Next**: 사용자 단일 Editor 인스턴스에서 Lobby 1080x1920 육안 재확인 후 P1 map/combat readability 개선
-- **Agent**: Codex
-
-### 2026-05-15 20:48 — Unity retry 성공 + Lobby black screen blocker handoff
-- **Phase**: W3-2
-- **Done**:
-  - Unity `6000.4.3f1` 재실행 성공: LicenseClient 연결, Unity Personal entitlement 확인, access token 갱신 통과
-  - 프로젝트 로드, script compilation/domain reload, `Lobby.unity` 열기 성공
-  - Play Mode 진입 성공 확인
-  - Game View 가 검은 화면으로 유지되어 Lobby UI가 보이지 않는 P0 blocker 확인
-  - QA 리포트를 최신 상태로 정정하고 개발 handoff 문서를 추가
-- **Files**: 변경/추가 3개 (`Docs/QA/QA_Report_2026-05-15.md`, `Docs/QA/Dev_Handoff_Unity_Retry_2026-05-15.md`, `Docs/Project/hwiglija-tower-progress.md`)
-- **GDD impact**: 없음 (QA/개발 인계 기록만, 신규 디자인 결정 없음)
-- **Blockers**: `Lobby.unity` Play Mode black Game View. 다음 개발 세션은 `LobbyController` UI 생성, Canvas/camera/render mode, presentation data binding 우선 확인 필요
-- **Next**: Lobby black screen P0 수정 후 1080x1920 fresh manual QA 재개
-- **Agent**: Codex
-
-### 2026-05-15 17:19 — QA playtest report 작성, Unity licensing blocker 기록
-- **Phase**: W3-2
-- **Done**:
-  - `origin/Proto` 최신 상태 확인 (`c4cad87`)
-  - SSOT pillars / locked decisions / tone bible 금지선과 최근 PROGRESS 확인
-  - Unity `6000.4.3f1` batch/GUI 실행을 시도했으나 LicenseClient 초기화 실패로 fresh manual playtest 차단 확인
-  - 기존 PlayMode/Lobby smoke coverage, runtime source, 1080x1920 screenshot artifacts를 근거로 QA 리포트 작성
-  - P0 environment blocker, P1 design gaps, dev/content/asset task를 우선순위화
-- **Files**: 변경/추가 2개 (`Docs/QA/QA_Report_2026-05-15.md`, `Docs/Project/hwiglija-tower-progress.md`)
-- **GDD impact**: 없음 (QA 제안만, 신규 디자인 결정 없음)
-- **Blockers**: Unity LicenseClient timeout으로 실제 Editor 수동 플레이/신규 PlayMode 결과 생성 불가
-- **Next**: Unity licensing 복구 후 Lobby부터 1080x1920 fresh manual QA 재실행, combat intent/map preview/Mataios reaction 우선 구현 검토
-- **Agent**: Codex
-
-### 2026-05-15 12:31 — Lobby portrait menu layout fix
-- **Phase**: W3-2
-- **Done**:
-  - Lobby UI를 1080x1920 portrait safe-area 루트 아래에 생성하도록 변경해 landscape Game View에서도 중앙 컬럼에 고정
-  - 새 게임/이어 하기/프로필/설정/종료 버튼을 동일 폭 세로 컬럼으로 정렬하고 종료 버튼의 far-right 배치를 제거
-  - 기본 화면의 큰 profile card를 작은 top-left chip으로 축소하고, 상세 정보는 Profile panel 안에서만 표시되도록 유지
-  - Settings slider가 기본 로비 화면에 노출되지 않고 Settings panel 안에서만 생성/표시되는지 PlayMode smoke 검증을 보강
-  - scene reload/enter play mode 설정 차이로 Awake가 누락되어도 Start/Update fallback에서 로비 UI를 1회 생성하도록 보강
-- **Files**: 변경/추가 3개 (LobbyController.cs, LobbySmokeTests.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Validation**: `git diff --check` pass, forbidden search 신규 코드 위반 없음, EditMode 116/116 pass, PlayMode 17/17 pass, skipped 0
-- **Blockers**: 1080x1920 수동 visual QA는 중복 Unity Editor lock/Hub focus 문제로 캡처 확인까지는 완료하지 못함. PlayMode smoke가 safe-area/button-column/settings/profile visibility를 구조적으로 검증.
-- **Next**: 사용자가 Editor에서 단일 인스턴스로 Lobby를 열어 최종 육안 확인. 다음 작업은 실제 배경/로고/저장 슬롯 polish.
-- **Agent**: Codex
-
-### 2026-05-13 22:31 — Mataios model-specific training plan split
-- **Phase**: W3-1
-- **Done**:
-  - `d405638 Document Mataios training dataset spec`를 origin/Proto에 push해 모델 비의존 spec 커밋을 보존
-  - 외부 편집으로 섞인 HyperCLOVA/Colab/Ollama/512-token/TRL 실행 가정을 새 training run plan 문서로 분리
-  - dataset spec v0.1은 schema, behavior contract, task coverage, keyword-only memory, fracture/forbidden rules 중심으로 정리
-  - eval plan v0.1은 model/tool 비의존 eval axes, manual rubric, optional automation note 중심으로 정리
-- **Files**: 변경/추가 4개 (Docs/AI/**, Docs/Project/hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: base model, training environment, final author-approved rows, Unity model artifact format은 아직 미정
-- **Next**: 작가 승인 tone rows 추가 후 선택 모델 기준으로 실제 SFT run script를 별도 repo/tooling에서 준비
-- **Agent**: Codex
-
-### 2026-05-13 21:30 — Mataios training dataset spec and seed samples
-- **Phase**: W3-1
-- **Done**:
-  - Mataios SFT dataset schema/spec 문서와 eval plan v0.1 문서를 추가
-  - banmal, affinity variation, no direct answer, keyword-only memory, light S3/S4 fracture, no final lore/moral judgment/Glitch exposure 규칙을 명시
-  - SFT seed JSONL 13개와 eval seed JSONL 13개를 추가해 rest/combat/event/shop/memory/boss/ending pending task를 커버
-  - JSONL line-by-line parse와 required field check를 수행
-- **Files**: 변경/추가 7개 (Docs/AI/**, mataios_sft_v0_1.sample.jsonl, mataios_eval_v0_1.sample.jsonl, metas)
-- **GDD impact**: 없음
-- **Blockers**: base model 미정. 샘플 target은 training-format temporary 예시이며 최종 canon dialogue가 아님.
-- **Next**: 실제 작가 승인 tone rows를 추가하고, eval 자동 체크 스크립트/CI 편입 여부 결정
-- **Agent**: Codex
-
-### 2026-05-12 22:32 — Prototype run save and Lobby Continue
-- **Phase**: W3-1
-- **Done**:
-  - deterministic prototype run save JSON model/store를 추가하고 missing save safe behavior를 고정
-  - PrototypeRoom safe points(run start, node/choice completion, rest commit, combat result, floor/ending transition)에 save write를 연결
-  - Lobby Continue가 save 존재 시 활성화되고 Floor/HP/Memory summary를 표시한 뒤 PrototypeRoom continue load로 진입하도록 연결
-  - run id/floor/map node completion/memory fragment state restore와 reflection/cache save 제외 정책을 EditMode 테스트로 고정
-  - Lobby PlayMode smoke에 no-save disabled, New Game save creation, Continue load path를 추가
-- **Files**: 변경/추가 12개 (PrototypeRunSaveData.cs, PrototypeRunSaveStore.cs, PrototypeRunState.cs, PrototypeRoomController.cs, LobbyController.cs, tests)
-- **GDD impact**: 없음
-- **Blockers**: reflection repo / deterministic LLM cache는 현 구조상 save file에 열거 API가 없어 명시적으로 제외. PlayMode batchmode가 결과 저장 후 종료 신호를 놓쳐 수동 Unity 종료 필요.
-- **Next**: save 파일에 reflection/cache를 포함할지 SSOT 결정 후 필요 시 repo snapshot API 추가
-- **Agent**: Codex
-
-### 2026-05-12 16:07 — Lobby main menu presentation polish
-- **Phase**: W3-1
-- **Done**:
-  - Lobby 전용 art intake folder/README를 추가하고 `lobby_bg_tower_temp.png`를 Sprite background slot에 바인딩
-  - `LobbyPresentationData`와 `SO_LobbyPresentationData`를 추가해 background/logo/title/subtitle/profile/quit visibility를 data-driven으로 분리
-  - Lobby UI를 profile card, title/subtitle, large touch buttons, profile/settings panels, desktop quit button이 있는 player-facing main menu로 재구성
-  - Continue는 `이어 하기` + `저장된 진행 없음` disabled state로 고정하고 Profile placeholder panel을 추가
-  - EditMode/PlayMode lobby smoke coverage를 presentation/profile/settings/new game 흐름에 맞게 확장
-- **Files**: 변경/추가 15개 (LobbyController.cs, LobbyPresentationData.cs, LobbySceneBuilder.cs, Lobby.unity, Art/Lobby/**, SO_LobbyPresentationData.asset, tests)
-- **GDD impact**: 없음
-- **Blockers**: 최종 로고/세이브 시스템 없음. Continue는 placeholder/disabled 유지.
-- **Next**: 실제 로비 로고와 음악 cue 수령 후 `SO_LobbyPresentationData` / `SO_AudioCueCatalog` 바인딩
-- **Agent**: Codex
-
-### 2026-05-11 22:47 — Lobby scene and audio scaffold
-- **Phase**: W2-2
-- **Done**:
-  - Lobby scene을 추가하고 BuildSettings 첫 scene으로 설정, PrototypeRoom은 두 번째 playable scene으로 유지
-  - New Game / Continue placeholder / Settings panel UI를 런타임 생성하는 `LobbyController`를 추가
-  - BGM/Ambience/SFX 채널과 volume clamp, context switch API를 가진 `PrototypeAudioService` 및 `SO_AudioCueCatalog`를 추가
-  - Music/Ambience/SFX intake folder와 naming/import README를 추가하고 missing clip safe behavior를 테스트로 고정
-  - PrototypeRoom runtime에 Lobby/Exploration/Combat/Boss/Rest/Shop/Event/Ending audio context hooks를 연결
-- **Files**: 변경/추가 70여 개 (Lobby.unity, Audio/** folders, Audio scripts/data, LobbyController.cs, PrototypeRoomController.cs, tests, EditorBuildSettings.asset)
-- **GDD impact**: 없음
-- **Blockers**: 실제 음악/SFX asset 없음. Continue는 save system 확장 전 안전 placeholder/disabled 상태.
-- **Next**: 로비를 첫 화면으로 수동 확인하고, 실제 audio asset 수령 시 `SO_AudioCueCatalog`에 cue slot 바인딩
-- **Agent**: Codex
-
-### 2026-05-11 22:08 — Screen Layer v2 readability polish
-- **Phase**: W2-2
-- **Done**:
-  - Mac Editor visual QA를 시도했으나 Computer Use Unity 접근 timeout/화면 캡처 privacy 제한으로 직접 GameView 조작은 수행하지 못함
-  - 코드 리뷰 기준 P0 overlap risk를 줄이기 위해 result panel을 action/rest 영역 밖 우측 상단으로 이동
-  - Rest interaction panel, action buttons, input field, response text 크기를 키우고 Rest 입력 중 result panel을 숨기도록 수정
-  - 임시 TestRunner entrypoint로 fresh EditMode/PlayMode 결과를 확보한 뒤 임시 파일과 ProjectSettings 부작용을 제거
-- **Files**: 변경 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: Codex tooling으로 Unity GameView 직접 시각 QA 불가. 실제 1080x1920 손플레이 확인은 사용자/Editor 수동 QA 필요.
-- **Next**: 실제 Game View 1080x1920에서 Floor map, Rest input, Combat, Ending 화면을 손으로 확인하고 남은 폰트/터치 P0만 조정
-- **Agent**: Codex
-
-### 2026-05-11 18:10 — Screen Layer v2 gameplay layout
-- **Phase**: W2-2
-- **Done**:
-  - `DemoPresentationData`에 node type별 icon slot을 추가하고 Combat/Event/Rest/Shop/Boss node art를 `SO_DemoPresentationData`에 바인딩
-  - `PrototypeHud`에 top/objective/visual/map/NPC/action/result/ending screen layer 패널을 분리하고 map node 버튼에 icon/state tint를 표시
-  - normal mode combat presentation에 public enemy name, training bonus, recall/bandage feedback을 보강하고 raw `ENEMY_` 노출을 차단
-  - EditMode/PlayMode smoke에 node icon binding, map UI icon, rest/combat layer 확인을 추가
-  - Unity batchmode 기본 `-runTests` 결과 XML 미생성 문제는 임시 TestRunner entrypoint로 검증 후 제거
-- **Files**: 변경/추가 16개 (PrototypeHud.cs, DemoPresentationData.cs, SO_DemoPresentationData.asset, Art/Nodes/**, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs)
-- **GDD impact**: 없음
-- **Blockers**: Codex가 GameView를 직접 조작하는 수동 시각 QA는 미수행. PlayMode batchmode는 결과 저장 후 종료 신호를 놓치는 현상이 있어 사용자가 Unity 종료/lock 정리 필요.
-- **Next**: Mac Editor에서 실제 1080x1920 손플레이로 map/rest/combat/ending layer 가독성 확인 후 폰트 크기/터치 영역 P0만 조정
-- **Agent**: Codex
-
-### 2026-05-11 12:54 — Renamed enemy art mappings finalized
-- **Phase**: W2-2
-- **Done**:
-  - `88ebb31` floor enemy catalog commit을 `origin/Proto`에 push하고 원격 HEAD를 확인
-  - `ENEMY_FRACTURE_HOUND` stableId는 유지한 채 presentation/art reference를 `enemy_fracture_hound.png`로 교체
-  - `ENEMY_LAMPLIGHTER_01` 점등인을 Floor 5 elite EnemyData, floor pool, presentation slot, catalog 문서에 추가
-  - `BOSS_APEX_02` final boss art/stableId mapping과 ending path를 유지하는 테스트를 보강
-  - `Assets/_Project/Art/Nodes/` intake 파일 목록은 확인만 하고 node icon binding은 다음 작업으로 보류
-- **Files**: 변경/추가/삭제 19개 (EnemyCatalog docs, Art README, FloorEnemyCatalogBuilder.cs, EncounterRuntimeCatalogBuilder.cs, SO_FloorEnemyPool_v0_1.asset, SO_DemoPresentationData.asset, EnemyData/Art assets, tests)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: node icon art를 branching map UI에 바인딩하고, Floor 5 elite encounter가 플레이 중 충분히 노출되는지 수동 QA
-- **Agent**: Codex
-
-### 2026-05-11 07:55 — Floor enemy catalog and pools
-- **Phase**: W2-2
-- **Done**:
-  - `be0a350` Rest interaction flow를 `origin/Proto`에 push하고 원격 HEAD를 확인
-  - `enemy_catalog_v0.1.md`로 floor/rank 기반 enemy catalog 문서를 추가
-  - Floor 1-5 normal/elite/boss enemy pool SO와 missing EnemyData placeholder SO를 추가
-  - branching map combat handoff가 selected map node 기준으로 floor enemy pool을 사용하도록 연결
-  - 사용 가능한 enemy art 20개를 presentation slot에 바인딩하고 catalog/presentation 테스트를 보강
-- **Files**: 변경/추가 96개 (EnemyCatalog docs, FloorEnemyPoolData.cs, FloorEnemyCatalogBuilder.cs, SO_FloorEnemyPool_v0_1.asset, EnemyData/Art/Presentation assets, RuntimeShellTests.cs, PrototypeRoomSmokeTests.cs)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: Mac Editor 수동 QA에서 floor별 enemy pool 체감, elite encounter 진입 빈도, floor boss 난이도와 reward pacing을 확인
-- **Agent**: Codex
-
-### 2026-05-10 22:07 — Mataios rest interaction flow
-- **Phase**: W2-2
-- **Done**:
-  - branching map Rest node를 HP 회복 즉시 처리에서 Mataios interaction panel 흐름으로 전환
-  - `rest.ask_mood`, `rest.train`, `rest.recover` action을 deterministic LLM/fallback 호출, temporary response, 1회 commit guard에 연결
-  - Ask Mood affinity/utterance reflection, Train next-combat damage +1 one-shot buff, Recover HP restore/internal Glitch decrease를 구현
-  - normal HUD에서 Glitch/raw provider/cache internals를 숨기고 Rest input/submit/continue UI와 PlayMode smoke를 추가
-  - Rest interaction template/content docs 4개를 추가
-- **Files**: 변경/추가 10개 (PrototypeRunState.cs, PrototypeHud.cs, PrototypeRoomController.cs, RuntimeShellTests.cs, PrototypeRoomSmokeTests.cs, Docs/Content/RestInteractions/**, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: Mac Editor 수동 QA에서 Rest input UX, mobile keyboard focus, Mataios temporary response replacement points를 확인
-- **Agent**: Codex
-
-### 2026-05-10 21:36 — Branching map event and enemy art binding
-- **Phase**: W2-2
-- **Done**:
-  - `EVT_F01_JAR_ROOM` presentation slot에 jar room background를 바인딩
-  - `ENEMY_EMPTY_ARMOR`, `ENEMY_SHADE_03`, `ENEMY_WRAITH_04` enemy-specific presentation slots를 추가
-  - combat enemy visual이 encounter background를 유지하면서 enemy stableId slot sprite를 우선 사용할 수 있도록 HUD override를 추가
-  - 신규 art import meta를 single sprite mode로 정리하고 EditMode asset binding 테스트를 추가
-- **Files**: 변경/추가 12개 (SO_DemoPresentationData.asset, PrototypeHud.cs, PresentationLayerTests.cs, Art/Encounters, Art/Enemies)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: Mac Editor에서 branching map event/combat 화면을 직접 확인하고 Floor 3-4 enemy가 실제 route enemy로 쓰일지 디자인 결정 후 combat handoff data를 별도 조정
-- **Agent**: Codex
-
-### 2026-05-10 21:26 — Branching map PlayMode smoke coverage restored
-- **Phase**: W2-2
-- **Done**:
-  - `e1d2d2f` / `7d2ba7b`를 `origin/Proto`에 push해 branching map과 event probability 변경을 보존
-  - 제거된 선형 route 직접 주입 PlayMode smoke 9개를 삭제하고 branching map route-action 기반 active smoke로 교체
-  - jar probability hint, interactive combat node, rest resolution, shop-before-boss, floor boss clear, final boss ending rest/continue 경로를 PlayMode에서 검증
-  - PlayMode ignored count를 9에서 0으로 복구
-- **Files**: 변경/추가 2개 (PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: 없음
-- **Next**: branching map 테스트는 복구됐으므로 다음은 실제 수동 플레이 기준 map UI/선택지 가독성 보강
-- **Agent**: Codex
-
-### 2026-05-10 20:54 — Event probability hints for jar room
-- **Phase**: W2-2
-- **Done**:
-  - `EVT_F01_JAR_ROOM` 선택지에 normal mode 확률 힌트를 추가해 patterned jar가 80% gold / 20% elite combat을 선택 전 표시
-  - 항아리 선택지 public label을 stableId 대신 플레이어용 이름으로 표시하도록 HUD 정규화 추가
-  - 선택 후 jar outcome 결과를 player-facing result summary로 변환하고 Glitch/raw choice id 노출을 차단
-  - EditMode 테스트로 확률 힌트, 공개 UI 라벨, 결과 요약을 고정
-- **Files**: 변경/추가 5개 (PrototypeEncounterRuntimeResolver.cs, PrototypeHud.cs, PresentationLayerTests.cs, RuntimeShellTests.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: PlayMode는 6 passed / 9 ignored 상태 유지. ignored 9개는 기존 branching map 전환 후 남은 선형 route smoke 재작성 과제.
-- **Next**: branching map 전용 PlayMode smoke를 추가해 ignored 9개를 active pass로 복구하고, Floor 2+ event probability distortion 정책은 별도 설계 결정 후 구현
-- **Agent**: Codex
-
-### 2026-05-10 18:28 — Branching floor map and jar event nodes
-- **Phase**: W2-2
-- **Done**:
-  - Floor 1-5 deterministic branching map state를 추가하고 Combat/Event/Rest/Shop/Boss node type을 HUD 선택 흐름에 연결
-  - 모든 floor path가 branch layer에서 pre-boss Shop으로 수렴한 뒤 Boss로 이어지도록 `SO_Room_Prototype` route를 갱신
-  - `EVT_F01_JAR_ROOM` event script 문서와 runtime SO를 추가하고 patterned/plain/cracked jar deterministic outcome을 구현
-  - Rest choice가 HP 회복, 내부 Glitch 감소, NPC fallback reaction을 적용하도록 runtime resolver에 연결하고 normal HUD에서 Glitch 노출을 숨김
-  - floor별 merchant presentation hook을 `DemoPresentationData`에 추가하고 EditMode/PlayMode smoke를 branching map 기준으로 갱신
-- **Files**: 변경/추가 22개 (PrototypeFloorMap.cs, PrototypeRunState.cs, PrototypeHud.cs, SO_Room_Prototype.asset, EVT_F01_JAR_ROOM, Docs/Content/EventScripts/**)
-- **GDD impact**: 없음 (GDD §7.0 OQ-012 결정 범위 내 구현)
-- **Blockers**: PlayMode는 6 passed / 9 ignored 상태. ignored 9개는 제거된 선형 route 직접 주입 smoke라 branching map 전용 smoke로 재작성 필요.
-- **Next**: PlayMode 선형 smoke를 ignored 상태로 두지 말고 branching map 경로별 shop/rest/combat/failure/ending smoke로 분해해 15/15 active pass로 복구
-- **Agent**: Codex
-
-### 2026-05-10 13:35 — Spine-ready cutscene pipeline prep
-- **Phase**: W2-2
-- **Done**:
-  - 2000x2000 cutscene source convention과 Spine export naming을 README에 고정
-  - Spine runtime 없이 동작하는 `CutsceneData` placeholder SO 3종을 추가
-  - memory fracture, final boss reveal, ending choice presentation slot을 fallback sprite 기반 cutscene으로 바인딩
-  - Spine namespace/package 미설치 상태 compile과 EditMode/PlayMode smoke를 검증
-- **Files**: 변경/추가 11개 (SpineSource/Data Cutscenes README, SO_CutsceneSpine_*, SO_DemoPresentationData, RuntimeShellTests.cs)
-- **GDD impact**: 없음
-- **Next**: Spine runtime 설치 승인 전까지는 fallback sprite 컷신만 사용하고, 다음 단계에서 2000x2000 source export 파일 수급 후 import setting 검증
-- **Agent**: Codex
-
-### 2026-05-10 13:26 — Combat readability and decision feedback
-- **Phase**: W2-2
-- **Done**:
-  - Attack/Defend/Skill 라운드 결과에 적/플레이어 HP 변화, 선택 행동, 방어/정찰/콤보 결과를 명시
-  - Skill을 `ABILITY_SCOUT` 전용 의미 선택지로 고정하고 미보유 시 버튼/피드백에서 정찰 필요를 표시
-  - Bandage 전투 시작 회복과 Recall Anchor 1회 개입 가능성을 combat panel에 노출
-  - final boss prepared-player 3-6턴 승리 sanity와 Scout skill/Recall smoke를 테스트로 보강
-- **Files**: 변경/추가 7개 (PrototypeRunState.cs, PrototypeRoomController.cs, PrototypeHud.cs, combat 관련 테스트, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Next**: Mac Editor 손플레이에서 Attack/Defend/Scout Skill 선택 이유가 실제로 읽히는지 확인하고, 필요하면 전투 패널 레이아웃을 Screen Layer v2로 분리
-- **Agent**: Codex
-
-### 2026-05-10 12:25 — Player-facing vertical slice flow polish
-- **Phase**: W2-2
-- **Done**:
-  - normal mode route/result/combat/end-state labels에서 raw stableId/debug-like 문구 노출을 줄이고 debug toggle은 유지
-  - Floor 목표 표시를 현재 층, 현재 조우, 다음 행동 이유 중심으로 재작성
-  - shop/item/ability/memory/combat/floor/end 결과 요약을 player-facing 시스템 문구로 정리
-  - PlayMode smoke 기대값을 normal-mode public UI 기준으로 갱신
-- **Files**: 변경/추가 4개 (PrototypeHud.cs, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Next**: Mac Editor에서 초회 플레이어 관점으로 Floor 1→5→ending.rest/continue를 다시 손플레이하고, 남은 화면 조악함은 Screen Layer v2에서 레이아웃/타이포 구조로 분리
-- **Agent**: Codex
-
-### 2026-05-10 11:30 — Hands-on HUD readability blocker polish
-- **Phase**: W2-2
-- **Done**:
-  - 사용자 손플레이 QA에서 전투/보스 도달/ending.continue는 확인됐지만 ending.rest와 UI 식별성은 미확정 blocker로 기록
-  - `PrototypeHud`의 기본 플레이 UI 텍스트, 선택지, 진행/다음층/재시작/엔딩 버튼, 전투 패널 크기와 대비를 상향
-  - 공통 HUD text best-fit 하한을 올려 public UI가 지나치게 작은 글씨로 축소되지 않도록 조정
-  - fresh EditMode/PlayMode로 Floor 1→5 route 및 ending smoke 회귀 확인
-- **Files**: 변경/추가 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: ending.rest는 아직 사용자 손플레이로 미확인. 실제 Mac Editor 화면에서 새 가독성 패스 체감 확인 필요.
-- **Next**: Unity Editor에서 ending.rest까지 직접 확인하고, 남은 UI 조악함은 Screen Layer v2로 별도 정리
-- **Agent**: Codex
-
-### 2026-05-09 18:30 — Mac Editor hands-on input QA blocker
-- **Phase**: W2-2
-- **Done**:
-  - `4455d95`를 `origin/Proto`에 push하고 원격 HEAD 확인
-  - Mac Editor `PrototypeRoom` PlayMode에서 `진행` 버튼 표시까지 확인
-  - Computer Use 기반 실제 GameView 클릭/키 입력으로는 Floor 1 choice open이 안정 재현되지 않는 blocker 확인
-  - 씬에 직렬화된 HUD Text도 raycast를 차단하도록 보강해 버튼 클릭 가로채기 가능성을 제거
-  - fresh EditMode/PlayMode로 route, presentation asset binding, ending smoke 회귀 확인
-- **Files**: 변경/추가 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: Codex Computer Use 입력이 Unity GameView에 안정 전달되지 않아 사람 손플레이 Floor 1→5→ending.rest/continue 완료는 미확정. 사용자 직접 입력 확인 필요.
-- **Next**: 사용자가 Editor에서 `진행` 버튼 또는 Enter/N, 1-4, A/D/S, ending 1/2로 직접 완주 확인
-- **Agent**: Codex
-
-### 2026-05-09 17:49 — Late-route presentation asset binding
-- **Phase**: W2-2
-- **Done**:
-  - 후반부 신규 background/portrait/enemy art를 `SO_DemoPresentationData` 슬롯에 연결
-  - `ENC_COMBAT_GATE_01/02/03`, `ENC_SHOP_02`, `ENC_MEMORY_FRAGMENT_03/05`, `run.clear` presentation slot 검증 추가
-  - run clear/ending choice 상태에서 `ending_choice_bg`를 표시하는 fallback hook 추가
-  - PlayMode에서 fracture hound, collapse echo, final boss, ending background 적용을 smoke로 고정
-- **Files**: 변경/추가 21개 (Art PNG/meta, SO_DemoPresentationData.asset, PrototypeHud.cs, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs)
-- **GDD impact**: 없음
-- **Blockers**: 실제 Android 기기 화면에서 신규 후반부 아트 가독성/성능은 아직 미검증
-- **Next**: Editor 손플레이로 Floor 1→5 presentation 확인 후 Android 실기 smoke
-- **Agent**: Codex
-
-### 2026-05-09 17:22 — Hands-on completion input blocker fix
-- **Phase**: W2-2
-- **Done**:
-  - `a61e86e`을 `origin/Proto`에 push하고 원격 HEAD 확인
-  - Mac Editor `PrototypeRoom` Play 진입 후 `진행` 버튼이 표시되지만 실제 클릭/키 입력이 안정적으로 route open으로 이어지지 않는 P0 확인
-  - 기존 EventSystem이 있을 때도 `InputSystemUIInputModule`을 보장하고 HUD 비상호작용 텍스트 raycast를 차단
-  - fresh EditMode/PlayMode로 기존 Floor 1→5 route와 ending smoke 회귀 확인
-- **Files**: 변경/추가 2개 (PrototypeHud.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: 실제 사람 손플레이 Floor 1→5→ending.rest/continue 최종 확인은 사용자 입력으로 남음. Codex UI 자동화는 Unity GameView 클릭 재현성이 낮음.
-- **Next**: 사용자가 Editor에서 `진행`/1-4/A-D-S/ending 1-2 키로 직접 완주 확인 후, 동일 경로를 Android 실기 smoke로 진행
-- **Agent**: Codex
-
-### 2026-05-09 16:27 — Manual completion route QA fixes
-- **Phase**: W2-2
-- **Done**:
-  - `69d9936`을 `origin/Proto`에 push하고 원격 HEAD 확인
-  - Mac Editor `PrototypeRoom`에서 시작 직후 HUD/`진행` 버튼이 보이지 않거나 입력되지 않는 P0 확인
-  - 씬 시작 시 run/HUD를 자동 초기화하고 HUD 버튼용 EventSystem을 보장
-  - Mac Editor용 키보드 fallback과 route-action full completion PlayMode smoke 추가
-- **Files**: 변경/추가 5개 (PlayerMovementController.cs, PrototypeRoomController.cs, PrototypeHud.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: Codex macOS 입력 자동화로 실제 마우스 클릭 완주는 안정 재현하지 못함. 동일 UI onClick route는 PlayMode에서 Floor 1→5→ending.continue까지 검증.
-- **Next**: 사람이 직접 Editor에서 마우스/키보드로 완주 확인 후 Android 실기 smoke 진행
-- **Agent**: Codex
-
-### 2026-05-09 14:17 — Mac Editor playability route entry pass
-- **Phase**: W2-2
-- **Done**:
-  - `bb19e20`을 `origin/Proto`에 push하고 원격 HEAD 확인
-  - Mac Unity Editor에서 `PrototypeRoom`을 열어 PlayMode 수동 진입성 확인
-  - 노드 이동/충돌 방식만으로는 선택형 진행 진입점이 약한 P0를 확인하고 HUD `진행` 버튼 추가
-  - `진행` 버튼이 현재 route encounter choice를 열고, choices 표시 중에는 숨도록 PlayMode smoke 고정
-- **Files**: 변경/추가 4개 (PrototypeRoomController.cs, PrototypeHud.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: Mac Editor에서 자동화 입력으로 Floor 1→ending 전체 수동 완주는 재현하지 못함. 전체 route는 fresh PlayMode로 검증.
-- **Next**: Android 실기 전, Editor에서 사람이 직접 마우스/터치로 `진행` 버튼 기반 Floor 1→ending 완주 확인
-- **Agent**: Codex
-
-### 2026-05-09 12:00 — Player-facing gameplay loop polish
-- **Phase**: W2-2
-- **Done**:
-  - 기본 HUD/route/result/combat 표시에서 raw stableId/textKey 노출을 줄이고 public play label을 적용
-  - 선택 버튼에 구매 비용, 획득, 메모리 해금, 전투 시작, 골드 부족 등 consequence hint를 표시
-  - result panel과 combat feedback을 HP/Gold/Mental/Glitch/Affinity/획득/진행 상태 중심으로 압축
-  - Floor 1→5, final boss, ending choice smoke가 public label 기준으로 통과하도록 PlayMode 갱신
-- **Files**: 변경/추가 5개 (PrototypeEncounterRuntimeResolver.cs, PrototypeHud.cs, PresentationLayerTests.cs, PrototypeRoomSmokeTests.cs, hwiglija-tower-progress.md)
-- **GDD impact**: 없음
-- **Blockers**: Android APK build artifact는 존재하나 ADB 연결 기기 없음으로 실기 smoke 미수행
-- **Next**: 실제 Android 기기 연결 후 install/run smoke 및 터치/세로 화면 확인
-- **Agent**: Codex
-
-### 2026-05-08 18:17 — Floor 1-5 final boss route and Spine intake scaffold
-- **Phase**: W2-1
-- **Done**:
-  - PrototypeRoom deterministic route를 Floor 1→5까지 확장하고 Floor 5 `ENC_COMBAT_GATE_03`에 `BOSS_APEX_02`를 연결
-  - Floor 2 BossGate는 Floor 3 unlock으로 유지하고 final boss victory가 기존 ending choice flow로 진입하도록 PlayMode smoke 갱신
-  - `BOSS_APEX_02`를 30 HP / 4 ATK / reward 30 gold 기준으로 세로 slice 클리어 가능한 밸런스로 조정
-  - run clear / failed / ending fallback reaction key coverage를 보강
-  - Spine runtime 미설치 상태에서 안전한 `SpineSource`, exported `Spine`, cutscene data folder와 `CutsceneData` fallback slots를 추가
-- **Files**: 변경/추가 51개 (주요: `SO_Room_Prototype.asset`, `SO_Encounter_ENC_COMBAT_GATE_03.asset`, `BOSS_APEX_02`, `CutsceneData.cs`, `PrototypeRoomSmokeTests.cs`, `Assets/_Project/Spine/**`)
-- **GDD impact**: 없음
-- **Blockers**: Android build smoke는 `Android build target is not installed in this Unity Editor.`로 APK 생성 불가
-- **Next**: Android Build Support 설치 후 BuildScript.BuildAndroid 재실행, 이후 실기 smoke와 final boss route 수동 플레이 QA
+  - 결과 요약을 Gold/HP/Affinity/Item/Ability/Memory 아이콘 칩과 짧은 수치로 분리
+  - 결과 텍스트를 `아이템 +1`, `기억 +1`, `Gold +8` 형태로 압축
+  - 기존 presentation icon slot을 재사용하고 HP는 fallback chip으로 처리
+  - EditMode/PlayMode/screenshot harness 검증 통과 확인
+- **Files**: 변경 2개 (`PrototypeHud.cs`, `PresentationLayerTests.cs`)
+- **GDD impact**: 없음 (P3/P5 정렬 UI polish, 신규 결정 없음)
+- **Next**: Combat decision feedback 또는 Shop clarity polish
 - **Agent**: Codex
 
 ---
 
-### 2026-05-08 10:29 — Ending choice flow implementation blocked on Unity licensing
-- **Phase**: W2-1
+### 2026-05-20 23:13 — 2550281 기준 Android APK 재빌드
+- **Phase**: 제출/배포
 - **Done**:
-  - BossGate victory 이후 `run.clear`에서 엔딩 선택 pending 상태로 멈추도록 런 상태를 확장
-  - `PLACEHOLDER_ENDING_REST` / `PLACEHOLDER_ENDING_CONTINUE` HUD 버튼과 1회 commit 정책 추가
-  - `ending.rest`는 최종 잠금, `ending.continue`는 restart-ready 루프로 분리
-  - restart 후 memory fragment / reflection repo / deterministic LLM cache 유지와 native model 없는 fallback 응답을 테스트 경로에 추가
-  - 구현 완료
-  - C# compile pass: generated C# csproj 기준 `HwigiTower.EditModeTests.csproj` / `HwigiTower.PlayModeTests.csproj` 컴파일 통과
-- **Files**: 변경/추가 7개 (`Assets/_Project/Scripts/Run/**`, `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `Assets/_Project/Tests/**`, `Docs/Project/hwiglija-tower-progress.md`)
+  - `/private/tmp/hwigi-play-latest` detached HEAD `2550281` / `origin/Proto` 일치 확인
+  - Android 제출 설정(Product `회귀자는 탑을 오른다`, package `com.godju.hwigitower`, ARM64/IL2CPP/non-development)을 빌드 시점에 적용해 APK 생성
+  - `/Users/godju/Downloads/AI Game/hwigi-tower/Builds/Android/Hwigitower-Prototype-20260520.apk` 및 업로드용 `Hwigitower-Prototype.apk` 복사본 생성
+  - `aapt` 로 package/native-code 확인, `apksigner` v2 signature verify 통과, `git diff --check` 통과
+  - source worktree tracked 변경 원복, `Assets/_Recovery/**` untracked는 그대로 제외
+- **Files**: repo 변경 없음 (APK 산출물 2개는 ignored build output)
+- **GDD impact**: 없음 (D-018 Android APK 우선순위 이행)
+- **Blockers**: `adb devices -l` 기기 없음으로 실기 smoke 미실행. Google Drive connector 승인이 완료되지 않아 업로드 링크 생성 불가.
+- **Next**: Android 기기 RSA 승인/USB mode 확인 후 install-run smoke, Google Drive 권한 연결 후 `Hwigitower-Prototype.apk` 업로드/링크 생성
+- **Agent**: Codex
+
+---
+
+### 2026-05-20 22:30 — Polished map and utility flow tests repaired
+- **Phase**: W3-2
+- **Done**:
+  - Updated EditMode expectations for `enc_complete_bg`, `상태/지도/장비`, and the fixed 10-node branch map.
+  - Repaired PlayMode route helpers for click-to-open maps, 5-product shop cards, skill picker combat flow, and boss-layer targeting.
+  - Extended screenshot harness coverage through `12_boss_gate_choices.png`.
+  - Fixed floor map combat classification so combat slots resolve from StartCombat effects.
+- **Files**: 변경 5개 (`PrototypeFloorMap.cs`, PlayMode/EditMode test files)
+- **GDD impact**: 없음 (existing UI validation alignment; 신규 결정 없음)
+- **Next**: Manual QA can continue from pushed `origin/Proto` 2550281; remaining UI polish can focus on result summary icons.
+- **Agent**: Codex
+
+### 2026-05-20 01:30 — Encounter map and utility polish feedback batch
+- **Phase**: W3-2
+- **Done**:
+  - Map entry is now user-triggered from `지도`, with fixed 10 branch nodes in a 4 event / 4 combat / 2 rest mix and bottom-to-top layout.
+  - Rest, event, shop, combat, status, and equipment UI layers were reworked around the latest manual QA feedback.
+  - Shop encounters now expose five purchasable products, rest uses the rest background without Mataios spotlight, and run clear binds `enc_complete_bg`.
+  - Combat action labels are `공격` / `방어` / `스킬`, with skill selection panel and player-style Mataios combat stats.
+- **Files**: 변경/추가 12개 (`PrototypeHud.cs`, `PrototypeFloorMap.cs`, shop encounter assets, `enc_complete_bg.png`)
+- **GDD impact**: 없음 (existing UI polish and asset binding; 신규 잠금 결정 없음)
+- **Blockers**: Unity batch PlayMode hit `LicenseClient-godju` timeout; earlier EditMode command compiled/imported but produced no test XML. Screenshot harness not rerun.
+- **Next**: GUI Test Runner에서 EditMode/PlayMode와 01-11 screenshot harness 재검증 후 push 판단.
+- **Agent**: Codex
+
+### 2026-05-19 14:30 — Boss gate choice and utility UI repair
+- **Phase**: W3-2
+- **Done**:
+  - Boss gate choices reduced to `전투 시작` / `돌아간다`, with boss prepare choices removed from encounter assets.
+  - Boss return and utility map return now cancel the selected route node without floor clear or ending progression.
+  - Persistent top utility buttons added for status, map, and loadout summaries without Glitch exposure.
+  - GUI Test Runner EditMode/PlayMode and portrait screenshot harness revalidated.
+- **Files**: 변경 8개 (`PrototypeHud.cs`, `PrototypeRunState.cs`, boss encounter assets, tests)
+- **GDD impact**: 없음 (P3/P4/P5-aligned UX repair, 신규 결정 없음)
+- **Blockers**: Unity batchmode still hits LicenseClient timeout; GUI Test Runner used for Unity validation.
+- **Next**: Manual touch QA for boss gate utility placement, then result summary icon polish.
+- **Agent**: Codex
+
+### 2026-05-19 07:54 — Floor map spacing and rest density polish
+- **Phase**: W3-2
+- **Done**:
+  - Floor map UI panel expanded vertically so route nodes are easier to tap.
+  - Map progression flipped to bottom-to-top, with start at bottom and shop/boss above.
+  - Branch map generation now places each route step once, reducing duplicate Rest nodes and repeated encounter auto-resolution.
+  - EditMode/PlayMode/screenshot QA revalidated.
+- **Files**: 변경 5개 (`PrototypeFloorMap.cs`, `PrototypeHud.cs`, `PrototypeRunState.cs` 등)
+- **GDD impact**: 없음 (map UX polish, 신규 디자인 결정 없음)
+- **Next**: manual touch QA blocker or result summary icon polish
+- **Agent**: Codex
+
+### 2026-05-19 07:28 — Encounter screen state layer cleanup
+- **Phase**: W3-2
+- **Done**:
+  - Map/Shop/Rest screen states now hide incompatible result/objective/debug/legacy visual layers
+  - Rest action select/input/response phases are separated so cards and input do not overlap
+  - Shop disabled purchase copy reduced to `Gold 부족`, map nodes enlarged, public companion/debug copy cleaned
+  - EditMode/PlayMode/screenshot QA revalidated
+- **Files**: 변경 1개 (`PrototypeHud.cs`)
+- **GDD impact**: 없음 (UI polish, 신규 디자인 결정 없음)
+- **Next**: manual touch QA blocker or result summary icon polish
+- **Agent**: Codex
+
+---
+
+### 2026-05-18 21:50 — APK distribution prep and codebase assessment
+- **Phase**: W3-2
+- **Done**:
+  - Project structure, AGENTS.md, and recent PROGRESS logs assessed
+  - APK file verified at `Builds/Android/Hwigitower-Prototype-20260518.apk`
+  - APK distribution preparation completed
+- **Files**: 변경 없음 (PROGRESS 항목 추가)
 - **GDD impact**: 없음
-- **Blockers**: Unity tests blocked by license. Unity batchmode fresh EditMode/PlayMode 및 Android build smoke가 LicenseClient `Licensing initialization failed`로 실행 불가. 외부 Obsidian PROGRESS prepend 대신 repo 내부 PROGRESS에 기록.
-- **Next**: Unity Hub/Editor를 열어 라이선스 channel 복구 후 fresh EditMode, PlayMode, Android BuildScript.BuildAndroid 실행 및 통과 시 커밋
+- **Next**: Final delivery instructions to user
 - **Agent**: Codex
 
 ---
 
-### 2026-05-08 09:38 — Post-BossGate gameplay blocker cleanup
+### 2026-05-18 21:44 — GUI PlayMode test runner regression repair
+- **Phase**: W3-2
+- **Done**:
+  - GUI Test Runner에서 누적되던 run save/request 상태를 PlayMode smoke/screenshot fixtures 전후로 격리
+  - final boss/rest/full-run/screenshot harness 실패 원인을 production route 변경 없이 테스트 상태 누수로 수리
+  - PlayMode 19/19, EditMode 128/128, screenshot 01-11 1080x1920, diff/forbidden 검증 완료
+- **Files**: 변경 2개 (`PrototypeRoomSmokeTests.cs`, `PortraitUiScreenshotQaTests.cs`)
+- **GDD impact**: 없음 (QA/test isolation repair, 신규 디자인 결정 없음)
+- **Next**: manual touch QA blocker 또는 result summary icons polish
+- **Agent**: Codex
+
+---
+
+### 2026-05-18 21:16 — Portrait frame and UI drop-in polish
+- **Phase**: W3-2
+- **Done**:
+  - `char_player_portrait_01`를 combat dock player portrait로 교체하고 `char_player_bust_01`도 import 보존
+  - `char_mataios_portrait_01`를 combat dock 전용 Mataios portrait로 바인딩해 rest/spotlight bust와 분리
+  - optional combat portrait frame slot을 추가해 별도 `ui_portrait_frame.png`가 없어도 UI가 깨지지 않도록 null-safe 처리
+  - EditMode/PlayMode/screenshot QA 재검증 및 remote `Proto` push 완료
+- **Files**: 변경/추가 13개 (주요: `DemoPresentationData.cs`, `PrototypeHud.cs`, `SO_DemoPresentationData.asset`, `char_*_portrait_01.png`)
+- **GDD impact**: 없음 (drop-in asset binding, 신규 디자인 결정 없음)
+- **Blockers**: `Assets/_Project/Art/UI/Portraits/ui_portrait_frame.png`와 `sfx_ui_disabled.wav`는 미제공 상태
+- **Next**: missing frame/disabled SFX drop-in 시 슬롯 연결 또는 result summary icons polish
+- **Agent**: Codex
+
+---
+
+### 2026-05-18 20:42 — Player portrait and audio cue binding
+- **Phase**: W3-2
+- **Done**:
+  - `char_player_standing_01` player portrait를 `SO_DemoPresentationData.defaultPlayerPortrait`와 combat party dock에 바인딩
+  - Lobby/Combat/Rest BGM과 UI/Combat/Shop/Rest SFX cue assets를 `SO_AudioCueCatalog`에 등록
+  - Lobby/PrototypeRoom scene이 audio cue catalog를 주입하고 combat/rest/shop/lobby interaction cue requests를 검증
+  - EditMode/PlayMode/screenshot QA 재검증 완료
+- **Files**: 변경/추가 61개 (주요: `SO_AudioCueCatalog.asset`, `SO_DemoPresentationData.asset`, `PrototypeAudioService.cs`, `PrototypeRoomController.cs`)
+- **GDD impact**: 없음 (asset/audio binding, 신규 디자인 결정 없음)
+- **Blockers**: `char_player_bust_01.png`와 `sfx_ui_disabled.wav`는 제공되지 않아 actual asset 기준으로 바인딩
+- **Next**: missing disabled SFX/player bust drop-in 시 교체 또는 result summary icons polish
+- **Agent**: Codex
+
+---
+
+### 2026-05-18 19:47 — Floor 3-5 shop route validation repair
+- **Phase**: W3-2
+- **Done**:
+  - GUI EditMode `PresentationLayerTests`의 `InputSystemUIInputModule` default action asset 생성 실패를 테스트 환경에서 회피하고 Play runtime 동작은 유지
+  - Floor 3/4/5 shop route 테스트 기대값을 `ENC_SHOP_03/04/05`와 전용 choice id로 갱신
+  - QA shop screenshot 상태가 활성 shop presentation slot을 유지하도록 보강하고 09/10/11 floor shop screenshot harness를 통과
+  - EditMode 126/126, PlayMode 19/19, `git diff --check`, forbidden search 검증 완료
+- **Files**: 변경 4개 (`PrototypeHud.cs`, `RuntimeShellTests.cs`, `PrototypeRoomSmokeTests.cs`, `PortraitUiScreenshotQaTests.cs`)
+- **GDD impact**: 없음 (기존 Floor 3-5 shop 노출 검증 보강, 신규 디자인 결정 없음)
+- **Next**: result summary icons polish 또는 manual touch QA blocker 수정
+- **Agent**: Codex
+
+---
+
+### 2026-05-18 11:49 — Android APK submission build generated
+- **Phase**: W3-2
+- **Done**:
+  - `origin/Proto` 기준 5468c31 이상 확인 후 로컬 HEAD 7f6856c 에서 Android release APK 빌드 성공
+  - Android Build Support/SDK/NDK/OpenJDK/adb 설치 경로 확인
+  - Product Name `회귀자는 탑을 오른다`, package `com.godju.hwigitower`, ARM64/IL2CPP/Portrait 제출 설정을 BuildScript/PlayerSettings에 반영
+  - `Builds/Android/Hwigitower-Prototype-20260518.apk` 생성 및 aapt/apksigner 검증
+  - ADB daemon은 실행됐지만 연결 기기 목록이 비어 실기기 smoke는 blocked로 기록
+- **Files**: 변경/추가 3개 (`BuildScript.cs`, `ProjectSettings.asset`, `Docs/Build/Android_APK_Build_2026-05-18.md`)
+- **GDD impact**: 없음 (D-018 Android APK 우선순위 이행, 신규 디자인 결정 없음)
+- **Blockers**: `adb devices -l` 에 연결 기기 없음. 앱 아이콘 슬롯은 명시 연결 전이라 Unity/default icon 상태.
+- **Next**: Android 기기 USB debugging 승인 후 APK install/launch/manual smoke 완료, 이후 Google Drive/Dropbox 업로드 링크 생성
+- **Agent**: Codex
+
+---
+
+### 2026-05-18 11:35 — Floor 3-5 shop route exposure
+- **Phase**: W3-2
+- **Done**:
+  - Floor 3/4/5 전용 `ENC_SHOP_03`, `ENC_SHOP_04`, `ENC_SHOP_05` EncounterData 자산 추가
+  - `SO_Room_Prototype` Floor 3~5 shop step을 전용 shop encounter로 교체
+  - QA 전용 floor jump helper를 추가해 실제 Floor 3/4/5 shop presentation screenshot 상태를 검증하도록 확장
+  - EditMode route coverage와 PlayMode screenshot harness에 floor 3/4/5 shop assertions 추가
+- **Files**: 변경/추가 11개 (주요: `SO_Room_Prototype.asset`, `PrototypeRunState.cs`, `PortraitUiScreenshotQaTests.cs`, `SO_Encounter_ENC_SHOP_03~05.asset`)
+- **GDD impact**: 없음 (D-009/OQ-012 기존 5층·상점 구조 노출 보강, 신규 결정 없음)
+- **Blockers**: Unity EditMode/PlayMode 실행은 LicenseClient channel timeout으로 테스트 본문 진입 전 차단
+- **Next**: Unity licensing 복구 후 EditMode/PlayMode/screenshot harness 재실행, 이후 result summary icons polish
+- **Agent**: Codex
+
+---
+
+### 2026-05-18 08:16 — Rest action card art binding
+- **Phase**: W3-2
+- **Done**:
+  - `origin/Proto` 최신 확인 (`66461c2` 기준, already up to date)
+  - `Assets/_Project/Art/UI/RestActions/` 카드 PNG 3종을 Sprite meta로 import하고 `SO_DemoPresentationData` 슬롯에 바인딩
+  - Rest 선택지를 3개 가로 아이콘 카드(`대화`/`훈련`/`휴식`) + 짧은 preview 구조로 교체
+  - 기존 Talk/Train/Recover 자연어 입력, 버프 중복 방지, 회복/Glitch 내부 처리 흐름 유지
+  - Rest card label/icon/EditMode/PlayMode 검증과 screenshot QA 8종 재실행
+- **Files**: 변경/추가 12개 (주요: `DemoPresentationData.cs`, `PrototypeHud.cs`, `SO_DemoPresentationData.asset`, `Art/UI/RestActions/*`)
+- **GDD impact**: 없음 (P1/P2/P3 정합: 안식 선택 가독성 보강, NPC spotlight/자연어 흐름 유지, 신규 디자인 결정 없음)
+- **Blockers**: 없음
+- **Next**: shop/rest encounter backgrounds 및 `Assets/_Project/Art/Icons/` 후속 바인딩
+- **Agent**: Codex
+
+---
+
+### 2026-05-17 20:02 — Floor 1-5 event script pack v0.1 작성
+- **Phase**: W3-2
+- **Done**:
+  - Floor 1~5 각 4개, 총 20개 Event markdown 작성
+  - 새 이벤트 문서 포맷에 맞춰 `_EVENT_SCRIPT_TEMPLATE.md` 갱신
+  - `event_pack_floor01_05_index_v0.1.md` 인덱스 작성
+  - `event_conversion_handoff_v0.1.md` 개발 변환 핸드오프 작성
+  - 금지 패턴, DTO 키워드, floor별 이벤트 수, `git diff --check` 검증 통과
+- **Files**: 변경/추가 23개 (주요: `Docs/Content/EventScripts/floor01-05/**`, `event_pack_floor01_05_index_v0.1.md`, `event_conversion_handoff_v0.1.md`)
+- **GDD impact**: 없음 (D-009 인카운터 수량 내 draft 산출물, 최종 NPC 대사/엔딩 진실 확정 없음)
+- **Next**: event script pack을 EncounterData/SO와 floor event pool로 변환
+- **Agent**: Codex
+
+---
+
+### 2026-05-15 07:44 — Floor 1-2 event scripts draft 정리
+- **Phase**: W3-2
+- **Done**:
+  - EventScripts 템플릿을 상세 이벤트 원고/데이터 명세 형식으로 갱신
+  - 기존 `EVT_F01_JAR_ROOM`을 새 템플릿 기준으로 재정리
+  - Floor 1 신규 `EVT_F01_ABANDONED_CAMP` 작성
+  - Floor 2 신규 `EVT_F02_OVERGROWN_GARDEN`, `EVT_F02_MERCENARY_GEAR` 작성
+  - 개발 전환 메모와 금지어/raw ID player-facing 점검 기록 추가
+- **Files**: 변경/추가 6개 (주요: `Docs/Content/EventScripts/floor01/**`, `Docs/Content/EventScripts/floor02/**`, `_DEV_CONVERSION_NOTES.md`)
+- **GDD impact**: 없음 (D-009 인카운터 수량 내 draft 산출물, 최종 서사 결정 없음)
+- **Next**: Floor 3-5 이벤트 초안 확장 후 EncounterData/floor event pool 변환
+- **Agent**: Codex
+
+---
+
+### 2026-05-08 12:01 — ending choice flow push 완료
 - **Phase**: W2-1
 - **Done**:
-  - Floor 2 shop refs를 정식 stableId로 정리: `ITEM_FIELD_BANDAGE`, `ABILITY_RECALL_ANCHOR`
-  - catalog-backed unknown ability refs가 Skill을 활성화하지 않도록 보강
-  - restart 시 memory fragment refs / reflection repo / deterministic LLM cache를 보존하고 floor / hp / gold / combat / route / recall-anchor used flag는 reset하도록 고정
-  - failure result에 `Run failed` / `Restart available` 표시 추가
-  - 관련 EditMode / PlayMode coverage 추가
-- **Files**: 변경/추가 8개 (`Assets/_Project/Data/Encounters/SO_Encounter_ENC_F02_SHOP_001.asset`, `Assets/_Project/Scripts/Encounters/EncounterRuntimeCatalogBuilder.cs`, `Assets/_Project/Scripts/Run/**`, `Assets/_Project/Scripts/UI/PrototypeHud.cs`, `Assets/_Project/Tests/**`)
+  - `git push origin Proto` 재시도 성공
+  - 원격 `origin/Proto` 를 `d94697f..dd83d0f` 로 업데이트
+  - working tree 의 excluded local 파일은 그대로 유지
+- **Files**: repo 파일 변경 없음 (PROGRESS 기록만 추가)
 - **GDD impact**: 없음
-- **Blockers**: 외부 Obsidian PROGRESS prepend는 승인/사용량 제한으로 미수행. repo 내부 PROGRESS에 기록.
-- **Next**: core loop 수동 플레이 체크 후 Android build smoke와 AI fallback/model artifact 연결 점검
+- **Next**: Unity LicenseClient 복구 후 blocked fresh EditMode/PlayMode/Android smoke 재검증
 - **Agent**: Codex
 
 ---
 
-### 2026-05-06 23:20 — W2 vertical slice UI/asset/combat/cutscene spec 작성
+### 2026-05-08 11:46 — ending choice flow 커밋, push 인증 차단
 - **Phase**: W2-1
 - **Done**:
-  - Unity 없이 코드/문서/기존 screenshot 기준으로 화면별 UI wireframe spec 작성
-  - stableId/usage 기준 Asset Integration Manifest v0.2 작성
-  - Attack/Defend/Skill 시연 이해도와 combat feedback 부족분을 acceptance criteria로 정리
-  - lightweight cutscene storyboard, writer decision packet v0.2, vertical slice test plan 작성
-- **Files**: 변경/추가 7개 (`Docs/Outsource/Juho/W2ProductionReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+  - 지정 7개 파일만 stage해 `dd83d0f` (`Add ending choice flow`) 커밋 생성
+  - repo 내부 PROGRESS에 구현 완료, C# compile pass, Unity tests blocked by license / LicenseClient 장애 명시
+  - `.obsidian/workspace.json`, `Assets/_Recovery/**`, `Mataios_LoRA_*.ipynb` 는 커밋 제외 유지
+  - `git diff --check` 및 forbidden search 통과 확인
+- **Files**: 커밋 7개 (`PrototypeRoomController.cs`, `PrototypeRunSnapshot.cs`, `PrototypeRunState.cs`, `PrototypeHud.cs`, `RuntimeShellTests.cs`, `PrototypeRoomSmokeTests.cs`, `Docs/Project/hwiglija-tower-progress.md`)
 - **GDD impact**: 없음
-- **Next**: writer v0.2 결정 회수 후 raw key/debug label toggle + combat feedback P0 구현 세션 진행
+- **Blockers**: `git push origin Proto` 는 GitHub HTTPS 인증 실패로 blocked (`gh` token invalid / username read unavailable)
+- **Next**: `gh auth login -h github.com` 또는 Git credential 복구 후 `git push origin Proto` 재실행
 - **Agent**: Codex
 
 ---
 
-### 2026-05-06 22:40 — Unityless W2 production readiness 문서 패킷 작성
+### 2026-05-07 21:33 — 외주 encounter pack 원복 + BossGate runtime override 분리
 - **Phase**: W2-1
 - **Done**:
-  - `origin/Proto` 기준 커밋 `57077ee`를 `Juho/Codex`에 병합해 viewport screenshot / CombatGate layering fix 맥락 반영
-  - Unity 없이 기존 문서와 5개 screenshot만 기반으로 W2 production readiness 검토 범위 정리
-  - demo recording runbook, screenshot visual audit, debug label 제거 명세, 다음 개발 지시서 작성
-  - 아트/사운드/AI 상태표와 모델 수령 시 Unity 전 평가 packet 작성
-- **Files**: 변경/추가 8개 (`Docs/Outsource/Juho/W2ProductionReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+  - `21382b6`의 `Docs/ExternalSpecs/EncounterPipeline/v0.3/pack_FULL_25_V003.json` 변경이 외주 pack 보관본 수정이었음을 확인하고 원본 내용으로 되돌림
+  - 외부 `/Users/godju/Downloads/외주 폴더/pack_FULL_25_V003.json`도 repo 보관본과 일치하도록 복구
+  - baker가 외주 pack을 그대로 구운 뒤 Unity prototype runtime override로 `ENC_COMBAT_GATE_02` BossGate SO 값을 재적용하도록 분리
+  - EditMode regression으로 full pack bake 이후에도 `BOSS_GATE_01`이 유지되는지 검증 추가
+  - fresh EditMode 74/74, fresh PlayMode 12/12 통과
+- **Files**: 변경/추가 4개 + pack 원복 1개 (주요: `EncounterRuntimeCatalogBuilder.cs`, `EncounterPipelineV02Baker.cs`, `EncounterPipelineV02Tests.cs`)
 - **GDD impact**: 없음
-- **Next**: 큰 world/debug node label 숨김 구현 후 1080x1920 recording screenshot QA 진행
+- **Blockers**: 범위 밖 local 파일 `.obsidian/workspace.json`, `Assets/_Recovery/**`, `Mataios_LoRA_*.ipynb`는 커밋 제외
+- **Next**: origin/Proto push 후 Floor 2 content/boss pattern 확장
 - **Agent**: Codex
 
 ---
 
-### 2026-05-06 15:42 — W2 demo readiness docs 최신 전투 UI 기준 refresh
+### 2026-05-07 21:17 — Dedicated BossGate balance + clear/failure presentation 보강
 - **Phase**: W2-1
 - **Done**:
-  - `origin/Proto` 최신 `9300cc1`을 `Juho/Codex`에 병합해 interactive combat UI / Mataios portrait 구현 상태 확인
-  - W2 readiness audit에서 CombatGate, DemoComplete, Combat UI, Mataios portrait 상태를 ready-for-review로 갱신
-  - 전투 QA 스크립트를 manual Attack/Defend 중심 경로로 갱신하고 auto-resolve를 회귀 smoke 경로로 낮춤
-  - 마타이오스 art brief와 dev handoff에서 portrait wiring / combat button TODO를 QA·polish 항목으로 재분류
-- **Files**: 변경/추가 5개 (`Docs/Outsource/Juho/W2DemoReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+  - Floor 2 BossGate를 demo combat enemy가 아닌 전용 `BOSS_GATE_01` enemy/SO로 연결
+  - BossGate 밸런스를 HP 28 / ATK 4 / gold +16 / glitch -4 / affinity +4로 조정하고 catalog/baker source를 동기화
+  - run.clear / run.failed 상태에서 choice/node interaction과 combat/result overlay를 차단하고 HUD restart 상태를 명확화
+  - boss reward/clear reward 재방문 중복 방지, recall anchor 1회 fallback, restart reset 경로를 EditMode/PlayMode로 보강
+  - fresh EditMode 74/74, fresh PlayMode 12/12 통과
+- **Files**: 변경/추가 10개 (주요: `SO_Enemy_BOSS_GATE_01.asset`, `PrototypeRoomController.cs`, `PrototypeRoomSmokeTests.cs`)
+- **GDD impact**: 없음 (기존 P1 run end/boss gate 구현 보강; 신규 결정 없음)
+- **Blockers**: 범위 밖 local 파일 `.obsidian/workspace.json`, `Assets/_Recovery/**`, `Mataios_LoRA_*.ipynb`는 커밋 제외
+- **Next**: boss 패턴/skill 선택지 다양화와 Floor 2 node subset 확장
+- **Agent**: Codex
+
+---
+
+### 2026-05-07 20:57 — Run end/restart + Floor 2 boss gate 구현
+- **Phase**: W2-1
+- **Done**:
+  - GDD item combo / utterance memory 승인 변경을 문서-only 커밋으로 분리 보존
+  - Floor 2 마지막 combat step을 BossGate로 판정하고 victory 시 run.clear, defeat 시 run.failed 상태를 연결
+  - run.restartReady 및 HUD restart 버튼을 추가하고 deterministic restart runId 정책으로 새 run state를 생성
+  - ABILITY_RECALL_ANCHOR 1회 revive-like fallback을 defeat 처리 전에 적용해 run failure를 막고 중복 발동을 차단
+  - fresh EditMode 71/71, fresh PlayMode 10/10 통과
+- **Files**: 변경/추가 7개 (주요: `PrototypeRunState.cs`, `PrototypeRoomController.cs`, `RuntimeShellTests.cs`)
+- **GDD impact**: D-023 / D-024 승인 변경 반영 (`Docs/Project/hwiglija-tower-gdd.md` 문서-only 커밋 분리)
+- **Blockers**: 범위 밖 local 파일 `.obsidian/workspace.json`, `Assets/_Recovery/**`, `Mataios_LoRA_*.ipynb`는 커밋 제외
+- **Next**: Floor 2 boss/gate 전용 Enemy/SO 밸런스와 run clear/failure presentation polish
+- **Agent**: Codex
+
+---
+
+### 2026-05-07 15:58 — Playable core loop P0 구현
+- **Phase**: W2-1
+- **Done**:
+  - 기존 deterministic demo path 위에 floor progression을 추가해 Floor 1 clear → Stair unlock → Floor 2 진입 흐름 구현
+  - PrototypeRoom 초기 gold/shop inventory 구매 루프를 보장하고 item/ability 보유 수를 HUD에 표시
+  - ITEM_FIELD_BANDAGE combat_start HP 보정, ABILITY_SCOUT skill combo, ABILITY_RECALL_ANCHOR revive-like fallback 효과를 연결
+  - combat victory/defeat 보상, reward 중복 방지, NPC fallback reaction key 표시와 floor transition reflection 저장을 보강
+  - fresh EditMode 66/66, fresh PlayMode 9/9 통과
+- **Files**: 변경/추가 14개 (주요: `PrototypeRunState.cs`, `PrototypeHud.cs`, `SO_Room_Prototype.asset`, `RuntimeShellTests.cs`)
+- **GDD impact**: 없음 (P0 playable vertical slice 구현; 최종 NPC/서사/기억 본문 결정 없음)
+- **Blockers**: Floor 2 이후 boss/run clear 확장은 P1 범위. 범위 밖 local 파일 `.obsidian/workspace.json`, `Docs/Project/hwiglija-tower-gdd.md`, `Assets/_Recovery/**`, `Mataios_LoRA_*.ipynb`는 커밋 제외
+- **Next**: Floor 2/3 boss gate와 restart/failure screen을 P1로 연결
+- **Agent**: Codex
+
+---
+
+### 2026-05-07 14:38 — P0 presentation polish + demo art binding
+- **Phase**: W2-1
+- **Done**:
+  - recording mode 기본 라벨/route/result를 public display 중심으로 정리하고 raw stableId/textKey는 debug toggle로 제한
+  - active combat 중 DemoComplete route 표시를 막고 combat cutscene/button gating 및 combat HP/enemy visual을 보강
+  - 사용자가 배치한 Shop/Moral/Memory/Combat/DemoComplete 배경, Mataios bust, enemy/UI/VFX PNG를 LFS 대상 에셋으로 import/binding
+  - 1080x1920 screenshots 16-20 캡처 및 QA 문서 갱신
+  - fresh EditMode 62/62, fresh PlayMode 9/9 통과
+- **Files**: 변경/추가 45개 (주요: `PrototypeHud.cs`, `PrototypeCutscenePlayer.cs`, `SO_DemoPresentationData.asset`, `Assets/_Project/Art/**`, QA screenshots)
+- **GDD impact**: 없음 (기존 W2 presentation polish 범위; 최종 텍스트/서사 결정 없음)
+- **Blockers**: CombatGate/DemoComplete focus art는 recording-safe scaffold이며 최종 승인 plate는 별도 필요. 범위 밖 local 파일 `.obsidian/workspace.json`, `Docs/Project/hwiglija-tower-gdd.md`, `Assets/_Recovery/**`, `Mataios_LoRA_*.ipynb`는 커밋 제외
+- **Next**: final cutscene plates/button sprite styling 적용 또는 Android build smoke
+- **Agent**: Codex
+
+---
+
+### 2026-05-07 11:35 — Presentation/cutscene screenshot QA + overlay fixes
+- **Phase**: W2-1
+- **Done**:
+  - `Proto` push 후 `origin/Proto` HEAD `7092b17` 확인
+  - 1080x1920 presentation/cutscene screenshots 10-15 캡처 및 QA 문서 갱신
+  - DemoComplete cutscene early trigger, cutscene hide lifecycle, memory result raw flag leakage 수정
+  - fresh EditMode 62/62, fresh PlayMode 9/9 통과
+- **Files**: 변경/추가 10개 (주요: `PrototypeHud.cs`, `PrototypeCutscenePlayer.cs`, `PrototypeRoomSmokeTests.cs`, viewport QA 문서, screenshots 6개)
 - **GDD impact**: 없음
-- **Next**: portrait viewport screenshot QA와 Android build host blocker 해결
+- **Blockers**: forbidden search는 외주 test plan의 금지어 체크리스트와 기존 정책 문서만 hit. 범위 밖 local 파일 `.obsidian/workspace.json`, `Assets/_Recovery/**`, `Mataios_LoRA_*.ipynb`는 커밋 제외
+- **Next**: asset slots에 실제 background/enemy/memory sprite 연결 또는 cropped transparent Mataios portrait 교체
 - **Agent**: Codex
 
----
-
-### 2026-05-06 15:00 — W2 demo readiness audit and handoff packet 작성
+### 2026-05-07 09:42 — Presentation screen layer 구현 + 외주 specs cherry-pick
 - **Phase**: W2-1
 - **Done**:
-  - 외주 요청 v3 기준 필수 문서/GDD/디자인/AI 모델/데모 QA 맥락 검토
-  - W2 데모 준비 상태 audit, 전투 QA 스크립트, 마타이오스 일러스트 적용 기준 작성
-  - AI 모델 수령 acceptance checklist, 작가 결정 packet, 개발 handoff TODO 작성
-  - 받은 `마타이오스 전신.png`를 확인하고 S0-S2 portrait 후보 기준 정리
-- **Files**: 변경/추가 7개 (`Docs/Outsource/Juho/W2DemoReadiness/**`, `Docs/Project/hwiglija-tower-progress.md`)
+  - PrototypeHud 기본 표시를 demo presentation 중심으로 정리하고 raw stableId/textKey는 dev toggle에서만 보이게 분리
+  - DemoPresentationData SO, CutsceneData SO, PrototypeCutscenePlayer scaffold 및 PrototypeRoom binding 추가
+  - CombatGate panel을 HP bar 중심 presentation text로 정리하고 combat feedback/cutscene route 회귀 테스트 추가
+  - fresh EditMode 62/62, fresh PlayMode 9/9 통과 후 구현 커밋 `2c42a1f` 생성
+  - 브랜치 merge 없이 외주 docs 커밋 `10967ad`만 cherry-pick하여 `7092b17`로 반영
+- **Files**: 변경/추가 30개 (구현 23개 + 외주 docs 7개; 주요: Assets/_Project/Scripts/UI/**, Assets/_Project/Data/Presentation/**, Docs/Outsource/Juho/W2ProductionReadiness/**)
+- **GDD impact**: 없음 (P3/P4/P5 정합; 최종 텍스트/서사 결정 없음)
+- **Blockers**: forbidden search는 외주 test plan의 금지어 체크리스트와 기존 정책 문서 문구만 hit. 범위 밖 local 파일: .obsidian/workspace.json, Assets/_Recovery/**, Mataios_LoRA_Training.ipynb, Mataios_LoRA_v2.ipynb, Mataios_LoRA_v3.ipynb
+- **Next**: 1080x1920 Game view screenshot QA로 presentation/cutscene overlay 확인 후 asset slots에 실제 background/enemy/memory sprites 연결
+- **Agent**: Codex
+
+### 2026-05-06 23:06 — Unityless readiness docs 반영 + PrototypeRoom debug label 숨김
+- **Phase**: W2-1
+- **Done**:
+  - 외주 문서 커밋 `3e10a69`를 `Proto`에 cherry-pick하여 `46b28fa`로 반영
+  - `PrototypeRoom` world/debug node label을 녹화 기본값에서 숨기고 개발용 toggle로 복구 가능하게 구현
+  - PlayMode smoke에 기본 label hidden 및 toggle restore 검증 추가
+  - 1080x1920 screenshot 4장(06-09)으로 Shop/Memory/Combat/DemoComplete label hidden QA 확인
+  - fresh EditMode 60/60, fresh PlayMode 7/7 통과
+- **Files**: 변경/추가 16개 (주요: `PrototypeRoomController.cs`, `PrototypeSceneRuntimeBuilder.cs`, `PrototypeRoomSmokeTests.cs`, `Docs/Outsource/Juho/W2ProductionReadiness/**`, `Docs/Outsource/Juho/W2DemoReadiness/**`)
 - **GDD impact**: 없음
-- **Next**: 전투 데모 경로를 auto-resolve로 고정할지, Attack/Defend/Skill 수동 UI를 먼저 붙일지 결정 후 P0 개발 진행
+- **Blockers**: 범위 밖 local 파일 존재: `.obsidian/workspace.json`, `Assets/_Recovery/**`, `Mataios_LoRA_Training.ipynb`는 커밋 제외
+- **Next**: result/memory placeholder text density 정리 또는 Android build smoke
 - **Agent**: Codex
 
----
-
-### 2026-05-05 18:45 — GDD v0.3.0 업데이트 및 전투 수직 슬라이스 구현
+### 2026-05-06 22:08 — PrototypeRoom 1080x1920 screenshot QA 보존 + CombatGate UI layering 수정
 - **Phase**: W2-1
 - **Done**:
-  - GDD v0.3.0 승격: 3택 턴제 전투(D-022), 특성 시스템(D-009), 밸런스 시트, 12능력·4시너지·7적 상세 명세 반영
-  - `CombatController`: Attack/Prepare 액션 및 데미지 경감 로직 구현
-  - `PrototypeRunState`: 인터랙티브 전투 모드(`ResolveCombatRoundInteractive`) 및 `AutoResolveCombat` 테스트 플래그 추가
-  - `PrototypeRunSnapshot`: UI용 실시간 전투 상태(Player/Enemy HP, InCombat 여부) 필드 확장
-  - OQ-004 해결: 8일 데모용 Deterministic Fake/Cache 모델 인테이크 전략 확정
-  - `Juho/Codex` 신규 문서(리뷰 스크립트, 메모리 스펙 등) 통합
-- **Files**: 변경/추가 8개 (주요: `hwiglija-tower-gdd.md`, `CombatController.cs`, `PrototypeRunState.cs`, `PrototypeRunSnapshot.cs`, `DECISION_LOG_20260505.md`)
-- **GDD impact**: v0.3.0 MAJOR 수준의 시스템 구체화, D-022 추가, D-009 갱신, OQ-011~014 등록, OQ-004 close
-- **Next**: `CombatGate` UI에 공격/준비 버튼 연결 및 `ABILITY_SWORD_01` 등 실제 능력 수치 바인딩 시작
+  - 실제 Game view 1080x1920 screenshot 5장 기록 및 QA 문서 갱신
+  - QA 산출물 보존 커밋 `dac6ffb Add PrototypeRoom viewport screenshots` 생성
+  - CombatGate active combat 중 `demo.complete` overlay/result text 숨김 처리
+  - 전투 종료 후 combat panel을 닫고 DemoComplete를 표시하도록 HUD/PlayMode smoke expectation 갱신
+  - fresh EditMode 60/60, fresh PlayMode 6/6 통과
+- **Files**: 변경/추가 8개 (주요: `PrototypeHud.cs`, `PrototypeRoomSmokeTests.cs`, `Docs/Outsource/Juho/W2DemoReadiness/**`)
+- **GDD impact**: 없음
+- **Blockers**: 범위 밖 local 파일 존재: `.obsidian/workspace.json`, `Assets/_Recovery/**`, `Mataios_LoRA_Training.ipynb`는 커밋 제외
+- **Next**: debug node label 축소/숨김과 Android build smoke 준비
 - **Agent**: Codex
 
----
+### 2026-05-06 16:23 — PrototypeRoom portrait/combat viewport QA 기록
+- **Phase**: W2-1
+- **Done**:
+  - 기준 HEAD `2912ea0`에서 `PrototypeRoom` portrait + interactive combat UI QA 수행
+  - `.obsidian/workspace.json` 범위 밖 변경 복원 후 QA 문서만 추가
+  - fresh EditMode 60/60, fresh PlayMode 6/6 결과를 QA 문서에 기록
+  - viewport size, scene, commit, pass/fail table, overlap risk, required fixes 정리
+- **Files**: 변경/추가 1개 (`Docs/Outsource/Juho/W2DemoReadiness/viewport_qa_result_v0.1.md`)
+- **GDD impact**: 없음
+- **Blockers**: 자동 screenshot hook 없음. 이번 산출물은 screenshot 없는 QA 기록이며, memory panel/portrait 근접은 human screenshot pass 권장으로 남김
+- **Next**: 실제 Game view 1080x1920 screenshot capture 자동화 또는 수동 캡처 후 memory/combat panel 간격 최종 polish
+- **Agent**: Codex
+
+### 2026-05-06 14:53 — Mataios portrait + interactive demo combat UI 연결
+- **Phase**: W2-1
+- **Done**:
+  - `PrototypeRoom` 씬 HUD에 마타이오스 전신 portrait sprite reference와 1080x1920 CanvasScaler 기준 적용
+  - CombatGate 선택 후 실제 demo scene path에서는 AutoResolve 대신 interactive combat panel 표시
+  - Attack/Defend 버튼을 `ResolveCombatRoundInteractive` 경로에 연결하고 Skill은 resolver 전까지 disabled 처리
+  - 전투 중/종료 HUD에 player HP, enemy HP/id, round, last result, victory/defeat, post-combat reward deltas, demo.complete 표시
+  - PlayMode smoke 확장: portrait load, combat panel, attack damage, defend round, combat 종료 후 DemoComplete 확인
+- **Files**: 변경/추가 9개 (주요: `PrototypeHud.cs`, `PrototypeRunState.cs`, `PrototypeRoom.unity`)
+- **GDD impact**: 없음 (기존 W2-1 demo 연결; 새 결정 없음)
+- **Blockers**: 없음. 금지어 검색은 `Docs/Project` 기존 정책/진행 문서의 문구만 히트. `.obsidian/workspace.json` 외부 변경은 커밋 제외.
+- **Validation**: `git diff --check` 통과, fresh EditMode 60/60, fresh PlayMode 6/6
+- **Next**: Skill placeholder를 실제 ability resolver/selection UI로 승격하고 enemy reward fields와 post-combat effects 중복 정책 확정
+- **Agent**: Codex
+
+### 2026-05-06 14:08 — 전투 루프 W2-1 데이터/테스트 보강
+- **Phase**: W2-1
+- **Done**:
+  - `ItemData`/전투 modifier/round result/enemy reward 필드와 콤보 공격 경로를 구현 명세서 기준으로 보강
+  - EnemyPattern 3종, 신규 Enemy 7종, Normal Item 12종, Relic Item 6종 SO placeholder 자산 추가
+  - PrototypeRoom demo combat handoff가 기존 smoke 기대대로 자동 완료되도록 run bootstrap 보정
+  - EditMode 회귀 테스트 추가: combo damage, item passive modifier 집계, 필수 SO 파일 존재 확인
+  - fresh EditMode 60/60, fresh PlayMode 5/5 통과 확인
+- **Files**: 변경/추가 68개 (주요: `Assets/_Project/Scripts/**`, `Assets/_Project/Data/Enemies/**`, `Assets/_Project/Data/Items/**`)
+- **GDD impact**: 없음 (기존 W2-1 전투 루프 명세 구현; 새 결정 없음)
+- **Blockers**: 금지어 검색은 새 코드가 아니라 `Docs/Project` 정책/진행 문서의 기존 문구만 히트
+- **Next**: 전투 보상 적용/아이템 패시브 실제 발동 resolver를 demo encounter reward flow에 연결
+- **Agent**: Codex
+
+### 2026-05-05 22:00 — 전투 루프 C# 구현 전체 완료 확인 (Task 1~5 기구현 검증)
+- **Phase**: W2-1
+- **Done**:
+  - Task 1~5 코드 실제 파일 직접 확인 → 이전 세션에서 이미 전부 구현 완료 상태임을 검증
+    - `ItemData.cs` — `ItemTier` enum, `tier`, `passiveTrigger`, `numericParams` 존재 확인
+    - `CombatAbilityModifiers.cs` — 7개 modifier 필드 + `From()` items 파라미터 존재 확인
+    - `CombatRoundResult.cs` — `ComboDamage` 필드 존재 확인
+    - `CombatController.cs` — `secondAction` 파라미터 + ATK×0.7 콤보 처리 존재 확인
+    - `EnemyData.cs` — `goldReward` / `xpReward` / `glitchDelta` / `affinityDelta` 존재 확인
+  - `EnemyPatternData.cs` 구조 확인 — id / situationText / choiceA / choiceB (damageMultiplier, directDamage)
+  - Data 디렉토리 구조 확인 — EnemyPatterns/ Items/ Enemies/ 등 폴더 이미 존재
+- **Files**: 프로젝트 파일 변경 없음 (읽기 전용 검증)
+- **GDD impact**: 없음
+- **Next**: SO 자산 생성 (Task 6) — EnemyPattern 3종, 적 신규 7종, 아이템 18종. 단, 작가 확인 필요 (수치·텍스트는 작가 권한).
+- **Agent**: OpenCode (Claude)
+
+### 2026-05-05 21:00 — 전투 루프 완성 구현 명세서 작성 + 전체 잔여 작업 목록 정리
+- **Phase**: W2-1
+- **Done**:
+  - 현재 코드베이스 전체 파악 — `.cs` 스크립트 80개, SO 자산 전체 목록 확인 및 GDD 명세 대비 갭 분석
+  - 구현 명세서 작성 (Codex 전달용): Task 1~7 포함
+    - Task 1: `ItemData.cs` 확장 — `ItemTier` enum + `tier` / `passiveTrigger` / `numericParams` 필드
+    - Task 2: `CombatAbilityModifiers.cs` 확장 — 아이템 패시브 수치 통합 (7개 modifier 필드)
+    - Task 3: `CombatRoundResult.cs` 확장 — `ComboDamage` 필드 추가
+    - Task 4: `CombatController.cs` 확장 — `secondAction` 복합행동 파라미터 (D-023 TRAIT_OFFENSE_04)
+    - Task 5: `EnemyData.cs` 확장 — `goldReward` / `xpReward` / `glitchDelta` / `affinityDelta` 보상 필드
+    - Task 6: SO 자산 생성 명세 — EnemyPattern 3종 / 적 신규 7종 / 아이템 18종 (YAML 포맷 + GUID 포함)
+    - Task 7: 컴파일 확인 체크리스트
+  - 마감(05-18)까지 전체 잔여 작업 목록 정리 (W2-1 ~ W3-2, 블로커 포함)
+- **Files**: 프로젝트 파일 변경 없음 (명세서는 채팅 출력, 파일 저장 없음)
+- **GDD impact**: 없음
+- **Blockers**:
+  - OQ-004 (on-device LLM 수용성) — 결정 전까지 NPC LLM 연결 전체 보류
+  - OQ-006 (메모리 파편 작가 퇴고) — W2-2 bake 전 완료 필요
+- **Next**: Codex에 구현 명세서 전달 → 전투 루프 구현 진행. 병행으로 OQ-004 / OQ-006 작가 결정.
+- **Agent**: OpenCode (Claude)
+
+### 2026-05-05 18:30 — OQ-002/003/006/010 처리, D-024 신규, GDD v0.6.1
+- **Phase**: W2-1
+- **Done**:
+  - OQ-002 close: 마타이오스 외형 = 10대 여성, 일러스트 보유 (외주 동생). §5.1 갱신.
+  - OQ-003 close: 엔딩 = 단순 컷씬 2종(안식/동행). 후속 메타 영향은 미래 고려.
+  - OQ-006 임시: 메모리 파편 5개 구조 확정(오브젝트+서사 텍스트, S2~S4 순차). `design/memory-fragments.md` 임시 초안 작성. 작가 퇴고 예정.
+  - OQ-010 close: `design/sound-brief.md` 작성 — BGM 8종·전투 SFX 14종·UI SFX 10종·NPC SFX 4종·환경음 4종 리스트업. 우선순위 분류 포함.
+  - D-024 신규 잠금: 플레이어 발화 기억 시스템 (휴식/이벤트 텍스트 필드 → SQLite 저장 → LLM 프롬프트 주입 → S2~S4 단계별 인용 방식).
+  - GDD §8.4 SQLite 스키마 `player_utterances` 테이블 추가.
+  - GDD v0.6.0 → v0.6.1 bump.
+- **Files**: 변경 1개 (`hwiglija-tower-gdd.md` v0.6.1), 추가 2개 (`design/memory-fragments.md`, `design/sound-brief.md`)
+- **GDD impact**: D-024 신규 / OQ-002·003·010 close / OQ-006 임시
+- **Next**: OQ-004 (on-device LLM 수용성 결정) 최우선. 네이티브 플러그인 빌드 or 클라우드 fallback 전환 결정 후 W2-1 LLM 통합 구현 진행.
+- **Agent**: OpenCode (Claude)
+
+### 2026-05-05 17:00 — OQ-015/016 확정, GDD v0.6.0 갱신, design/items.md 작성
+- **Phase**: W2-1
+- **Done**:
+  - OQ-015 확정: 복합 행동(TRAIT_OFFENSE_04) = 1번 선택→처리→2번 선택, 2번째=추가공격(ATK×0.7) 또는 아이템 사용만 허용, 방어/스킬 불가. D-023 신규 잠금.
+  - OQ-016 확정: 아이템 시스템 = 유물 6개 + 일반 아이템 12개, 전부 패시브 보유, 소모품 없음. 유물/일반 tier 이분화(시스템 코드 동일).
+  - GDD v0.5.0 → v0.6.0 bump. D-023 신규, D-009 수량 갱신(유물 6/일반 아이템 12 추가), §7.7 신규 섹션, OQ-015/016 closed.
+  - `design/items.md` 신규 작성 — 유물 6 + 일반 12 전체 NumericParam 키 명세(🟡 임시).
+- **Files**: 변경 1개 (`hwiglija-tower-gdd.md` v0.6.0), 추가 1개 (`design/items.md`)
+- **GDD impact**: D-023 신규 / OQ-015·016 close / D-009 갱신
+- **Next**: 남은 open OQ — OQ-002(NPC 외형), OQ-003(엔딩 메커니즘), OQ-006(메모리 파편 텍스트). 또는 Codex에 `ItemData.cs` + `design/items.md` 기반 구현 의뢰 가능.
+- **Agent**: OpenCode (Claude)
+
+### 2026-05-05 — GDD v0.5.0 기반 코드 구조 갱신
+- **Phase**: W2-1
+- **Done**:
+  - `CombatAction` enum: `Prepare` → `Defend` + `Skill` 추가 (per GDD D-022)
+  - `CombatController.ResolveRound`: Attack/Skill = 공격, Defend = 피해 절반
+  - `AbilityData`: `costGold` 필드 추가, 기본값 20 (per OQ-013)
+  - `EnemyPatternData.cs` 신규 — 상황 텍스트 + 2택(EnemyChoice) 구조 (per D-022/OQ-014)
+  - `EnemyData`: `EnemyPatternData pattern` 직접 참조 필드 추가
+  - `TraitData.cs` 신규 — 태그/UnlockWinCount/NumericParams (per OQ-011)
+  - `NodeKind` enum: `Encounter`/`Boss` 추가, `Shop`=상인(보스 직전 고정) 주석 (per OQ-012)
+  - `GameFlowEventType`: `CombatRoundResolved`/`TraitUnlocked`/`ShopRerolled`/`PlayerDefeated`/`EnemyDefeated` 추가
+- **Files**: 변경 5개, 추가 2개 (`EnemyPatternData.cs`, `TraitData.cs`)
+- **GDD impact**: 없음 (코드가 GDD에 수렴)
+- **Next**: `CombatRoundResult`에 `SkillTriggered` 플래그 추가 검토. 상점/맵 시스템 ScriptableObject 구조 구현
+- **Agent**: OpenCode (Claude)
+
+### 2026-05-05 — OQ-012/013/014 확정, GDD v0.5.0 갱신
+- **Phase**: W2-1
+- **Done**:
+  - OQ-012 확정: 슬더스식 3경로 / 선택지 팝업(맵 화면 없음) / 시드 랜덤 / 상인→보스 고정. GDD §7.0 신규 섹션 추가, `design/balance.md` 노드맵 섹션 추가
+  - OQ-013 확정: 상점 3개/런, 기본 20G·3번째 30G, 리롤 10G→+5G 누적. `design/balance.md` 상점 섹션 추가, `design/abilities.md` cost_gold 임시→확정
+  - OQ-014 확정: 적 턴 = 상황 텍스트 1개 + 2택 1, 몬스터별 고유 기믹(피어&헝거·서울2033 참조). `design/balance.md` 적 턴 패턴 섹션 추가
+  - D-022 잠긴 결정 갱신: 적 턴 3택→2택 (작가 확인 후 진행)
+  - GDD v0.4.1→v0.5.0 bump
+- **Files**: 변경 3개 (`hwiglija-tower-gdd.md` v0.5.0, `design/balance.md`, `design/abilities.md`)
+- **GDD impact**: D-022 갱신 / OQ-012·013·014 close
+- **Next**: OQ-015(복합 행동 전투 구조) → OQ-016(유물 목록) 순서로 진행. 또는 Codex에 현재 design/ 문서 기반 코드 구현 의뢰 가능
+- **Agent**: OpenCode (Claude)
+
+### 2026-05-05 — OQ-011 특성 12종 확정 및 design/traits.md 작성
+- **Phase**: W2-1
+- **Done**:
+  - OQ-011 작가와 질의응답으로 특성 시스템 전체 결정: 메타 영구 해금 / 생존·공격·지원 3태그×4개=12종 / 승리 횟수 3단계(3·6·10회)
+  - `design/traits.md` 작성 — 12종 NumericParam 키/값 전체 명세, 🟡(임시) 키 분리
+  - GDD v0.4.0 갱신: frontmatter 버전·날짜, CHANGELOG, D-009 수량(특성 12 확정), OQ-011 close, OQ-015/016 신규 등록, §7.1 특성 섹션 전면 교체
+  - 신규 OQ 2건 발굴: OQ-015(복합 행동 전투 구조 확장), OQ-016(유물 아이템 목록)
+- **Files**: 추가 1개 (`design/traits.md`), 변경 1개 (`hwiglija-tower-gdd.md` v0.4.0)
+- **GDD impact**: D-009 갱신 / OQ-011 close / OQ-015·016 신규
+- **Next**: OQ-012(노드 맵), OQ-013(상점 Pool), OQ-014(적 턴 선택지) 순서로 작가 결정 진행
+- **Agent**: OpenCode (Claude)
+
+### 2026-05-05 — design/ 구현 참조 문서 3종 작성 (Codex 코드 구조 연동 준비)
+- **Phase**: W2-1
+- **Done**:
+  - `design/abilities.md` — 능력 12종 NumericParam 키/값 전체 명세. ✅ 확정 키(`player.attack_bonus`, `player.max_hp_bonus`)와 🟡 (임시) 키 명확히 분리
+  - `design/synergies.md` — 시너지 4종 NumericParam 키/값 + 심화 로직 조건(Glitch/Affinity/방어 횟수/HP 비율) 명세
+  - `design/balance.md` — 플레이어 기초 스탯, 적 7종 수치 테이블, Gold 경제 역산 검증, 기존 SO 자산 3종 GDD ID 매핑 현황
+  - 신규 키 전부 🟡 (임시) 표기 — Codex가 조건부 전투 시스템 구현 시 키 네이밍 확정 후 갱신하도록 명시
+- **Files**: 추가 3개 (`design/abilities.md`, `design/synergies.md`, `design/balance.md`)
+- **GDD impact**: 없음 (SSOT는 GDD 0.3.0 이미 반영 완료)
+- **Next**: OQ-011 특성 8~12종 상세 설계 (작가 결정 필요) → 확정 후 `design/traits.md` 추가. OQ-014 적 턴 선택지 확정 후 `balance.md` patternId 갱신
+- **Agent**: OpenCode (Claude)
 
 ### 2026-05-05 01:12 — external AI model intake 폴더/manifest 보강
 - **Phase**: W2-1

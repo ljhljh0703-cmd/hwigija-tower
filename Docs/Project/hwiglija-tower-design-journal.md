@@ -49,6 +49,151 @@ project: 회귀자는 탑을 오른다
 
 ## 사고 로그 (최신이 위)
 
+### 2026-05-24 — Combat Core Rebuild는 D-032 위의 상위 전투 결정
+
+**맥락**: D-032로 마타이오스 actor baseline은 잠겼지만, 현재 전투의 더 큰 문제는 Attack spam damage race다. 마타이오스를 추가해도 enemy intent와 counterplay가 없으면 Defend/Skill 선택 이유와 긴장감은 회복되지 않는다.
+
+**옵션들**:
+- A) D-032를 계속 확장해 enemy intent, feedback, balance까지 모두 넣음 → 기각. D-032의 책임이 actor baseline에서 전투 코어 전체로 비대해진다.
+- B) D-033으로 Combat Core Rebuild를 별도 잠금 → 채택. D-032는 2인 actor 기준선으로 유지하고, D-033은 intent/counterplay/feedback/balance batch를 관리한다.
+- C) 전투 수치만 올려 Attack spam을 막음 → 기각. damage race가 더 아프기만 해지고 Defend/Skill의 의미가 생기지 않는다.
+- D) 다중 적을 바로 넣음 → 기각. 모바일 5-7분 런과 1차 구현 범위를 동시에 흔든다.
+
+**선택**: B. D-033은 visible enemy intent, action counterplay, Mataios strategic support, SFX/VFX/log feedback, AI QA metric을 상위 전투 코어로 잠근다. Enemy별 exact intent deck과 payload 수치는 OQ-025로 분리한다.
+
+**Pillar 점검**: P1은 down/collapse pressure를 전투 scaling이 아닌 런 압박으로 유지해 정렬. P3는 적 1체와 compact log로 정렬. P4는 deterministic intent pattern으로 정렬. P5는 intent와 feedback이 선택 결과를 즉시 보여주므로 정렬.
+
+**Ambiguity 점수**: 0.18. 전투 코어 방향과 배치 순서는 잠글 수 있으나 enemy별 deck 숫자는 OQ-025가 필요하다.
+
+**기각된 매력**: C는 가장 빠르고 D는 전투 다양성이 크게 늘어난다. 하지만 둘 다 현재 문제의 원인인 "읽고 대응할 정보 부족"을 직접 고치지 못하거나 범위를 과도하게 키운다.
+
+**재검토 조건**: Batch 2 이후에도 Defend/Skill 사용률이 낮거나 Attack spam win rate가 높게 유지될 때.
+
+**연결**: D-033 / OQ-025 / `design/combat-core-rebuild-spec.md`
+
+---
+
+### 2026-05-24 — 2인 파티 전투는 actor화하되 자동 최적화는 제한
+
+**맥락**: 현재 전투는 플레이어만 싸우고 마타이오스는 UI/서사에 머무는 느낌이 강하다. 다음 Stage에서 동행자 정체성을 전투 구조에 넣되, D-029 이후 붕괴도/관계 상태를 전투 수치 modifier로 되돌리면 안 된다.
+
+**옵션들**:
+- A) 마타이오스를 직접 조작 가능한 2번째 캐릭터로 추가 → 기각. 입력 밀도가 늘어 5-7분 모바일 전투가 무거워지고, 플레이어 빌드 선택 표면이 흐려진다.
+- B) 마타이오스를 deterministic automatic actor로 추가 → 채택. 파티감을 만들면서 조작 부담과 비결정성을 억제할 수 있다.
+- C) 실시간 RL/학습 policy를 본편 runtime에 넣음 → 기각. P4 결정성, 구현 리스크, 본편 범위를 모두 흔든다.
+- D) 마타이오스를 계속 UI 보조 연출로만 둠 → 기각. 프로젝트 차별점인 동행자가 전투 경험에서 사라진다.
+
+**선택**: B. `Player + Mataios vs Enemy` 2인 파티 전투를 D-032로 잠그고, 마타이오스는 자동 행동 actor가 된다. Down은 전투 패배가 아니라 붕괴 이벤트/회복 압박으로 연결한다. 숫자와 down 표시 방식, `광폭` chain scope는 OQ-021~024로 분리한다.
+
+**Pillar 점검**: P1은 down/collapse/recovery 압박으로 정렬. P3는 적 1체와 자동 동료로 입력 밀도를 제한해 정렬. P4는 deterministic policy와 fixed turn order로 정렬. P5는 마타이오스 행동/down/collapse를 즉시 로그/UI에 보여야 정렬.
+
+**Ambiguity 점수**: 0.2. 구조는 잠글 수 있으나 exact HP/action power/down penalty/policy threshold는 PM 결정이 필요하다.
+
+**기각된 매력**: A는 파티 RPG 감각이 강하고 C는 포트폴리오 기술 어필이 크다. 다만 이번 본편 전투 Stage에서는 둘 다 플레이어 선택 표면과 결정성을 해친다.
+
+**재검토 조건**: 2인 파티 1차 구현 후 마타이오스가 전투를 자동 해결하거나, 반대로 존재감이 로그에만 머무를 때.
+
+**연결**: D-032 / OQ-021 / OQ-022 / OQ-023 / OQ-024 / `design/two-actor-party-combat-lock-spec.md`
+
+**2026-05-24 PM 보정**:
+- OQ-021/OQ-024는 1차 구현값으로 닫는다. 이 값들은 최종 밸런스 잠금이 아니라 구현 unblock용 기준값이다.
+- OQ-022는 temporary implementation contract로만 partial-close한다. 붕괴도 +5, 전투당 1회, non-blocking log/overlay는 플레이 후 교체 가능해야 하며 hard-coded modal/수치가 되면 안 된다.
+- OQ-023은 defer한다. 1차 구현은 기존 `광폭/FRENZY` Player action chain을 유지하고, Mataios action은 chain 유지/강화/파괴에 관여하지 않는다.
+
+---
+
+### 2026-05-22 — OQ-020 숫자는 첫 플레이테스트 기준값
+
+**맥락**: D-031 effect contract가 닫힌 뒤 첫 Build Surface 개발 brief가 숫자 입력만 기다리고 있었다. PM이 `SWORD_03`, `광폭`, `반사`의 첫 numeric baseline을 제공했다.
+
+**옵션들**:
+- A) 숫자를 최종 밸런스 잠금으로 기록 → 기각. 현재는 playable surface를 런에 올리는 단계다.
+- B) 숫자를 OQ-020 1차 플레이테스트 기준값으로 기록 → 채택. 구현을 unblock하되 Balance Pass 재조정 여지를 남긴다.
+- C) 숫자 기록을 개발 세션에만 넘김 → 기각. SSOT와 handoff brief가 다시 어긋난다.
+
+**선택**: B. `SWORD_03` HP 3/+5, `광폭` ATK×0.5→직전 Attack 시 ×0.75, `반사` 받은 피해 50% 반사+다음 Attack 1회 ×1.5로 기준값을 넣는다.
+
+**Pillar 점검**: P3는 짧게 읽히는 수치 규칙. P4는 chain/break/1회 소비를 결정적으로 적용 가능. P5는 해당 공격 또는 다음 공격에서 즉시 체감.
+
+**Ambiguity 점수**: 0.1. 기준값은 구현 가능하고 최종 밸런스 검증은 후속 Balance Pass다.
+
+**기각된 매력**: A는 결정이 단단해 보인다. 다만 아직 build surface가 런에서 비교되지 않았다.
+
+**재검토 조건**: 첫 Build Surface 플레이테스트에서 검 연쇄 auto-pick, HP-cost dead pick, 결 반격 과보상/저보상이 드러날 때.
+
+**연결**: D-031 / OQ-020 close
+
+---
+
+### 2026-05-22 — OQ-018 계약 close와 첫 Build Surface 배치 경계
+
+**맥락**: PM이 `SWORD_03`, `광폭`, `반사`의 효과 계약을 승인했다. 첫 개발 배치가 즉시 시작될 수 있도록 계약은 닫아야 하지만, 지시에는 실제 numeric baseline 숫자가 없었다.
+
+**옵션들**:
+- A) 계약 close와 동시에 개발 세션이 숫자를 채우게 둠 → 기각. "최종 밸런스 아님"과 "임의 수치 확정 금지"를 혼동해 값이 drift할 수 있다.
+- B) 계약은 D-031로 잠그고, 숫자 입력은 플레이테스트 기준값 OQ-020으로 분리 → 채택. 개발 brief는 구현 범위와 미결정을 동시에 고정한다.
+- C) OQ-018을 계속 open으로 남김 → 기각. 효과 계약이 승인된 사실이 구현 handoff에 약하게 남는다.
+
+**선택**: B. OQ-018은 close하고 첫 배치 brief는 dead pick 차단, controlled item pool, 검 x3 surface, `ARTS_03` skill 축을 필수로 고정한다. `ITEM_07`, `반사` runtime, full quantity exposure, 밸런스 튜닝은 보류한다.
+
+**Pillar 점검**: P3는 첫 배치 선택 표면을 좁혀 정렬. P4는 계약과 수치 입력을 분리해 결정적 구현 경계가 선명. P5는 노출되는 pick이 실제 효과로 닿아야 한다는 dead-pick guard로 정렬.
+
+**Ambiguity 점수**: 0.15. 첫 배치 범위는 잠글 수 있고 남은 numeric 입력은 명시 OQ다.
+
+**기각된 매력**: A는 개발 속도가 가장 빠르다. 다만 플레이테스트 숫자가 설계 승인 없이 코드에 사실상 잠길 위험이 있다.
+
+**재검토 조건**: PM이 OQ-020 숫자를 승인하거나, 개발 세션이 구현상 숫자 입력 전에 별도 data placeholder 전략을 제시할 때.
+
+**연결**: D-031 / OQ-018 close / OQ-020 / `design/first-build-surface-development-brief.md`
+
+---
+
+### 2026-05-22 — OQ-017은 축을 잠그고 수치와 패턴 계약을 분리
+
+**맥락**: D-029로 관계 상태 전투 modifier를 걷어낸 뒤 `SWORD_03`, `광폭`, `반사`, `ITEM_07`이 빈 슬롯이 되었다. Build Surface Lock 전에 이 슬롯들을 비워 두면 구현 세션이 다시 flat stat이나 관계 전투 축으로 후퇴할 위험이 있었다.
+
+**옵션들**:
+- A) 네 슬롯의 exact 효과와 수치를 한 번에 확정 → 기각. `ITEM_07`은 적 패턴 결과 공통 계약이 없고, 나머지도 resolver 범위 확인 전 수치가 먼저 굳는다.
+- B) 빌드 축만 잠그고 수치 계약(OQ-018)과 `ITEM_07` 패턴 결과 계약(OQ-019)을 분리 → 채택. 구현 handoff가 dead pick을 피하면서도 방향 drift를 막는다.
+- C) OQ-017을 계속 open으로 두고 Build Surface Lock 뒤로 미룸 → 기각. 검/결의 역할 표면이 흐린 채 spec이 나가게 된다.
+
+**선택**: B. `SWORD_03`은 HP 리스크 강공, `광폭`은 공격 연쇄 유지, `반사`는 방어 결과의 짧은 반격 기회, `ITEM_07`은 패턴 대응 보조 축으로 잠근다. exact 수치와 `ITEM_07` 공통 패턴 계약은 별도 OQ로 남긴다.
+
+**Pillar 점검**: P1은 관계 붕괴 축과 전투 리스크 축을 분리해 정렬. P3는 검/결/패턴 대응의 선택 이유를 짧게 읽게 해 정렬. P4는 계약이 없는 효과를 수치로 먼저 잠그지 않아 정렬. P5는 노출되는 빌드가 실제 전투 결과로 닿아야 한다는 spec exit criteria로 정렬.
+
+**Ambiguity 점수**: 0.25. 축은 잠겼지만 OQ-018/OQ-019가 닫히기 전 deep logic 구현 범위는 미확정.
+
+**기각된 매력**: A는 빠르다. 다만 수치와 resolver 계약이 잘못 잠기면 Balance Pass 전에 다시 설계를 뜯는다.
+
+**재검토 조건**: 1차 playable build pool이 공격/방어/skill/synergy 축을 실제로 비교 가능하게 만든 뒤, OQ-018 효과 계약이 그 표면에서 겹치거나 dead pick을 만들 때.
+
+**연결**: D-030 / OQ-017 close / OQ-018 / OQ-019
+
+---
+
+### 2026-05-22 — 붕괴도는 관계 압박으로 남기고 전투 빌드 축에서 분리
+
+**맥락**: Playable Build Surface audit에서 능력·아이템·유물·시너지 표면 자체가 아직 런타임에 충분히 닿지 않는 상태가 드러났다. 그 와중에 기존 Glitch 전투 효과가 타이머·공격력·시너지 배율까지 물고 있어, 플레이어가 관계 상태와 전투 빌드 평가를 동시에 해석해야 하는 문제가 생겼다.
+
+**옵션들**:
+- A) 기존 Glitch 전투 압박/파워 축 유지 → 기각. 관계 붕괴가 공격력 최적화와 섞여 P3의 짧은 런 판독성을 해치고, 빌드 재미의 주 표면을 흐린다.
+- B) Glitch를 **붕괴도**로 치환해 호감도·회복·관계 붕괴 축에 남기고 전투 modifier에서는 분리 → 채택. 전투 재미는 능력·아이템·유물·시너지와 적 패턴 대응에서 만든다.
+- C) 붕괴 상태를 시스템에서 제거하고 서사 표현만 남김 → 기각. P1의 회복→붕괴→망각 악장과 플레이어가 회복할 수 있는 관계 압박을 약화한다.
+
+**선택**: B. D-022의 붕괴 연동 타이머 축소를 철회하고 D-025의 정서 modifier 원리를 재고한다. 기존 `ABILITY_SWORD_03`, `ITEM_07`, `광폭`, `반사` 심화 로직은 대체 효과를 임의 확정하지 않고 OQ-017로 넘긴다.
+
+**Pillar 점검**: P1은 붕괴도를 관계·회복 압박으로 보존해 정렬. P3는 전투 판독 축을 분리해 정렬. P4는 전투 입력 범위를 빌드·패턴 중심으로 줄여 정렬. P5는 빌드 결과와 관계 결과가 각각 즉시 보이는 표면을 요구한다.
+
+**Ambiguity 점수**: 0.2. 방향은 잠글 수 있으나 OQ-017의 대체 효과는 별도 결정 필요.
+
+**기각된 매력**: A의 “붕괴할수록 강해진다”는 역설은 P1을 수치로 강하게 보이게 한다. 다만 현재 게임에서 그것을 전투 최적화 보상으로 만들면 관계 붕괴의 의미와 빌드 비교를 동시에 왜곡한다.
+
+**재검토 조건**: 관계 상태를 전투에 다시 넣지 않고도 P1의 붕괴 체감이 휴식·인카운터·회복 표면에서 전혀 전달되지 않을 때.
+
+**연결**: D-029 / D-022 / D-025 / OQ-017
+
+---
+
 ### 2026-04-28 — D-019 잃어버린 것 = 유대 + 기억 + 재망각의 종착
 
 **맥락**: 마타이오스 (μάταιος "무가치함") 이름이 이미 결정되어 있었고, NPC 가 *무엇을* 잃었는지에 따라 게임 전체의 의미가 정해지는 분기점이었다.
