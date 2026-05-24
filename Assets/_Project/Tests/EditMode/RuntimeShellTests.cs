@@ -67,6 +67,134 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void MataiosActorState_DefaultsAndSnapshotExposeCombatActor()
+        {
+            var state = new PrototypeRunState("run-mataios-default", new GameFlowEventBus()) { AutoResolveCombat = false };
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual(16, state.MataiosMaxHp);
+            Assert.AreEqual(16, snapshot.MataiosHp);
+            Assert.AreEqual(16, snapshot.MataiosMaxHp);
+            Assert.AreEqual(3, snapshot.MataiosAttack);
+            Assert.IsFalse(snapshot.MataiosDown);
+            Assert.IsTrue(snapshot.MataiosTargetable);
+        }
+
+        [Test]
+        public void MataiosPolicy_DefaultProtectFinishCounterAndPressureAreDeterministic()
+        {
+            var support = StartRuntimeCombat("run-mataios-support", "COMBAT_MATAIOS_SUPPORT", "ENEMY_EMPTY_ARMOR");
+            var supportRound = support.ResolveCombatRoundInteractive(CombatAction.Defend);
+            StringAssert.Contains("mataios support", support.CreateSnapshot().LastCombatRoundResult);
+            Assert.AreEqual(2, supportRound.AllyDamage);
+
+            var protect = StartRuntimeCombat("run-mataios-protect", "COMBAT_MATAIOS_PROTECT", "ENEMY_EMPTY_ARMOR");
+            protect.ActiveCombatPlayer.ApplyDamage(16);
+            var protectRound = protect.ResolveCombatRoundInteractive(CombatAction.Attack);
+            StringAssert.Contains("mataios protect", protect.CreateSnapshot().LastCombatRoundResult);
+            Assert.Greater(protectRound.PlayerDamagePrevented, 0);
+
+            var finish = StartRuntimeCombat("run-mataios-finish", "COMBAT_MATAIOS_FINISH", "ENEMY_EMPTY_ARMOR");
+            finish.ActiveCombatEnemy.ApplyDamage(9);
+            var finishRound = finish.ResolveCombatRoundInteractive(CombatAction.Defend);
+            StringAssert.Contains("mataios finish", finish.CreateSnapshot().LastCombatRoundResult);
+            Assert.AreEqual(3, finishRound.AllyDamage);
+
+            var counter = StartRuntimeCombat("run-mataios-counter", "COMBAT_MATAIOS_COUNTER", "BOSS_APEX_02", true);
+            counter.ResolveCombatRoundInteractive(CombatAction.Defend);
+            counter.ResolveCombatRoundInteractive(CombatAction.Defend);
+            var counterRound = counter.ResolveCombatRoundInteractive(CombatAction.Defend);
+            StringAssert.Contains("mataios counter", counter.CreateSnapshot().LastCombatRoundResult);
+            Assert.AreEqual(2, counterRound.AllyDamage);
+
+            var pressure = StartRuntimeCombat("run-mataios-pressure", "COMBAT_MATAIOS_PRESSURE", "BOSS_APEX_02", true);
+            pressure.ResolveCombatRoundInteractive(CombatAction.Attack);
+            pressure.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var pressureRound = pressure.ResolveCombatRoundInteractive(CombatAction.Defend);
+            StringAssert.Contains("mataios pressure", pressure.CreateSnapshot().LastCombatRoundResult);
+            Assert.AreEqual(3, pressureRound.AllyDamage);
+        }
+
+        [Test]
+        public void MataiosDownContinuesCombatAppliesOneCollapsePenaltyAndSuppressesAction()
+        {
+            var state = StartRuntimeCombat("run-mataios-down", "COMBAT_MATAIOS_DOWN", "BOSS_APEX_02", true);
+
+            Assert.AreEqual(16, state.MataiosHp);
+            Assert.AreEqual(16, state.ApplyMataiosCombatDamage(16));
+            var downSnapshot = state.CreateSnapshot();
+
+            Assert.IsTrue(state.IsInCombat);
+            Assert.IsTrue(downSnapshot.MataiosDown);
+            Assert.IsFalse(downSnapshot.MataiosTargetable);
+            Assert.AreEqual(0, downSnapshot.MataiosHp);
+            Assert.AreEqual(5, downSnapshot.GlitchLevel);
+            Assert.IsTrue(state.HasFlag("FLAG_MATAIOS_COLLAPSE_EVENT"));
+
+            Assert.AreEqual(0, state.ApplyMataiosCombatDamage(16));
+            Assert.AreEqual(5, state.GlitchLevel);
+
+            var round = state.ResolveCombatRoundInteractive(CombatAction.Defend);
+            StringAssert.Contains("mataios none", state.CreateSnapshot().LastCombatRoundResult);
+            Assert.AreEqual(0, round.AllyDamage);
+        }
+
+        [Test]
+        public void MataiosRecoversAfterCombatAndFullyRecoversAtRest()
+        {
+            var partial = StartRuntimeCombat("run-mataios-partial-recovery", "COMBAT_MATAIOS_PARTIAL_RECOVERY", "ENEMY_EMPTY_ARMOR");
+            partial.ApplyMataiosCombatDamage(5);
+            var partialGuard = 0;
+            while (partial.IsInCombat && partialGuard < 6)
+            {
+                partial.ResolveCombatRoundInteractive(CombatAction.Attack);
+                partialGuard++;
+            }
+
+            Assert.IsFalse(partial.IsInCombat);
+            Assert.AreEqual(15, partial.MataiosHp);
+
+            var state = StartRuntimeCombat("run-mataios-recovery", "COMBAT_MATAIOS_RECOVERY", "ENEMY_EMPTY_ARMOR");
+            state.ApplyMataiosCombatDamage(16);
+
+            var guard = 0;
+            while (state.IsInCombat && guard < 6)
+            {
+                state.ResolveCombatRoundInteractive(CombatAction.Attack);
+                guard++;
+            }
+
+            Assert.IsFalse(state.IsInCombat);
+            Assert.AreEqual(4, state.MataiosHp);
+            Assert.IsFalse(state.MataiosDown);
+
+            var glitchAfterFirstDown = state.GlitchLevel;
+            var next = CreateRuntimeEncounter(
+                "ENC_MATAIOS_DOWN_RESET",
+                CreateChoice(
+                    "CHOICE_MATAIOS_DOWN_RESET",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_MATAIOS_DOWN_RESET", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-mataios-recovery", 1002), "node.mataios.down.reset", next, "CHOICE_MATAIOS_DOWN_RESET");
+            state.ApplyMataiosCombatDamage(16);
+            Assert.AreEqual(glitchAfterFirstDown + 5, state.GlitchLevel);
+
+            var restGuard = 0;
+            while (state.IsInCombat && restGuard < 6)
+            {
+                state.ResolveCombatRoundInteractive(CombatAction.Attack);
+                restGuard++;
+            }
+
+            Assert.IsFalse(state.IsInCombat);
+            Assert.Less(state.MataiosHp, state.MataiosMaxHp);
+            state.ResolveRestInteraction("node.rest.recover", "ENC_REST_01", "rest.recover", string.Empty);
+
+            Assert.AreEqual(16, state.MataiosHp);
+            Assert.IsFalse(state.MataiosDown);
+        }
+
+        [Test]
         public void SynergyDetector_ActivatesWhenRequiredTagCountIsMet()
         {
             var bus = new GameFlowEventBus();
@@ -1153,6 +1281,7 @@ namespace HwigiTower.Tests.EditMode
                     new[] { CreateCombatEffect("COMBAT_SWORD_THREE_OVERLOAD_ONCE", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
 
             state.ResolveEncounterChoice(new DeterministicRunContext("run-sword-three-overload-reset", 1001), "node.sword.once", first, "CHOICE_SWORD_THREE_OVERLOAD_ONCE");
+            state.ApplyMataiosCombatDamage(16);
             state.ResolveCombatRoundInteractive(CombatAction.Attack);
             StringAssert.Contains("blood overload", state.CreateSnapshot().LastCombatRoundResult);
             Assert.IsTrue(state.IsInCombat);
@@ -2219,6 +2348,25 @@ namespace HwigiTower.Tests.EditMode
                 kind = kind,
                 amount = amount
             };
+        }
+
+        private static PrototypeRunState StartRuntimeCombat(string runId, string combatId, string enemyRef, bool attachCatalog = false)
+        {
+            var state = new PrototypeRunState(runId, new GameFlowEventBus()) { AutoResolveCombat = false };
+            if (attachCatalog)
+            {
+                state.AttachEncounterCatalog(EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog);
+            }
+
+            var encounter = CreateRuntimeEncounter(
+                "ENC_" + combatId,
+                CreateChoice(
+                    "CHOICE_" + combatId,
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect(combatId, enemyRef, new EncounterPostCombatEffectRuntimeData[0]) }));
+            state.ResolveEncounterChoice(new DeterministicRunContext(runId, 1001), "node." + combatId, encounter, "CHOICE_" + combatId);
+            Assert.IsTrue(state.IsInCombat, combatId);
+            return state;
         }
 
         private static PrototypeRunState CreateDemoOrderState(

@@ -35,7 +35,9 @@ namespace HwigiTower.Combat
             CombatAction? secondAction = null,
             int? skillDamageOverride = null,
             int preEnemyDamageBonus = 0,
-            int preEnemyPlayerHpCost = 0)
+            int preEnemyPlayerHpCost = 0,
+            int preEnemyAllyDamage = 0,
+            int preEnemyPlayerDamageReduction = 0)
         {
             if (player == null || enemy == null || player.IsDefeated || enemy.IsDefeated)
             {
@@ -45,6 +47,8 @@ namespace HwigiTower.Combat
             var playerDamage = 0;
             var enemyDamage = 0;
             var comboDamage = 0;
+            var allyDamage = 0;
+            var playerDamagePrevented = 0;
 
             if (playerAction == CombatAction.Attack || playerAction == CombatAction.Skill)
             {
@@ -68,6 +72,12 @@ namespace HwigiTower.Combat
                 player.ApplyDamage(preEnemyPlayerHpCost);
             }
 
+            if (!enemy.IsDefeated && preEnemyAllyDamage > 0)
+            {
+                allyDamage = System.Math.Max(0, preEnemyAllyDamage);
+                enemy.ApplyDamage(allyDamage);
+            }
+
             if (!enemy.IsDefeated && !player.IsDefeated)
             {
                 enemyDamage = DamageRoll(enemy.Attack);
@@ -75,10 +85,17 @@ namespace HwigiTower.Combat
                 {
                     enemyDamage /= 2;
                 }
+
+                if (preEnemyPlayerDamageReduction > 0)
+                {
+                    playerDamagePrevented = System.Math.Min(enemyDamage, preEnemyPlayerDamageReduction);
+                    enemyDamage -= playerDamagePrevented;
+                }
+
                 player.ApplyDamage(enemyDamage);
             }
 
-            return new CombatRoundResult(playerDamage, enemyDamage, player.IsDefeated, enemy.IsDefeated, comboDamage);
+            return new CombatRoundResult(playerDamage, enemyDamage, player.IsDefeated, enemy.IsDefeated, comboDamage, allyDamage, playerDamagePrevented);
         }
 
         private int DamageRoll(int baseDamage)

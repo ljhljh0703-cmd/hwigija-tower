@@ -5393,27 +5393,37 @@ namespace HwigiTower.UI
 
         private static string BuildMataiosHp(PrototypeRunSnapshot snapshot)
         {
-            var max = Mathf.Max(1, snapshot.PlayerMaxHp - 4);
-            var current = Mathf.Clamp(snapshot.PlayerHp - 4, 1, max);
+            var max = Mathf.Max(1, snapshot.MataiosMaxHp);
+            var current = Mathf.Clamp(snapshot.MataiosHp, 0, max);
             return current + "/" + max;
         }
 
         private static int BuildMataiosAttack(PrototypeRunSnapshot snapshot)
         {
-            return Mathf.Max(1, snapshot.PlayerAttack - 1);
+            return Mathf.Max(0, snapshot.MataiosAttack);
         }
 
         private static string BuildMataiosBuffLine(PrototypeRunSnapshot snapshot)
         {
             var buffs = new List<string>();
-            if (snapshot.Affinity > 0)
+            if (snapshot.MataiosDown)
             {
-                buffs.Add("지원");
+                buffs.Add("전투 불능");
             }
 
-            if (snapshot.MemoryFragmentCount > 0)
+            if (snapshot.LastMataiosProtectReduction > 0)
             {
-                buffs.Add("기억");
+                buffs.Add("보호 -" + snapshot.LastMataiosProtectReduction);
+            }
+
+            if (snapshot.LastMataiosCombatDamage > 0)
+            {
+                buffs.Add("지원 피해 " + snapshot.LastMataiosCombatDamage);
+            }
+
+            if (snapshot.LastMataiosDownEvent)
+            {
+                buffs.Add("붕괴도 +5");
             }
 
             return buffs.Count == 0 ? "없음" : string.Join("  ", buffs);

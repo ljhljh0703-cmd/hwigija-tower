@@ -10,6 +10,8 @@ namespace HwigiTower.Run
         public int currentFloor = 1;
         public int playerHp = 24;
         public int playerMaxHp = 24;
+        public int mataiosHp = 16;
+        public bool mataiosDown;
         public int mental;
         public int gold;
         public int glitchLevel;

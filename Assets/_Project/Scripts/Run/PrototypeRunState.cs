@@ -33,6 +33,12 @@ namespace HwigiTower.Run
     {
         private const int BasePlayerMaxHp = 24;
         private const int BasePlayerAttack = 5;
+        private const int MataiosMaxHpValue = 16;
+        private const int MataiosActionPowerValue = 3;
+        private const int MataiosProtectDamageReduction = 2;
+        private const int MataiosCounterAssistDamage = 2;
+        private const int MataiosCollapseDelta = 5;
+        private const int MataiosDownRecoveryHp = 4;
         private const int FallbackEnemyHp = 12;
         private const int FallbackEnemyAttack = 3;
         private const int MinMental = -100;
@@ -71,6 +77,8 @@ namespace HwigiTower.Run
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
         private int _playerAttack = BasePlayerAttack;
+        private int _mataiosHp = MataiosMaxHpValue;
+        private bool _mataiosDown;
         private int _mental;
         private int _gold;
         private int _glitchLevel;
@@ -93,6 +101,13 @@ namespace HwigiTower.Run
         private int _arts03CooldownRounds;
         private bool _lastCombatActionWasAttack;
         private bool _sword03OverloadUsed;
+        private bool _mataiosDownPenaltyConsumedThisCombat;
+        private bool _mataiosDownThisCombat;
+        private readonly List<CombatAction> _recentPlayerCombatActions = new List<CombatAction>(2);
+        private string _lastMataiosCombatAction = string.Empty;
+        private int _lastMataiosCombatDamage;
+        private int _lastMataiosProtectReduction;
+        private bool _lastMataiosDownEvent;
         private bool _firstHitMitigationAvailable;
         private int _crackedJarBuffCombats;
         private bool _trainingBuffActive;
@@ -151,6 +166,15 @@ namespace HwigiTower.Run
         public int PlayerHp => _playerHp;
         public int PlayerMaxHp => _playerMaxHp;
         public int PlayerAttack => _playerAttack;
+        public int MataiosHp => IsInCombat && _activeCombatMataios != null ? _activeCombatMataios.Hp : _mataiosHp;
+        public int MataiosMaxHp => MataiosMaxHpValue;
+        public int MataiosActionPower => MataiosActionPowerValue;
+        public bool MataiosDown => IsInCombat && _activeCombatMataios != null ? _activeCombatMataios.IsDefeated : _mataiosDown;
+        public bool MataiosTargetable => !MataiosDown;
+        public string LastMataiosCombatAction => _lastMataiosCombatAction;
+        public int LastMataiosCombatDamage => _lastMataiosCombatDamage;
+        public int LastMataiosProtectReduction => _lastMataiosProtectReduction;
+        public bool LastMataiosDownEvent => _lastMataiosDownEvent;
         public int Mental => _mental;
         public int Gold => _gold;
         public int GlitchLevel => _glitchLevel;
@@ -212,8 +236,10 @@ namespace HwigiTower.Run
             {
                 runId = RunId,
                 currentFloor = _currentFloor,
-                playerHp = _activeCombatPlayer?.Hp ?? _playerHp,
+                playerHp = IsInCombat && _activeCombatPlayer != null ? _activeCombatPlayer.Hp : _playerHp,
                 playerMaxHp = _playerMaxHp,
+                mataiosHp = IsInCombat && _activeCombatMataios != null ? _activeCombatMataios.Hp : _mataiosHp,
+                mataiosDown = MataiosDown,
                 mental = _mental,
                 gold = _gold,
                 glitchLevel = _glitchLevel,
@@ -353,6 +379,8 @@ namespace HwigiTower.Run
             RecalculatePlayerStats();
             _playerMaxHp = data.playerMaxHp <= 0 ? _playerMaxHp : data.playerMaxHp;
             _playerHp = Clamp(data.playerHp, 0, _playerMaxHp);
+            _mataiosHp = Clamp(data.mataiosHp <= 0 && !data.mataiosDown ? MataiosMaxHpValue : data.mataiosHp, 0, MataiosMaxHpValue);
+            _mataiosDown = data.mataiosDown || _mataiosHp <= 0;
             _lastCombatResultId = string.Empty;
             _lastCombatRoundResult = "loaded save";
             _lastNpcReactionKey = "NPC_REACT_SAVE_LOADED";
@@ -490,7 +518,16 @@ namespace HwigiTower.Run
                 _endingContinue,
                 _endingChoiceId,
                 BuildMapNodeViews(),
-                _selectedMapNodeId);
+                _selectedMapNodeId,
+                MataiosHp,
+                MataiosMaxHp,
+                MataiosActionPower,
+                MataiosDown,
+                MataiosTargetable,
+                _lastMataiosCombatAction,
+                _lastMataiosCombatDamage,
+                _lastMataiosProtectReduction,
+                _lastMataiosDownEvent);
         }
 
         public string NextDemoNodeId
@@ -1036,6 +1073,7 @@ namespace HwigiTower.Run
             }
 
             _playerHp = System.Math.Min(_playerMaxHp, _playerHp + 6);
+            RecoverMataiosAtRest();
             ModifyGlitchLevel(-3);
             var recall = _reflectionPipeline.LoadRecallPrompt(RunId, 3);
             ApplyNpcTrigger("rest.recall");
@@ -1249,6 +1287,7 @@ namespace HwigiTower.Run
         }
 
         private CombatantState _activeCombatPlayer;
+        private CombatantState _activeCombatMataios;
         private CombatantState _activeCombatEnemy;
         private CombatController _activeCombatController;
         private EncounterCombatHandoffRuntimeData _activeCombatHandoff;
@@ -1258,7 +1297,23 @@ namespace HwigiTower.Run
 
         public bool IsInCombat => _activeCombatPlayer != null && _activeCombatEnemy != null && !_activeCombatPlayer.IsDefeated && !_activeCombatEnemy.IsDefeated;
         public CombatantState ActiveCombatPlayer => _activeCombatPlayer;
+        public CombatantState ActiveCombatMataios => _activeCombatMataios;
         public CombatantState ActiveCombatEnemy => _activeCombatEnemy;
+
+        private readonly struct MataiosPolicyResolution
+        {
+            public MataiosPolicyResolution(string actionId, int enemyDamage, int playerDamageReduction)
+            {
+                ActionId = actionId ?? string.Empty;
+                EnemyDamage = System.Math.Max(0, enemyDamage);
+                PlayerDamageReduction = System.Math.Max(0, playerDamageReduction);
+            }
+
+            public string ActionId { get; }
+            public int EnemyDamage { get; }
+            public int PlayerDamageReduction { get; }
+            public bool IsNone => string.IsNullOrEmpty(ActionId) || ActionId == "none";
+        }
 
         public CombatRoundResult ResolveCombatRoundInteractive(CombatAction action)
         {
@@ -1275,6 +1330,7 @@ namespace HwigiTower.Run
 
             var enemyHpBefore = _activeCombatEnemy.Hp;
             var playerHpBefore = _activeCombatPlayer.Hp;
+            var mataiosHpBefore = MataiosHp;
             var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData());
             var poisonDamage = ApplyRoundStartPoison(modifiers);
             if (_activeCombatEnemy.IsDefeated)
@@ -1285,6 +1341,7 @@ namespace HwigiTower.Run
                 return new CombatRoundResult(0, 0, false, true);
             }
 
+            var mataiosPolicy = ResolveMataiosPolicy();
             var artsSkillUsed = action == CombatAction.Skill && HasReadyArts03Skill();
             var secondAction = action == CombatAction.Skill && !artsSkillUsed && HasAbilityRef("ABILITY_SCOUT")
                 ? (CombatAction?)CombatAction.Attack
@@ -1298,7 +1355,9 @@ namespace HwigiTower.Run
                 secondAction,
                 skillDamage,
                 sword03.DamageBonus,
-                sword03.HpCost);
+                sword03.HpCost,
+                mataiosPolicy.EnemyDamage,
+                mataiosPolicy.PlayerDamageReduction);
             _combatRound++;
             var itemStrikeDamage = ApplyAttackItemDamage(action, modifiers);
             var abilityStrikeDamage = sword03.DamageBonus + ApplySwordAttackEffects(action);
@@ -1327,6 +1386,9 @@ namespace HwigiTower.Run
             }
 
             _lastCombatComboDamage = result.ComboDamage;
+            _lastMataiosCombatAction = mataiosPolicy.ActionId;
+            _lastMataiosCombatDamage = result.AllyDamage;
+            _lastMataiosProtectReduction = result.PlayerDamagePrevented;
             _lastCombatRoundResult =
                 "round " + _combatRound +
                 " | action " + action +
@@ -1334,6 +1396,8 @@ namespace HwigiTower.Run
                 " | enemyDamage " + result.EnemyDamage +
                 " | enemyHp " + enemyHpBefore + "->" + _activeCombatEnemy.Hp +
                 " | playerHp " + playerHpBefore + "->" + _activeCombatPlayer.Hp +
+                " | mataiosHp " + mataiosHpBefore + "->" + MataiosHp +
+                BuildMataiosRoundLog(mataiosPolicy, result) +
                 (crackedJarBonus > 0 ? " | cracked jar +" + crackedJarBonus : string.Empty) +
                 (trainingBonus > 0 ? " | training +" + trainingBonus : string.Empty) +
                 (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty) +
@@ -1370,6 +1434,7 @@ namespace HwigiTower.Run
                 }
             }
 
+            RecordPlayerCombatAction(action);
             _lastCombatActionWasAttack = action == CombatAction.Attack;
 
             if (result.IsComplete || _activeCombatEnemy.IsDefeated || _activeCombatPlayer.IsDefeated)
@@ -1378,6 +1443,123 @@ namespace HwigiTower.Run
             }
 
             return result;
+        }
+
+        public int ApplyMataiosCombatDamage(int amount)
+        {
+            var damage = System.Math.Max(0, amount);
+            if (damage <= 0 || !MataiosTargetable)
+            {
+                return 0;
+            }
+
+            if (IsInCombat && _activeCombatMataios != null)
+            {
+                _activeCombatMataios.ApplyDamage(damage);
+            }
+            else
+            {
+                _mataiosHp = Clamp(_mataiosHp - damage, 0, MataiosMaxHpValue);
+            }
+
+            ApplyMataiosDownIfNeeded();
+            return damage;
+        }
+
+        private MataiosPolicyResolution ResolveMataiosPolicy()
+        {
+            if (_activeCombatMataios == null || _activeCombatMataios.IsDefeated)
+            {
+                return new MataiosPolicyResolution("none", 0, 0);
+            }
+
+            if (RatioAtOrBelow(_activeCombatPlayer.Hp, _activeCombatPlayer.MaxHp, 0.35f) &&
+                RatioAbove(_activeCombatMataios.Hp, _activeCombatMataios.MaxHp, 0.25f))
+            {
+                return new MataiosPolicyResolution("protect", 0, MataiosProtectDamageReduction);
+            }
+
+            if (_activeCombatEnemy.Hp <= MataiosActionPowerValue)
+            {
+                return new MataiosPolicyResolution("finish", MataiosActionPowerValue, 0);
+            }
+
+            if (CountRecentPlayerActions(CombatAction.Defend) >= 2)
+            {
+                return new MataiosPolicyResolution("counter", MataiosCounterAssistDamage, 0);
+            }
+
+            if (CountRecentPlayerActions(CombatAction.Attack) >= 2)
+            {
+                return new MataiosPolicyResolution("pressure", MataiosActionPowerValue, 0);
+            }
+
+            return new MataiosPolicyResolution("support", MataiosCounterAssistDamage, 0);
+        }
+
+        private static bool RatioAtOrBelow(int value, int max, float threshold)
+        {
+            return max > 0 && value / (float)max <= threshold;
+        }
+
+        private static bool RatioAbove(int value, int max, float threshold)
+        {
+            return max > 0 && value / (float)max > threshold;
+        }
+
+        private int CountRecentPlayerActions(CombatAction action)
+        {
+            var count = 0;
+            for (var i = 0; i < _recentPlayerCombatActions.Count; i++)
+            {
+                if (_recentPlayerCombatActions[i] == action)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private void RecordPlayerCombatAction(CombatAction action)
+        {
+            _recentPlayerCombatActions.Add(action);
+            while (_recentPlayerCombatActions.Count > 2)
+            {
+                _recentPlayerCombatActions.RemoveAt(0);
+            }
+        }
+
+        private static string BuildMataiosRoundLog(MataiosPolicyResolution policy, CombatRoundResult result)
+        {
+            if (policy.IsNone)
+            {
+                return " | mataios none";
+            }
+
+            return " | mataios " + policy.ActionId +
+                (result.AllyDamage > 0 ? " " + result.AllyDamage : string.Empty) +
+                (result.PlayerDamagePrevented > 0 ? " protect -" + result.PlayerDamagePrevented : string.Empty);
+        }
+
+        private void ApplyMataiosDownIfNeeded()
+        {
+            var down = IsInCombat && _activeCombatMataios != null ? _activeCombatMataios.IsDefeated : _mataiosHp <= 0;
+            if (!down)
+            {
+                return;
+            }
+
+            _mataiosHp = 0;
+            _mataiosDown = true;
+            _lastMataiosDownEvent = true;
+            _mataiosDownThisCombat = true;
+            SetFlag("FLAG_MATAIOS_COLLAPSE_EVENT", true);
+            if (!_mataiosDownPenaltyConsumedThisCombat)
+            {
+                ModifyGlitchLevel(MataiosCollapseDelta);
+                _mataiosDownPenaltyConsumedThisCombat = true;
+            }
         }
 
         private void FinalizeCombat()
@@ -1399,6 +1581,7 @@ namespace HwigiTower.Run
             }
 
             _playerHp = _activeCombatPlayer.Hp;
+            RecoverMataiosAfterCombat();
             var resultId = enemyDefeated ? "victory" : "defeat";
             _lastCombatResultId = resultId;
             _lastCombatEnemyDefeated = enemyDefeated;
@@ -1430,6 +1613,21 @@ namespace HwigiTower.Run
             {
                 UpdateDemoProgression(_activeCombatNodeId, _activeCombatEncounterId, true);
             }
+        }
+
+        private void RecoverMataiosAfterCombat()
+        {
+            if (_mataiosDownThisCombat || (_activeCombatMataios != null && _activeCombatMataios.IsDefeated))
+            {
+                _mataiosHp = MataiosDownRecoveryHp;
+                _mataiosDown = false;
+                return;
+            }
+
+            var current = _activeCombatMataios?.Hp ?? _mataiosHp;
+            var restore = System.Math.Max(3, MataiosMaxHpValue / 4);
+            _mataiosHp = Clamp(current + restore, 0, MataiosMaxHpValue);
+            _mataiosDown = _mataiosHp <= 0;
         }
 
         public bool AutoResolveCombat { get; set; }
@@ -1470,12 +1668,14 @@ namespace HwigiTower.Run
             var enemy = enemyData != null
                 ? CreateEnemyState(enemyData)
                 : new CombatantState(enemyId, FallbackEnemyHp, FallbackEnemyAttack);
+            var mataios = new CombatantState("mataios", MataiosMaxHpValue, MataiosActionPowerValue, _mataiosDown ? 0 : _mataiosHp);
             var combat = new CombatController(context, string.IsNullOrEmpty(handoff.seedKey) ? combatId : handoff.seedKey);
 
             _lastCombatId = combatId;
             _lastCombatEnemyId = enemy.Id;
             _lastCombatResultId = "started";
             _lastCombatRoundResult = "round 0 | ready" +
+                " | mataios " + mataios.Hp + "/" + mataios.MaxHp +
                 (combatStartRestore > 0 ? " | bandage " + combatStartRestore : string.Empty) +
                 (modifiers.PlayerMaxHpBonus > 0 ? " | maxHp +" + modifiers.PlayerMaxHpBonus : string.Empty) +
                 (HasAbilityRef("ABILITY_SCOUT") ? " | scout +" + modifiers.PlayerAttackBonus : string.Empty) +
@@ -1490,11 +1690,19 @@ namespace HwigiTower.Run
             _arts03CooldownRounds = 0;
             _lastCombatActionWasAttack = false;
             _sword03OverloadUsed = false;
+            _mataiosDownPenaltyConsumedThisCombat = false;
+            _mataiosDownThisCombat = false;
+            _recentPlayerCombatActions.Clear();
+            _lastMataiosCombatAction = string.Empty;
+            _lastMataiosCombatDamage = 0;
+            _lastMataiosProtectReduction = 0;
+            _lastMataiosDownEvent = false;
             _firstHitMitigationAvailable = true;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
 
             // Initialize interactive state
             _activeCombatPlayer = player;
+            _activeCombatMataios = mataios;
             _activeCombatEnemy = enemy;
             _activeCombatController = combat;
             _activeCombatHandoff = handoff;
@@ -1587,6 +1795,8 @@ namespace HwigiTower.Run
 
         private string ApplyRestInteractionEffect(string actionId)
         {
+            RecoverMataiosAtRest();
+
             if (actionId == "rest.ask_mood")
             {
                 ModifyAffinity(2);
@@ -1607,6 +1817,13 @@ namespace HwigiTower.Run
             ModifyGlitchLevel(-3);
             ApplyNpcTrigger("rest.recover");
             return "rest recover complete | HP restored | Glitch -3";
+        }
+
+        private void RecoverMataiosAtRest()
+        {
+            _mataiosHp = MataiosMaxHpValue;
+            _mataiosDown = false;
+            _lastMataiosDownEvent = false;
         }
 
         private static string NormalizeRestActionId(string actionId)

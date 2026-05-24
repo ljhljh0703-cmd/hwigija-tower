@@ -51,7 +51,16 @@ namespace HwigiTower.Run
             bool endingContinue = false,
             string endingChoiceId = "",
             PrototypeFloorMapNodeView[] floorMapNodes = null,
-            string selectedMapNodeId = "")
+            string selectedMapNodeId = "",
+            int mataiosHp = 16,
+            int mataiosMaxHp = 16,
+            int mataiosAttack = 3,
+            bool mataiosDown = false,
+            bool mataiosTargetable = true,
+            string lastMataiosCombatAction = "",
+            int lastMataiosCombatDamage = 0,
+            int lastMataiosProtectReduction = 0,
+            bool lastMataiosDownEvent = false)
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -102,6 +111,15 @@ namespace HwigiTower.Run
             EndingChoiceId = endingChoiceId ?? string.Empty;
             FloorMapNodes = floorMapNodes ?? new PrototypeFloorMapNodeView[0];
             SelectedMapNodeId = selectedMapNodeId ?? string.Empty;
+            MataiosHp = System.Math.Max(0, mataiosHp);
+            MataiosMaxHp = mataiosMaxHp <= 0 ? 16 : mataiosMaxHp;
+            MataiosAttack = System.Math.Max(0, mataiosAttack);
+            MataiosDown = mataiosDown;
+            MataiosTargetable = mataiosTargetable;
+            LastMataiosCombatAction = lastMataiosCombatAction ?? string.Empty;
+            LastMataiosCombatDamage = System.Math.Max(0, lastMataiosCombatDamage);
+            LastMataiosProtectReduction = System.Math.Max(0, lastMataiosProtectReduction);
+            LastMataiosDownEvent = lastMataiosDownEvent;
         }
 
         public string RunId { get; }
@@ -153,6 +171,15 @@ namespace HwigiTower.Run
         public string EndingChoiceId { get; }
         public PrototypeFloorMapNodeView[] FloorMapNodes { get; }
         public string SelectedMapNodeId { get; }
+        public int MataiosHp { get; }
+        public int MataiosMaxHp { get; }
+        public int MataiosAttack { get; }
+        public bool MataiosDown { get; }
+        public bool MataiosTargetable { get; }
+        public string LastMataiosCombatAction { get; }
+        public int LastMataiosCombatDamage { get; }
+        public int LastMataiosProtectReduction { get; }
+        public bool LastMataiosDownEvent { get; }
         public bool HasFloorMap => FloorMapNodes.Length > 0;
         public bool HasSelectedMapNode => !string.IsNullOrEmpty(SelectedMapNodeId);
     }
