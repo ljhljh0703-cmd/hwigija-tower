@@ -24,7 +24,7 @@ namespace HwigiTower.EditorTools
             behavior.BehaviorName = "TrainingCombat";
             behavior.BehaviorType = BehaviorType.Default;
             behavior.TeamId = 0;
-            behavior.BrainParameters.VectorObservationSize = 8;
+            behavior.BrainParameters.VectorObservationSize = 11;
             behavior.BrainParameters.NumStackedVectorObservations = 1;
             behavior.BrainParameters.ActionSpec = Unity.MLAgents.Actuators.ActionSpec.MakeDiscrete(3);
 
