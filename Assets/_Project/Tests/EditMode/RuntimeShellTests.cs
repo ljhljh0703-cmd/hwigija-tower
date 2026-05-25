@@ -892,6 +892,7 @@ namespace HwigiTower.Tests.EditMode
                 Assert.AreEqual(4, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Event), "Expected 4 event branch nodes on floor " + floor);
                 Assert.AreEqual(4, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Combat), "Expected 4 combat branch nodes on floor " + floor);
                 Assert.AreEqual(2, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Rest), "Expected reduced 2 rest branch nodes on floor " + floor);
+                Assert.IsTrue(nodes.Where(node => node.Layer == 1).All(node => node.Type != PrototypeFloorMapNodeType.Rest), "First selectable row should not contain rest on floor " + floor);
                 Assert.GreaterOrEqual(nodes.Count(node => node.Selectable), 3);
                 Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Shop));
                 Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Boss));
@@ -905,6 +906,22 @@ namespace HwigiTower.Tests.EditMode
                 Assert.IsTrue(branchNodes.All(node => node.NormalizedY < shop.NormalizedY), "Branch nodes should sit below shop on floor " + floor);
                 Assert.IsTrue(nodes.Where(node => node.Layer == lastBranchLayer).All(node => node.NextMapNodeIds.Contains(shop.MapNodeId)));
                 CollectionAssert.Contains(shop.NextMapNodeIds, boss.MapNodeId);
+                foreach (var node in nodes)
+                {
+                    Assert.LessOrEqual(node.NextMapNodeIds.Length, 2, "Map node out-degree should stay readable on " + node.MapNodeId);
+                    foreach (var nextId in node.NextMapNodeIds)
+                    {
+                        var next = nodes.Single(candidate => candidate.MapNodeId == nextId);
+                        Assert.AreEqual(node.Layer + 1, next.Layer, "Map edges should only advance one layer from " + node.MapNodeId);
+                    }
+
+                    var nextLayer = nodes.Where(candidate => candidate.Layer == node.Layer + 1).ToArray();
+                    if (nextLayer.Length > 2)
+                    {
+                        Assert.Less(node.NextMapNodeIds.Length, nextLayer.Length, "Map node should not connect to every node in the next layer: " + node.MapNodeId);
+                    }
+                }
+
                 Assert.IsTrue(nodes.Where(node => node.Layer == 1).All(node => node.Selectable));
                 Assert.IsTrue(nodes.Where(node => node.Layer > 1).All(node => !node.Selectable));
             }

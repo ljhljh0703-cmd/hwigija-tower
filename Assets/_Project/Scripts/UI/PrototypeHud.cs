@@ -166,9 +166,9 @@ namespace HwigiTower.UI
         private const float ChoiceButtonSpacing = 130f;
         private const float EventChoiceButtonHeight = 104f;
         private const float EventChoiceButtonSpacing = 116f;
-        private const float MapNodeButtonHeight = 132f;
+        private const float MapNodeButtonHeight = 124f;
         private const float MapNodeButtonSpacing = 132f;
-        private const float MapNodeIconSize = 90f;
+        private const float MapNodeIconSize = 84f;
         private const int TitleFontSize = 34;
         private const int SubtitleFontSize = 30;
         private const int BodyFontSize = 28;
@@ -201,6 +201,8 @@ namespace HwigiTower.UI
         public string CombatMessage => combatText == null ? string.Empty : combatText.text;
         public bool CombatPanelVisible => combatPanel != null && combatPanel.gameObject.activeSelf;
         public bool PortraitVisible => npcPortraitImage != null && npcPortraitImage.gameObject.activeSelf;
+        public bool NodeMapVisible => nodeMapLayer != null && nodeMapLayer.gameObject.activeInHierarchy;
+        public bool ResultPanelVisible => resultLayer != null && resultLayer.gameObject.activeInHierarchy;
         public bool RouteActionButtonVisible => routeActionButton != null && routeActionButton.gameObject.activeSelf;
         public bool EndingRestButtonVisible => endingRestButton != null && endingRestButton.gameObject.activeSelf;
         public bool EndingContinueButtonVisible => endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
@@ -729,6 +731,7 @@ namespace HwigiTower.UI
             SetLayerVisible(npcReactionLayer, false);
             SetLayerVisible(resultLayer, false);
             HideMerchantPresentation();
+            HideNpcSpotlight();
             EnsureEventSystem();
             EnsureChoiceContainer();
             if (choiceContainer == null || nodes == null)
@@ -888,25 +891,53 @@ namespace HwigiTower.UI
             var rect = lineObject.AddComponent<RectTransform>();
             var start = ResolveMapNodePosition(from);
             var end = ResolveMapNodePosition(to);
-            var center = (start + end) * 0.5f;
-            rect.anchorMin = center;
-            rect.anchorMax = center;
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = Vector2.zero;
 
             var parentRect = nodeMapLayer.rect;
             var parentWidth = parentRect.width > 1f ? parentRect.width : 960f;
             var parentHeight = parentRect.height > 1f ? parentRect.height : 500f;
-            var delta = new Vector2((end.x - start.x) * parentWidth, (end.y - start.y) * parentHeight);
-            rect.sizeDelta = new Vector2(Mathf.Max(12f, delta.magnitude), 5f);
-            rect.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
+            var startPixels = new Vector2(start.x * parentWidth, start.y * parentHeight);
+            var endPixels = new Vector2(end.x * parentWidth, end.y * parentHeight);
+            var rawDelta = endPixels - startPixels;
+            var rawLength = rawDelta.magnitude;
+            if (rawLength < 8f)
+            {
+                Destroy(lineObject);
+                return;
+            }
+
+            var direction = rawDelta / rawLength;
+            var inset = Mathf.Min(MapNodeButtonHeight * 0.44f, rawLength * 0.32f);
+            startPixels += direction * inset;
+            endPixels -= direction * inset;
+            var adjustedDelta = endPixels - startPixels;
+            var adjustedCenter = (startPixels + endPixels) * 0.5f;
+            var center = new Vector2(adjustedCenter.x / parentWidth, adjustedCenter.y / parentHeight);
+            rect.anchorMin = center;
+            rect.anchorMax = center;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(Mathf.Max(12f, adjustedDelta.magnitude), 3.5f);
+            rect.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(adjustedDelta.y, adjustedDelta.x) * Mathf.Rad2Deg);
 
             var image = lineObject.AddComponent<Image>();
-            image.color = from.Completed && !to.Locked
-                ? new Color(0.72f, 0.94f, 0.70f, 0.82f)
-                : new Color(0.42f, 0.48f, 0.54f, 0.48f);
+            image.color = ResolveMapRouteLineColor(from, to);
             image.raycastTarget = false;
             _mapDecorations.Add(lineObject);
+        }
+
+        private static Color ResolveMapRouteLineColor(PrototypeFloorMapNodeView from, PrototypeFloorMapNodeView to)
+        {
+            if (from.Completed && !to.Locked)
+            {
+                return new Color(0.82f, 0.96f, 0.74f, 0.86f);
+            }
+
+            if (from.Current || from.Selectable || to.Selectable)
+            {
+                return new Color(0.76f, 0.84f, 0.92f, 0.64f);
+            }
+
+            return new Color(0.44f, 0.50f, 0.56f, 0.34f);
         }
 
         public void ShowFocus(InteractableNode node)
@@ -1184,6 +1215,7 @@ namespace HwigiTower.UI
             button.onClick.AddListener(() =>
             {
                 ClearChoices();
+                HideEventCutsceneLayout();
                 if (stableId == BossReturnChoiceId && _roomController != null)
                 {
                     var resolution = _roomController.CancelCurrentRouteSelection();
@@ -1433,7 +1465,7 @@ namespace HwigiTower.UI
             visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.49f), new Vector2(0.96f, 0.835f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.52f), false);
             npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, PanelColor, false);
             resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.285f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.90f), false);
-            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.06f, 0.09f), new Vector2(0.94f, 0.73f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
+            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.04f, 0.06f), new Vector2(0.96f, 0.84f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.265f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.02f, 0.025f, 0.03f, 0.50f), false);
             endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.30f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.06f, 0.055f, 0.04f, 0.90f), false);
         }
@@ -1562,6 +1594,18 @@ namespace HwigiTower.UI
             SetButtonVisible(utilityStatusButton, visible);
             SetButtonVisible(utilityMapButton, visible);
             SetButtonVisible(utilityLoadoutButton, visible);
+            var mapInteractable = visible &&
+                snapshot.HasFloorMap &&
+                !snapshot.HasSelectedMapNode &&
+                !snapshot.IsInCombat &&
+                !snapshot.StairUnlocked &&
+                !RestInteractionPanelVisible &&
+                !_shopPresentationActive &&
+                !_eventPresentationActive;
+            if (utilityMapButton != null)
+            {
+                utilityMapButton.interactable = mapInteractable;
+            }
 
             if (!visible)
             {
@@ -1589,9 +1633,9 @@ namespace HwigiTower.UI
             if (!snapshot.IsInCombat &&
                 !snapshot.RunCompleted &&
                 !snapshot.StairUnlocked &&
+                !snapshot.HasSelectedMapNode &&
                 snapshot.HasFloorMap)
             {
-                _roomController.CancelCurrentRouteSelection();
                 HideUtilityPanel();
                 ClearChoices();
                 ShowMapChoices(_roomController.GetFloorMapNodes(), mapNodeId =>
@@ -3454,8 +3498,11 @@ namespace HwigiTower.UI
                 !snapshot.IsInCombat &&
                 !snapshot.RunCompleted &&
                 !snapshot.StairUnlocked &&
+                !snapshot.HasSelectedMapNode &&
                 !string.IsNullOrEmpty(snapshot.NextDemoEncounterId) &&
                 _choiceButtons.Count == 0 &&
+                !_eventPresentationActive &&
+                !_shopPresentationActive &&
                 !RestInteractionPanelVisible;
             SetButtonLabel(routeActionButton, showRawDebugText ? "Open route step" : "다음 조우");
             routeActionButton.gameObject.SetActive(visible);
@@ -3600,9 +3647,26 @@ namespace HwigiTower.UI
                 return;
             }
 
-            var resolution = _roomController.ResolveNextFloor();
-            ShowResult(resolution);
-            ShowRunState(_roomController.GetSnapshot());
+            _roomController.ResolveNextFloor();
+            HideUtilityPanel();
+            HideRestInteractionPanel();
+            HideEventCutsceneLayout();
+            HideMerchantPresentation();
+            HideNpcSpotlight();
+            ClearChoices();
+            ShowResultMessage(string.Empty);
+            SetResultVisible(false);
+            var snapshot = _roomController.GetSnapshot();
+            ShowRunState(snapshot);
+            if (snapshot.HasFloorMap && !snapshot.RunCompleted)
+            {
+                ShowMapChoices(_roomController.GetFloorMapNodes(), mapNodeId =>
+                {
+                    var selected = _roomController.SelectMapNode(mapNodeId);
+                    OpenSelectedRouteStep(selected);
+                });
+                ShowRunState(_roomController.GetSnapshot());
+            }
         }
 
         private void OpenCurrentRouteStep()
@@ -3684,8 +3748,20 @@ namespace HwigiTower.UI
                     if (choiceStableId == BossReturnChoiceId)
                     {
                         var returnResolution = _roomController.CancelCurrentRouteSelection();
+                        ClearChoices();
                         ShowResult(returnResolution);
-                        ShowRunState(_roomController.GetSnapshot());
+                        var snapshot = _roomController.GetSnapshot();
+                        ShowRunState(snapshot);
+                        if (snapshot.HasFloorMap && !snapshot.RunCompleted)
+                        {
+                            ShowMapChoices(_roomController.GetFloorMapNodes(), mapNodeId =>
+                            {
+                                var selected = _roomController.SelectMapNode(mapNodeId);
+                                OpenSelectedRouteStep(selected);
+                            });
+                            ShowRunState(_roomController.GetSnapshot());
+                        }
+
                         return;
                     }
 
