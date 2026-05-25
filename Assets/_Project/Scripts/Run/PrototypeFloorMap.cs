@@ -256,15 +256,41 @@ namespace HwigiTower.Run
 
         private static void AssignPosition(PrototypeFloorMapNode node, int layerCount, DeterministicRandom random)
         {
-            var baseX = layerCount <= 1 ? 0.5f : (node.Index + 1f) / (layerCount + 1f);
-            var jitter = random.Range(-0.045f, 0.045f);
+            var baseX = ResolveLaneX(node.Index, layerCount);
+            var jitter = random.Range(-0.018f, 0.018f);
             node.NormalizedX = Clamp01(baseX + jitter);
             node.NormalizedY = node.Layer switch
             {
-                1 => random.Range(0.12f, 0.21f),
-                2 => random.Range(0.32f, 0.43f),
-                3 => random.Range(0.53f, 0.64f),
+                1 => random.Range(0.14f, 0.17f),
+                2 => random.Range(0.36f, 0.39f),
+                3 => random.Range(0.58f, 0.61f),
                 _ => 0.5f
+            };
+        }
+
+        private static float ResolveLaneX(int index, int layerCount)
+        {
+            if (layerCount <= 1)
+            {
+                return 0.5f;
+            }
+
+            if (layerCount == 2)
+            {
+                return index <= 0 ? 0.34f : 0.66f;
+            }
+
+            if (layerCount == 3)
+            {
+                return index <= 0 ? 0.22f : index == 1 ? 0.5f : 0.78f;
+            }
+
+            return index switch
+            {
+                0 => 0.17f,
+                1 => 0.39f,
+                2 => 0.61f,
+                _ => 0.83f
             };
         }
 
@@ -330,6 +356,7 @@ namespace HwigiTower.Run
                 return layers;
             }
 
+            MoveNonRestStepsToFront(branchSteps, 3);
             var layerSizes = new[] { 3, 4, 3 };
             var cursor = 0;
             for (var layer = 0; layer < layers.Length; layer++)
@@ -342,6 +369,31 @@ namespace HwigiTower.Run
             }
 
             return layers;
+        }
+
+        private static void MoveNonRestStepsToFront(List<PrototypeDemoRunStep> steps, int requiredCount)
+        {
+            if (steps == null || steps.Count == 0 || requiredCount <= 0)
+            {
+                return;
+            }
+
+            var firstLayer = new List<PrototypeDemoRunStep>(requiredCount);
+            for (var i = 0; i < steps.Count && firstLayer.Count < requiredCount; i++)
+            {
+                var step = steps[i];
+                if (step != null && step.IsValid && Classify(step, false) != PrototypeFloorMapNodeType.Rest)
+                {
+                    firstLayer.Add(step);
+                    steps.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            for (var i = firstLayer.Count - 1; i >= 0; i--)
+            {
+                steps.Insert(0, firstLayer[i]);
+            }
         }
 
         private static List<PrototypeDemoRunStep> CollectStepsOfType(List<PrototypeDemoRunStep> branchSteps, PrototypeFloorMapNodeType type)
@@ -440,14 +492,80 @@ namespace HwigiTower.Run
             {
                 var current = nonEmptyLayers[layer];
                 var next = nonEmptyLayers[layer + 1];
+                SortNodesByPosition(current);
+                SortNodesByPosition(next);
                 for (var i = 0; i < current.Count; i++)
                 {
-                    for (var n = 0; n < next.Count; n++)
+                    var primaryIndex = ResolveNearestLaneIndex(next, current[i].NormalizedX);
+                    Connect(current[i], next[primaryIndex]);
+
+                    var crossIndex = ResolveAdjacentLaneIndex(i, current.Count, primaryIndex, next.Count);
+                    if (crossIndex >= 0 && crossIndex != primaryIndex)
                     {
-                        Connect(current[i], next[n]);
+                        Connect(current[i], next[crossIndex]);
                     }
                 }
             }
+        }
+
+        private static void SortNodesByPosition(List<PrototypeFloorMapNode> nodes)
+        {
+            nodes.Sort((left, right) =>
+            {
+                var compare = left.Layer.CompareTo(right.Layer);
+                if (compare != 0)
+                {
+                    return compare;
+                }
+
+                compare = left.NormalizedX.CompareTo(right.NormalizedX);
+                return compare != 0 ? compare : left.Index.CompareTo(right.Index);
+            });
+        }
+
+        private static int ResolveNearestLaneIndex(List<PrototypeFloorMapNode> nodes, float normalizedX)
+        {
+            var bestIndex = 0;
+            var bestDistance = float.MaxValue;
+            for (var i = 0; i < nodes.Count; i++)
+            {
+                var distance = nodes[i] == null ? float.MaxValue : System.Math.Abs(nodes[i].NormalizedX - normalizedX);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestIndex = i;
+                }
+            }
+
+            return bestIndex;
+        }
+
+        private static int ResolveAdjacentLaneIndex(int currentIndex, int currentCount, int primaryIndex, int nextCount)
+        {
+            if (nextCount <= 1)
+            {
+                return -1;
+            }
+
+            var preferRight = (currentIndex + currentCount) % 2 == 0;
+            var right = primaryIndex + 1;
+            var left = primaryIndex - 1;
+            if (preferRight && right < nextCount)
+            {
+                return right;
+            }
+
+            if (!preferRight && left >= 0)
+            {
+                return left;
+            }
+
+            if (right < nextCount)
+            {
+                return right;
+            }
+
+            return left >= 0 ? left : -1;
         }
 
         private static List<PrototypeFloorMapNode> CollectLayer(List<PrototypeFloorMapNode> nodes, int layer)

@@ -29,6 +29,7 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
+        [Explicit("Screenshot QA is manual-only and excluded from standard PlayMode validation.")]
         public IEnumerator PortraitUiV3_CapturesRequiredQaScreens()
         {
             Directory.CreateDirectory(ScreenshotDirectory);
@@ -100,9 +101,8 @@ namespace HwigiTower.Tests.PlayMode
                 StringAssert.Contains("icon_item_field_bandage", hud.CurrentShopChoiceIconNames);
                 StringAssert.Contains("icon_ability_scout", hud.CurrentShopChoiceIconNames);
                 Assert.GreaterOrEqual(hud.ChoiceButtonCount, 3, "Expected opening shop products plus leave.");
-                var disabledAbility = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
-                Assert.IsNotNull(disabledAbility);
-                StringAssert.Contains("예리한 감각", disabledAbility.text);
+                var disabledAbility = FindChoiceButtonTextContaining(hud, "예리한 감각");
+                Assert.IsNotNull(disabledAbility, "Expected shop products to include a visible disabled sword ability card.");
                 StringAssert.Contains("Gold -12", disabledAbility.text);
                 StringAssert.Contains("Gold 부족", disabledAbility.text);
             });
@@ -340,6 +340,26 @@ namespace HwigiTower.Tests.PlayMode
                 if (button != null && button.name == "Choice Button " + choiceStableId)
                 {
                     return button;
+                }
+            }
+
+            return null;
+        }
+
+        private static Text FindChoiceButtonTextContaining(PrototypeHud hud, string value)
+        {
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button == null)
+                {
+                    continue;
+                }
+
+                var text = button.GetComponentInChildren<Text>();
+                if (text != null && text.text.Contains(value))
+                {
+                    return text;
                 }
             }
 
