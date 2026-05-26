@@ -32,6 +32,323 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-27 00:38 — 2026-05-27 feedback rules lock 반영
+- **Phase**: Game/System Track / Feedback Rules Lock
+- **Done**:
+  - `Docs/Feedback/2026-05-27` 피드백에서 시스템 규칙이 필요한 pre-run, map route/reveal, combat preview, enemy stat, audio/low HP 항목을 분리
+  - D-034를 pre-run placeholder + sparse route/reveal/commitment로 정식 잠금하고 OQ-026을 close
+  - D-036으로 resolver-owned combat preview, supported enemy stat surface, read-only combat item inspect, map/boss BGM reset, low HP P1 feedback 계약을 신규 잠금
+  - OQ-019 `ITEM_07`과 OQ-025 enemy intent deck은 open 유지하고, runtime RL/ONNX/최종 story text는 범위 밖으로 명시
+- **Files**: 변경/추가 6개 (`design/feedback-rules-lock-2026-05-27.md`, `design/map-flow-route-commitment-spec.md`, `design/balance.md`, SSOT/journal/progress)
+- **GDD impact**: v0.15.0 MINOR — D-034 locked, D-036 locked, OQ-026 closed
+- **Next**: 개발 세션은 clean worktree에서 CodeGraph preflight 후 D-034/D-036 구현 계약만 처리하고, OQ-019/OQ-025 범위는 건드리지 않는다
+- **Agent**: Codex
+
+### 2026-05-26 00:37 — ML-Agents blog visual pack 추가
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - 기존 테스트 스크린샷 위치와 AI training 전용 시각 자료 부재를 확인
+  - `mlagents_blog_metric_summary.csv`에서 블로그용 reward/action/defend/tuning 차트를 생성
+  - SVG 원본과 PNG screenshot 변환본을 `mlagents_blog_visuals` 폴더에 정리
+  - 새 training, Unity screenshot harness, ONNX/runtime 연결 없이 CSV 기반 시각 자료만 추가
+- **Files**: 변경/추가 11개 (`Docs/Portfolio/assets/mlagents_blog_visuals/*`, `hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (portfolio visual material 정리)
+- **Next**: 블로그에는 `mlagents_blog_visuals` PNG를 사용하고, 게임 QA 스크린샷은 별도 폴더로 분리 유지
+- **Agent**: Codex
+
+### 2026-05-26 00:24 — ML-Agents combat portfolio draft pack 작성
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp02-06 evidence를 바탕으로 개발 블로그용 brief와 한국어 draft를 작성
+  - PPO/AttackSpam/SkillSpam/ContextPolicy 핵심 metric을 blog summary CSV로 정리
+  - Exp05/05b/06은 failure/near-miss evidence로 표현하고 Exp04 strict best accepted probe를 유지
+  - 추가 training, 50k, ONNX 연결, 본편 runtime RL 변경 없이 문서 산출물만 추가
+- **Files**: 변경/추가 4개 (`ml-agents-blog-brief.md`, `ml-agents-blog-draft-ko.md`, `mlagents_blog_metric_summary.csv`, `hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (portfolio/blog material 정리, 본편 전투 결정 미변경)
+- **Next**: PM/블로그 담당자 검토 후 문구 확정. commit/push는 PM 승인 전까지 보류
+- **Agent**: Codex
+
+### 2026-05-26 00:13 — Mataios ContextPolicy combat brain 설계 lock
+- **Phase**: Game/System Track / Combat Brain Design
+- **Done**:
+  - AI Track Exp04-06 evidence를 읽고 PPO/ONNX runtime 연결 대신 ContextPolicy deterministic handoff가 맞다는 결론을 GDD에 반영
+  - D-035로 `MataiosCombatContext → MataiosCombatBrain → MataiosActionPlan` 순수 도메인 경계를 잠금
+  - OQ-024 table은 fallback/payload 기준으로 유지하고, 다음 구현은 enemy threat/tempoReady/Skill context/player history 기반 ordered brain을 따르도록 정리
+  - 첫 runtime은 새 전투 수치를 만들지 않고 OQ-024 payload를 재사용하며, 새 tempo/Skill 보너스 수치는 Balance OQ 전까지 금지
+  - 본편 C# runtime 변경 전 CodeGraph fresh status/sync/query/context 필수 조건을 D-035와 system spec에 명시
+- **Files**: 변경/추가 6개 (`design/mataios-context-policy-combat-brain-spec.md`, `design/two-actor-party-combat-lock-spec.md`, `design/combat-core-rebuild-spec.md`, SSOT/journal/progress)
+- **GDD impact**: v0.14.0 MINOR — D-035 locked, OQ-024 fallback화
+- **Next**: 개발 세션은 clean `origin/Proto` worktree에서 CodeGraph preflight 후 D-035 brain을 pure C#으로 구현하고, runtime RL/ONNX/새 수치 추가는 하지 않는다
+- **Agent**: Codex
+
+### 2026-05-26 00:00 — AI Track tuning stop 및 commit hold 확정
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp05/05b/06 추가 튜닝 중단을 확정하고 failure/near-miss evidence로 보존
+  - 50k PPO, ONNX runtime connection, shipped runtime RL integration 금지를 유지
+  - PM 승인 후 commit 범위를 docs/config/source/curated CSV/JSON evidence로 제한
+  - raw TensorBoard event, checkpoint `.pt`, ONNX, macOS app build, generated result folder 제외를 재확인
+- **Files**: 변경/추가 2개 (`ai-assisted-combat-design-lab.md`, `hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (AI Track evidence/commit policy 정리, 본편 전투 결정 미변경)
+- **Next**: PM 승인 전 commit/push 보류. 승인 시 `ML-Agents tuning evidence freeze` 후보 범위만 stage
+- **Agent**: Codex
+
+### 2026-05-25 23:35 — Exp05-06 evidence freeze hold 정리
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp05/05b/06을 failure/near-miss evidence로 유지하도록 포트폴리오 문서에 freeze status를 명시
+  - Exp04를 strict best accepted design probe로 유지한다고 기록
+  - 50k PPO, ONNX runtime connection, shipped runtime RL integration 중단을 재확인
+  - Exp05/05b/06 commit 후보는 PM 승인 전까지 보류한다고 명시
+- **Files**: 변경/추가 2개 (`ai-assisted-combat-design-lab.md`, `hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (portfolio/training evidence 상태 정리, 본편 전투 결정 미변경)
+- **Next**: PM 승인 전에는 commit/push 없이 ContextPolicy handoff 설계 지시서만 준비
+- **Agent**: Codex
+
+### 2026-05-25 23:33 — Exp06 실패 검토 및 ContextPolicy handoff 결정
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp06 `Skill opportunity observation bit` 보고를 clean AI worktree `/private/tmp/hwigi-mlagents-bootstrap` 기준으로 검토
+  - `HEAD`/`origin/Proto`가 `68b143b`로 일치하고, Exp05/05b/06 산출물 34개가 uncommitted evidence인 상태를 확인
+  - Exp06 PPO reward 1.798036, Skill share 0.213534, ContextPolicyGap -0.304295로 strict fail 판정을 확인
+  - observation count 11→12, Exp06 분리 산출물, runtime diff empty, raw generated file 미포함 상태를 확인
+  - PM 방향을 PPO tuning 중단 및 ContextPolicy deterministic handoff 준비로 정리
+- **Files**: 변경/추가 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (PM review/progress 기록 한정; 본편 deterministic policy lock은 별도 GDD/시스템 디자인 세션 필요)
+- **Next**: AI 세션에는 Exp05/05b/06 failure/near-miss evidence 보존안을 정리하게 하고, Game Track에는 ContextPolicy→Mataios deterministic combat brain 설계 lock 지시서를 발행
+- **Agent**: Codex
+
+### 2026-05-25 23:29 — ML-Agents Experiment 06 Skill opportunity observation bit probe 완료
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp06 training-only observation에 `SkillOpportunityAvailable` bit를 추가하고 TrainingCombat observation size를 12로 갱신
+  - `hwigi_training_combat_exp06_10k` PPO 10k run을 실행하고 10,001 step ONNX/checkpoint/TensorBoard event 생성을 확인
+  - Exp06 baseline exporter로 Random/AttackSpam/SkillSpam/DefendHeavy/ContextPolicy 1,000 episodes 비교 CSV/JSON을 생성
+  - PPO reward 1.798036, Skill share 0.213534, ContextPolicyGap -0.304295로 핵심 기준을 통과하지 못해 failure evidence로 문서화
+  - 본편 runtime CombatController/PrototypeRunState/Mataios policy/ONNX 연결은 변경하지 않음
+- **Files**: 변경/추가 30개+ (`CombatTrainingAgent.cs`, `TrainingCombatSceneBuilder.cs`, Exp06 rules/exporter/config/docs/assets 등)
+- **GDD impact**: 없음 (training/tooling/docs 한정, 본편 전투 결정 미변경)
+- **Next**: PM에게 AI tuning 중단 후 ContextPolicy를 Game Track으로 handoff할지 확인. 50k와 ONNX runtime 연결은 보류
+- **Agent**: Codex
+
+### 2026-05-25 23:20 — Exp06 Skill opportunity observation bit 지시 발행
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - 다음 AI Training stage를 Exp06 `Skill opportunity observation bit` 10k probe로 지정
+  - Exp04는 strict best accepted probe, Exp05/05b는 uncommitted over-correction/near-miss evidence로 구분
+  - Exp06 성공/실패별 commit 판단 기준을 정리하고, 50k/ONNX/runtime RL 금지를 재확인
+  - CodeGraph 규칙을 반영: 본편 C# runtime 변경 전에는 current `origin/Proto` clean worktree에서 fresh status/sync/query/context가 필요하며, 이번 AI training/docs/config 작업에는 선택 사항
+  - `hwiglija-tower-codegraph-brief.md`와 `Docs/.bkit-memory.json`은 현재 main/AI clean worktree의 `rg --files` 기준 미발견으로 확인
+- **Files**: 변경/추가 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (PM directive/progress 기록 한정)
+- **Next**: AI 세션에 Exp06 지시서를 전달하고, 결과가 애매하면 ContextPolicy deterministic handoff로 전환 판단
+- **Agent**: Codex
+
+### 2026-05-25 23:11 — Exp05b PM review 및 다음 AI Training 전략 정리
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - accepted baseline `68b143b`와 clean AI worktree `/private/tmp/hwigi-mlagents-bootstrap` 기준을 확인
+  - Exp05b report/CSV/code boundary를 검토해 PPO reward 회복, zero Skill waste, Skill share strict fail을 재확인
+  - 본편 runtime RL 미도입, `CombatController`/`PrototypeRunState`/LLM/UI runtime diff 없음, raw output 제외 상태를 확인
+  - 다음 전략은 50k/ONNX 연결이 아니라 Skill opportunity observation bit 10k probe 우선으로 정리
+- **Files**: 변경/추가 1개 (`hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 (PM review/progress 기록 한정)
+- **Next**: Exp05/Exp05b를 over-correction/near-miss evidence로 커밋할지 승인 후, observation-bit Exp06 지시서를 발행
+- **Agent**: Codex
+
+### 2026-05-25 22:55 — ML-Agents Experiment 05b Skill gate relaxation 10k 완료
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp05b training-only Skill opportunity gate를 HP threshold 12에서 10으로 완화
+  - `hwigi_training_combat_exp05b_10k` PPO 10k run을 실행하고 10,003 step ONNX/checkpoint/TensorBoard event 생성을 확인
+  - Exp05b baseline exporter로 Random/AttackSpam/SkillSpam/DefendHeavy/ContextPolicy 1,000 episodes 비교 CSV/JSON을 생성
+  - PPO reward는 1.862258, SpamPolicyGap은 +0.329483으로 개선됐지만 Skill share가 0.230376으로 25% 목표에 못 미쳐 strict pass는 보류
+  - 본편 runtime CombatController/PrototypeRunState/Mataios policy/ONNX 연결은 변경하지 않음
+- **Files**: 변경/추가 20개+ (`CombatTrainingExp05bRules.cs`, Exp05b exporter/config/docs/assets 등)
+- **GDD impact**: 없음 (training/tooling/docs 한정, 본편 전투 결정 미변경)
+- **Next**: Exp05b는 near-miss evidence로 유지. 다음은 Skill opportunity observation bit 또는 design 승인 후 threshold 10 미만 10k probe
+- **Agent**: Codex
+
+### 2026-05-25 22:39 — ML-Agents Experiment 05 Skill opportunity/waste tuning 완료
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp05 training-only Skill opportunity gate를 추가해 Skill valid 조건을 cooldown ready + enemy HP 12 이상으로 제한
+  - `hwigi_training_combat_exp05_10k` PPO 10k run을 실행하고 10,001 step ONNX/checkpoint/TensorBoard event 생성을 확인
+  - Exp05 baseline exporter로 Random/AttackSpam/SkillSpam/DefendHeavy/ContextPolicy 1,000 episodes 비교 CSV/JSON을 생성
+  - SkillWastedPerEpisode는 0으로 감소했지만 Skill share가 0.205214로 목표 25~40% 아래로 내려가 over-correction으로 문서화
+  - 본편 runtime CombatController/PrototypeRunState/Mataios policy/ONNX 연결은 변경하지 않음
+- **Files**: 변경/추가 12개 (`CombatTrainingAgent.cs`, `CombatTrainingExp05Rules.cs`, Exp05 exporter/config/docs/assets 등)
+- **GDD impact**: 없음 (training/tooling/docs 한정, 본편 전투 결정 미변경)
+- **Next**: SkillOpportunityHpThreshold를 10~11로 완화하거나 Skill opportunity observation bit를 추가한 10k 재실험. 50k는 보류
+- **Agent**: Codex
+
+### 2026-05-25 22:11 — Exp02-04 ML-Agents evidence freeze commit/push
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp02~04 training source/config/exporter/docs/assets 32개를 `Document ML-Agents combat design experiments`로 commit
+  - raw TensorBoard event, checkpoint `.pt`, ONNX, macOS TrainingCombat.app, result folder, Library cache는 commit 제외 유지
+  - `git diff --check`, forbidden added-line search, runtime diff empty, generated raw not staged를 확인
+  - commit `68b143b416807a36cc06edd484d2f7ca8a785b5b`를 `origin/Proto`에 push
+- **Files**: commit 32개 (`TrainingCombat*`, `CombatTraining*`, `Config/MLAgents/training_combat_exp0*_10k.yaml`, `Docs/Portfolio/*`)
+- **GDD impact**: 없음 (training/tooling/docs baseline, 본편 runtime RL 미도입)
+- **Next**: Exp05 Skill opportunity/waste tuning은 별도 commit으로 진행
+- **Agent**: Codex
+
+### 2026-05-25 22:05 — Exp04 evidence freeze 및 ContextPolicy handoff 문서화
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - Exp04 결과를 AI-Assisted Combat Design Lab 문서로 freeze하고 Exp02/03/04 설계 루프를 정리
+  - 31개 변경 파일을 Exp04 핵심, Exp02/03 보강, curated generated summary, Unity/package/cache drift로 분류
+  - ContextPolicy가 PPO보다 높은 이유와 본편 deterministic policy 후보 handoff 기준을 문서화
+  - raw TensorBoard/checkpoint/ONNX/result folder는 commit 제외 대상으로 명시
+  - 본편 runtime CombatController/PrototypeRunState/Mataios policy/ONNX 연결은 변경하지 않음
+- **Files**: 추가 1개 (`Docs/Portfolio/ai-assisted-combat-design-lab.md`) + 기존 Exp02-04 training/docs/assets freeze
+- **GDD impact**: 없음 (포트폴리오 evidence/handoff 문서화, 본편 전투 결정 미변경)
+- **Next**: Skill opportunity/waste 기준 소폭 튜닝 후 10k 재실험. 50k는 보류
+- **Agent**: Codex
+
+### 2026-05-25 21:56 — ML-Agents Experiment 04 combat rule redesign probe 완료
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - training-only Exp04 규칙을 추가해 2턴 Skill cooldown, low-HP Skill waste penalty, high-threat enemy turn, Defend tempo attack payoff를 구현
+  - `training_combat_exp04_10k.yaml`로 PPO 10k run을 실행하고 10,002 step ONNX/checkpoint/TensorBoard event 생성을 확인
+  - Random/AttackSpam/SkillSpam/DefendHeavy/ContextPolicy baseline을 같은 Exp04 schema로 1,000 episodes씩 재평가
+  - PPO reward가 1.855968로 spam policy max 1.536994를 넘고, ContextPolicy가 2.101917로 최고 성능임을 comparison CSV와 문서에 기록
+  - 본편 runtime CombatController/PrototypeRunState/Mataios policy/ONNX 연결은 변경하지 않음
+- **Files**: 변경/추가 15개+ (`CombatTrainingAgent.cs`, `CombatTrainingExp04Rules.cs`, Exp04 exporter/config/docs/assets 등)
+- **GDD impact**: 없음 (training/tooling/docs 한정, 본편 전투 결정 임의 변경 없음)
+- **Next**: ContextPolicy를 deterministic combat policy 후보로 별도 정리하고, Skill opportunity signal/waste 기준을 작게 조정한 Exp05 또는 문서화 마감 판단
+- **Agent**: Codex
+
+### 2026-05-25 21:36 — ML-Agents Experiment 03 reward/context gate 완료
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - training-only `CombatTrainingRules`를 추가해 1턴 Skill cooldown, Skill cost, Defend prevented-damage metric/reward를 공유 규칙으로 분리
+  - `training_combat_exp03_10k.yaml`로 PPO 10k run을 실행하고 10,003 step ONNX/checkpoint/TensorBoard event 생성을 확인
+  - Exp03 baseline exporter로 Random/AttackSpam/SkillSpam/DefendHeavy/ContextPolicy 1,000 episodes 비교 CSV/JSON을 생성
+  - Skill share가 0.719929→0.309283으로 감소하고 DamagePreventedPerStep이 0→0.245509로 surfaced됨을 문서화
+  - SkillSpam/AttackSpam이 여전히 PPO reward를 상회하므로 50k보다 reward/context 재설계가 우선이라는 결론을 기록
+- **Files**: 변경/추가 10개+ (`CombatTrainingAgent.cs`, `CombatTrainingRules.cs`, Exp03 exporter/config/docs/assets 등)
+- **GDD impact**: 없음 (training/tooling/docs 한정, 본편 runtime RL/CombatController 미변경)
+- **Next**: Skill에 더 강한 context gate를 주고 Defend에 offensive tempo payoff를 부여한 Exp04 설계
+- **Agent**: Codex
+
+### 2026-05-25 21:19 — ML-Agents Experiment 02 baseline comparison 완료
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - training-only Editor exporter로 Random/AttackSpam/SkillSpam/DefendHeavy baseline을 1,000 episodes씩 deterministic 평가
+  - baseline result CSV/JSON 및 PPO10k 포함 comparison CSV를 `Docs/Portfolio/assets`에 생성
+  - PPO10k가 Random/AttackSpam보다 reward/episode length는 좋지만 SkillSpam보다 명확히 낫지 않다는 결론을 문서화
+  - DefendHeavy 실패와 `DamagePreventedPerStep=0`을 근거로 Defend 보상보다 먼저 방어 효과 metric surfacing이 필요하다고 정리
+  - 본편 runtime combat/RL/Mataios 경로는 변경하지 않음
+- **Files**: 변경/추가 6개 (`TrainingCombatBaselineExporter.cs`, baseline CSV/JSON, comparison CSV, `ml-agents-combat-exp02.md` 등)
+- **GDD impact**: 없음 (training/tooling/docs 한정, 본편 runtime RL 미도입)
+- **Next**: Skill cost/context gate와 Defend prevented-damage metric을 training wrapper에서 보정한 뒤 같은 baseline 비교를 재실행
+- **Agent**: Codex
+
+### 2026-05-25 21:13 — ML-Agents Experiment 02 포트폴리오 증거 기록 보강
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - 512-step smoke를 학습 품질이 아닌 Unity executable/trainer 연결 및 ONNX export milestone으로 명확히 분리 기록
+  - 10k PPO 결과의 reward 증가, episode length 감소, entropy/loss, action share 변화를 포트폴리오 evidence로 정리
+  - PPO가 attack-only가 아니라 Skill-heavy policy로 이동했고 Defend가 collapse했다는 reward-design issue를 명시
+  - TensorBoard scalar 요약 export CSV와 artifact manifest, training command, trainer yaml 핵심값, observation/action/reward schema를 문서에 추가
+- **Files**: 변경/추가 2개 (`ml-agents-combat-exp02.md`, `mlagents_exp02_tensorboard_scalars.csv`)
+- **GDD impact**: 없음 (포트폴리오 문서 보강, 본편 runtime RL 미도입)
+- **Next**: Random/AttackSpam baseline을 같은 scalar schema로 비교하고 Skill/Defend reward shaping 실험을 설계
+- **Agent**: Codex
+
+### 2026-05-25 20:53 — ML-Agents Combat Experiment 02 10k PPO run 완료
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - clean worktree `/private/tmp/hwigi-mlagents-bootstrap`에서 `origin/Proto@271f0c65` 기준 exp02를 진행
+  - training-only `CombatTrainingAgent`에 TensorBoard용 action share, win/loss/timeout, episode length, damage metric을 추가
+  - `training_combat_exp02_10k.yaml`로 10,000 step PPO run을 실행하고 10,001 step ONNX/checkpoint export를 확인
+  - event scalar에서 reward, episode length, entropy/loss, action distribution을 확인하고 portfolio 문서에 결과를 기록
+  - 본편 runtime combat/Mataios/enemy intent/RL 연결 경로는 변경하지 않음
+- **Files**: 변경/추가 3개 (`CombatTrainingAgent.cs`, `training_combat_exp02_10k.yaml`, `ml-agents-combat-exp02.md`)
+- **GDD impact**: 없음 (포트폴리오용 isolated training experiment, 본편 runtime RL 미도입)
+- **Next**: Random/AttackSpam baseline을 같은 metric schema로 별도 run/export하고 reward shaping 1차 조정 여부 결정
+- **Agent**: Codex
+
+### 2026-05-25 20:05 — ML-Agents 전투 학습 bootstrap 구현
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - clean worktree `/private/tmp/hwigi-mlagents-bootstrap`에서 `origin/Proto@3bc598b` 기준 ML-Agents training track 구현
+  - `com.unity.ml-agents` release_20 package를 추가하고 본편 runtime과 분리된 `HwigiTower.Training` asmdef를 구성
+  - `TrainingCombat` scene, `CombatTrainingAgent`, macOS training build helper, PPO trainer yaml을 추가
+  - 지정 venv(`mlagents==0.30.0`)로 `mlagents-learn` smoke를 실행해 Unity 연결, 512 step 학습, ONNX export, TensorBoard event file 생성을 확인
+  - 본편 combat/Mataios/enemy intent/runtime RL 경로는 변경하지 않음
+- **Files**: 변경/추가 10개 (`Packages/manifest.json`, `CombatTrainingAgent.cs`, `TrainingCombat.unity`, `training_combat_ppo.yaml`, portfolio doc 등)
+- **GDD impact**: 없음 (포트폴리오용 isolated training environment, 본편 runtime RL 미도입)
+- **Next**: TensorBoard 결과를 확인하며 reward shaping/observation 개선안을 별도 AI Training 세션에서 조정
+- **Agent**: Codex
+
+### 2026-05-25 18:34 — Map/Floor Transition P0 복구
+- **Phase**: Core Run UI / Map Flow
+- **Done**:
+  - clean worktree `/private/tmp/hwigi-map-floor-p0`에서 `origin/Proto@76403ac` 기준 지도/층 전환 P0 복구
+  - 새 층 진입 시 이전 result/combat/portrait/CTA를 clear하고 새 floor map을 즉시 표시하도록 정리
+  - node tap 즉시 encounter commit, active encounter 중 utility map 재선택 차단, boss return 시 map 복귀 흐름을 보정
+  - floor map을 3 sparse lane, out-degree max 2, same-layer/far-lane/all-to-all edge 금지 구조로 갱신하고 first selectable row Rest 금지 반영
+  - D-034 map invariant 기준으로 EditMode/PlayMode helper 기대값을 갱신하고 screenshot QA는 PM 지시에 따라 standard test에서 Explicit 제외
+- **Files**: 변경 5개 (`PrototypeFloorMap.cs`, `PrototypeHud.cs`, `RuntimeShellTests.cs`, `PrototypeRoomSmokeTests.cs` 등)
+- **GDD impact**: 없음 — D-034 후보/PM 피드백 구현 반영, 새 SSOT 결정 추가 없음
+- **Next**: PM 수동 플레이로 map readability/commitment 확인 후 필요 시 Top HUD 또는 Combat Batch 후속으로 전환
+- **Agent**: Codex
+
+### 2026-05-25 18:39 — ML-Agents 전투 학습 재편 명세 및 로컬 trainer 준비
+- **Phase**: Post-deadline / AI Portfolio Tooling
+- **Done**:
+  - ML-Agents 전투 학습 방향을 포트폴리오용 `TrainingCombat` 분리 씬 + ONNX 산출 우선으로 정리
+  - 구현 세션 확인 질문(worktree, 독립 Agent vs 실전투 wrapper, package source, scene creation, artifact target)을 명세서에 고정
+  - Python 3.10.12를 pyenv로 설치하고 ML-Agents용 별도 venv를 준비
+  - `mlagents==1.1.0`은 macOS 26 arm64 `grpcio<=1.48.2` 빌드 실패로 보류하고, `mlagents==0.30.0` trainer를 설치/검증
+  - `mlagents-learn --help`, `tensorboard --help`, 핵심 package freeze 확인
+- **Files**: 변경 1개 (`Docs/AI/ml-agents-combat-training-implementation-spec.md`) + 외부 venv/tooling
+- **GDD impact**: 없음 (본편 runtime RL 미도입, 포트폴리오/학습 tooling 범위)
+- **Blockers**: Unity package 추가와 `TrainingCombat` 구현은 구현 기준 worktree를 진행 세션에서 확정한 뒤 적용 필요
+- **Next**: clean `origin/Proto` 기준 구현 세션에서 ML-Agents package/source와 독립 training scene scope를 확정하고 Milestone 1 착수
+- **Agent**: Codex
+
+### 2026-05-25 10:17 — Map Flow / Route Commitment 설계 검토
+- **Phase**: Core Run Design / Map Flow
+- **Done**:
+  - 현행 `PrototypeFloorMap`/`RunState`/HUD map flow를 audit해 dense route graph, 느슨한 commitment, early Rest, floor transition result 잔류 리스크를 분리
+  - 5컬럼 유지 + 3 logical lane sparse route + adjacent cross-lane branch 제한 + irreversible node commitment를 D-034 후보로 정리
+  - Rest는 Layer 1 금지, Layer 2/3 0-1개 후보로 미루고 boss 직전 Shop 구조와 충돌하지 않게 placement rule 작성
+  - 다음 층 진입 시 이전 result UI clear 후 새 floor map generated/visible 보장 규칙과 QA checklist 작성
+  - OQ-026을 open으로 등록해 PM 확정 전 구현 금지 상태를 명시
+- **Files**: 변경/추가 5개 (`design/map-flow-route-commitment-spec.md`, `design/balance.md`, `hwiglija-tower-gdd.md` 등)
+- **GDD impact**: v0.13.1 PATCH — D-034 후보 / OQ-026 open
+- **Next**: PM이 Floor 1 Rest 정책, Rest frequency, single-edge explicit tap 여부를 확정하면 D-034 lock 후 Map Flow 개발 brief로 전환
+- **Agent**: Codex
+
+### 2026-05-25 04:20 — Two-Actor Combat Batch 1 구현
+- **Phase**: Core Combat Rebuild
+- **Done**:
+  - clean worktree `/private/tmp/hwigi-two-actor-baseline-2fbaed5`에서 최신 `origin/Proto` `2fbaed5` 기준 D-032 2인 전투 baseline 구현
+  - Mataios HP/down/targetable/action power 상태와 deterministic support policy를 `PrototypeRunState` 전투 흐름에 연결
+  - protect/finish/counter/pressure/support 행동, down collapse flag, 붕괴도 +5 1회 penalty, combat/rest recovery를 검증
+  - 기존 SWORD_03 과부하, FRENZY, ARTS_03, GUARD_01 build surface 회귀 테스트 유지
+  - GUI EditMode 140/140, GUI PlayMode 20/20 및 `git diff --check` 통과
+- **Files**: 변경/추가 7개 (`CombatController.cs`, `PrototypeRunState.cs`, `PrototypeHud.cs`, `RuntimeShellTests.cs` 등)
+- **GDD impact**: 없음 — D-032/OQ-022 temporary baseline 구현 반영, D-033/OQ-025/ITEM_07/OQ-019 범위는 미구현 유지
+- **Next**: PM 수동 전투 QA 후 Batch 2 enemy intent/counterplay 설계(OQ-025) 확정 여부 판단
+- **Agent**: Codex
+
+### 2026-05-24 23:59 — Two-Actor Combat 문서 기준선 publish
+- **Phase**: Core Combat Rebuild
+- **Done**:
+  - latest `origin/Proto` 기준 clean worktree `/private/tmp/hwigi-docs-publish-20260524`에서 docs-only publish 수행
+  - `design/two-actor-party-combat-lock-spec.md`, `design/combat-core-rebuild-spec.md`를 Proto에 반영
+  - repo-local GDD / design journal / progress 문서에서 D-032, D-033, OQ-021~OQ-025 visibility 확인
+  - `git diff --check HEAD^ HEAD` 통과 후 `Proto`에 push 완료
+- **Files**: 변경/추가 5개 (`design/*combat*.md`, `Docs/Project/hwiglija-tower-gdd.md`, `Docs/Project/hwiglija-tower-design-journal.md`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 — 기존 SSOT 결정을 repo 문서 기준선으로 publish
+- **Next**: clean worktree/branch에서 Two-Actor Combat Batch 1 구현 착수
+- **Agent**: Codex
+
 ### 2026-05-24 23:18 — Two-Actor Combat Batch 1 착수 차단
 - **Phase**: Core Combat Rebuild
 - **Done**:

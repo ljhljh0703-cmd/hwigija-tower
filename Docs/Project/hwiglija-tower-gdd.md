@@ -1,11 +1,11 @@
 ---
 created: 2026-04-27
-updated: 2026-05-24 (v0.13.0)
+updated: 2026-05-27 (v0.15.0)
 type: project
 tags: [gdd, project, flick, roguelike, ai-npc, on-device-llm, unity, hybrid-casual, gpt-5.5]
 status: active
 codename: 회귀자는 탑을 오른다
-version: 0.13.0
+version: 0.15.0
 deadline: 2026-05-18
 ---
 
@@ -109,6 +109,9 @@ deadline: 2026-05-18
 | 0.12.0 | 2026-05-24 | D-032 신규 잠금 — 다음 전투 기준선을 `Player + Mataios vs Enemy` 2인 파티 전투로 전환. 마타이오스는 deterministic automatic actor로 참여하고, down 시 전투는 지속되며 붕괴 이벤트/회복 압박을 발생시킨다. D-029 금지선 유지, 다중 적/직접 조작/본편 runtime RL 제외. OQ-021~024 추가. |
 | 0.12.1 | 2026-05-24 | D-032 보정 — OQ-021/OQ-024를 1차 구현값으로 close. OQ-022는 down/collapse temporary implementation contract로 partial-close(+5, 전투당 1회, non-blocking log/overlay). OQ-023은 combat expansion stage로 defer하고 1차 구현은 기존 Player chain 유지. |
 | 0.13.0 | 2026-05-24 | D-033 신규 잠금 — Combat Core Rebuild 상위 방향 잠금. Enemy intent/counterplay/feedback/balance metric을 D-032 위에 올려 Attack spam damage race를 전략적 턴 전투로 교체한다. 구현은 4개 배치로 분리하고, enemy별 intent deck exact payload는 OQ-025로 분리. |
+| 0.13.1 | 2026-05-25 | Map Flow / Route Commitment 검토 — OQ-012의 "맵 화면 없음/선택지 팝업" 구현 세부는 현재 런타임 지도 UI와 사용자 피드백에 의해 D-034 후보로 대체 검토. Sparse 3-lane route, irreversible node commitment, delayed Rest, next-floor map visibility를 제안하고 OQ-026을 등록. |
+| 0.14.0 | 2026-05-26 | D-035 신규 잠금 — AI Track Exp04-06 결과를 본편 runtime RL/ONNX가 아니라 `ContextPolicy` 기반 deterministic Mataios combat brain으로 전환. OQ-024 단순 table은 fallback으로 남기고, enemy threat/tempo/skill context를 읽는 명시 rule table을 다음 구현 기준으로 잠금. 본편 C# 변경 전 CodeGraph fresh status/sync/query/context 필수. |
+| 0.15.0 | 2026-05-27 | D-034 정식 잠금 + D-036 신규 잠금 — 2026-05-27 피드백을 반영해 pre-run placeholder, sparse route/reveal/commitment, resolver-owned combat preview, enemy stat surface, read-only combat item inspect, map/boss BGM reset, low HP P1 feedback 계약을 확정. OQ-026 close. OQ-019/OQ-025는 open 유지. |
 
 ---
 
@@ -542,6 +545,128 @@ CREATE TABLE player_utterances (
 
 ---
 
+### D-034 Map Flow / Route Reveal / Commitment 🔒 LOCKED 2026-05-27
+
+**값**:
+- Floor 1은 바로 지도/준비 화면으로 시작하지 않는다. 새 런 시작 시 pre-run placeholder screen을 먼저 보여준다.
+- pre-run placeholder는 현재 비어 있어도 된다. 향후 슬롯은 기억 계승, 장비 선택, 짧은 스토리 컷신/이미지다.
+- pre-run placeholder에는 최종 스토리/대사, 장비 규칙, 기억 계승 효과를 임의로 넣지 않는다.
+- 지도는 5컬럼 visual grid를 유지하되, 3개 logical sparse lane으로 생성한다.
+- 대부분의 non-Shop/non-Boss node outgoing edge는 1개다. 2갈래 branch는 이벤트/휴식 등 의미 있는 선택 차이가 있을 때만 가끔 허용한다.
+- all-to-all layer 연결은 금지한다. adjacent-lane cross edge는 첫 구현에서 floor당 0-2개 이하로 제한한다.
+- 지나온/cleared node만 back/cleared-back 시각 상태를 사용한다.
+- 미래 node는 type을 face-up으로 보여주되, 아직 선택 불가하면 dark/disabled 상태로 둔다.
+- 선택 가능 node는 lit/active 상태이며, click 시 즉시 encounter로 진입한다.
+- active encounter 중 route 선택 취소, map 복귀 후 다른 노드 선택, utility map을 통한 commitment 회피는 금지한다.
+- Rest는 Floor 시작 직후/Layer 1에 나오지 않는다. 첫 구현은 Layer 2/3에서 floor당 0-1개 후보를 기준으로 둔다.
+- Boss clear 후 다음 층 선택 시 이전 result UI를 clear하고 새 floor map generated/visible 상태를 보장한다.
+
+**근거**:
+- 현재 지도는 visible map surface를 갖고 있지만 route density와 reveal/commitment 규칙이 약해 전략 선택으로 읽히지 않는다.
+- 사용자 피드백은 지도 제거가 아니라 sparse lane route와 irreversible node commitment를 요구한다.
+- future node type을 숨기기보다 face-up disabled로 보여주면 모바일 화면에서 다음 선택 비용을 읽기 쉽고, disabled 상태가 현재 경로 제약을 전달한다.
+
+**Pillar 점검**:
+- P1: Rest 초반 노출을 막아 회복 auto-pick을 줄이고, route commitment가 손실 위험을 만든다.
+- P2: AI/NPC/서사 생성과 무관한 deterministic run flow 계약이다.
+- P3: 3-lane sparse route와 occasional fork는 5-7분 모바일 런의 선택 밀도를 감당 가능하게 한다.
+- P4: route generation과 reveal/commitment state는 run id + floor seed 및 run state로 결정 가능하다.
+- P5: lit/disabled/back state와 즉시 encounter 진입이 선택 결과를 바로 보여준다.
+
+**범위**:
+- 설계/구현 handoff 문서: `design/map-flow-route-commitment-spec.md`, `design/feedback-rules-lock-2026-05-27.md`.
+- OQ-012의 초기 "맵 화면 없음/선택지 팝업" 구현 세부는 superseded된다.
+- OQ-026은 D-034로 close한다. Rest exact weighted probability는 이후 balance tuning이며 route-system blocker가 아니다.
+
+**참조**: OQ-012 historical, OQ-026 close, D-036
+
+---
+
+### D-035 Mataios ContextPolicy Combat Brain 🔒 LOCKED 2026-05-26
+
+**값**:
+- AI Track ML-Agents Exp04-06의 production handoff는 ONNX/PPO runtime 연결이 아니라 `ContextPolicy`를 명시적 deterministic rule logic으로 변환하는 것이다.
+- OQ-024의 단순 Mataios policy table은 fallback으로 유지한다. 다음 본편 구현 기준은 `ContextPolicy` 기반 Mataios combat brain이다.
+- Production brain은 `MataiosCombatContext → MataiosCombatBrain → MataiosActionPlan`의 순수 C# 도메인 경계로 설계한다. MonoBehaviour/UI/Save/Collapse mutation은 brain 밖에 둔다.
+- Brain은 다음 allowed input만 사용한다: Mataios down state, Player selected action, recent Player action history, Player/Mataios HP ratio, Enemy HP, enemy intent/threat tier, deterministic incoming preview, player Skill readiness, one-round `tempoReady`.
+- Brain은 다음 input을 사용하지 않는다: Affinity, NPC state, 붕괴도 값, random roll, runtime model inference, remote policy call.
+- 첫 runtime은 새 damage/heal 수치를 추가하지 않고 OQ-024 payload를 재사용한다.
+  - Protect: Player incoming damage -2
+  - Finisher/Pressure: damage 3
+  - Counter/Support/Skill setup assist: damage 2 또는 기존 support payload
+- Ordered rule priority:
+  1. Mataios down → no action
+  2. Enemy HP <= Mataios action power → finisher
+  3. `tempoReady` → tempo attack
+  4. high threat + Player did not Defend + Mataios HP >25% → protect
+  5. Player HP <=35% + Mataios HP >25% → protect
+  6. high threat + Player Defend → counter assist
+  7. Skill ready + Skill context valuable + Player Skill → skill setup assist
+  8. recent Attack streak → pressure attack
+  9. recent Defend streak → counter assist
+  10. default → support attack
+- Enemy threat should come from D-033 enemy intent or deterministic incoming preview. Training-only hidden cadence such as `stepIndex % 3` must not be copied into production combat.
+- Runtime RL learning, ONNX inference, ML-Agents dependency, external policy API, `광폭/FRENZY` party-chain redesign, `ITEM_07`, multi-enemy targeting, relationship/collapse combat scaling are out of scope.
+- 본편 C# runtime 변경 전에는 current `origin/Proto` clean worktree에서 CodeGraph fresh `status`/`sync`/`query`/`context`를 수행해야 한다. `.codegraph/` 및 generated analysis artifact는 commit 후보가 아니다.
+
+**근거**:
+- Exp04는 rule/reward/context redesign 뒤 ContextPolicy가 PPO 및 spam baselines를 이겼음을 보여줬다.
+- Exp05/05b/06은 PPO tuning이 deterministic ContextPolicy보다 안전한 production path가 아님을 보여줬다.
+- 본편 전투에는 P4 결정성과 D-029 금지선이 더 중요하므로, AI evidence는 runtime model이 아니라 사람이 읽을 수 있는 deterministic rule로 환원해야 한다.
+
+**Pillar 점검**:
+- P1: Mataios down/collapse는 런 압박으로 남고, 붕괴도는 combat scaling이 되지 않는다.
+- P2: AI Track evidence는 기술 과시가 아니라 캐릭터 동행자의 명시 행동 규칙을 개선하는 데 쓰인다.
+- P3: ordered rule table은 5-7분 모바일 전투에서 읽을 수 있는 밀도를 유지한다.
+- P4: no RNG/no model inference/no runtime learning. 같은 state는 같은 action을 반환한다.
+- P5: Protect, tempo spend, Skill setup, finisher 결과는 해당 라운드 log/UI에서 즉시 드러나야 한다.
+
+**범위**:
+- 설계/구현 handoff 문서: `design/mataios-context-policy-combat-brain-spec.md`.
+- `design/two-actor-party-combat-lock-spec.md`와 `design/combat-core-rebuild-spec.md`의 Mataios policy 섹션은 D-035를 다음 구현 기준으로 참조한다.
+- OQ-024는 closed/fallback으로 유지한다. 새 payload 수치를 만들려면 별도 Balance OQ가 필요하지만, 첫 구현은 OQ-024 payload 재사용으로 blocker가 아니다.
+
+**참조**: D-029, D-032, D-033, OQ-022 temporary, OQ-023 defer, OQ-024 fallback, OQ-025
+
+---
+
+### D-036 2026-05-27 Feedback Rules Contract 🔒 LOCKED 2026-05-27
+
+**값**:
+- Combat preview UI는 resolver-owned non-mutating preview 결과를 source of truth로 사용한다. UI가 combat formula를 독자 계산하거나 hard-code하지 않는다.
+- Attack preview는 실제 resolver 기준 예상 피해를 보여준다. variance가 있으면 range를 보여주고, deterministic baseline만 가능하면 expected/base damage로 라벨링한다.
+- Defend preview는 이번 턴 incoming/intent를 알 수 있을 때 예상 피해 감소/방어량을 보여준다. incoming이 없으면 action mitigation만 보여주고 exact prevented damage처럼 말하지 않는다.
+- Skill preview는 사용 가능 여부, 사용 후 cooldown, 사용 불가 시 남은 cooldown을 보여준다.
+- Enemy stat surface는 현재 data/runtime이 가진 `attack`, 지원되는 경우의 `defense`, active buffs/debuffs/status만 보여준다. 없는 값을 새 시스템으로 임의 생성하지 않는다.
+- 전투 중 보유 아이템 확인은 첫 구현에서 read-only inspect로 제한한다. in-combat item activation, 새 item effect, `ITEM_07` 구현을 추가하지 않는다.
+- Map/node-choice state 진입 시 normal/map BGM으로 reset한다. Boss BGM은 boss encounter active state 밖에서 유지하지 않는다.
+- Low HP red flash는 P2 polish가 아니라 P1 feedback이다. 즉시 생존 위험을 읽히게 하는 신호이며, 첫 구현 threshold는 data/config 소유여야 하고 UI magic number로 박지 않는다.
+
+**근거**:
+- 2026-05-27 피드백의 핵심은 "플레이어가 지금 무엇을 선택하면 어떤 일이 벌어지는지"를 UI가 거짓말 없이 보여주는 것이다.
+- Combat preview가 resolver와 분리되면 실제 피해와 UI 숫자가 drift하여 P5를 깨고 QA가 불가능해진다.
+- Enemy stat panel은 정보성을 높여야 하지만, OQ-025가 열려 있는 상태에서 intent/status mechanics를 새로 invent하면 scope가 넘친다.
+- Combat item inspect는 정보 접근성만 개선해야 하며 아이템 사용/효과 구현으로 확장하면 OQ-019와 충돌한다.
+- Boss BGM 누수와 low HP danger 미표시는 전투/지도 상태 판독성을 직접 해친다.
+
+**Pillar 점검**:
+- P1: Low HP feedback은 회복을 강화하지 않고 위험을 읽게 한다.
+- P2: RL/ONNX/NPC state combat modifier 없이 feedback 계약만 잠근다.
+- P3: preview와 enemy stat은 compact한 숫자/상태만 보여주어 모바일 밀도를 넘기지 않는다.
+- P4: resolver preview, BGM state transition, HP threshold는 결정적으로 검증 가능해야 한다.
+- P5: damage/guard/cooldown/stat/BGM/danger feedback이 선택 결과와 상태 전환을 즉시 체감하게 한다.
+
+**범위**:
+- 설계/구현 handoff 문서: `design/feedback-rules-lock-2026-05-27.md`.
+- OQ-019 `ITEM_07`은 open 유지한다. 본 계약은 `ITEM_07` 구현 지시가 아니다.
+- OQ-025 enemy intent deck/payload는 open 유지한다. 본 계약은 preview source와 UI truthfulness만 잠근다.
+- 본편 runtime RL/ONNX, 최종 스토리/대사, 다중 적, 새 combat balance number는 범위 밖이다.
+- 본편 C# runtime 변경 전에는 D-035의 CodeGraph fresh status/sync/query/context 절차를 따른다.
+
+**참조**: D-033, D-034, D-035, OQ-019, OQ-025
+
+---
+
 ### D-009 콘텐츠 수량 🔒 LOCKED 갱신 2026-05-05 (최초 LOCKED 2026-04-27)
 **값**: 능력 12 / 시너지 4 / **특성 12** / **유물 6 / 일반 아이템 12** / 적 6 / 보스 2 / 층 5 / 인카운터 25 / 메모리 파편 5 / 엔딩 2
 **특성 정의**: 메타 영구 해금 패시브. 승리 횟수 누적으로 해금(Lv1:3회/Lv2:6회/Lv3:10회). 태그: 생존/공격/지원 각 4개. 능력(액티브, 상점 Gold)과 이분화. 수량 OQ-011 확정(2026-05-05).
@@ -574,7 +699,7 @@ CREATE TABLE player_utterances (
 | OQ-009 | iOS 빌드 환경 (Mac 보유 여부) | 작가 | W1-1 (04-30) | ✅ closed 04-28 → D-018 (Mac 보유, Apple Dev 미가입, Android APK 우선) |
 | OQ-010 | 외주(동생) 작업 정의 — 범위(아트만/사운드만/둘 다) · 기한 · 소통 채널 · 산출 형식 | 작가 + 동생 | W2-2 시작 전 (05-09) | ✅ closed 05-05 → `design/sound-brief.md` 리스트업. 작가가 동생에게 직접 전달. |
 | OQ-011 | 특성 8~12개 상세 설계 (태그 분류·XP 임계값·구체 효과) | 작가 + Claude | W2-1 (05-08) | ✅ closed 05-05 → 특성 12종 확정(생존/공격/지원×4), 메타 영구 해금, 승리 3단계. `design/traits.md` 참조 |
-| OQ-012 | 노드 맵 시각 구성 (층당 분기 수, 경로 종류, 시각 표현) | 작가 | W2-1 (05-08) | ✅ closed 05-05 → 슬더스식 3경로, 선택지 팝업, 시드 랜덤. `design/balance.md` §노드맵 참조 |
+| OQ-012 | 노드 맵 시각 구성 (층당 분기 수, 경로 종류, 시각 표현) | 작가 | W2-1 (05-08) | ✅ closed 05-05 → 슬더스식 3경로, 선택지 팝업, 시드 랜덤. 05-27 현재 런타임 지도 UI와 사용자 피드백에 의해 D-034가 이 구현 세부를 대체함 |
 | OQ-013 | 상점 능력 Pool (1런당 표시 개수, 리롤 가능 여부, 가격 확정) | 작가 | W1-2 잔여 (05-07) | ✅ closed 05-05 → 3개/런, 기본 20G·3번째 30G, 리롤 10G→+5G씩 증가 |
 | OQ-014 | 적 턴 선택지 3개의 구체 내용 (패링/회피/버티기 등 명칭·효과) | 작가 | W2-1 (05-08) | ✅ closed 05-05 → 상황 텍스트 1개+2택 1, 몬스터별 고유 기믹. D-022 갱신(3택→2택) |
 | OQ-015 | 복합 행동 전투 구조 세부 (TRAIT_OFFENSE_04: 1턴 2택 순차 선택, ATK ×0.7 적용 방식, UI 표현) | 작가 + Codex | W2-1 (05-08) | ✅ closed 05-05 → D-023 (1→처리→2 순차, 2번째=추가공격ATK×0.7 또는 아이템만, 방어/스킬 불가) |
@@ -586,8 +711,9 @@ CREATE TABLE player_utterances (
 | OQ-021 | 마타이오스 전투 actor 기준값: Max HP, action power, 전투 종료 후 부분 회복량, Rest 완전 회복 exact 처리 | PM + 시스템 디자인 | Two-Actor Combat 1차 구현 전 | ✅ closed 05-24 → 1차 구현값: Max HP 16, action power 3, 전투 후 down 아님 Max HP 25%(최소 3) 회복, down이면 HP 4 복귀, Rest 완전 회복/down 해제 |
 | OQ-022 | 마타이오스 down/collapse 처리: 붕괴도 증가량/가속 방식, down event 표시 방식(팝업 vs 로그/오버레이), 한 전투 내 반복 penalty 여부 | PM + 시스템 디자인 | down/collapse 구현 전 | 🟡 partial-close 05-24 → temporary implementation contract: down 시 붕괴도 +5, 전투당 penalty 1회, blocking popup 금지, 전투 로그+non-blocking overlay 우선. 플레이 후 교체 가능해야 하며 hard-coded modal/수치 금지 |
 | OQ-023 | `광폭/FRENZY` 공격 연쇄 판정 범위: Player action chain만 볼지, Party action chain까지 볼지 | PM + 시스템 디자인 | future combat expansion stage | ⏸ defer 05-24 → 1차 구현은 기존 Player action chain 유지. Mataios action은 chain 유지/강화/파괴에 관여하지 않음. 광폭 신규 설계/수치 제안 금지 |
-| OQ-024 | Mataios deterministic policy thresholds/action constants: low HP 기준, finisher margin, protect/stabilize 강도와 우선순위 조정값 | 시스템 디자인 + 개발 | Mataios policy data entry 전 | ✅ closed 05-24 → 1차 rule table 확정. Player HP≤35% & Mataios HP>25% 보호(-2), enemy HP≤3 마무리 3, 최근 Defend 2회 반격 보조 2, 최근 Attack 2회 압박 3, 기본 지원 2 |
+| OQ-024 | Mataios deterministic policy thresholds/action constants: low HP 기준, finisher margin, protect/stabilize 강도와 우선순위 조정값 | 시스템 디자인 + 개발 | Mataios policy data entry 전 | ✅ closed 05-24 → 1차 rule table 확정. 05-26 D-035 이후에는 fallback/payload 기준으로 유지하고, 다음 구현의 primary selection logic은 ContextPolicy brain을 따른다 |
 | OQ-025 | Enemy intent system의 enemy별 첫 deck과 exact payload 숫자: normal/heavy/guard/charge/weak/special intent를 어떤 적에게 어떤 순서·피해·방어·charge 값으로 배치할지 | 시스템 디자인 + 개발 | Combat Core Rebuild Batch 2 구현 전 | ❓ open 05-24 → D-033은 intent role/counterplay를 잠그고, enemy별 numeric deck은 별도 확정 필요 |
+| OQ-026 | Map Flow / Route Commitment 확정: D-034 후보의 sparse 3-lane route, irreversible node commitment, Rest frequency/Floor 1 Rest, single-edge auto-open 여부를 잠글지 | PM + 시스템 디자인 | Map Flow 구현 전 | ✅ closed 05-27 → D-034. Pre-run placeholder, sparse route/reveal/commitment, delayed Rest, explicit tap first implementation으로 잠금. Rest exact weighted probability는 balance tuning으로 이관 |
 
 ---
 
@@ -697,31 +823,44 @@ CREATE TABLE player_utterances (
 
 ## 7. 콘텐츠 명세 (D-009)
 
-### 7.0 노드 맵 구조 — OQ-012 ✅ 확정 2026-05-05
+### 7.0 노드 맵 구조 — OQ-012 ✅ / D-034 🔒 LOCKED 2026-05-27
 
-**구조**: 슬레이 더 스파이어식 — 층당 3개 경로 중 1개 선택, 경로마다 노드 혼재.
+**현재 상태**: OQ-012는 역사적으로 closed지만, "맵 화면 없음/선택지 팝업" 구현 세부는 현재 런타임 지도 UI와 사용자 피드백에 의해 더 이상 기준으로 쓰지 않는다. D-034는 지도를 단순 UI가 아니라 로그라이크 route commitment 표면으로 재정의한다.
 
-| 항목 | 값 |
-|------|-----|
-| 총 층 수 | 5층 |
-| 층당 경로 수 | 3개 (시드 랜덤 배치) |
-| 노드 종류 | 전투 / 인카운터 / 휴식 |
-| 상인 위치 | 매 층 보스 직전 고정 (경로 무관) |
+**D-034 구조**: Floor 1 map 전에 pre-run placeholder를 먼저 보여준다. 이후 5컬럼 시각 그리드는 유지하되, 3개 logical lane을 sparse route로 생성한다. 노드 선택은 즉시 조우 진입으로 확정되며, 선택 후 취소/지도 복귀로 다른 노드를 고르는 흐름은 금지한다.
+
+| 항목 | D-034 값 |
+|------|--------------|
+| 총 층 수 | 5층 유지 |
+| pre-run | Floor 1 map 전 placeholder screen. 현재는 빈 화면 허용, 향후 기억 계승/장비 선택/짧은 컷신 슬롯 예약 |
+| 시각 컬럼 | 5컬럼 유지 |
+| 논리 경로 | 3개 sparse lane |
+| 분기 layer | 3개 branch layer 후 Shop/Boss |
+| cross-lane branch | 대부분 outgoing 1개. 2갈래는 이벤트/휴식 등 의미 있는 branch에서만 가끔 허용, 층당 adjacent branch 0-2개 이하 |
+| reveal | 미래 node는 face-up type 표시. 선택 불가 node는 dark/disabled. 지나온 node만 back/cleared-back |
+| merge | pre-Shop merge 최대 1회 + Shop forced merge |
+| 노드 종류 | 전투 / 인카운터 / 휴식 / 상점 / 보스 |
+| Rest timing | Floor 시작 직후 Rest 금지. Rest는 Layer 2/3 후보, 첫 구현은 층당 0-1개 후보 |
+| 상인 위치 | 매 층 보스 직전 고정 |
 | 보스 위치 | 매 층 최하단 고정 |
-| 노드 배치 비율 | 전투 40% / 인카운터 40% / 휴식 20% |
-| 시각 표현 | **맵 화면 없음** — 경로 선택 시 팝업(노드 종류 아이콘 + 텍스트) 으로만 분기 |
-| 레이아웃 생성 | 시드 랜덤 (run_id 기반, P4 결정성 유지) |
+| 선택 규칙 | 노드 선택 즉시 encounter 진입, 취소 없음, active encounter 중 map/route utility 비활성 |
+| 층 전환 | 다음 층 선택 시 이전 result UI clear 후 새 floor map generated/visible 보장 |
+| 레이아웃 생성 | 시드 랜덤 (run_id + floor 기반, P4 결정성 유지) |
 
-**층 흐름 예시 (1층):**
+**층 흐름 예시 (D-034):**
 ```
-[탑 진입] → [경로 선택 팝업: 전투 / 인카운터 / 휴식]
-   → 선택한 노드 처리
+[Pre-run placeholder] → [새 층 지도] → [Layer 1: 2-3개 selectable node]
+   → 선택 즉시 조우 진입
+   → 해결 후 선택하지 않은 sibling lane skip/lock
+   → [Layer 2/3 route 선택]
    → [상인]
-   → [1층 보스]
-   → 다음 층
+   → [층 보스]
+   → [다음 층] 선택 시 새 floor map 즉시 표시
 ```
 
-> Codex 구현 참조: `design/balance.md` §노드 맵 (추후 추가 예정)
+**보류**: Rest exact weighted probability는 Balance Pass/tuning으로 이관한다. 단일 outgoing edge도 첫 구현은 explicit tap을 유지한다.
+
+> Codex 구현 참조: `design/balance.md` §노드 맵, `design/map-flow-route-commitment-spec.md`, `design/feedback-rules-lock-2026-05-27.md`.
 
 ### 7.1 능력 / 시너지 / 특성 (12 + 4 + 8~12)
 
@@ -743,6 +882,20 @@ CREATE TABLE player_utterances (
 - `Attack`은 punish/finish/chain payoff, `Defend`는 heavy/special threat 대응, `Skill`은 guard/charge/opening timing payoff를 맡는다.
 - SFX/VFX/log feedback은 전투 판독성의 일부이며, 구현은 4개 batch로 분리한다.
 - 상세 intent/counterplay/feedback/balance handoff는 `design/combat-core-rebuild-spec.md`를 기준으로 한다.
+
+**Mataios ContextPolicy Combat Brain (D-035):**
+- AI Track의 Exp04-06 결과는 본편 runtime RL/ONNX가 아니라 deterministic rule logic으로 반영한다.
+- OQ-024 table은 fallback/payload 기준으로 유지하고, 다음 Mataios policy 구현은 enemy threat, tempoReady, Skill context, player action history를 읽는 D-035 ordered table을 따른다.
+- Enemy threat는 D-033 intent 또는 deterministic preview에서 오며, training-only hidden cadence는 production에 넣지 않는다.
+- 상세 brain contract와 CodeGraph preflight 조건은 `design/mataios-context-policy-combat-brain-spec.md`를 기준으로 한다.
+
+**Combat Preview / Enemy Stat / Audio Feedback (D-036):**
+- Attack/Defend/Skill preview는 resolver-owned non-mutating preview 결과를 source of truth로 사용한다. UI는 combat formula를 독자 계산하지 않는다.
+- Enemy stat surface는 현재 data/runtime이 가진 attack, 지원되는 경우의 defense, active buffs/debuffs/status만 보여준다. 없는 값을 새 시스템으로 임의 생성하지 않는다.
+- 전투 중 보유 아이템 확인은 read-only inspect만 허용한다. 아이템 사용/효과 구현으로 확장하지 않는다.
+- Map/node-choice state 진입 시 normal/map BGM으로 reset하고, boss BGM은 boss encounter 밖에서 유지하지 않는다.
+- Low HP red flash는 P1 feedback이다. threshold는 data/config 소유여야 하며 UI magic number로 박지 않는다.
+- OQ-019 `ITEM_07`과 OQ-025 enemy intent deck은 계속 open이다.
 
 **4 태그**: `검`(직접·근접) · `술`(원소·광역) · `선`(원거리·관통) · `결`(방어·반격)
 
