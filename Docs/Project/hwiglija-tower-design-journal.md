@@ -49,6 +49,78 @@ project: 회귀자는 탑을 오른다
 
 ## 사고 로그 (최신이 위)
 
+### 2026-05-27 — 피드백 규칙은 UI polish가 아니라 거짓말 없는 선택 계약이다
+
+**맥락**: 2026-05-27 피드백은 화면 배치 문제가 아니라, 런 시작/지도/전투 preview/audio가 플레이어에게 어떤 결정을 요구하는지 불명확하다는 문제를 드러냈다. 개발 세션이 이를 단순 UI polish로 처리하면 route commitment와 combat preview source가 다시 drift할 위험이 있다.
+
+**옵션들**:
+- A) 피드백을 모두 UI/QA polish로 분류 → 기각. Attack/Defend/Skill preview와 map route reveal은 실제 시스템 규칙이 없으면 UI가 숫자와 상태를 추측하게 된다.
+- B) D-034 route/reveal을 잠그고, combat preview/enemy stat/audio feedback은 D-036으로 별도 잠금 → 채택. 지도 구조와 전투 피드백의 책임을 분리하면서 개발 가능한 계약을 만든다.
+- C) D-033 enemy intent/OQ-025까지 같이 닫아 combat preview를 완전하게 만듦 → 기각. Enemy별 deck/payload 숫자는 아직 open이며, 지금 닫으면 scope를 넘고 임의 수치를 만들게 된다.
+- D) pre-run screen에 기억/장비/스토리 내용을 임시로 채움 → 기각. 슬롯은 예약하되 최종 스토리/대사와 새 meta rule은 작가/PM 결정 없이 넣지 않는다.
+
+**선택**: B. D-034는 pre-run placeholder, sparse lane, face-up future node, disabled/active reveal, irreversible node commitment까지 잠근다. D-036은 resolver-owned combat preview, enemy stat surface, read-only combat item inspect, map/boss BGM state, low HP P1 feedback을 잠근다. OQ-019와 OQ-025는 open 유지한다.
+
+**Pillar 점검**: P1은 위험/회복 압박을 더 읽히게 하되 회복을 강화하지 않는다. P2는 AI/RL/서사 생성 없이 시스템 판독성만 고친다. P3는 sparse route와 compact preview로 모바일 선택 밀도를 제한한다. P4는 resolver preview와 seeded route로 결정성을 보장한다. P5는 숫자/노드/BGM/low HP feedback이 즉시 체감되도록 한다.
+
+**Ambiguity 점수**: 0.17. Route/reveal/preview source/audio state는 잠금 가능하다. Enemy intent payload와 `ITEM_07` 패턴 대응은 각각 OQ-025/OQ-019가 필요하다.
+
+**기각된 매력**: A는 빠르고 C는 전투 정보가 더 완전해 보인다. 하지만 A는 근본 규칙을 남기고, C는 아직 잠기지 않은 enemy payload를 임의 확정하게 만든다.
+
+**재검토 조건**: D-034/D-036 구현 후에도 preview mismatch, boss BGM leakage, map route 선택률/이탈률, low HP 피드백 과잉/부족이 반복될 때.
+
+**연결**: D-034 / D-036 / OQ-019 open / OQ-025 open / OQ-026 close
+
+---
+
+### 2026-05-26 — ContextPolicy는 runtime ML이 아니라 Mataios deterministic brain으로 흡수한다
+
+**맥락**: ML-Agents Exp04-06은 PPO를 본편에 붙일 근거를 만들기보다, 명시적 ContextPolicy가 spam policy와 PPO보다 안정적인 전투 판단 후보임을 보여줬다. Game/System Track에서는 이 결과를 본편 C# runtime 변경 전에 GDD/system design으로 잠가야 한다.
+
+**옵션들**:
+- A) Exp06 ONNX/PPO를 본편 runtime에 연결 → 기각. Exp06은 Skill share와 ContextPolicyGap에서 실패했고, D-032/D-033의 runtime RL 금지선과 P4 결정성을 흔든다.
+- B) OQ-024 단순 table을 그대로 유지 → 기각. baseline으로는 충분하지만 Exp04-06이 보여준 high threat/tempo/skill context 학습을 버린다.
+- C) ContextPolicy를 명시 rule table로 변환해 Mataios combat brain으로 잠금 → 채택. AI Track의 유효한 부분만 사람 읽을 수 있는 deterministic policy로 흡수한다.
+- D) enemy intent 구현까지 기다린 뒤 policy를 다시 설계 → 부분 기각. Enemy threat가 없으면 fallback을 쓰되, brain contract는 지금 잠가 개발 순서를 명확히 해야 한다.
+
+**선택**: C. D-035로 `MataiosCombatContext → MataiosCombatBrain → MataiosActionPlan` 구조를 잠그고, OQ-024는 fallback/payload 기준으로 유지한다. 첫 구현은 새 수치를 추가하지 않고 OQ-024 payload를 재사용한다. Enemy threat는 D-033 intent 또는 deterministic preview에서 오며, training-only `stepIndex % 3` cadence는 production에 넣지 않는다.
+
+**Pillar 점검**: P1은 붕괴도를 policy input으로 금지해 정렬. P2는 AI evidence를 기술 과시가 아니라 캐릭터 행동 규칙 개선으로 사용해 정렬. P3는 ordered table로 입력 밀도를 제한해 정렬. P4는 no RNG/no model inference로 정렬. P5는 Protect/tempo/Skill setup/finisher를 round log에 즉시 드러내야 정렬.
+
+**Ambiguity 점수**: 0.16. Architecture와 first implementation payload 재사용은 잠금 가능하다. 새 tempo/Skill-support 수치를 만들려면 별도 Balance OQ가 필요하지만 first runtime blocker는 아니다.
+
+**기각된 매력**: A는 포트폴리오상 "AI가 플레이한다"는 그림이 강하지만, 현재 지표와 본편 결정성 기준에 맞지 않는다. D는 더 깔끔하지만 개발 세션이 policy 경계를 알 수 없어 지연된다.
+
+**재검토 조건**: D-033 enemy intent 구현 후에도 D-035 brain이 Protect/Skill setup을 과소 또는 과다 사용하거나, Mataios가 전투를 자동 해결하는 양상이 보일 때.
+
+**연결**: D-035 / OQ-024 fallback / `design/mataios-context-policy-combat-brain-spec.md`
+
+---
+
+### 2026-05-25 — Map Flow는 dense graph가 아니라 route commitment 표면이어야 한다
+
+**맥락**: 현재 지도는 런타임 UI가 생겼지만, route generator가 5컬럼 위에 6개 path를 만들고 여러 path가 node를 공유하면서 all-to-all에 가까운 인상을 준다. 또한 노드 선택 후 결과/지도 전환이 느슨하면 선택의 무게가 약해진다.
+
+**옵션들**:
+- A) 기존 5컬럼/6 path 구조를 유지하고 UI만 정리 → 기각. 시각 밀도와 선택 무게 문제의 원인이 route graph 자체에 남는다.
+- B) 5컬럼은 유지하되 3 logical lane sparse route로 재해석 → 채택 후보. 기존 UI 좌표계를 보존하면서 로그라이크식 route choice를 만들 수 있다.
+- C) Slay the Spire처럼 대형 노드 맵으로 확대 → 기각. 모바일 세로 5-7분 런에서 지도 조작 밀도가 커지고, 현재 구현 범위를 벗어난다.
+- D) 경로 선택을 다시 팝업으로 되돌림 → 기각. 이미 visible map surface가 있으며, 사용자 피드백의 핵심은 지도 제거가 아니라 route commitment 부재다.
+
+**선택**: B를 D-034 후보로 제안한다. 5컬럼 visual grid는 유지하고, 3개 sparse lane + adjacent cross-lane branch 1-2개 이하 + irreversible node commitment + delayed Rest + next-floor map visibility를 기준으로 삼는다. PM 확정 전에는 OQ-026 open으로 둔다.
+
+**Pillar 점검**: P1은 Rest를 초반에서 밀어 회복 auto-pick을 줄인다. P3는 3 branch layer + Shop + Boss로 선택 밀도를 제한한다. P4는 run_id+floor deterministic generation으로 정렬한다. P5는 노드 선택 즉시 조우 진입과 sibling skip/lock으로 결과를 즉시 보이게 한다.
+
+**Ambiguity 점수**: 0.22. Route structure와 commitment 원칙은 잠금 가능하지만, Floor 1 Rest 완전 금지 여부와 Rest exact frequency는 PM 확인이 필요하다.
+
+**기각된 매력**: C는 지도 자체가 더 풍부해 보이고, D는 구현 비용이 낮다. 하지만 C는 scope를 키우고, D는 현재 visible route surface를 포기한다.
+
+**재검토 조건**: sparse lane 적용 후에도 route 선택률/Rest 선택률/층 전환 QA에서 선택 무게가 개선되지 않을 때.
+
+**연결**: D-034 candidate / OQ-026 / `design/map-flow-route-commitment-spec.md`
+
+---
+
 ### 2026-05-24 — Combat Core Rebuild는 D-032 위의 상위 전투 결정
 
 **맥락**: D-032로 마타이오스 actor baseline은 잠겼지만, 현재 전투의 더 큰 문제는 Attack spam damage race다. 마타이오스를 추가해도 enemy intent와 counterplay가 없으면 Defend/Skill 선택 이유와 긴장감은 회복되지 않는다.
