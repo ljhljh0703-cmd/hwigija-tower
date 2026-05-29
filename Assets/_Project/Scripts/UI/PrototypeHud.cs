@@ -41,6 +41,7 @@ namespace HwigiTower.UI
         [SerializeField] private Text eventBodyText;
         [SerializeField] private Text eventUtilityText;
         [SerializeField] private Text combatEnemyTitleText;
+        [SerializeField] private Text combatEnemyStatusText;
         [SerializeField] private Text combatPlayerCardText;
         [SerializeField] private Text combatMataiosCardText;
         [SerializeField] private Image combatPlayerPortraitImage;
@@ -74,6 +75,7 @@ namespace HwigiTower.UI
         [SerializeField] private Button attackButton;
         [SerializeField] private Button defendButton;
         [SerializeField] private Button skillButton;
+        [SerializeField] private Button combatItemInspectButton;
         [SerializeField] private Button routeActionButton;
         [SerializeField] private Button nextFloorButton;
         [SerializeField] private Button restartButton;
@@ -103,6 +105,10 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform portraitRoot;
         [SerializeField] private Image floorMapBackgroundImage;
         [SerializeField] private RectTransform utilityPanel;
+        [SerializeField] private RectTransform preRunPlaceholderLayer;
+        [SerializeField] private RectTransform combatItemInspectPanel;
+        [SerializeField] private Text combatItemInspectText;
+        [SerializeField] private Image lowHpWarningImage;
         [SerializeField] private Image utilityPortraitImage;
         [SerializeField] private Text utilityText;
         [SerializeField] private Button utilityStatusButton;
@@ -110,6 +116,7 @@ namespace HwigiTower.UI
         [SerializeField] private Button utilityLoadoutButton;
         [SerializeField] private Button utilityPlayerTabButton;
         [SerializeField] private Button utilityMataiosTabButton;
+        [SerializeField, Range(0.05f, 0.75f)] private float lowHpWarningRatio = 0.30f;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
         private readonly List<Image> _mapNodeIconImages = new List<Image>();
@@ -189,7 +196,6 @@ namespace HwigiTower.UI
         private const int ResultLineLimit = 3;
         private const int ResultIconChipCount = 6;
         private const float DenseLineSpacing = 0.92f;
-        private const string BossReturnChoiceId = "CHOICE_BOSS_RETURN";
         private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
         private static readonly Color ResultTextColor = new Color(0.88f, 0.93f, 0.95f, 1f);
         private static readonly Color PanelColor = new Color(0.035f, 0.045f, 0.055f, 0.88f);
@@ -223,6 +229,12 @@ namespace HwigiTower.UI
         public bool CombatPortraitFrameVisible => combatPlayerPortraitFrameImage != null && combatPlayerPortraitFrameImage.gameObject.activeInHierarchy;
         public bool CombatPartyDockVisible => combatPartyDock != null && combatPartyDock.gameObject.activeInHierarchy;
         public string CombatPartyMessage => ((combatPlayerCardText == null ? string.Empty : combatPlayerCardText.text) + "\n" + (combatMataiosCardText == null ? string.Empty : combatMataiosCardText.text)).Trim();
+        public string CombatEnemyStatusMessage => combatEnemyStatusText == null ? string.Empty : combatEnemyStatusText.text;
+        public bool CombatItemInspectButtonVisible => combatItemInspectButton != null && combatItemInspectButton.gameObject.activeInHierarchy;
+        public bool CombatItemInspectVisible => combatItemInspectPanel != null && combatItemInspectPanel.gameObject.activeInHierarchy;
+        public string CombatItemInspectMessage => combatItemInspectText == null ? string.Empty : combatItemInspectText.text;
+        public bool PreRunPlaceholderVisible => preRunPlaceholderLayer != null && preRunPlaceholderLayer.gameObject.activeInHierarchy;
+        public bool LowHpWarningVisible => lowHpWarningImage != null && lowHpWarningImage.gameObject.activeInHierarchy;
         public string CurrentCombatActionIconNames => string.Join("|", new[]
         {
             attackActionIconImage != null && attackActionIconImage.sprite != null ? attackActionIconImage.sprite.name : string.Empty,
@@ -234,6 +246,12 @@ namespace HwigiTower.UI
             combatTrainingStatusIconImage != null && combatTrainingStatusIconImage.sprite != null ? combatTrainingStatusIconImage.sprite.name : string.Empty,
             combatBandageStatusIconImage != null && combatBandageStatusIconImage.sprite != null ? combatBandageStatusIconImage.sprite.name : string.Empty,
             combatRecallStatusIconImage != null && combatRecallStatusIconImage.sprite != null ? combatRecallStatusIconImage.sprite.name : string.Empty
+        });
+        public string CombatActionButtonLabels => string.Join("|", new[]
+        {
+            ResolveButtonLabel(attackButton),
+            ResolveButtonLabel(defendButton),
+            ResolveButtonLabel(skillButton)
         });
         public string CurrentTopHudIconNames => string.Join("|", new[]
         {
@@ -613,6 +631,12 @@ namespace HwigiTower.UI
 #if UNITY_EDITOR || UNITY_INCLUDE_TESTS
         public void OpenQaRouteStep(EncounterSelection selection)
         {
+            if (_roomController != null && _roomController.PreRunPlaceholderPending)
+            {
+                _roomController.ConfirmPreRunPlaceholder();
+                HidePreRunPlaceholder();
+            }
+
             OpenSelectedRouteStep(selection);
         }
 #endif
@@ -1046,6 +1070,15 @@ namespace HwigiTower.UI
             }
 
             EnsureEventSystem();
+            EnsureLowHpWarning();
+            UpdateLowHpWarning(snapshot);
+            if (_roomController != null && _roomController.PreRunPlaceholderPending)
+            {
+                ShowPreRunPlaceholder();
+                return;
+            }
+
+            HidePreRunPlaceholder();
             // Map selection is user-driven from the persistent map button.
             UpdateScreenLayers(snapshot);
             UpdateNextFloorButton(snapshot);
@@ -1118,6 +1151,166 @@ namespace HwigiTower.UI
                 var selected = _roomController.SelectMapNode(mapNodeId);
                 OpenSelectedRouteStep(selected);
             });
+        }
+
+        private void ShowPreRunPlaceholder()
+        {
+            EnsurePreRunPlaceholderLayer();
+            if (preRunPlaceholderLayer == null)
+            {
+                return;
+            }
+
+            ClearChoices();
+            HideRestInteractionPanel();
+            HideEventCutsceneLayout();
+            HideMerchantPresentation();
+            HideNpcSpotlight();
+            HideSkillPicker();
+            HideCombatItemInspect();
+            EnsureScreenLayers();
+            SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(actionLayer, false);
+            SetLayerVisible(visualLayer, false);
+            SetLayerVisible(npcReactionLayer, false);
+            SetLayerVisible(resultLayer, false);
+            SetLayerVisible(endingLayer, false);
+            if (combatPanel != null)
+            {
+                combatPanel.gameObject.SetActive(false);
+            }
+
+            preRunPlaceholderLayer.gameObject.SetActive(true);
+        }
+
+        private void HidePreRunPlaceholder()
+        {
+            if (preRunPlaceholderLayer != null)
+            {
+                preRunPlaceholderLayer.gameObject.SetActive(false);
+            }
+        }
+
+        private void EnsurePreRunPlaceholderLayer()
+        {
+            if (preRunPlaceholderLayer != null)
+            {
+                return;
+            }
+
+            var layerObject = new GameObject("Pre Run Placeholder Stepper");
+            layerObject.transform.SetParent(HudParent, false);
+            preRunPlaceholderLayer = layerObject.AddComponent<RectTransform>();
+            preRunPlaceholderLayer.anchorMin = Vector2.zero;
+            preRunPlaceholderLayer.anchorMax = Vector2.one;
+            preRunPlaceholderLayer.offsetMin = Vector2.zero;
+            preRunPlaceholderLayer.offsetMax = Vector2.zero;
+
+            var background = layerObject.AddComponent<Image>();
+            background.color = new Color(0.014f, 0.019f, 0.026f, 0.98f);
+            background.raycastTarget = true;
+
+            var title = CreateHudText("Pre Run Title", new Vector2(0.08f, 0.83f), new Vector2(0.92f, 0.90f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, TitleFontSize, TextAnchor.MiddleCenter, PrimaryTextColor);
+            title.transform.SetParent(layerObject.transform, false);
+            title.text = "출발 준비";
+
+            CreatePlaceholderFrame(layerObject.transform, "Pre Run Art Slot", new Vector2(0.10f, 0.41f), new Vector2(0.90f, 0.79f), "이미지 슬롯");
+            CreatePlaceholderFrame(layerObject.transform, "Pre Run Memory Slot", new Vector2(0.10f, 0.22f), new Vector2(0.48f, 0.36f), "기억 계승\n비활성");
+            CreatePlaceholderFrame(layerObject.transform, "Pre Run Equipment Slot", new Vector2(0.52f, 0.22f), new Vector2(0.90f, 0.36f), "장비 선택\n비활성");
+
+            var ctaObject = new GameObject("Pre Run Confirm Button");
+            ctaObject.transform.SetParent(layerObject.transform, false);
+            var rect = ctaObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.18f, 0.08f);
+            rect.anchorMax = new Vector2(0.82f, 0.16f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var image = ctaObject.AddComponent<Image>();
+            image.color = new Color(0.18f, 0.25f, 0.29f, 0.98f);
+            var button = ctaObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(ConfirmPreRunPlaceholder);
+            var label = CreateHudText("Pre Run Confirm Label", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, ButtonFontSize, TextAnchor.MiddleCenter, PrimaryTextColor);
+            label.transform.SetParent(ctaObject.transform, false);
+            label.text = "시작";
+        }
+
+        private void CreatePlaceholderFrame(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, string labelText)
+        {
+            var frameObject = new GameObject(name);
+            frameObject.transform.SetParent(parent, false);
+            var rect = frameObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var image = frameObject.AddComponent<Image>();
+            image.color = new Color(0.045f, 0.055f, 0.064f, 0.90f);
+            image.raycastTarget = false;
+            var label = CreateHudText(name + " Label", new Vector2(0.05f, 0.08f), new Vector2(0.95f, 0.92f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, CaptionFontSize, TextAnchor.MiddleCenter, new Color(0.63f, 0.68f, 0.70f, 1f));
+            label.transform.SetParent(frameObject.transform, false);
+            label.text = labelText;
+        }
+
+        private void ConfirmPreRunPlaceholder()
+        {
+            _roomController?.ConfirmPreRunPlaceholder();
+            HidePreRunPlaceholder();
+            if (_roomController == null)
+            {
+                return;
+            }
+
+            var snapshot = _roomController.GetSnapshot();
+            if (snapshot.HasFloorMap && !snapshot.RunCompleted)
+            {
+                ShowMapChoices(_roomController.GetFloorMapNodes(), mapNodeId =>
+                {
+                    var selected = _roomController.SelectMapNode(mapNodeId);
+                    OpenSelectedRouteStep(selected);
+                });
+            }
+
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void EnsureLowHpWarning()
+        {
+            if (lowHpWarningImage != null)
+            {
+                return;
+            }
+
+            var warningObject = new GameObject("Low HP Edge Warning");
+            warningObject.transform.SetParent(HudParent, false);
+            warningObject.transform.SetAsLastSibling();
+            var rect = warningObject.AddComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            lowHpWarningImage = warningObject.AddComponent<Image>();
+            lowHpWarningImage.color = new Color(0.80f, 0.06f, 0.05f, 0.16f);
+            lowHpWarningImage.raycastTarget = false;
+            lowHpWarningImage.gameObject.SetActive(false);
+        }
+
+        private void UpdateLowHpWarning(PrototypeRunSnapshot snapshot)
+        {
+            if (lowHpWarningImage == null)
+            {
+                return;
+            }
+
+            var visible = !string.IsNullOrEmpty(snapshot.RunId) &&
+                snapshot.PlayerMaxHp > 0 &&
+                snapshot.PlayerHp > 0 &&
+                snapshot.PlayerHp / (float)snapshot.PlayerMaxHp <= lowHpWarningRatio;
+            lowHpWarningImage.gameObject.SetActive(visible);
+            if (visible)
+            {
+                lowHpWarningImage.transform.SetAsLastSibling();
+            }
         }
 
         private Transform HudParent
@@ -1222,14 +1415,6 @@ namespace HwigiTower.UI
             {
                 ClearChoices();
                 HideEventCutsceneLayout();
-                if (stableId == BossReturnChoiceId && _roomController != null)
-                {
-                    var resolution = _roomController.CancelCurrentRouteSelection();
-                    ShowResult(resolution);
-                    ShowRunState(_roomController.GetSnapshot());
-                    return;
-                }
-
                 onChoiceSelected?.Invoke(stableId);
             });
 
@@ -1633,6 +1818,12 @@ namespace HwigiTower.UI
             if (_roomController == null)
             {
                 return;
+            }
+
+            if (_roomController.PreRunPlaceholderPending)
+            {
+                _roomController.ConfirmPreRunPlaceholder();
+                HidePreRunPlaceholder();
             }
 
             var snapshot = _roomController.GetSnapshot();
@@ -3158,6 +3349,7 @@ namespace HwigiTower.UI
             combatEnemyImage = CreateCombatImage(combatEnemyStage, "Combat Enemy Image", new Vector2(0.05f, 0.03f), new Vector2(0.95f, 0.76f));
             combatEnemyTitleText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Title", new Vector2(0.06f, 0.83f), new Vector2(0.94f, 0.97f), 32, TextAnchor.MiddleCenter);
             enemyHpFill = CreateHpBar(combatEnemyStage, "Enemy HP Bar", new Vector2(0.07f, 0.765f), new Vector2(0.93f, 0.815f), new Color(0.84f, 0.24f, 0.24f, 1f));
+            combatEnemyStatusText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Status Chips", new Vector2(0.07f, 0.705f), new Vector2(0.93f, 0.755f), 22, TextAnchor.MiddleCenter);
 
             combatLogPanel = CreateCombatPanelRect(panelObject.transform, "Combat Log Panel", new Vector2(0.04f, 0.345f), new Vector2(0.96f, 0.505f), new Color(0.02f, 0.025f, 0.030f, 0.84f));
             combatText = CreateCombatChildText(combatLogPanel, "Combat Status Text", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), CombatBodyFontSize, TextAnchor.MiddleLeft);
@@ -3181,8 +3373,10 @@ namespace HwigiTower.UI
             attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.22f, 0.045f), CombatAction.Attack, out attackActionIconImage);
             defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.045f), CombatAction.Defend, out defendActionIconImage);
             skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "스킬", new Vector2(0.78f, 0.045f), CombatAction.Skill, out skillActionIconImage);
+            combatItemInspectButton = CreateCombatItemInspectButton(combatPartyDock);
             skillButton.interactable = false;
             EnsureSkillPickerPanel();
+            EnsureCombatItemInspectPanel();
             ApplyCombatStatusIconSprites();
         }
 
@@ -3402,6 +3596,79 @@ namespace HwigiTower.UI
             label.color = new Color(0.94f, 0.97f, 0.98f, 1f);
             label.text = labelText;
             return button;
+        }
+
+        private Button CreateCombatItemInspectButton(Transform parent)
+        {
+            var buttonObject = new GameObject("Combat Item Inspect Button");
+            buttonObject.transform.SetParent(parent, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.91f, 0.34f);
+            rect.anchorMax = new Vector2(0.91f, 0.34f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.sizeDelta = new Vector2(74f, 58f);
+            rect.anchoredPosition = Vector2.zero;
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.11f, 0.15f, 0.18f, 0.96f);
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(ToggleCombatItemInspect);
+
+            var iconObject = new GameObject("Icon");
+            iconObject.transform.SetParent(buttonObject.transform, false);
+            var iconRect = iconObject.AddComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0.18f, 0.14f);
+            iconRect.anchorMax = new Vector2(0.82f, 0.86f);
+            iconRect.offsetMin = Vector2.zero;
+            iconRect.offsetMax = Vector2.zero;
+            var icon = iconObject.AddComponent<Image>();
+            icon.sprite = ResolveIcon("item.field_bandage");
+            icon.color = icon.sprite == null ? new Color(0.90f, 0.84f, 0.64f, 0.95f) : Color.white;
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            return button;
+        }
+
+        private void EnsureCombatItemInspectPanel()
+        {
+            if (combatItemInspectPanel != null || combatPartyDock == null)
+            {
+                return;
+            }
+
+            var panelObject = new GameObject("Combat Item Inspect Panel");
+            panelObject.transform.SetParent(combatPartyDock, false);
+            combatItemInspectPanel = panelObject.AddComponent<RectTransform>();
+            combatItemInspectPanel.anchorMin = new Vector2(0.50f, 0.35f);
+            combatItemInspectPanel.anchorMax = new Vector2(0.96f, 0.96f);
+            combatItemInspectPanel.offsetMin = Vector2.zero;
+            combatItemInspectPanel.offsetMax = Vector2.zero;
+            var image = panelObject.AddComponent<Image>();
+            image.color = new Color(0.018f, 0.023f, 0.030f, 0.98f);
+            image.raycastTarget = false;
+            combatItemInspectText = CreateCombatChildText(panelObject.transform, "Combat Item Inspect Text", new Vector2(0.06f, 0.06f), new Vector2(0.94f, 0.94f), 20, TextAnchor.UpperLeft);
+            combatItemInspectText.text = string.Empty;
+            combatItemInspectPanel.gameObject.SetActive(false);
+        }
+
+        private void ToggleCombatItemInspect()
+        {
+            EnsureCombatItemInspectPanel();
+            if (combatItemInspectPanel == null)
+            {
+                return;
+            }
+
+            combatItemInspectPanel.gameObject.SetActive(!combatItemInspectPanel.gameObject.activeSelf);
+        }
+
+        private void HideCombatItemInspect()
+        {
+            if (combatItemInspectPanel != null)
+            {
+                combatItemInspectPanel.gameObject.SetActive(false);
+            }
         }
 
         private void EnsureNextFloorButton()
@@ -3765,26 +4032,6 @@ namespace HwigiTower.UI
                 var views = _roomController.BuildEncounterChoiceViews(selection);
                 ShowChoices(selection.Encounter, views, choiceStableId =>
                 {
-                    if (choiceStableId == BossReturnChoiceId)
-                    {
-                        var returnResolution = _roomController.CancelCurrentRouteSelection();
-                        ClearChoices();
-                        ShowResult(returnResolution);
-                        var snapshot = _roomController.GetSnapshot();
-                        ShowRunState(snapshot);
-                        if (snapshot.HasFloorMap && !snapshot.RunCompleted)
-                        {
-                            ShowMapChoices(_roomController.GetFloorMapNodes(), mapNodeId =>
-                            {
-                                var selected = _roomController.SelectMapNode(mapNodeId);
-                                OpenSelectedRouteStep(selected);
-                            });
-                            ShowRunState(_roomController.GetSnapshot());
-                        }
-
-                        return;
-                    }
-
                     var resolution = _roomController.ResolveCurrentRouteChoice(selection, choiceStableId);
                     ShowResult(resolution);
                     ShowRunState(_roomController.GetSnapshot());
@@ -4220,24 +4467,49 @@ namespace HwigiTower.UI
             UpdateCombatVisuals(snapshot);
             UpdatePartyDock(snapshot);
             UpdateCombatActionIcons();
+            UpdateCombatItemInspect(snapshot);
 
             var canAct = snapshot.IsInCombat && _roomController != null && !IsCutscenePlaying();
             if (attackButton != null)
             {
                 attackButton.interactable = canAct;
+                SetCombatActionButtonPreview(attackButton, _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Attack));
             }
 
             if (defendButton != null)
             {
                 defendButton.interactable = canAct;
+                SetCombatActionButtonPreview(defendButton, _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Defend));
             }
 
             if (skillButton != null)
             {
-                var skillReady = HasAnyCombatSkill();
-                skillButton.interactable = canAct && skillReady;
-                SetButtonLabel(skillButton, "스킬");
+                var preview = _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Skill);
+                skillButton.interactable = canAct && preview.Usable;
+                SetCombatActionButtonPreview(skillButton, preview);
             }
+        }
+
+        private static void SetCombatActionButtonPreview(Button button, CombatActionPreview preview)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            var label = button.GetComponentInChildren<Text>();
+            if (label == null)
+            {
+                return;
+            }
+
+            label.text = string.IsNullOrEmpty(preview.Label)
+                ? string.Empty
+                : preview.HasPreview ? preview.Label + "\n" + preview.PreviewText : preview.Label;
+            label.fontSize = preview.HasPreview ? 21 : 28;
+            label.resizeTextMinSize = preview.HasPreview ? 15 : 22;
+            label.resizeTextMaxSize = preview.HasPreview ? 21 : 28;
+            label.lineSpacing = 0.92f;
         }
 
         private void UpdateCombatVisuals(PrototypeRunSnapshot snapshot)
@@ -4254,9 +4526,13 @@ namespace HwigiTower.UI
 
             if (combatEnemyTitleText != null)
             {
-                var intent = BuildCombatIntentLine(snapshot);
-                combatEnemyTitleText.text = PublicEnemyName(snapshot.LastCombatEnemyId) + "  HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp +
-                    (string.IsNullOrEmpty(intent) ? string.Empty : "\n" + intent);
+                combatEnemyTitleText.text = PublicEnemyName(snapshot.LastCombatEnemyId) + "  HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp;
+            }
+
+            if (combatEnemyStatusText != null)
+            {
+                combatEnemyStatusText.text = BuildCombatEnemyStatusChips(snapshot);
+                combatEnemyStatusText.gameObject.SetActive(!string.IsNullOrEmpty(combatEnemyStatusText.text));
             }
 
             if (enemyHpFill != null)
@@ -4389,6 +4665,27 @@ namespace HwigiTower.UI
             SetImageVisible(combatTrainingStatusIconImage, snapshot.IsInCombat && hasTraining);
             SetImageVisible(combatBandageStatusIconImage, snapshot.IsInCombat && hasBandage);
             SetImageVisible(combatRecallStatusIconImage, snapshot.IsInCombat && hasRecall);
+        }
+
+        private void UpdateCombatItemInspect(PrototypeRunSnapshot snapshot)
+        {
+            EnsureCombatItemInspectPanel();
+            var visible = snapshot.IsInCombat;
+            if (combatItemInspectButton != null)
+            {
+                combatItemInspectButton.gameObject.SetActive(visible);
+                combatItemInspectButton.interactable = visible && snapshot.ItemCount > 0;
+            }
+
+            if (combatItemInspectText != null)
+            {
+                combatItemInspectText.text = BuildCombatItemInspectText();
+            }
+
+            if (!visible || snapshot.ItemCount <= 0)
+            {
+                HideCombatItemInspect();
+            }
         }
 
         private void SetStaticIcon(Image target, string key)
@@ -5387,6 +5684,55 @@ namespace HwigiTower.UI
             return string.Empty;
         }
 
+        private static string BuildCombatEnemyStatusChips(PrototypeRunSnapshot snapshot)
+        {
+            var chips = new List<string>();
+            if (snapshot.EnemyAttack > 0)
+            {
+                chips.Add("ATK " + snapshot.EnemyAttack);
+            }
+
+            var result = snapshot.LastCombatRoundResult ?? string.Empty;
+            if (result.Contains("poison ", StringComparison.Ordinal))
+            {
+                chips.Add("중독");
+            }
+
+            if (chips.Count > 4)
+            {
+                var overflow = chips.Count - 3;
+                chips.RemoveRange(3, overflow);
+                chips.Add("+" + overflow);
+            }
+
+            return string.Join("  ", chips);
+        }
+
+        private string BuildCombatItemInspectText()
+        {
+            if (_roomController == null || _roomController.RunState == null)
+            {
+                return "아이템 없음";
+            }
+
+            var lines = new List<string>();
+            AddCombatInspectItemLine(lines, "ITEM_FIELD_BANDAGE", "붕대", "전투 시작 HP 회복 +4 / 최대 HP +2");
+            AddCombatInspectItemLine(lines, "ITEM_LANTERN_OIL", "등유", "구현 효과 없음");
+            AddCombatInspectItemLine(lines, "ITEM_TORN_CHARM", "찢어진 부적", "구현 효과 없음");
+            return lines.Count == 0 ? "아이템 없음" : string.Join("\n", lines);
+        }
+
+        private void AddCombatInspectItemLine(List<string> lines, string itemRef, string label, string summary)
+        {
+            var count = _roomController == null || _roomController.RunState == null ? 0 : _roomController.RunState.GetItemCount(itemRef);
+            if (count <= 0)
+            {
+                return;
+            }
+
+            lines.Add(label + " x" + count + " - " + summary);
+        }
+
         private static string BuildCombatIntentLine(PrototypeRunSnapshot snapshot)
         {
             if (snapshot.CombatRound <= 1)
@@ -6007,11 +6353,7 @@ namespace HwigiTower.UI
                 engage = new PrototypeEncounterChoiceView("CHOICE_COMBAT_02_ENGAGE", string.Empty, true, true, string.Empty, string.Empty);
             }
 
-            return new[]
-            {
-                engage,
-                new PrototypeEncounterChoiceView(BossReturnChoiceId, string.Empty, true, true, string.Empty, string.Empty)
-            };
+            return new[] { engage };
         }
 
         private static bool IsCombatEncounterId(string encounterId)
@@ -6023,11 +6365,6 @@ namespace HwigiTower.UI
         {
             if (!string.IsNullOrEmpty(choiceStableId))
             {
-                if (choiceStableId == BossReturnChoiceId)
-                {
-                    return "돌아간다";
-                }
-
                 if (choiceStableId == "CHOICE_EVT_F01_JAR_PATTERNED")
                 {
                     return "신기한 문양이 각인된 항아리";

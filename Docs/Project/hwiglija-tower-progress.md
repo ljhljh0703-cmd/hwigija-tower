@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-29 11:16 — feedback batch B runtime 적용
+- **Phase**: Post-feedback / Runtime UI Reliability
+- **Done**:
+  - clean worktree `/private/tmp/hwigi-game-feedback-batch-b`에서 `origin/Proto@038052d` 기준 CodeGraph fresh preflight를 수행
+  - New Run 전용 full-screen pre-run placeholder stepper를 추가하고 확인 후 Floor 1 map으로 진입하도록 연결
+  - map route를 3 sparse lanes / 5 visual columns 구조로 줄이고 Rest layer 1 금지, Shop forced merge, skipped sibling lock을 유지
+  - resolver-owned combat action preview DTO와 enemy ATK chip, read-only combat item inspect panel, low HP red edge feedback을 runtime UI에 연결
+  - boss gate return/cancel choice를 제거해 node tap 후 active encounter route 변경을 막음
+- **Files**: 변경/추가 11개 (`CombatActionPreview.cs`, `PrototypeHud.cs`, `PrototypeFloorMap.cs`, `PrototypeRunState.cs`, tests, progress)
+- **GDD impact**: 없음 — D-034/D-036 잠금 범위 내 runtime 구현
+- **Blockers**: Unity batchmode EditMode/PlayMode 검증은 licensing reconnect loop로 테스트 실행 단계까지 도달 불가
+- **Next**: Unity Editor playtest path에서 feedback item 1/6/9/12-lowHP를 직접 확인하고, screenshot harness 없이 smoke flow를 수동 체크
+- **Agent**: Codex
+
 ### 2026-05-29 10:31 — feedback batch A runtime 적용
 - **Phase**: Post-feedback / Runtime UI Reliability
 - **Done**:

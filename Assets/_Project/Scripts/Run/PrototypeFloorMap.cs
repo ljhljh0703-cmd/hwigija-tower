@@ -334,10 +334,10 @@ namespace HwigiTower.Run
             }
 
             var fallback = branchSteps ?? new List<PrototypeDemoRunStep>();
-            var results = new List<PrototypeDemoRunStep>(10);
-            AddRepeated(results, events, fallback, 4);
-            AddRepeated(results, combat, fallback, 4);
-            AddRepeated(results, rests, fallback, 2);
+            var results = new List<PrototypeDemoRunStep>(9);
+            AddRepeated(results, events, fallback, 3);
+            AddRepeated(results, combat, fallback, 5);
+            AddRepeated(results, rests, fallback, rests.Count > 0 ? 1 : 0);
             Shuffle(results, random);
             return results;
         }
@@ -357,7 +357,7 @@ namespace HwigiTower.Run
             }
 
             MoveNonRestStepsToFront(branchSteps, 3);
-            var layerSizes = new[] { 3, 4, 3 };
+            var layerSizes = new[] { 3, 3, 3 };
             var cursor = 0;
             for (var layer = 0; layer < layers.Length; layer++)
             {
@@ -488,6 +488,7 @@ namespace HwigiTower.Run
                 }
             }
 
+            var forkBudget = 2;
             for (var layer = 0; layer < nonEmptyLayers.Count - 1; layer++)
             {
                 var current = nonEmptyLayers[layer];
@@ -500,12 +501,42 @@ namespace HwigiTower.Run
                     Connect(current[i], next[primaryIndex]);
 
                     var crossIndex = ResolveAdjacentLaneIndex(i, current.Count, primaryIndex, next.Count);
-                    if (crossIndex >= 0 && crossIndex != primaryIndex)
+                    if (forkBudget > 0 &&
+                        IsRouteForkCandidate(current[i]) &&
+                        crossIndex >= 0 &&
+                        crossIndex != primaryIndex &&
+                        IsAdjacentLane(current[i], next[crossIndex]))
                     {
                         Connect(current[i], next[crossIndex]);
+                        forkBudget--;
                     }
                 }
             }
+        }
+
+        private static bool IsRouteForkCandidate(PrototypeFloorMapNode node)
+        {
+            return node != null && (node.Type == PrototypeFloorMapNodeType.Event || node.Type == PrototypeFloorMapNodeType.Rest);
+        }
+
+        private static bool IsAdjacentLane(PrototypeFloorMapNode from, PrototypeFloorMapNode to)
+        {
+            if (from == null || to == null)
+            {
+                return false;
+            }
+
+            return System.Math.Abs(ResolveVisualLane(from.NormalizedX) - ResolveVisualLane(to.NormalizedX)) <= 1;
+        }
+
+        private static int ResolveVisualLane(float normalizedX)
+        {
+            if (normalizedX < 0.36f)
+            {
+                return 0;
+            }
+
+            return normalizedX > 0.64f ? 2 : 1;
         }
 
         private static void SortNodesByPosition(List<PrototypeFloorMapNode> nodes)

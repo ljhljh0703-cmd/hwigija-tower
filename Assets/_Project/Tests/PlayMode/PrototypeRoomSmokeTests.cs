@@ -40,6 +40,31 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PrototypeRoom_NewRunShowsPreRunPlaceholderBeforeMap()
+        {
+            yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
+            yield return null;
+
+            var controller = Object.FindFirstObjectByType<Run.PrototypeRoomController>();
+            var hud = Object.FindFirstObjectByType<PrototypeHud>();
+            Assert.IsNotNull(controller);
+            Assert.IsNotNull(hud);
+
+            hud.ShowRunState(controller.GetSnapshot());
+
+            Assert.IsTrue(controller.PreRunPlaceholderPending);
+            Assert.IsTrue(hud.PreRunPlaceholderVisible);
+            Assert.IsFalse(hud.NodeMapVisible);
+            var confirm = GameObject.Find("Pre Run Confirm Button").GetComponent<Button>();
+            confirm.onClick.Invoke();
+            yield return null;
+
+            Assert.IsFalse(controller.PreRunPlaceholderPending);
+            Assert.IsFalse(hud.PreRunPlaceholderVisible);
+            Assert.IsTrue(hud.NodeMapVisible);
+        }
+
+        [UnityTest]
         public IEnumerator PrototypeRoom_HidesDebugNodeLabelsByDefaultAndRestoresWithToggle()
         {
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
@@ -148,6 +173,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(hud);
 
             controller.AutoResolveCombat = false;
+            controller.RunState.AddItemRef("ITEM_FIELD_BANDAGE", 1);
             hud.ShowRunState(controller.GetSnapshot());
             yield return OpenQaEncounterChoice(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
 
@@ -155,9 +181,17 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsFalse(string.IsNullOrEmpty(controller.RunState.LastCombatEnemyId));
             Assert.IsTrue(hud.CombatPanelVisible);
             Assert.IsTrue(hud.CombatPartyDockVisible);
+            Assert.IsTrue(hud.CombatItemInspectButtonVisible);
             Assert.AreEqual("char_player_portrait_01", hud.CurrentCombatPlayerPortraitSpriteName);
             Assert.AreEqual("char_mataios_portrait_01", hud.CurrentCombatMataiosPortraitSpriteName);
             StringAssert.Contains("적 HP", hud.CombatMessage);
+            StringAssert.Contains("예상 피해", hud.CombatActionButtonLabels);
+            StringAssert.Contains("피해 감소", hud.CombatActionButtonLabels);
+            GameObject.Find("Combat Item Inspect Button").GetComponent<Button>().onClick.Invoke();
+            yield return null;
+            Assert.IsTrue(hud.CombatItemInspectVisible);
+            StringAssert.Contains("붕대", hud.CombatItemInspectMessage);
+            StringAssert.DoesNotContain("ITEM_07", hud.CombatItemInspectMessage);
             StringAssert.Contains("플레이어", hud.CombatPartyMessage);
             StringAssert.Contains("마타이오스", hud.CombatPartyMessage);
             StringAssert.DoesNotContain("ENEMY_", hud.CombatMessage);
@@ -223,7 +257,7 @@ namespace HwigiTower.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PrototypeRoom_BossGateShowsFightAndReturnOnly()
+        public IEnumerator PrototypeRoom_BossGateShowsFightOnlyAfterMapCommit()
         {
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
             yield return null;
@@ -239,22 +273,11 @@ namespace HwigiTower.Tests.PlayMode
             OpenSelectedRouteStepForTest(hud, controller.SelectCurrentRouteEncounter());
             yield return null;
 
-            Assert.AreEqual(2, hud.ChoiceButtonCount, DescribeChoiceButtons(hud));
+            Assert.AreEqual(1, hud.ChoiceButtonCount, DescribeChoiceButtons(hud));
             Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_COMBAT_01_ENGAGE"), DescribeChoiceButtons(hud));
-            Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_BOSS_RETURN"), DescribeChoiceButtons(hud));
             StringAssert.Contains("전투 시작", DescribeChoiceButtons(hud));
-            StringAssert.Contains("돌아간다", DescribeChoiceButtons(hud));
+            StringAssert.DoesNotContain("돌아간다", DescribeChoiceButtons(hud));
             StringAssert.DoesNotContain("준비", DescribeChoiceButtons(hud));
-
-            FindChoiceButton(hud, "CHOICE_BOSS_RETURN").onClick.Invoke();
-            yield return null;
-
-            Assert.IsFalse(controller.RunState.StairUnlocked);
-            Assert.IsFalse(controller.RunState.RunClear);
-            Assert.IsFalse(controller.RunState.IsInCombat);
-            OpenMapChoicesIfNeeded(hud);
-            yield return null;
-            Assert.IsNotNull(FindFirstInteractableMapChoiceButton(hud), DescribeChoiceButtons(hud));
         }
 
         [UnityTest]

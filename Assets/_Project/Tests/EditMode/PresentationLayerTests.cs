@@ -239,7 +239,7 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void BossGateChoices_ShowOnlyFightAndReturn()
+        public void BossGateChoices_ShowOnlyFightAfterMapCommit()
         {
             var boss = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset");
             Assert.IsNotNull(boss);
@@ -249,15 +249,13 @@ namespace HwigiTower.Tests.EditMode
 
             hud.ShowChoices(boss, views, _ => { });
 
-            Assert.AreEqual(2, hud.ChoiceButtonCount);
+            Assert.AreEqual(1, hud.ChoiceButtonCount);
             var fight = hud.GetChoiceButton(0).GetComponentInChildren<Text>();
-            var back = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
             Assert.IsNotNull(fight);
-            Assert.IsNotNull(back);
             StringAssert.Contains("전투 시작", fight.text);
-            StringAssert.Contains("돌아간다", back.text);
-            StringAssert.DoesNotContain("준비", fight.text + back.text);
-            StringAssert.DoesNotContain("CHOICE_", fight.text + back.text);
+            StringAssert.DoesNotContain("돌아간다", fight.text);
+            StringAssert.DoesNotContain("준비", fight.text);
+            StringAssert.DoesNotContain("CHOICE_", fight.text);
         }
 
         [Test]
@@ -403,6 +401,7 @@ namespace HwigiTower.Tests.EditMode
                 lastCombatEnemyId: "BOSS_APEX_02",
                 enemyHp: 22,
                 enemyMaxHp: 34,
+                enemyAttack: 7,
                 combatRound: 3,
                 lastCombatRoundResult: "round 3 | action Defend | playerDamage 0 | enemyDamage 2");
 
@@ -418,6 +417,7 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("icon_action_attack", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("icon_action_defend", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("icon_action_skill_scout", hud.CurrentCombatActionIconNames);
+            StringAssert.Contains("ATK 7", hud.CombatEnemyStatusMessage);
             StringAssert.Contains("최종 보스", hud.CombatMessage);
             StringAssert.Contains("적 HP 22/34", hud.CombatMessage);
             StringAssert.Contains("선택 방어 | 받은 피해", hud.CombatMessage);
@@ -430,6 +430,43 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(22f / 34f, hud.CurrentEnemyHpFillAmount, 0.001f);
             Assert.AreEqual(15f / 24f, hud.CurrentPlayerHpFillAmount, 0.001f);
             Assert.AreEqual(1f, hud.CurrentMataiosHpFillAmount, 0.001f);
+        }
+
+        [Test]
+        public void Hud_LowHpWarningUsesConfiguredThresholdAndClearsOnHeal()
+        {
+            var hud = CreateHud(out _);
+            hud.ShowRunState(new PrototypeRunSnapshot(
+                "run-low-hp",
+                6,
+                24,
+                5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false));
+
+            Assert.IsTrue(hud.LowHpWarningVisible);
+
+            hud.ShowRunState(new PrototypeRunSnapshot(
+                "run-low-hp",
+                12,
+                24,
+                5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false));
+
+            Assert.IsFalse(hud.LowHpWarningVisible);
         }
 
         [Test]
