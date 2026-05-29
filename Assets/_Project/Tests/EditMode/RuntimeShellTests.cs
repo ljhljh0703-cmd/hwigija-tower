@@ -116,6 +116,90 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void MataiosCombatBrain_HighThreatSelectsProtect()
+        {
+            var plan = MataiosCombatBrain.Decide(CreateMataiosBrainContext(
+                enemyThreatHigh: true,
+                incomingTargetsPlayer: true));
+
+            Assert.AreEqual(MataiosCombatBrain.ActionProtectPlayer, plan.ActionId);
+            Assert.AreEqual(MataiosActionTarget.Player, plan.Target);
+        }
+
+        [Test]
+        public void MataiosCombatBrain_PlayerLowHpSelectsProtect()
+        {
+            var plan = MataiosCombatBrain.Decide(CreateMataiosBrainContext(playerHp: 8));
+
+            Assert.AreEqual(MataiosCombatBrain.ActionProtectPlayer, plan.ActionId);
+            Assert.AreEqual("player_low_hp", plan.ReasonKey);
+        }
+
+        [Test]
+        public void MataiosCombatBrain_SkillOpportunitySelectsAssist()
+        {
+            var plan = MataiosCombatBrain.Decide(CreateMataiosBrainContext(
+                playerAction: CombatAction.Skill,
+                playerSkillReady: true,
+                skillContextValuable: true));
+
+            Assert.AreEqual(MataiosCombatBrain.ActionSkillSetupAssist, plan.ActionId);
+            Assert.AreEqual(MataiosCombatBrain.ActionSkillSetupAssist, plan.PayloadKey);
+        }
+
+        [Test]
+        public void MataiosCombatBrain_InvalidContextUsesFallbackAction()
+        {
+            var plan = MataiosCombatBrain.Decide(CreateMataiosBrainContext(playerMaxHp: 0));
+
+            Assert.AreEqual(MataiosCombatBrain.ActionSupportAttack, plan.ActionId);
+            CollectionAssert.Contains(plan.MetricTags, "fallback");
+        }
+
+        [Test]
+        public void MataiosCombatBrain_ContextShapeStaysDeterministic()
+        {
+            var names = typeof(MataiosCombatContext)
+                .GetProperties()
+                .Select(property => property.Name)
+                .OrderBy(name => name)
+                .ToArray();
+            var expected = new[]
+            {
+                nameof(MataiosCombatContext.EnemyHp),
+                nameof(MataiosCombatContext.EnemyMaxHp),
+                nameof(MataiosCombatContext.EnemyThreatHigh),
+                nameof(MataiosCombatContext.IncomingTargetsPlayer),
+                nameof(MataiosCombatContext.IsMataiosDown),
+                nameof(MataiosCombatContext.MataiosActionPower),
+                nameof(MataiosCombatContext.MataiosHp),
+                nameof(MataiosCombatContext.MataiosMaxHp),
+                nameof(MataiosCombatContext.PlayerAction),
+                nameof(MataiosCombatContext.PlayerHp),
+                nameof(MataiosCombatContext.PlayerMaxHp),
+                nameof(MataiosCombatContext.PlayerSkillReady),
+                nameof(MataiosCombatContext.RecentPlayerActions),
+                nameof(MataiosCombatContext.SkillContextValuable),
+                nameof(MataiosCombatContext.TempoReady)
+            }.OrderBy(name => name).ToArray();
+
+            CollectionAssert.AreEqual(expected, names);
+        }
+
+        [Test]
+        public void MataiosCombatBrain_SameContextReturnsSameAction()
+        {
+            var context = CreateMataiosBrainContext(
+                recentPlayerActions: new[] { CombatAction.Attack, CombatAction.Attack });
+
+            var first = MataiosCombatBrain.Decide(context);
+            var second = MataiosCombatBrain.Decide(context);
+
+            Assert.AreEqual(first, second);
+            Assert.AreEqual(MataiosCombatBrain.ActionPressureAttack, first.ActionId);
+        }
+
+        [Test]
         public void MataiosDownContinuesCombatAppliesOneCollapsePenaltyAndSuppressesAction()
         {
             var state = StartRuntimeCombat("run-mataios-down", "COMBAT_MATAIOS_DOWN", "BOSS_APEX_02", true);
@@ -2388,6 +2472,41 @@ namespace HwigiTower.Tests.EditMode
                 kind = kind,
                 amount = amount
             };
+        }
+
+        private static MataiosCombatContext CreateMataiosBrainContext(
+            CombatAction playerAction = CombatAction.Attack,
+            IReadOnlyList<CombatAction> recentPlayerActions = null,
+            int playerHp = 18,
+            int playerMaxHp = 24,
+            int mataiosHp = 16,
+            int mataiosMaxHp = 16,
+            int enemyHp = 12,
+            int enemyMaxHp = 12,
+            int mataiosActionPower = 3,
+            bool enemyThreatHigh = false,
+            bool incomingTargetsPlayer = false,
+            bool playerSkillReady = false,
+            bool skillContextValuable = false,
+            bool tempoReady = false,
+            bool isMataiosDown = false)
+        {
+            return new MataiosCombatContext(
+                isMataiosDown,
+                playerAction,
+                recentPlayerActions ?? new CombatAction[0],
+                playerHp,
+                playerMaxHp,
+                mataiosHp,
+                mataiosMaxHp,
+                enemyHp,
+                enemyMaxHp,
+                mataiosActionPower,
+                enemyThreatHigh,
+                incomingTargetsPlayer,
+                playerSkillReady,
+                skillContextValuable,
+                tempoReady);
         }
 
         private static PrototypeRunState StartRuntimeCombat(string runId, string combatId, string enemyRef, bool attachCatalog = false)

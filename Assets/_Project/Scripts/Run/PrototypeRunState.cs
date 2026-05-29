@@ -107,6 +107,7 @@ namespace HwigiTower.Run
         private string _lastMataiosCombatAction = string.Empty;
         private int _lastMataiosCombatDamage;
         private int _lastMataiosProtectReduction;
+        private bool _mataiosTempoReady;
         private bool _lastMataiosDownEvent;
         private bool _firstHitMitigationAvailable;
         private int _crackedJarBuffCombats;
@@ -1311,17 +1312,19 @@ namespace HwigiTower.Run
 
         private readonly struct MataiosPolicyResolution
         {
-            public MataiosPolicyResolution(string actionId, int enemyDamage, int playerDamageReduction)
+            public MataiosPolicyResolution(MataiosActionPlan plan, int enemyDamage, int playerDamageReduction)
             {
-                ActionId = actionId ?? string.Empty;
+                Plan = plan;
+                ActionId = plan.ActionId ?? string.Empty;
                 EnemyDamage = System.Math.Max(0, enemyDamage);
                 PlayerDamageReduction = System.Math.Max(0, playerDamageReduction);
             }
 
+            public MataiosActionPlan Plan { get; }
             public string ActionId { get; }
             public int EnemyDamage { get; }
             public int PlayerDamageReduction { get; }
-            public bool IsNone => string.IsNullOrEmpty(ActionId) || ActionId == "none";
+            public bool IsNone => Plan.IsNone;
         }
 
         public CombatRoundResult ResolveCombatRoundInteractive(CombatAction action)
@@ -1350,7 +1353,7 @@ namespace HwigiTower.Run
                 return new CombatRoundResult(0, 0, false, true);
             }
 
-            var mataiosPolicy = ResolveMataiosPolicy();
+            var mataiosPolicy = ResolveMataiosPolicy(action);
             var artsSkillUsed = action == CombatAction.Skill && HasReadyArts03Skill();
             var secondAction = action == CombatAction.Skill && !artsSkillUsed && HasAbilityRef("ABILITY_SCOUT")
                 ? (CombatAction?)CombatAction.Attack
@@ -1368,6 +1371,7 @@ namespace HwigiTower.Run
                 mataiosPolicy.EnemyDamage,
                 mataiosPolicy.PlayerDamageReduction);
             _combatRound++;
+            _mataiosTempoReady = !mataiosPolicy.Plan.ConsumesTempo && result.PlayerDamagePrevented > 0;
             var itemStrikeDamage = ApplyAttackItemDamage(action, modifiers);
             var abilityStrikeDamage = sword03.DamageBonus + ApplySwordAttackEffects(action);
             var frenzyDamage = ApplyFrenzyAttackEffect(action);
@@ -1475,59 +1479,51 @@ namespace HwigiTower.Run
             return damage;
         }
 
-        private MataiosPolicyResolution ResolveMataiosPolicy()
+        private MataiosPolicyResolution ResolveMataiosPolicy(CombatAction playerAction)
         {
-            if (_activeCombatMataios == null || _activeCombatMataios.IsDefeated)
-            {
-                return new MataiosPolicyResolution("none", 0, 0);
-            }
-
-            if (RatioAtOrBelow(_activeCombatPlayer.Hp, _activeCombatPlayer.MaxHp, 0.35f) &&
-                RatioAbove(_activeCombatMataios.Hp, _activeCombatMataios.MaxHp, 0.25f))
-            {
-                return new MataiosPolicyResolution("protect", 0, MataiosProtectDamageReduction);
-            }
-
-            if (_activeCombatEnemy.Hp <= MataiosActionPowerValue)
-            {
-                return new MataiosPolicyResolution("finish", MataiosActionPowerValue, 0);
-            }
-
-            if (CountRecentPlayerActions(CombatAction.Defend) >= 2)
-            {
-                return new MataiosPolicyResolution("counter", MataiosCounterAssistDamage, 0);
-            }
-
-            if (CountRecentPlayerActions(CombatAction.Attack) >= 2)
-            {
-                return new MataiosPolicyResolution("pressure", MataiosActionPowerValue, 0);
-            }
-
-            return new MataiosPolicyResolution("support", MataiosCounterAssistDamage, 0);
+            var context = new MataiosCombatContext(
+                _activeCombatMataios == null || _activeCombatMataios.IsDefeated,
+                playerAction,
+                _recentPlayerCombatActions,
+                _activeCombatPlayer == null ? 0 : _activeCombatPlayer.Hp,
+                _activeCombatPlayer == null ? 0 : _activeCombatPlayer.MaxHp,
+                _activeCombatMataios == null ? 0 : _activeCombatMataios.Hp,
+                _activeCombatMataios == null ? 0 : _activeCombatMataios.MaxHp,
+                _activeCombatEnemy == null ? 0 : _activeCombatEnemy.Hp,
+                _activeCombatEnemy == null ? 0 : _activeCombatEnemy.MaxHp,
+                MataiosActionPowerValue,
+                false,
+                false,
+                HasPlayableSkill(),
+                false,
+                _mataiosTempoReady);
+            var plan = MataiosCombatBrain.Decide(context);
+            return new MataiosPolicyResolution(
+                plan,
+                ResolveMataiosEnemyDamage(plan),
+                ResolveMataiosPlayerDamageReduction(plan));
         }
 
-        private static bool RatioAtOrBelow(int value, int max, float threshold)
+        private static int ResolveMataiosEnemyDamage(MataiosActionPlan plan)
         {
-            return max > 0 && value / (float)max <= threshold;
-        }
-
-        private static bool RatioAbove(int value, int max, float threshold)
-        {
-            return max > 0 && value / (float)max > threshold;
-        }
-
-        private int CountRecentPlayerActions(CombatAction action)
-        {
-            var count = 0;
-            for (var i = 0; i < _recentPlayerCombatActions.Count; i++)
+            switch (plan.PayloadKey)
             {
-                if (_recentPlayerCombatActions[i] == action)
-                {
-                    count++;
-                }
+                case MataiosCombatBrain.ActionFinishAttack:
+                case MataiosCombatBrain.ActionPressureAttack:
+                case MataiosCombatBrain.ActionTempoAttack:
+                    return MataiosActionPowerValue;
+                case MataiosCombatBrain.ActionCounterAssist:
+                case MataiosCombatBrain.ActionSkillSetupAssist:
+                case MataiosCombatBrain.ActionSupportAttack:
+                    return MataiosCounterAssistDamage;
+                default:
+                    return 0;
             }
+        }
 
-            return count;
+        private static int ResolveMataiosPlayerDamageReduction(MataiosActionPlan plan)
+        {
+            return plan.PayloadKey == MataiosCombatBrain.ActionProtectPlayer ? MataiosProtectDamageReduction : 0;
         }
 
         private void RecordPlayerCombatAction(CombatAction action)
@@ -1705,6 +1701,7 @@ namespace HwigiTower.Run
             _lastMataiosCombatAction = string.Empty;
             _lastMataiosCombatDamage = 0;
             _lastMataiosProtectReduction = 0;
+            _mataiosTempoReady = false;
             _lastMataiosDownEvent = false;
             _firstHitMitigationAvailable = true;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.CombatStarted, RunId, nodeId, enemy.Id));
