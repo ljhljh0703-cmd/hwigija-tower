@@ -1,5 +1,6 @@
 using HwigiTower.Audio;
 using HwigiTower.Lobby;
+using HwigiTower.Run;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -71,6 +72,28 @@ namespace HwigiTower.Tests.EditMode
             AssertCue(catalog, PrototypeAudioContext.CombatVictory, PrototypeAudioChannel.Sfx, "sfx_combat_victory");
             AssertCue(catalog, PrototypeAudioContext.ShopPurchase, PrototypeAudioChannel.Sfx, "sfx_shop_purchase");
             AssertCue(catalog, PrototypeAudioContext.RestSubmit, PrototypeAudioChannel.Sfx, "sfx_rest_submit");
+        }
+
+        [Test]
+        public void RoomController_ExplorationContextResetsToNormalBgm()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<AudioCueCatalog>("Assets/_Project/Data/Audio/SO_AudioCueCatalog.asset");
+            var serviceObject = new GameObject("Audio Service Exploration Reset Test");
+            var service = serviceObject.AddComponent<PrototypeAudioService>();
+            var controller = new GameObject("Room Controller Exploration Reset Test").AddComponent<PrototypeRoomController>();
+            var method = typeof(PrototypeRoomController).GetMethod("PlayAudioContext", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            Assert.IsNotNull(catalog);
+            Assert.IsNotNull(method);
+            service.Configure(catalog);
+            service.PlayContext(PrototypeAudioContext.Combat);
+            controller.SetAudioCueCatalog(catalog);
+
+            method.Invoke(controller, new object[] { PrototypeAudioContext.Exploration });
+
+            Assert.AreEqual(PrototypeAudioContext.Lobby, PrototypeAudioService.Instance.LastPlayedBgmContext);
+            Object.DestroyImmediate(controller.gameObject);
+            Object.DestroyImmediate(serviceObject);
         }
 
         [Test]

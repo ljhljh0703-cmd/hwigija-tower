@@ -362,10 +362,16 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(new Vector2(1080f, 1920f), hud.PortraitRootSize);
             Assert.IsTrue(hud.HasScreenLayerPanels);
             StringAssert.Contains("Floor 2", hud.RunStateMessage);
-            StringAssert.Contains("기억 1", hud.RunStateMessage);
-            StringAssert.Contains("아이템 2", hud.RunStateMessage);
+            StringAssert.Contains("HP 19/24", hud.RunStateMessage);
+            StringAssert.Contains("Gold 12", hud.RunStateMessage);
+            StringAssert.Contains("이성 7", hud.RunStateMessage);
+            StringAssert.DoesNotContain("기억", hud.RunStateMessage);
+            StringAssert.DoesNotContain("능력", hud.RunStateMessage);
+            StringAssert.DoesNotContain("아이템", hud.RunStateMessage);
+            StringAssert.DoesNotContain("정신", hud.RunStateMessage);
             StringAssert.DoesNotContain("Glitch", hud.RunStateMessage);
-            StringAssert.Contains("지도", hud.RouteMessage);
+            Assert.AreEqual("갈림길 선택", hud.RouteMessage);
+            Assert.LessOrEqual(hud.NodeMapLayerAnchorMax.y, hud.RouteHeaderAnchorMin.y);
         }
 
         [Test]
@@ -421,6 +427,28 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.DoesNotContain("BOSS_APEX_02", hud.CombatMessage);
             StringAssert.DoesNotContain("Glitch", hud.CombatMessage);
             StringAssert.DoesNotContain("Glitch", hud.CombatPartyMessage);
+            Assert.AreEqual(22f / 34f, hud.CurrentEnemyHpFillAmount, 0.001f);
+            Assert.AreEqual(15f / 24f, hud.CurrentPlayerHpFillAmount, 0.001f);
+            Assert.AreEqual(1f, hud.CurrentMataiosHpFillAmount, 0.001f);
+        }
+
+        [Test]
+        public void Hud_RestInteractionKeepsBackgroundAndMovesChoiceUiUp()
+        {
+            var hud = CreateHud(out _);
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            hud.SetPresentationData(data);
+            var restNode = CreateNode("node.rest");
+            var restEncounter = CreateEncounter("ENC_REST_UNKNOWN", EncounterType.Rest);
+            var selection = new EncounterSelection(restNode, restEncounter);
+            var method = typeof(PrototypeHud).GetMethod("ShowRestInteraction", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            Assert.IsNotNull(method);
+            method.Invoke(hud, new object[] { selection });
+
+            Assert.IsTrue(hud.RestInteractionPanelVisible);
+            Assert.AreEqual("enc_rest_01_bg", hud.CurrentBackgroundSpriteName);
+            Assert.GreaterOrEqual(hud.RestInteractionAnchorMin.y, 0.45f);
         }
 
         [Test]
