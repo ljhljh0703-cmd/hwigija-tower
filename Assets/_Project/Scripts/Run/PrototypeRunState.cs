@@ -832,6 +832,9 @@ namespace HwigiTower.Run
                     step = selectableNode.Step;
                     return step != null && step.IsValid;
                 }
+
+                step = null;
+                return false;
             }
 
             for (var i = 0; i < _demoRunPath.Count; i++)
@@ -2474,7 +2477,43 @@ namespace HwigiTower.Run
                 return node.Layer == activeLayer;
             }
 
-            return lastCompleted.NextMapNodeIds.Contains(node.MapNodeId);
+            if (lastCompleted.NextMapNodeIds.Contains(node.MapNodeId))
+            {
+                return true;
+            }
+
+            var fallback = GetFallbackMapNodeForNoSelectableState(activeLayer, lastCompleted);
+            return fallback != null && fallback.MapNodeId == node.MapNodeId;
+        }
+
+        private PrototypeFloorMapNode GetFallbackMapNodeForNoSelectableState(int activeLayer, PrototypeFloorMapNode lastCompleted)
+        {
+            if (activeLayer <= 0 || lastCompleted == null)
+            {
+                return null;
+            }
+
+            PrototypeFloorMapNode firstOpen = null;
+            for (var i = 0; i < _floorMapNodes.Count; i++)
+            {
+                var node = _floorMapNodes[i];
+                if (node == null || !node.IsValid || node.Completed || node.Skipped || node.Layer != activeLayer)
+                {
+                    continue;
+                }
+
+                if (lastCompleted.NextMapNodeIds.Contains(node.MapNodeId))
+                {
+                    return null;
+                }
+
+                if (firstOpen == null || node.Index < firstOpen.Index)
+                {
+                    firstOpen = node;
+                }
+            }
+
+            return firstOpen;
         }
 
         private void MarkSelectedMapNodeCompleted(string resolvedKey)

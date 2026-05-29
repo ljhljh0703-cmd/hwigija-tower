@@ -13,6 +13,7 @@ using HwigiTower.UI;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HwigiTower.Tests.EditMode
 {
@@ -949,6 +950,39 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void FloorMap_NoConnectedSelectableNodeExposesSingleFallback()
+        {
+            var first = CreateRuntimeEncounter("ENC_MAP_FALLBACK_FIRST", EncounterType.MoralChoice, CreateChoice("CHOICE_MAP_FALLBACK_FIRST", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", 1) }));
+            var second = CreateRuntimeEncounter("ENC_MAP_FALLBACK_SECOND", EncounterType.MoralChoice, CreateChoice("CHOICE_MAP_FALLBACK_SECOND", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 1) }));
+            var third = CreateRuntimeEncounter("ENC_MAP_FALLBACK_THIRD", EncounterType.MoralChoice, CreateChoice("CHOICE_MAP_FALLBACK_THIRD", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyMental", 1) }));
+            var shop = CreateRuntimeEncounter("ENC_MAP_FALLBACK_SHOP", EncounterType.Shop, CreateChoice("CHOICE_MAP_FALLBACK_SHOP_LEAVE", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 0) }));
+            var boss = CreateRuntimeEncounter("ENC_MAP_FALLBACK_BOSS", CreateChoice("CHOICE_MAP_FALLBACK_BOSS", new EncounterRequirementRuntimeData[0], new[] { CreateCombatEffect("COMBAT_MAP_FALLBACK_BOSS", "ENEMY_MAP_FALLBACK_BOSS", new EncounterPostCombatEffectRuntimeData[0]) }));
+            var state = new PrototypeRunState("run-map-fallback", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachFloorRunPaths(new[]
+            {
+                CreateFloorPath(
+                    1,
+                    new PrototypeDemoRunStep(CreateNode("node.map.fallback.first", first), first),
+                    new PrototypeDemoRunStep(CreateNode("node.map.fallback.second", second), second),
+                    new PrototypeDemoRunStep(CreateNode("node.map.fallback.third", third), third),
+                    new PrototypeDemoRunStep(CreateNode("node.map.fallback.shop", shop), shop),
+                    new PrototypeDemoRunStep(CreateNode("node.map.fallback.boss", boss), boss))
+            }, null);
+
+            var firstSelectable = state.GetSelectableMapNodeViews().OrderBy(node => node.Index).First();
+            Assert.IsTrue(state.TrySelectMapNode(firstSelectable.MapNodeId, out var step));
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-map-fallback", 1001), step.NodeId, step.Encounter, step.Encounter.Choices[0].stableId);
+
+            ClearCompletedMapNodeOutgoingEdges(state);
+
+            var fallback = state.GetSelectableMapNodeViews();
+            Assert.AreEqual(1, fallback.Length);
+            Assert.AreEqual(2, fallback[0].Layer);
+            Assert.IsTrue(state.TryGetNextDemoStep(out var fallbackStep));
+            Assert.AreEqual(fallback[0].MapNodeId, "floor.1.layer.2." + fallback[0].Index + "." + fallbackStep.EncounterId);
+        }
+
+        [Test]
         public void FloorTwoBossGate_UnlocksAsFinalCombatStep()
         {
             var floorOneEncounter = CreateRuntimeEncounter("ENC_FLOOR_ONE_CLEAR", CreateChoice("CHOICE_FLOOR_ONE_CLEAR", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyAffinity", 1) }));
@@ -1589,6 +1623,55 @@ namespace HwigiTower.Tests.EditMode
             }
             finally
             {
+                Object.DestroyImmediate(hudObject);
+            }
+        }
+
+        [Test]
+        public void PrototypeHud_CombatItemInspectCloseButtonHidesPanel()
+        {
+            var hudObject = new GameObject("Combat Item Inspect Hud");
+            var runStateTextObject = new GameObject("Run State Text");
+            try
+            {
+                var hud = hudObject.AddComponent<PrototypeHud>();
+                var runStateText = runStateTextObject.AddComponent<Text>();
+                hud.Configure(null, null, runStateText);
+                var snapshot = new PrototypeRunSnapshot(
+                    "run-item-inspect",
+                    20,
+                    24,
+                    5,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    isInCombat: true,
+                    enemyHp: 10,
+                    enemyMaxHp: 10,
+                    enemyAttack: 3,
+                    itemCount: 1);
+                hud.ShowRunState(snapshot);
+
+                var inspectButton = GetPrivateField<Button>(hud, "combatItemInspectButton");
+                var closeButton = GetPrivateField<Button>(hud, "combatItemInspectCloseButton");
+                Assert.IsNotNull(inspectButton);
+                Assert.IsNotNull(closeButton);
+                Assert.IsTrue(hud.CombatItemInspectButtonVisible);
+
+                inspectButton.onClick.Invoke();
+                Assert.IsTrue(hud.CombatItemInspectVisible);
+
+                closeButton.onClick.Invoke();
+                Assert.IsFalse(hud.CombatItemInspectVisible);
+            }
+            finally
+            {
+                Object.DestroyImmediate(runStateTextObject);
                 Object.DestroyImmediate(hudObject);
             }
         }
@@ -2886,6 +2969,47 @@ namespace HwigiTower.Tests.EditMode
                     node.NormalizedY.ToString("0.000"),
                     string.Join(",", node.NextMapNodeIds)))
                 .ToArray();
+        }
+
+        private static T GetPrivateField<T>(object target, string fieldName) where T : class
+        {
+            Assert.IsNotNull(target);
+            var field = target.GetType().GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            Assert.IsNotNull(field, fieldName);
+            return field.GetValue(target) as T;
+        }
+
+        private static void ClearCompletedMapNodeOutgoingEdges(PrototypeRunState state)
+        {
+            Assert.IsNotNull(state);
+            var field = typeof(PrototypeRunState).GetField("_floorMapNodes", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            Assert.IsNotNull(field);
+            var nodes = field.GetValue(state) as System.Collections.IEnumerable;
+            Assert.IsNotNull(nodes);
+            foreach (var node in nodes)
+            {
+                if (node == null)
+                {
+                    continue;
+                }
+
+                var type = node.GetType();
+                var completedProperty = type.GetProperty("Completed");
+                var nextProperty = type.GetProperty("NextMapNodeIds");
+                Assert.IsNotNull(completedProperty);
+                Assert.IsNotNull(nextProperty);
+                if (!(bool)completedProperty.GetValue(node))
+                {
+                    continue;
+                }
+
+                var next = nextProperty.GetValue(node) as System.Collections.IList;
+                Assert.IsNotNull(next);
+                next.Clear();
+                return;
+            }
+
+            Assert.Fail("Expected a completed floor map node.");
         }
 
         private static PrototypeFloorRunPath CreateFloorPath(int floor, params PrototypeDemoRunStep[] steps)

@@ -76,6 +76,7 @@ namespace HwigiTower.UI
         [SerializeField] private Button defendButton;
         [SerializeField] private Button skillButton;
         [SerializeField] private Button combatItemInspectButton;
+        [SerializeField] private Button combatItemInspectCloseButton;
         [SerializeField] private Button routeActionButton;
         [SerializeField] private Button nextFloorButton;
         [SerializeField] private Button restartButton;
@@ -1092,7 +1093,6 @@ namespace HwigiTower.UI
             }
 
             HidePreRunPlaceholder();
-            // Map selection is user-driven from the persistent map button.
             UpdateScreenLayers(snapshot);
             UpdateNextFloorButton(snapshot);
             UpdateRouteActionButton(snapshot);
@@ -1107,6 +1107,7 @@ namespace HwigiTower.UI
             UpdateResultVisibility(snapshot);
             UpdateDemoCompletePanel(snapshot);
             UpdateCutsceneTriggers(snapshot);
+            AutoShowMapIfNeeded(snapshot);
         }
 
         private void UpdateScreenLayers(PrototypeRunSnapshot snapshot)
@@ -3660,9 +3661,34 @@ namespace HwigiTower.UI
             var image = panelObject.AddComponent<Image>();
             image.color = new Color(0.018f, 0.023f, 0.030f, 0.98f);
             image.raycastTarget = false;
-            combatItemInspectText = CreateCombatChildText(panelObject.transform, "Combat Item Inspect Text", new Vector2(0.06f, 0.06f), new Vector2(0.94f, 0.94f), 20, TextAnchor.UpperLeft);
+            combatItemInspectText = CreateCombatChildText(panelObject.transform, "Combat Item Inspect Text", new Vector2(0.06f, 0.08f), new Vector2(0.94f, 0.76f), 20, TextAnchor.UpperLeft);
             combatItemInspectText.text = string.Empty;
+            combatItemInspectCloseButton = CreateCombatItemInspectCloseButton(panelObject.transform);
             combatItemInspectPanel.gameObject.SetActive(false);
+        }
+
+        private Button CreateCombatItemInspectCloseButton(Transform parent)
+        {
+            var buttonObject = new GameObject("Combat Item Inspect Close Button");
+            buttonObject.transform.SetParent(parent, false);
+
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.68f, 0.80f);
+            rect.anchorMax = new Vector2(0.94f, 0.96f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.14f, 0.18f, 0.22f, 0.96f);
+
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(HideCombatItemInspect);
+
+            var label = CreateCombatChildText(buttonObject.transform, "Label", Vector2.zero, Vector2.one, 18, TextAnchor.MiddleCenter);
+            label.text = showRawDebugText ? "close" : "닫기";
+            label.raycastTarget = false;
+            return button;
         }
 
         private void ToggleCombatItemInspect()
@@ -3673,7 +3699,13 @@ namespace HwigiTower.UI
                 return;
             }
 
-            combatItemInspectPanel.gameObject.SetActive(!combatItemInspectPanel.gameObject.activeSelf);
+            var nextVisible = !combatItemInspectPanel.gameObject.activeSelf;
+            if (nextVisible)
+            {
+                HideSkillPicker();
+            }
+
+            combatItemInspectPanel.gameObject.SetActive(nextVisible);
         }
 
         private void HideCombatItemInspect()
@@ -4894,6 +4926,7 @@ namespace HwigiTower.UI
             }
 
             HideSkillPicker();
+            HideCombatItemInspect();
             var resolution = _roomController.ResolveCombatAction(action);
             ShowResult(resolution);
             ShowRunState(_roomController.GetSnapshot());
