@@ -4042,20 +4042,44 @@ namespace HwigiTower.UI
 
             if (_roomController.HasEncounterChoices(selection))
             {
-                var views = _roomController.BuildEncounterChoiceViews(selection);
-                ShowChoices(selection.Encounter, views, choiceStableId =>
-                {
-                    var resolution = _roomController.ResolveCurrentRouteChoice(selection, choiceStableId);
-                    ShowResult(resolution);
-                    ShowRunState(_roomController.GetSnapshot());
-                });
-                ShowRunState(_roomController.GetSnapshot());
+                ShowEncounterChoicesForSelection(selection);
                 return;
             }
 
             var nodeResolution = _roomController.ResolveCurrentRouteNode(selection);
             ShowResult(nodeResolution);
             ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void ShowEncounterChoicesForSelection(EncounterSelection selection)
+        {
+            if (_roomController == null || !selection.HasEncounter)
+            {
+                return;
+            }
+
+            var views = _roomController.BuildEncounterChoiceViews(selection);
+            ShowChoices(selection.Encounter, views, choiceStableId =>
+            {
+                var shopPurchase = IsShopPurchaseChoice(selection.Encounter, choiceStableId);
+                var resolution = _roomController.ResolveCurrentRouteChoice(selection, choiceStableId);
+                ShowResult(resolution);
+                if (shopPurchase && !resolution.RunCompleted && _roomController.GetSnapshot().HasSelectedMapNode)
+                {
+                    ShowEncounterChoicesForSelection(selection);
+                }
+
+                ShowRunState(_roomController.GetSnapshot());
+            });
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private static bool IsShopPurchaseChoice(EncounterData encounter, string choiceStableId)
+        {
+            return encounter != null &&
+                encounter.Type == EncounterType.Shop &&
+                !string.IsNullOrEmpty(choiceStableId) &&
+                choiceStableId.Contains("_BUY_", StringComparison.Ordinal);
         }
 
         private void ResolveRestart()
@@ -5444,6 +5468,11 @@ namespace HwigiTower.UI
                 return "result: " + message;
             }
 
+            if (IsBossClearResult(message))
+            {
+                return BuildBossClearResultSummary(message);
+            }
+
             if (message.StartsWith("선택 가능한 길", StringComparison.Ordinal) ||
                 message.StartsWith("아이콘을 보고", StringComparison.Ordinal))
             {
@@ -5512,6 +5541,44 @@ namespace HwigiTower.UI
             }
 
             return summary == "결과" ? "결과\n-" : summary;
+        }
+
+        private static bool IsBossClearResult(string message)
+        {
+            return !string.IsNullOrEmpty(message) &&
+                message.Contains("enemyDefeated True", StringComparison.Ordinal) &&
+                (message.Contains("stair unlocked", StringComparison.OrdinalIgnoreCase) ||
+                 message.Contains("run.clear", StringComparison.Ordinal));
+        }
+
+        private static string BuildBossClearResultSummary(string message)
+        {
+            var summary = "결과";
+            AppendResultLine(ref summary, message.Contains("run.clear", StringComparison.Ordinal) ? "최종 보스 격파" : "보스 격파", allowOverflow: true);
+            AppendResultLine(ref summary, ExtractTokenResult(message, "gold reward "), allowOverflow: true);
+            AppendResultLine(ref summary, ExtractTokenResult(message, "affinity "), allowOverflow: true);
+            AppendResultLine(ref summary, message.Contains("run.clear", StringComparison.Ordinal) ? "엔딩 선택 가능" : "다음 층 준비", allowOverflow: true);
+            return summary;
+        }
+
+        private static string ExtractTokenResult(string message, string tokenPrefix)
+        {
+            if (string.IsNullOrEmpty(message) || string.IsNullOrEmpty(tokenPrefix))
+            {
+                return string.Empty;
+            }
+
+            var tokens = message.Split(new[] { '|', ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            for (var i = 0; i < tokens.Length; i++)
+            {
+                var normalized = NormalizeResultToken(tokens[i].Trim());
+                if (!string.IsNullOrEmpty(normalized) && tokens[i].Trim().StartsWith(tokenPrefix, StringComparison.Ordinal))
+                {
+                    return normalized;
+                }
+            }
+
+            return string.Empty;
         }
 
         private static void AppendEffectTokens(ref string summary, string message)
@@ -6528,6 +6595,12 @@ namespace HwigiTower.UI
         {
             if (!string.IsNullOrEmpty(choiceStableId))
             {
+                if (choiceStableId.Contains("SHOP", StringComparison.Ordinal) &&
+                    choiceStableId.Contains("_LEAVE", StringComparison.Ordinal))
+                {
+                    return "상점 나가기";
+                }
+
                 if (choiceStableId == "CHOICE_EVT_F01_JAR_PATTERNED")
                 {
                     return "신기한 문양이 각인된 항아리";

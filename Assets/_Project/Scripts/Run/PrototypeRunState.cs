@@ -1249,16 +1249,22 @@ namespace HwigiTower.Run
             }
 
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, new DeterministicRunContext(RunId, 0), nodeId);
-            if (resolution.Applied)
+            var shopPurchase = IsShopPurchaseChoice(encounter, resolution.ChoiceStableId);
+            if (resolution.Applied && !shopPurchase)
             {
                 MarkEncounterChoiceResolved(resolvedNodeId, encounterId, resolution.ChoiceStableId);
             }
 
-            NodesResolved++;
-            UpdateDemoProgression(nodeId, encounterId, ShouldAdvanceDemoProgression(encounter, choiceStableId, resolution.Applied));
+            if (!shopPurchase)
+            {
+                NodesResolved++;
+                UpdateDemoProgression(nodeId, encounterId, ShouldAdvanceDemoProgression(encounter, resolution.ChoiceStableId, resolution.Applied));
+            }
+
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
-            return new PrototypeNodeResolution(nodeId, payloadId, BuildChoiceResolutionMessage(resolution.Message), _runCompleted);
+            var message = shopPurchase ? BuildShopStayOpenMessage(resolution.Message) : BuildChoiceResolutionMessage(resolution.Message);
+            return new PrototypeNodeResolution(nodeId, payloadId, message, _runCompleted);
         }
 
         public PrototypeNodeResolution ResolveEncounterChoice(DeterministicRunContext context, string nodeId, EncounterData encounter, string choiceStableId)
@@ -1276,16 +1282,22 @@ namespace HwigiTower.Run
             }
 
             var resolution = PrototypeEncounterRuntimeResolver.Resolve(this, encounter, choiceStableId, context, nodeId);
-            if (resolution.Applied)
+            var shopPurchase = IsShopPurchaseChoice(encounter, resolution.ChoiceStableId);
+            if (resolution.Applied && !shopPurchase)
             {
                 MarkEncounterChoiceResolved(resolvedNodeId, encounterId, resolution.ChoiceStableId);
             }
 
-            NodesResolved++;
-            UpdateDemoProgression(nodeId, encounterId, ShouldAdvanceDemoProgression(encounter, choiceStableId, resolution.Applied));
+            if (!shopPurchase)
+            {
+                NodesResolved++;
+                UpdateDemoProgression(nodeId, encounterId, ShouldAdvanceDemoProgression(encounter, resolution.ChoiceStableId, resolution.Applied));
+            }
+
             var payloadId = resolution.ChoiceStableId;
             _eventBus?.Raise(new GameFlowEvent(GameFlowEventType.EncounterCompleted, RunId, nodeId, payloadId));
-            return new PrototypeNodeResolution(nodeId, payloadId, BuildChoiceResolutionMessage(resolution.Message), _runCompleted);
+            var message = shopPurchase ? BuildShopStayOpenMessage(resolution.Message) : BuildChoiceResolutionMessage(resolution.Message);
+            return new PrototypeNodeResolution(nodeId, payloadId, message, _runCompleted);
         }
 
         private CombatantState _activeCombatPlayer;
@@ -2271,6 +2283,19 @@ namespace HwigiTower.Run
             }
 
             return !IsInCombat || AutoResolveCombat || !ChoiceStartsCombat(encounter, choiceStableId);
+        }
+
+        private static bool IsShopPurchaseChoice(EncounterData encounter, string choiceStableId)
+        {
+            return encounter != null &&
+                encounter.Type == EncounterType.Shop &&
+                !string.IsNullOrEmpty(choiceStableId) &&
+                choiceStableId.Contains("_BUY_", System.StringComparison.Ordinal);
+        }
+
+        private static string BuildShopStayOpenMessage(string baseMessage)
+        {
+            return string.IsNullOrEmpty(baseMessage) ? "shop.open" : baseMessage + " | shop.open";
         }
 
         private static bool ChoiceStartsCombat(EncounterData encounter, string choiceStableId)
