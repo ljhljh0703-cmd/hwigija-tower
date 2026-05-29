@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-29 15:19 — D-035 ContextPolicy handoff docs-only commit
+- **Phase**: Game/System Track / Combat Brain Design
+- **Done**:
+  - latest `origin/Proto@16320a293e401d70cc004886c67a5fbaa974c437` clean worktree에서 D-035 handoff 문서를 분리 반영
+  - main dirty worktree의 `design/d035-context-policy-handoff.md`를 입력 파일로만 복사하고 accepted base 표기를 최신 commit으로 보정
+  - `MataiosCombatContext`, ordered brain table, OQ-024 fallback, acceptance criteria, portfolio wording을 docs-only로 보존
+  - runtime Scripts/Scenes/ProjectSettings 변경 없이 commit 후보를 문서와 progress log로 제한
+- **Files**: 변경/추가 2개 (`design/d035-context-policy-handoff.md`, `Docs/Project/hwiglija-tower-progress.md`)
+- **GDD impact**: 없음 — D-035 locked 결정의 구현 handoff 문서화
+- **Next**: Game Dev는 clean accepted runtime 위에서 CodeGraph preflight 후 pure C# brain/EditMode tests 구현
+- **Agent**: Codex
+
 ### 2026-05-29 11:16 — feedback batch B runtime 적용
 - **Phase**: Post-feedback / Runtime UI Reliability
 - **Done**:
