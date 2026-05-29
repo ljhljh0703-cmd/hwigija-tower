@@ -884,14 +884,12 @@ namespace HwigiTower.Tests.EditMode
                     BuildMapSignature(nodes),
                     BuildMapSignature(different.CreateSnapshot().FloorMapNodes));
                 var branchNodes = nodes.Where(node => node.Layer >= 1 && node.Layer <= 3).ToArray();
-                Assert.AreEqual(12, nodes.Length, "Expected 10 branch nodes plus shop and boss on floor " + floor);
-                Assert.AreEqual(10, branchNodes.Length, "Expected fixed 10 branch nodes on floor " + floor);
+                Assert.AreEqual(11, nodes.Length, "Expected 9 sparse branch nodes plus shop and boss on floor " + floor);
+                Assert.AreEqual(9, branchNodes.Length, "Expected fixed 9 sparse branch nodes on floor " + floor);
                 Assert.AreEqual(3, nodes.Count(node => node.Layer == 1), "Expected three-way branch start on floor " + floor);
-                Assert.AreEqual(4, nodes.Count(node => node.Layer == 2), "Expected four middle branch nodes on floor " + floor);
+                Assert.AreEqual(3, nodes.Count(node => node.Layer == 2), "Expected three middle branch nodes on floor " + floor);
                 Assert.AreEqual(3, nodes.Count(node => node.Layer == 3), "Expected three branch nodes before shop on floor " + floor);
-                Assert.AreEqual(4, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Event), "Expected 4 event branch nodes on floor " + floor);
-                Assert.AreEqual(4, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Combat), "Expected 4 combat branch nodes on floor " + floor);
-                Assert.AreEqual(2, branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Rest), "Expected reduced 2 rest branch nodes on floor " + floor);
+                Assert.LessOrEqual(branchNodes.Count(node => node.Type == PrototypeFloorMapNodeType.Rest), 1, "Expected at most one rest branch node on floor " + floor);
                 Assert.IsTrue(nodes.Where(node => node.Layer == 1).All(node => node.Type != PrototypeFloorMapNodeType.Rest), "First selectable row should not contain rest on floor " + floor);
                 Assert.GreaterOrEqual(nodes.Count(node => node.Selectable), 3);
                 Assert.AreEqual(1, nodes.Count(node => node.Type == PrototypeFloorMapNodeType.Shop));
@@ -906,6 +904,9 @@ namespace HwigiTower.Tests.EditMode
                 Assert.IsTrue(branchNodes.All(node => node.NormalizedY < shop.NormalizedY), "Branch nodes should sit below shop on floor " + floor);
                 Assert.IsTrue(nodes.Where(node => node.Layer == lastBranchLayer).All(node => node.NextMapNodeIds.Contains(shop.MapNodeId)));
                 CollectionAssert.Contains(shop.NextMapNodeIds, boss.MapNodeId);
+                var forkNodes = branchNodes.Where(node => node.NextMapNodeIds.Length > 1).ToArray();
+                Assert.LessOrEqual(forkNodes.Length, 2, "Floor route should only have occasional forks on floor " + floor);
+                Assert.IsTrue(forkNodes.All(node => node.Type == PrototypeFloorMapNodeType.Event || node.Type == PrototypeFloorMapNodeType.Rest));
                 foreach (var node in nodes)
                 {
                     Assert.LessOrEqual(node.NextMapNodeIds.Length, 2, "Map node out-degree should stay readable on " + node.MapNodeId);
@@ -946,6 +947,28 @@ namespace HwigiTower.Tests.EditMode
             var selectableIds = nextSnapshot.FloorMapNodes.Where(node => node.Selectable).Select(node => node.MapNodeId).ToArray();
             CollectionAssert.AreEquivalent(selected.NextMapNodeIds, selectableIds);
             Assert.IsTrue(nextSnapshot.FloorMapNodes.Where(node => node.Layer == 1 && node.MapNodeId != selected.MapNodeId).All(node => node.Locked));
+        }
+
+        [Test]
+        public void CombatActionPreview_ComesFromRuntimeResolverWithoutMutatingCombat()
+        {
+            var state = StartRuntimeCombat("run-preview", "COMBAT_PREVIEW", "ENEMY_EMPTY_ARMOR", attachCatalog: true);
+            var before = state.CreateSnapshot();
+
+            var attack = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Attack);
+            var defend = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Defend);
+            var skill = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Skill);
+            var after = state.CreateSnapshot();
+
+            Assert.AreEqual("공격", attack.Label);
+            StringAssert.Contains("예상 피해", attack.PreviewText);
+            Assert.AreEqual("방어", defend.Label);
+            StringAssert.Contains("피해 감소", defend.PreviewText);
+            Assert.AreEqual("스킬", skill.Label);
+            Assert.IsTrue(skill.PreviewText == "사용 가능 / 사용 후 CD 0" || skill.PreviewText == "조건 부족");
+            Assert.AreEqual(before.PlayerHp, after.PlayerHp);
+            Assert.AreEqual(before.EnemyHp, after.EnemyHp);
+            Assert.AreEqual(before.CombatRound, after.CombatRound);
         }
 
         [Test]

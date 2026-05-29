@@ -31,6 +31,7 @@ namespace HwigiTower.Run
             bool isInCombat = false,
             int enemyHp = 0,
             int enemyMaxHp = 0,
+            int enemyAttack = 0,
             int combatRound = 0,
             int lastCombatGoldReward = 0,
             int lastCombatGlitchDelta = 0,
@@ -90,6 +91,7 @@ namespace HwigiTower.Run
             IsInCombat = isInCombat;
             EnemyHp = enemyHp;
             EnemyMaxHp = enemyMaxHp;
+            EnemyAttack = System.Math.Max(0, enemyAttack);
             CombatRound = combatRound;
             LastCombatGoldReward = lastCombatGoldReward;
             LastCombatGlitchDelta = lastCombatGlitchDelta;
@@ -150,6 +152,7 @@ namespace HwigiTower.Run
         public bool IsInCombat { get; }
         public int EnemyHp { get; }
         public int EnemyMaxHp { get; }
+        public int EnemyAttack { get; }
         public int CombatRound { get; }
         public int LastCombatGoldReward { get; }
         public int LastCombatGlitchDelta { get; }

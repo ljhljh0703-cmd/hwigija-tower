@@ -1,3 +1,4 @@
+using HwigiTower.Combat;
 using HwigiTower.Encounters;
 using HwigiTower.Core;
 
@@ -49,6 +50,82 @@ namespace HwigiTower.Run
 
     public static class PrototypeEncounterRuntimeResolver
     {
+        public static CombatActionPreview BuildCombatActionPreview(PrototypeRunState state, CombatAction action)
+        {
+            var label = action switch
+            {
+                CombatAction.Attack => "공격",
+                CombatAction.Defend => "방어",
+                CombatAction.Skill => "스킬",
+                _ => string.Empty
+            };
+
+            if (state == null || !state.IsInCombat || state.ActiveCombatPlayer == null || state.ActiveCombatEnemy == null)
+            {
+                return new CombatActionPreview(action, label, string.Empty, false);
+            }
+
+            switch (action)
+            {
+                case CombatAction.Attack:
+                    return BuildAttackPreview(state, label);
+                case CombatAction.Defend:
+                    return BuildDefendPreview(state, label);
+                case CombatAction.Skill:
+                    return BuildSkillPreview(state, label);
+                default:
+                    return new CombatActionPreview(action, label, string.Empty, false);
+            }
+        }
+
+        private static CombatActionPreview BuildAttackPreview(PrototypeRunState state, string label)
+        {
+            var attack = state.ActiveCombatPlayer == null ? 0 : state.ActiveCombatPlayer.Attack;
+            if (attack <= 0)
+            {
+                return new CombatActionPreview(CombatAction.Attack, label, string.Empty, true);
+            }
+
+            return new CombatActionPreview(
+                CombatAction.Attack,
+                label,
+                "예상 피해 " + attack + "-" + (attack + 2),
+                true);
+        }
+
+        private static CombatActionPreview BuildDefendPreview(PrototypeRunState state, string label)
+        {
+            var enemyAttack = state.ActiveCombatEnemy == null ? 0 : state.ActiveCombatEnemy.Attack;
+            if (enemyAttack <= 0)
+            {
+                return new CombatActionPreview(CombatAction.Defend, label, string.Empty, true);
+            }
+
+            return new CombatActionPreview(
+                CombatAction.Defend,
+                label,
+                "피해 감소 " + System.Math.Max(1, enemyAttack / 2),
+                true);
+        }
+
+        private static CombatActionPreview BuildSkillPreview(PrototypeRunState state, string label)
+        {
+            if (state.Arts03CooldownRounds > 0)
+            {
+                return new CombatActionPreview(CombatAction.Skill, label, "CD " + state.Arts03CooldownRounds + "턴", false);
+            }
+
+            if (!state.HasAnyPlayableCombatSkill)
+            {
+                return new CombatActionPreview(CombatAction.Skill, label, "조건 부족", false);
+            }
+
+            var cooldownAfterUse = state.HasReadyArts03SkillForPreview
+                ? System.Math.Max(0, (int)state.GetAbilityNumericParamForPreview("ABILITY_ARTS_03", "skill.cooldown_rounds"))
+                : 0;
+            return new CombatActionPreview(CombatAction.Skill, label, "사용 가능 / 사용 후 CD " + cooldownAfterUse, true);
+        }
+
         public static PrototypeEncounterChoiceResolution Resolve(PrototypeRunState state, EncounterData encounter, string choiceStableId)
         {
             return Resolve(state, encounter, choiceStableId, default, string.Empty);

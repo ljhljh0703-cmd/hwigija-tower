@@ -27,7 +27,9 @@ namespace HwigiTower.Run
         private INPCMemoryRepo _persistentMemoryRepo;
         private readonly HashSet<string> _persistentMemoryFragmentRefs = new HashSet<string>();
         private int _restartIndex;
+        private bool _preRunPlaceholderPending;
         private string ActiveRunId => RunState == null ? RunContext.RunId : RunState.RunId;
+        public bool PreRunPlaceholderPending => _preRunPlaceholderPending;
         public bool AutoResolveCombat
         {
             get => autoResolveCombat;
@@ -139,6 +141,7 @@ namespace HwigiTower.Run
             }
             ConfigureHudDemoRoute();
             RunState.ModifyGold(6);
+            _preRunPlaceholderPending = true;
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, runId, string.Empty, string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, runId, RunContext.RunId, string.Empty));
             PlayAudioContext(PrototypeAudioContext.Exploration);
@@ -163,6 +166,7 @@ namespace HwigiTower.Run
             RunState.RestoreFromSaveData(saveData, roomDefinition == null ? null : roomDefinition.FloorRunPaths, roomDefinition == null ? null : roomDefinition.DemoRunPath);
             PreserveCurrentMemoryFragments();
             ConfigureHudDemoRoute();
+            _preRunPlaceholderPending = false;
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RunStarted, saveData.runId, "save.loaded", string.Empty));
             EventBus.Raise(new GameFlowEvent(GameFlowEventType.RoomEntered, saveData.runId, "save.loaded", string.Empty));
             PlayAudioContext(PrototypeAudioContext.Exploration);
@@ -261,6 +265,7 @@ namespace HwigiTower.Run
                 return new EncounterSelection(null, null);
             }
 
+            _preRunPlaceholderPending = false;
             var selectable = RunState.GetSelectableMapNodeViews();
             if (selectable.Length == 1 && RunState.TrySelectMapNode(selectable[0].MapNodeId, out var selectedStep))
             {
@@ -408,8 +413,21 @@ namespace HwigiTower.Run
                 return new EncounterSelection(null, null);
             }
 
+            _preRunPlaceholderPending = false;
             PlayAudioContextForEncounter(step.Encounter);
             return new EncounterSelection(step.Node, step.Encounter);
+        }
+
+        public void ConfirmPreRunPlaceholder()
+        {
+            _preRunPlaceholderPending = false;
+            PlayAudioContext(PrototypeAudioContext.Exploration);
+            SaveCurrentRun();
+        }
+
+        public CombatActionPreview BuildCombatActionPreview(CombatAction action)
+        {
+            return PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(RunState, action);
         }
 
         public PrototypeEncounterChoiceView[] BuildEncounterChoiceViews(EncounterSelection selection)
@@ -481,14 +499,8 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", RunState != null && RunState.RunCompleted);
             }
 
-            var canceled = RunState.CancelSelectedMapNode();
-            if (canceled)
-            {
-                PlayAudioContext(PrototypeAudioContext.Exploration);
-            }
-
             SaveCurrentRun();
-            return new PrototypeNodeResolution("node.map", canceled ? "return" : string.Empty, canceled ? "returned to map" : "map already open", false);
+            return new PrototypeNodeResolution("node.map", string.Empty, "route cancel unavailable", false);
         }
 
         public PrototypeNodeResolution ResolveCurrentRouteRestInteraction(EncounterSelection selection, string actionId, string utterance)

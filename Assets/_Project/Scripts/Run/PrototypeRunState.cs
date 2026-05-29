@@ -498,6 +498,7 @@ namespace HwigiTower.Run
                 IsInCombat,
                 _activeCombatEnemy?.Hp ?? 0,
                 _activeCombatEnemy?.MaxHp ?? 0,
+                _activeCombatEnemy?.Attack ?? 0,
                 _combatRound,
                 _lastCombatGoldReward,
                 _lastCombatGlitchDelta,
@@ -1299,6 +1300,14 @@ namespace HwigiTower.Run
         public CombatantState ActiveCombatPlayer => _activeCombatPlayer;
         public CombatantState ActiveCombatMataios => _activeCombatMataios;
         public CombatantState ActiveCombatEnemy => _activeCombatEnemy;
+        public int Arts03CooldownRounds => _arts03CooldownRounds;
+        public bool HasAnyPlayableCombatSkill => HasPlayableSkill();
+        public bool HasReadyArts03SkillForPreview => HasReadyArts03Skill();
+
+        public float GetAbilityNumericParamForPreview(string abilityRef, string key)
+        {
+            return GetAbilityParam(abilityRef, key);
+        }
 
         private readonly struct MataiosPolicyResolution
         {
