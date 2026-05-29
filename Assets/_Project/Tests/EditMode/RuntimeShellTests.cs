@@ -642,6 +642,81 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void ShopPurchase_StaysOpenUntilExplicitLeaveChoice()
+        {
+            var state = new PrototypeRunState("run-shop-stays-open", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.ModifyGold(12);
+            var encounter = CreateRuntimeEncounter(
+                "ENC_SHOP_STAY_OPEN",
+                EncounterType.Shop,
+                CreateChoice(
+                    "CHOICE_SHOP_STAY_BUY_ITEM",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 5) },
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", -5),
+                        CreateItemEffect("ITEM_FIELD_BANDAGE", 1)
+                    },
+                    "DisabledVisible",
+                    "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"),
+                CreateChoice(
+                    "CHOICE_SHOP_STAY_LEAVE",
+                    new EncounterRequirementRuntimeData[0],
+                    new EncounterEffectRuntimeData[0]));
+
+            var purchase = state.ResolveEncounterChoice(new DeterministicRunContext("run-shop-stays-open", 1001), "node.shop.stay", encounter, "CHOICE_SHOP_STAY_BUY_ITEM");
+            var afterPurchase = state.CreateSnapshot();
+            var leave = state.ResolveEncounterChoice(new DeterministicRunContext("run-shop-stays-open", 1001), "node.shop.stay", encounter, "CHOICE_SHOP_STAY_LEAVE");
+
+            Assert.AreEqual("CHOICE_SHOP_STAY_BUY_ITEM", purchase.PayloadId);
+            Assert.AreEqual(7, afterPurchase.Gold);
+            Assert.AreEqual(1, state.GetItemCount("ITEM_FIELD_BANDAGE"));
+            Assert.AreEqual(0, afterPurchase.NodesResolved);
+            Assert.IsFalse(state.HasResolvedEncounterChoice("node.shop.stay", "ENC_SHOP_STAY_OPEN"));
+            StringAssert.Contains("shop.open", purchase.Message);
+            Assert.AreEqual("CHOICE_SHOP_STAY_LEAVE", leave.PayloadId);
+            Assert.AreEqual(1, state.CreateSnapshot().NodesResolved);
+            Assert.IsTrue(state.HasResolvedEncounterChoice("node.shop.stay", "ENC_SHOP_STAY_OPEN"));
+        }
+
+        [Test]
+        public void ShopOwnedAbilityChoice_DisablesWithoutSpendingGold()
+        {
+            var state = new PrototypeRunState("run-shop-owned-ability", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.ModifyGold(24);
+            var encounter = CreateRuntimeEncounter(
+                "ENC_SHOP_OWNED_ABILITY",
+                EncounterType.Shop,
+                CreateChoice(
+                    "CHOICE_SHOP_BUY_SCOUT",
+                    new[] { CreateRequirement("StatAtLeast", "gold", 12) },
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", -12),
+                        CreateAbilityEffect("ABILITY_SCOUT")
+                    },
+                    "DisabledVisible",
+                    "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"),
+                CreateChoice(
+                    "CHOICE_SHOP_OWNED_LEAVE",
+                    new EncounterRequirementRuntimeData[0],
+                    new EncounterEffectRuntimeData[0]));
+
+            var first = state.ResolveEncounterChoice(new DeterministicRunContext("run-shop-owned-ability", 1001), "node.shop.owned", encounter, "CHOICE_SHOP_BUY_SCOUT");
+            var goldAfterFirst = state.Gold;
+            var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, encounter);
+            var second = state.ResolveEncounterChoice(new DeterministicRunContext("run-shop-owned-ability", 1001), "node.shop.owned", encounter, "CHOICE_SHOP_BUY_SCOUT");
+
+            Assert.AreEqual("CHOICE_SHOP_BUY_SCOUT", first.PayloadId);
+            Assert.IsTrue(state.HasAbilityRef("ABILITY_SCOUT"));
+            Assert.AreEqual(12, goldAfterFirst);
+            Assert.IsFalse(views[0].Enabled);
+            StringAssert.Contains("이미 보유", views[0].HintText);
+            Assert.IsFalse(second.Message.Contains("Gold -12"));
+            Assert.AreEqual(goldAfterFirst, state.Gold);
+        }
+
+        [Test]
         public void EncounterRuntimeResolver_UsesCatalogForShopItemAndAbility()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
@@ -1499,6 +1574,26 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void PrototypeHud_FinalBossClearResultPrioritizesRewardFeedback()
+        {
+            var hudObject = new GameObject("Final Boss Clear Result Hud");
+            try
+            {
+                var hud = hudObject.AddComponent<PrototypeHud>();
+                hud.ShowResultMessage("combat victory | round 4 | action Attack | player HP 12 -> 9 | enemy BOSS_APEX_02 0/32 | playerDamage 7 | enemyDamage 3 | enemyDefeated True | gold reward 30 | glitch -8 | affinity +6 | run.clear");
+
+                StringAssert.Contains("최종 보스 격파", hud.ResultMessage);
+                StringAssert.Contains("Gold +30", hud.ResultMessage);
+                StringAssert.Contains("신뢰 +6", hud.ResultMessage);
+                StringAssert.Contains("엔딩 선택 가능", hud.ResultMessage);
+            }
+            finally
+            {
+                Object.DestroyImmediate(hudObject);
+            }
+        }
+
+        [Test]
         public void FinalBossDefeat_WithRecallAnchorRevivesOnceThenCanFail()
         {
             var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
@@ -2245,9 +2340,15 @@ namespace HwigiTower.Tests.EditMode
 
         private static EncounterData CreateRuntimeEncounter(string id, params EncounterChoiceRuntimeData[] choices)
         {
+            return CreateRuntimeEncounter(id, EncounterType.Battle, choices);
+        }
+
+        private static EncounterData CreateRuntimeEncounter(string id, EncounterType type, params EncounterChoiceRuntimeData[] choices)
+        {
             var encounter = ScriptableObject.CreateInstance<EncounterData>();
             var serialized = new SerializedObject(encounter);
             serialized.FindProperty("id").stringValue = id;
+            serialized.FindProperty("type").enumValueIndex = (int)type;
             var property = serialized.FindProperty("choices");
             property.arraySize = choices.Length;
             for (var i = 0; i < choices.Length; i++)

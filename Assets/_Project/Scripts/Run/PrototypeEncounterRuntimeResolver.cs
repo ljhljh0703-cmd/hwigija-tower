@@ -207,13 +207,13 @@ namespace HwigiTower.Run
                     !hidden,
                     met,
                     met ? string.Empty : choices[i].unavailableReasonTextKey,
-                    BuildChoiceHint(encounter, choices[i], met));
+                    BuildChoiceHint(state, encounter, choices[i], met));
             }
 
             return views;
         }
 
-        private static string BuildChoiceHint(EncounterData encounter, EncounterChoiceRuntimeData choice, bool requirementsMet)
+        private static string BuildChoiceHint(PrototypeRunState state, EncounterData encounter, EncounterChoiceRuntimeData choice, bool requirementsMet)
         {
             if (choice == null)
             {
@@ -222,7 +222,7 @@ namespace HwigiTower.Run
 
             if (!requirementsMet)
             {
-                var reason = BuildUnavailableReason(choice);
+                var reason = BuildUnavailableReason(choice, state);
                 var unavailable = string.IsNullOrEmpty(reason) ? "Unavailable" : "Unavailable: " + reason;
                 if (encounter != null && encounter.Type == EncounterType.Shop)
                 {
@@ -264,8 +264,13 @@ namespace HwigiTower.Run
             };
         }
 
-        private static string BuildUnavailableReason(EncounterChoiceRuntimeData choice)
+        private static string BuildUnavailableReason(EncounterChoiceRuntimeData choice, PrototypeRunState state)
         {
+            if (ChoiceAddsOwnedAbility(state, choice))
+            {
+                return "이미 보유";
+            }
+
             var requirements = choice.requirements ?? new EncounterRequirementRuntimeData[0];
             for (var i = 0; i < requirements.Length; i++)
             {
@@ -384,7 +389,7 @@ namespace HwigiTower.Run
             var requirements = choice.requirements ?? new EncounterRequirementRuntimeData[0];
             if (requirements.Length == 0)
             {
-                return true;
+                return !ChoiceAddsOwnedAbility(state, choice);
             }
 
             var anyMode = choice.requirementMode == "Any";
@@ -408,7 +413,29 @@ namespace HwigiTower.Run
                 }
             }
 
-            return anyMode ? matched > 0 : true;
+            return (anyMode ? matched > 0 : true) && !ChoiceAddsOwnedAbility(state, choice);
+        }
+
+        private static bool ChoiceAddsOwnedAbility(PrototypeRunState state, EncounterChoiceRuntimeData choice)
+        {
+            if (state == null || choice == null || choice.effects == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < choice.effects.Length; i++)
+            {
+                var effect = choice.effects[i];
+                if (effect != null &&
+                    effect.kind == "AddAbility" &&
+                    !string.IsNullOrEmpty(effect.abilityRef) &&
+                    state.HasAbilityRef(effect.abilityRef))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool RequirementMet(PrototypeRunState state, EncounterData encounter, EncounterRequirementRuntimeData requirement)
