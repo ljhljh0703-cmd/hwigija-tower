@@ -146,6 +146,14 @@ namespace HwigiTower.UI
         private string _utilityCharacterMode = "player";
         private string _lastResultMessage = string.Empty;
         private PrototypeRunSnapshot _lastSnapshot;
+        private string _lastCombatVisualKey = string.Empty;
+        private int _lastCombatVisualRound = -1;
+        private int _lastCombatVisualEnemyHp = -1;
+        private bool _combatEnemyFeedbackBaseCaptured;
+        private Vector2 _combatEnemyImageBasePosition;
+        private Vector3 _combatEnemyImageBaseScale = Vector3.one;
+        private float _combatEnemyHitShakeTimer;
+        private float _combatEnemyAttackPulseTimer;
 
         private enum NpcSpotlightMode
         {
@@ -184,7 +192,7 @@ namespace HwigiTower.UI
         private const int ResultFontSize = 28;
         private const int StatFontSize = 26;
         private const int CaptionFontSize = 23;
-        private const int CombatBodyFontSize = 31;
+        private const int CombatBodyFontSize = 28;
         private const float CombatActionButtonSize = 118f;
         private const int ChoiceFontSize = ButtonFontSize;
         private const int MapNodeFontSize = 29;
@@ -196,6 +204,10 @@ namespace HwigiTower.UI
         private const int ResultLineLimit = 3;
         private const int ResultIconChipCount = 6;
         private const float DenseLineSpacing = 0.92f;
+        private const float CombatEnemyHitShakeDuration = 0.18f;
+        private const float CombatEnemyAttackPulseDuration = 0.16f;
+        private const float CombatEnemyHitShakePixels = 11f;
+        private const float CombatEnemyAttackPulseScale = 1.045f;
         private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
         private static readonly Color ResultTextColor = new Color(0.88f, 0.93f, 0.95f, 1f);
         private static readonly Color PanelColor = new Color(0.035f, 0.045f, 0.055f, 0.88f);
@@ -425,6 +437,7 @@ namespace HwigiTower.UI
         private void Update()
         {
             HandleManualShortcuts();
+            UpdateCombatEnemyFeedbackAnimation(Time.unscaledDeltaTime);
         }
 
         public void Configure(Text focus, Text interaction, Text runState = null, Text result = null)
@@ -4450,6 +4463,7 @@ namespace HwigiTower.UI
             if (!hasCombat || combatText == null)
             {
                 HideSkillPicker();
+                ResetCombatEnemyFeedbackState();
                 return;
             }
 
@@ -4540,6 +4554,8 @@ namespace HwigiTower.UI
                 enemyHpFill.fillAmount = Ratio(snapshot.EnemyHp, snapshot.EnemyMaxHp);
             }
 
+            TrackCombatEnemyFeedback(snapshot);
+
             if (playerHpFill != null)
             {
                 playerHpFill.fillAmount = Ratio(snapshot.PlayerHp, snapshot.PlayerMaxHp);
@@ -4549,6 +4565,126 @@ namespace HwigiTower.UI
             {
                 mataiosHpFill.fillAmount = Ratio(snapshot.MataiosHp, snapshot.MataiosMaxHp);
             }
+        }
+
+        private void TrackCombatEnemyFeedback(PrototypeRunSnapshot snapshot)
+        {
+            if (!snapshot.IsInCombat || combatEnemyImage == null)
+            {
+                ResetCombatEnemyFeedbackState();
+                return;
+            }
+
+            CaptureCombatEnemyFeedbackBase();
+            var visualKey = (snapshot.LastCombatId ?? string.Empty) + "|" + (snapshot.LastCombatEnemyId ?? string.Empty);
+            if (_lastCombatVisualKey != visualKey)
+            {
+                _lastCombatVisualKey = visualKey;
+                _lastCombatVisualRound = snapshot.CombatRound;
+                _lastCombatVisualEnemyHp = snapshot.EnemyHp;
+                ResetCombatEnemyFeedbackTransform();
+                return;
+            }
+
+            if (snapshot.CombatRound == _lastCombatVisualRound)
+            {
+                return;
+            }
+
+            if (_lastCombatVisualEnemyHp >= 0 && snapshot.EnemyHp < _lastCombatVisualEnemyHp)
+            {
+                TriggerCombatEnemyHitShake();
+            }
+
+            if ((snapshot.LastCombatRoundResult ?? string.Empty).Contains("enemyDamage ", StringComparison.Ordinal))
+            {
+                TriggerCombatEnemyAttackPulse();
+            }
+
+            _lastCombatVisualRound = snapshot.CombatRound;
+            _lastCombatVisualEnemyHp = snapshot.EnemyHp;
+        }
+
+        private void TriggerCombatEnemyHitShake()
+        {
+            CaptureCombatEnemyFeedbackBase();
+            _combatEnemyHitShakeTimer = CombatEnemyHitShakeDuration;
+        }
+
+        private void TriggerCombatEnemyAttackPulse()
+        {
+            CaptureCombatEnemyFeedbackBase();
+            _combatEnemyAttackPulseTimer = CombatEnemyAttackPulseDuration;
+        }
+
+        private void UpdateCombatEnemyFeedbackAnimation(float deltaTime)
+        {
+            if (combatEnemyImage == null || (!_combatEnemyFeedbackBaseCaptured && _combatEnemyHitShakeTimer <= 0f && _combatEnemyAttackPulseTimer <= 0f))
+            {
+                return;
+            }
+
+            CaptureCombatEnemyFeedbackBase();
+            _combatEnemyHitShakeTimer = Mathf.Max(0f, _combatEnemyHitShakeTimer - Mathf.Max(0f, deltaTime));
+            _combatEnemyAttackPulseTimer = Mathf.Max(0f, _combatEnemyAttackPulseTimer - Mathf.Max(0f, deltaTime));
+
+            var rect = combatEnemyImage.rectTransform;
+            var shakeOffset = 0f;
+            if (_combatEnemyHitShakeTimer > 0f)
+            {
+                var progress = 1f - _combatEnemyHitShakeTimer / CombatEnemyHitShakeDuration;
+                shakeOffset = Mathf.Sin(progress * Mathf.PI * 6f) * CombatEnemyHitShakePixels * (1f - progress);
+            }
+
+            var pulseScale = 1f;
+            if (_combatEnemyAttackPulseTimer > 0f)
+            {
+                var progress = 1f - _combatEnemyAttackPulseTimer / CombatEnemyAttackPulseDuration;
+                pulseScale = Mathf.Lerp(CombatEnemyAttackPulseScale, 1f, progress);
+            }
+
+            rect.anchoredPosition = _combatEnemyImageBasePosition + new Vector2(shakeOffset, 0f);
+            rect.localScale = _combatEnemyImageBaseScale * pulseScale;
+
+            if (_combatEnemyHitShakeTimer <= 0f && _combatEnemyAttackPulseTimer <= 0f)
+            {
+                ResetCombatEnemyFeedbackTransform();
+            }
+        }
+
+        private void CaptureCombatEnemyFeedbackBase()
+        {
+            if (_combatEnemyFeedbackBaseCaptured || combatEnemyImage == null)
+            {
+                return;
+            }
+
+            var rect = combatEnemyImage.rectTransform;
+            _combatEnemyImageBasePosition = rect.anchoredPosition;
+            _combatEnemyImageBaseScale = rect.localScale;
+            _combatEnemyFeedbackBaseCaptured = true;
+        }
+
+        private void ResetCombatEnemyFeedbackTransform()
+        {
+            if (!_combatEnemyFeedbackBaseCaptured || combatEnemyImage == null)
+            {
+                return;
+            }
+
+            var rect = combatEnemyImage.rectTransform;
+            rect.anchoredPosition = _combatEnemyImageBasePosition;
+            rect.localScale = _combatEnemyImageBaseScale;
+        }
+
+        private void ResetCombatEnemyFeedbackState()
+        {
+            ResetCombatEnemyFeedbackTransform();
+            _lastCombatVisualKey = string.Empty;
+            _lastCombatVisualRound = -1;
+            _lastCombatVisualEnemyHp = -1;
+            _combatEnemyHitShakeTimer = 0f;
+            _combatEnemyAttackPulseTimer = 0f;
         }
 
         private void UpdatePartyDock(PrototypeRunSnapshot snapshot)
@@ -5648,22 +5784,49 @@ namespace HwigiTower.UI
 
         private string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
-            var skill = HasArtsSkill() ? "번개 방출: 직접 피해" :
-                HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" :
-                "기술 불가: 보유 스킬 필요";
-            var extra = BuildCombatExtraLine(snapshot);
-            var state = string.IsNullOrEmpty(extra) ? skill :
-                extra.StartsWith("콤보 피해", StringComparison.Ordinal) ? "정찰 기술 | " + extra : extra;
+            var state = BuildCombatLogDetailLine(snapshot);
             return PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + " | 내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
-                ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 34) + "\n" +
-                ShortenPublicLine(state, 36);
+                ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 40) + "\n" +
+                ShortenPublicLine(state, 38);
+        }
+
+        private string BuildCombatLogDetailLine(PrototypeRunSnapshot snapshot)
+        {
+            var highlights = new List<string>();
+            var extra = BuildCombatExtraLine(snapshot);
+            if (!string.IsNullOrEmpty(extra))
+            {
+                highlights.Add(extra);
+            }
+
+            if (snapshot.LastMataiosProtectReduction > 0)
+            {
+                highlights.Add("보호 -" + snapshot.LastMataiosProtectReduction);
+            }
+
+            if (snapshot.LastMataiosCombatDamage > 0)
+            {
+                highlights.Add("지원 피해 " + snapshot.LastMataiosCombatDamage);
+            }
+
+            if (highlights.Count > 0)
+            {
+                return string.Join(" | ", highlights);
+            }
+
+            if (HasArtsSkill())
+            {
+                return "번개 방출: 직접 피해";
+            }
+
+            return HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" : "기술 불가: 보유 스킬 필요";
         }
 
         private static string BuildCombatExtraLine(PrototypeRunSnapshot snapshot)
         {
             if (snapshot.LastCombatComboDamage > 0)
             {
-                return "콤보 피해 " + snapshot.LastCombatComboDamage;
+                return "정찰 기술: 추가 공격 " + snapshot.LastCombatComboDamage;
             }
 
             if (snapshot.LastCombatRoundResult.Contains("training +", StringComparison.Ordinal))
