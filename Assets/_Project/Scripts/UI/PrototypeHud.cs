@@ -70,6 +70,7 @@ namespace HwigiTower.UI
         [SerializeField] private Image topMataiosProfileImage;
         [SerializeField] private Image enemyHpFill;
         [SerializeField] private Image playerHpFill;
+        [SerializeField] private Image mataiosHpFill;
         [SerializeField] private Button attackButton;
         [SerializeField] private Button defendButton;
         [SerializeField] private Button skillButton;
@@ -236,10 +237,14 @@ namespace HwigiTower.UI
         });
         public string CurrentTopHudIconNames => string.Join("|", new[]
         {
-            topGoldIconImage != null && topGoldIconImage.sprite != null ? topGoldIconImage.sprite.name : string.Empty,
-            topMemoryIconImage != null && topMemoryIconImage.sprite != null ? topMemoryIconImage.sprite.name : string.Empty,
-            topAffinityIconImage != null && topAffinityIconImage.sprite != null ? topAffinityIconImage.sprite.name : string.Empty
+            topGoldIconImage != null && topGoldIconImage.gameObject.activeInHierarchy && topGoldIconImage.sprite != null ? topGoldIconImage.sprite.name : string.Empty,
+            topMemoryIconImage != null && topMemoryIconImage.gameObject.activeInHierarchy && topMemoryIconImage.sprite != null ? topMemoryIconImage.sprite.name : string.Empty,
+            topAffinityIconImage != null && topAffinityIconImage.gameObject.activeInHierarchy && topAffinityIconImage.sprite != null ? topAffinityIconImage.sprite.name : string.Empty
         });
+        public Vector2 RouteHeaderAnchorMin => routeText == null ? Vector2.zero : routeText.GetComponent<RectTransform>().anchorMin;
+        public Vector2 RouteHeaderAnchorMax => routeText == null ? Vector2.zero : routeText.GetComponent<RectTransform>().anchorMax;
+        public Vector2 NodeMapLayerAnchorMax => nodeMapLayer == null ? Vector2.zero : nodeMapLayer.anchorMax;
+        public Vector2 RestInteractionAnchorMin => restInteractionPanel == null ? Vector2.zero : restInteractionPanel.anchorMin;
         public string CurrentShopChoiceCardSpriteNames => JoinImageSpriteNames(_shopChoiceCardImages);
         public string CurrentShopChoiceIconNames => JoinImageSpriteNames(_shopChoiceIconImages);
         public string CurrentResultSummaryIconNames => JoinImageSpriteNames(_resultSummaryIconImages);
@@ -257,6 +262,9 @@ namespace HwigiTower.UI
             ResolveButtonLabel(restTrainButton),
             ResolveButtonLabel(restRecoverButton)
         });
+        public float CurrentEnemyHpFillAmount => enemyHpFill == null ? -1f : enemyHpFill.fillAmount;
+        public float CurrentPlayerHpFillAmount => playerHpFill == null ? -1f : playerHpFill.fillAmount;
+        public float CurrentMataiosHpFillAmount => mataiosHpFill == null ? -1f : mataiosHpFill.fillAmount;
         public bool EventCutsceneVisible => eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy;
         public string EventCutsceneMessage => ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
         public bool UtilityPanelVisible => utilityPanel != null && utilityPanel.gameObject.activeInHierarchy;
@@ -1029,9 +1037,7 @@ namespace HwigiTower.UI
                     snapshot.RunClear ? " | 클리어" :
                     snapshot.RunFailed ? " | 실패" :
                     string.Empty;
-                runStateText.text =
-                    $"Floor {snapshot.CurrentFloor}{status}  HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp}  Gold {snapshot.Gold}  정신 {snapshot.Mental}\n" +
-                    $"기억 {snapshot.MemoryFragmentCount}  능력 {snapshot.AbilityCount}  아이템 {snapshot.ItemCount}";
+                runStateText.text = $"Floor {snapshot.CurrentFloor}{status}  HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp}  Gold {snapshot.Gold}  이성 {snapshot.Mental}";
             }
 
             if (snapshot.RunCompleted)
@@ -1465,7 +1471,7 @@ namespace HwigiTower.UI
             visualLayer = EnsureLayerPanel(visualLayer, "Screen Layer Visual", new Vector2(0.04f, 0.49f), new Vector2(0.96f, 0.835f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.05f, 0.52f), false);
             npcReactionLayer = EnsureLayerPanel(npcReactionLayer, "Screen Layer Companion Status", new Vector2(0.04f, 0.375f), new Vector2(0.96f, 0.485f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, PanelColor, false);
             resultLayer = EnsureLayerPanel(resultLayer, "Screen Layer Result", new Vector2(0.06f, 0.285f), new Vector2(0.94f, 0.405f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.035f, 0.045f, 0.055f, 0.90f), false);
-            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.04f, 0.06f), new Vector2(0.96f, 0.84f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
+            nodeMapLayer = EnsureLayerPanel(nodeMapLayer, "Screen Layer Node Map", new Vector2(0.04f, 0.06f), new Vector2(0.96f, 0.80f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.030f, 0.040f, 0.050f, 0.90f), false);
             actionLayer = EnsureLayerPanel(actionLayer, "Screen Layer Action", new Vector2(0.06f, 0.045f), new Vector2(0.94f, 0.265f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.02f, 0.025f, 0.03f, 0.50f), false);
             endingLayer = EnsureLayerPanel(endingLayer, "Screen Layer Ending", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.30f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, new Color(0.06f, 0.055f, 0.04f, 0.90f), false);
         }
@@ -1473,11 +1479,11 @@ namespace HwigiTower.UI
         private void EnsureTopHudIcons()
         {
             EnsureScreenLayers();
-            topGoldIconImage = EnsureHudIcon(topGoldIconImage, "Top Gold Icon", topStatusLayer, new Vector2(0.56f, 0.58f), 34f);
+            topGoldIconImage = EnsureHudIcon(topGoldIconImage, "Top Gold Icon", topStatusLayer, new Vector2(0.62f, 0.50f), 36f);
             topMemoryIconImage = EnsureHudIcon(topMemoryIconImage, "Top Memory Icon", topStatusLayer, new Vector2(0.28f, 0.24f), 32f);
             topAffinityIconImage = EnsureHudIcon(topAffinityIconImage, "Top Affinity Icon", topStatusLayer, new Vector2(0.48f, 0.24f), 32f);
-            topPlayerProfileImage = EnsureHudIcon(topPlayerProfileImage, "Top Player Profile", topStatusLayer, new Vector2(0.055f, 0.50f), 56f);
-            topMataiosProfileImage = EnsureHudIcon(topMataiosProfileImage, "Top Mataios Profile", topStatusLayer, new Vector2(0.125f, 0.50f), 56f);
+            topPlayerProfileImage = EnsureHudIcon(topPlayerProfileImage, "Top Player Profile", topStatusLayer, new Vector2(0.052f, 0.50f), 68f);
+            topMataiosProfileImage = EnsureHudIcon(topMataiosProfileImage, "Top Mataios Profile", topStatusLayer, new Vector2(0.128f, 0.50f), 68f);
         }
 
         private void EnsureUtilityUi()
@@ -1846,6 +1852,7 @@ namespace HwigiTower.UI
             ApplyTextRect(interactionText, new Vector2(0.06f, 0.89f), new Vector2(0.94f, 0.925f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, TitleFontSize, TextAnchor.MiddleCenter);
             ApplyTextRect(runStateText, new Vector2(0.06f, 0.925f), new Vector2(0.94f, 0.965f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, BodyFontSize, TextAnchor.MiddleCenter);
             ApplyTextRect(resultText, new Vector2(0.08f, 0.292f), new Vector2(0.92f, 0.345f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, ResultFontSize, TextAnchor.MiddleCenter);
+            ApplyRouteHeaderRect();
             if (resultText != null)
             {
                 resultText.lineSpacing = DenseLineSpacing;
@@ -2222,7 +2229,7 @@ namespace HwigiTower.UI
             SetLayerVisible(visualLayer, true);
             SetLayerVisible(npcReactionLayer, false);
             SetLayerVisible(resultLayer, false);
-            ApplyPresentationSlot(selection.EncounterId);
+            ApplyRestPresentationSlot(selection.EncounterId);
             HideNpcSpotlight();
             _pendingRestSelection = selection;
             _pendingRestActionId = string.Empty;
@@ -2272,8 +2279,8 @@ namespace HwigiTower.UI
             panelObject.transform.SetParent(HudParent, false);
 
             restInteractionPanel = panelObject.AddComponent<RectTransform>();
-            restInteractionPanel.anchorMin = new Vector2(0.06f, 0.08f);
-            restInteractionPanel.anchorMax = new Vector2(0.94f, 0.66f);
+            restInteractionPanel.anchorMin = new Vector2(0.06f, 0.46f);
+            restInteractionPanel.anchorMax = new Vector2(0.94f, 0.84f);
             restInteractionPanel.pivot = new Vector2(0.5f, 0.5f);
             restInteractionPanel.anchoredPosition = Vector2.zero;
             restInteractionPanel.sizeDelta = Vector2.zero;
@@ -2831,10 +2838,22 @@ namespace HwigiTower.UI
         {
             if (routeText != null)
             {
+                ApplyRouteHeaderRect();
                 return;
             }
 
-            routeText = CreateHudText("Demo Route Text", new Vector2(0.06f, 1f), new Vector2(0.94f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -330f), new Vector2(0f, 112f), 28, TextAnchor.UpperCenter, new Color(0.88f, 0.94f, 0.98f, 1f));
+            routeText = CreateHudText("Demo Route Text", new Vector2(0.08f, 0.845f), new Vector2(0.92f, 0.900f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 34, TextAnchor.MiddleCenter, new Color(0.88f, 0.94f, 0.98f, 1f));
+            ApplyRouteHeaderRect();
+        }
+
+        private void ApplyRouteHeaderRect()
+        {
+            if (routeText == null)
+            {
+                return;
+            }
+
+            ApplyTextRect(routeText, new Vector2(0.08f, 0.845f), new Vector2(0.92f, 0.900f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 34, TextAnchor.MiddleCenter);
         }
 
         private void EnsureMemoryText()
@@ -3157,6 +3176,7 @@ namespace HwigiTower.UI
             combatBandageStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Bandage Status Icon", new Vector2(0.84f, 0.72f), new Vector2(0.92f, 0.90f));
             combatRecallStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Recall Status Icon", new Vector2(0.68f, 0.72f), new Vector2(0.76f, 0.90f));
             playerHpFill = CreateHpBar(combatPlayerCard, "Player HP Bar", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.15f), new Color(0.30f, 0.78f, 0.50f, 1f));
+            mataiosHpFill = CreateHpBar(combatMataiosCard, "Mataios HP Bar", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.15f), new Color(0.30f, 0.60f, 0.82f, 1f));
 
             attackButton = CreateCombatButton(combatPartyDock, "Combat Button Attack", "공격", new Vector2(0.22f, 0.045f), CombatAction.Attack, out attackActionIconImage);
             defendButton = CreateCombatButton(combatPartyDock, "Combat Button Defend", "방어", new Vector2(0.50f, 0.045f), CombatAction.Defend, out defendActionIconImage);
@@ -4029,47 +4049,7 @@ namespace HwigiTower.UI
 
         private static string BuildPublicMapSummary(PrototypeRunSnapshot snapshot)
         {
-            var selectable = 0;
-            var completed = 0;
-            var activeLayer = 0;
-            var bossVisible = false;
-            for (var i = 0; i < snapshot.FloorMapNodes.Length; i++)
-            {
-                var node = snapshot.FloorMapNodes[i];
-                if (node.Selectable)
-                {
-                    selectable++;
-                    activeLayer = node.Layer;
-                }
-
-                if (node.Completed)
-                {
-                    completed++;
-                }
-
-                if (node.Type == PrototypeFloorMapNodeType.Boss)
-                {
-                    bossVisible = true;
-                }
-            }
-
-            var objective = snapshot.HasSelectedMapNode
-                ? "선택한 노드 해결"
-                : selectable > 1
-                    ? "갈림길 선택"
-                    : "다음 길 선택";
-            var bossLayer = 0;
-            for (var i = 0; i < snapshot.FloorMapNodes.Length; i++)
-            {
-                if (snapshot.FloorMapNodes[i].Type == PrototypeFloorMapNodeType.Boss)
-                {
-                    bossLayer = Mathf.Max(bossLayer, snapshot.FloorMapNodes[i].Layer);
-                }
-            }
-
-            var stepsToBoss = bossLayer > 0 && activeLayer > 0 ? Mathf.Max(1, bossLayer - activeLayer + 1) : 0;
-            var boss = bossVisible ? " | 보스까지 " + stepsToBoss + "번" : string.Empty;
-            return "지도\nFloor " + snapshot.CurrentFloor + " | " + objective + boss + "\n밝은 노드를 선택하세요 | 완료 " + completed + "개";
+            return "갈림길 선택";
         }
 
         private static string ResolvePublicDemoStatus(PrototypeRunSnapshot snapshot)
@@ -4288,6 +4268,11 @@ namespace HwigiTower.UI
             {
                 playerHpFill.fillAmount = Ratio(snapshot.PlayerHp, snapshot.PlayerMaxHp);
             }
+
+            if (mataiosHpFill != null)
+            {
+                mataiosHpFill.fillAmount = Ratio(snapshot.MataiosHp, snapshot.MataiosMaxHp);
+            }
         }
 
         private void UpdatePartyDock(PrototypeRunSnapshot snapshot)
@@ -4362,10 +4347,10 @@ namespace HwigiTower.UI
             ApplyTopHudIconSprites();
             var visible = !showRawDebugText && !string.IsNullOrEmpty(snapshot.RunId);
             SetImageVisible(topGoldIconImage, visible);
-            SetImageVisible(topMemoryIconImage, visible);
-            SetImageVisible(topAffinityIconImage, visible);
+            SetImageVisible(topMemoryIconImage, false);
+            SetImageVisible(topAffinityIconImage, false);
             SetImageVisible(topPlayerProfileImage, visible);
-            SetImageVisible(topMataiosProfileImage, visible);
+            SetImageVisible(topMataiosProfileImage, false);
         }
 
         private void ApplyTopHudIconSprites()
@@ -5764,6 +5749,27 @@ namespace HwigiTower.UI
             {
                 _activePresentationEncounterId = encounterStableId;
                 ApplyPresentationSlot(slot);
+            }
+        }
+
+        private void ApplyRestPresentationSlot(string encounterStableId)
+        {
+            if (presentationData == null)
+            {
+                return;
+            }
+
+            if (presentationData.TryGetSlot(encounterStableId, out var slot))
+            {
+                _activePresentationEncounterId = encounterStableId;
+                ApplyPresentationSlot(slot);
+                return;
+            }
+
+            if (presentationData.TryGetSlot("ENC_REST_01", out var fallbackSlot))
+            {
+                _activePresentationEncounterId = "ENC_REST_01";
+                ApplyPresentationSlot(fallbackSlot);
             }
         }
 

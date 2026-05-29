@@ -32,6 +32,20 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-29 10:31 — feedback batch A runtime 적용
+- **Phase**: Post-feedback / Runtime UI Reliability
+- **Done**:
+  - clean worktree `/private/tmp/hwigi-game-feedback-batch-a`에서 `origin/Proto@3985c55` 기준 CodeGraph fresh preflight를 수행
+  - top HUD를 `Floor / HP / Gold / 이성` 표면으로 축소하고 map header를 `갈림길 선택`으로 단순화
+  - map node layer와 rest choice panel 위치를 조정하고 map/rest 화면의 Mataios large status surface를 숨김 상태로 유지
+  - enemy/player/Mataios HP fill을 current/max 비율로 갱신하고 rest background fallback persistence를 추가
+  - map return/exploration context가 normal lobby BGM으로 복귀하도록 fallback reset을 추가
+- **Files**: 변경/추가 5개 (`PrototypeHud.cs`, `PrototypeRoomController.cs`, `PresentationLayerTests.cs`, `AudioLobbyTests.cs`, progress)
+- **GDD impact**: 없음 — D-034/D-036 잠금 범위 내 runtime 구현
+- **Blockers**: Unity batchmode EditMode/PlayMode 검증은 licensing reconnect loop로 완료 불가
+- **Next**: Unity Editor playtest에서 feedback item 2/3/4/5/7/8/10/11/12 체크 후 Batch B 범위(item 1/6/9/low HP)를 분리 적용
+- **Agent**: Codex
+
 ### 2026-05-27 00:38 — 2026-05-27 feedback rules lock 반영
 - **Phase**: Game/System Track / Feedback Rules Lock
 - **Done**:

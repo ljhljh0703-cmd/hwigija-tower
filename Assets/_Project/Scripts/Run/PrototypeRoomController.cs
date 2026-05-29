@@ -482,6 +482,11 @@ namespace HwigiTower.Run
             }
 
             var canceled = RunState.CancelSelectedMapNode();
+            if (canceled)
+            {
+                PlayAudioContext(PrototypeAudioContext.Exploration);
+            }
+
             SaveCurrentRun();
             return new PrototypeNodeResolution("node.map", canceled ? "return" : string.Empty, canceled ? "returned to map" : "map already open", false);
         }
@@ -775,7 +780,18 @@ namespace HwigiTower.Run
         {
             EnsureAudioServiceConfigured();
 
-            audioService.PlayContext(context);
+            if (context == PrototypeAudioContext.Exploration &&
+                (audioCueCatalog == null || !audioCueCatalog.TryGetCue(PrototypeAudioContext.Exploration, out _)) &&
+                audioCueCatalog != null &&
+                audioCueCatalog.TryGetCue(PrototypeAudioContext.Lobby, out _))
+            {
+                audioService.PlayContext(PrototypeAudioContext.Lobby);
+            }
+            else
+            {
+                audioService.PlayContext(context);
+            }
+
             var floor = RunState == null ? 1 : RunState.CurrentFloor;
             var ambience = floor switch
             {
