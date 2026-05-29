@@ -667,7 +667,6 @@ namespace HwigiTower.Tests.EditMode
 
             var purchase = state.ResolveEncounterChoice(new DeterministicRunContext("run-shop-stays-open", 1001), "node.shop.stay", encounter, "CHOICE_SHOP_STAY_BUY_ITEM");
             var afterPurchase = state.CreateSnapshot();
-            var leave = state.ResolveEncounterChoice(new DeterministicRunContext("run-shop-stays-open", 1001), "node.shop.stay", encounter, "CHOICE_SHOP_STAY_LEAVE");
 
             Assert.AreEqual("CHOICE_SHOP_STAY_BUY_ITEM", purchase.PayloadId);
             Assert.AreEqual(7, afterPurchase.Gold);
@@ -675,6 +674,8 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(0, afterPurchase.NodesResolved);
             Assert.IsFalse(state.HasResolvedEncounterChoice("node.shop.stay", "ENC_SHOP_STAY_OPEN"));
             StringAssert.Contains("shop.open", purchase.Message);
+
+            var leave = state.ResolveEncounterChoice(new DeterministicRunContext("run-shop-stays-open", 1001), "node.shop.stay", encounter, "CHOICE_SHOP_STAY_LEAVE");
             Assert.AreEqual("CHOICE_SHOP_STAY_LEAVE", leave.PayloadId);
             Assert.AreEqual(1, state.CreateSnapshot().NodesResolved);
             Assert.IsTrue(state.HasResolvedEncounterChoice("node.shop.stay", "ENC_SHOP_STAY_OPEN"));
@@ -2827,7 +2828,7 @@ namespace HwigiTower.Tests.EditMode
                     preferredChoiceId = "CHOICE_SHOP_05_LEAVE";
                     break;
                 case "ENC_F02_SHOP_001":
-                    preferredChoiceId = "CHOICE_F02_SHOP_BUY_ITEM";
+                    preferredChoiceId = "CHOICE_F02_SHOP_LEAVE";
                     break;
                 case "ENC_COMBAT_GATE_01":
                     preferredChoiceId = "CHOICE_COMBAT_01_ENGAGE";
