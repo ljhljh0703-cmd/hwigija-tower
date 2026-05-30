@@ -296,6 +296,92 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void Hud_FloorClearResultHidesMapStatusButtonsAndKeepsObjective()
+        {
+            var hud = CreateHud(out _);
+            var floorNodes = new[]
+            {
+                new PrototypeFloorMapNodeView("floor.1.layer.5.0.ENC_BOSS", PrototypeFloorMapNodeType.Boss, 1, 5, 0, false, true, false)
+            };
+            var active = new PrototypeRunSnapshot(
+                "run-floor-clear-ui",
+                18,
+                24,
+                5,
+                0,
+                10,
+                0,
+                0,
+                1,
+                1,
+                0,
+                false,
+                currentFloor: 1,
+                floorMapNodes: floorNodes);
+            hud.ShowRunState(active);
+            hud.GetUtilityButton("status").onClick.Invoke();
+            Assert.IsTrue(hud.UtilityPanelVisible);
+
+            var cleared = new PrototypeRunSnapshot(
+                "run-floor-clear-ui",
+                18,
+                24,
+                5,
+                0,
+                10,
+                0,
+                0,
+                1,
+                1,
+                0,
+                false,
+                currentFloor: 1,
+                stairUnlocked: true,
+                floorMapNodes: floorNodes);
+            hud.ShowRunState(cleared);
+
+            Assert.IsFalse(hud.GetUtilityButton("map").gameObject.activeSelf);
+            Assert.IsFalse(hud.GetUtilityButton("status").gameObject.activeSelf);
+            Assert.IsFalse(hud.UtilityPanelVisible);
+            StringAssert.Contains("Floor 1 완료", hud.RouteMessage);
+            StringAssert.Contains("다음 층으로 올라가세요", hud.RouteMessage);
+        }
+
+        [Test]
+        public void Hud_BossClearRewardUsesProminentPopupWithNextFloorCta()
+        {
+            var hud = CreateHud(out _);
+            hud.ShowResultMessage("combat victory | enemyDefeated True | gold reward 9 | affinity +1 | stair unlocked");
+            hud.ShowRunState(new PrototypeRunSnapshot(
+                "run-boss-popup",
+                18,
+                24,
+                5,
+                0,
+                19,
+                0,
+                1,
+                3,
+                1,
+                0,
+                false,
+                lastCombatResultId: "victory",
+                lastCombatGoldReward: 9,
+                lastCombatAffinityDelta: 1,
+                lastCombatEnemyDefeated: true,
+                currentFloor: 1,
+                stairUnlocked: true));
+
+            Assert.IsTrue(hud.BossRewardPopupVisible);
+            StringAssert.Contains("보스 격파", hud.BossRewardPopupMessage);
+            StringAssert.Contains("Gold +9", hud.BossRewardPopupMessage);
+            StringAssert.Contains("신뢰 +1", hud.BossRewardPopupMessage);
+            Assert.IsTrue(hud.BossRewardNextFloorButtonVisible);
+            Assert.IsFalse(hud.RouteActionButtonVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+        }
+
+        [Test]
         public void Hud_MapScreenShowsNodeIconsAndHidesRawIds()
         {
             var hud = CreateHud(out var result);
