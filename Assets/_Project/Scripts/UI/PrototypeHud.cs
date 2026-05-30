@@ -110,6 +110,13 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform combatItemInspectPanel;
         [SerializeField] private Text combatItemInspectText;
         [SerializeField] private Image lowHpWarningImage;
+        [SerializeField] private RectTransform bossRewardPanel;
+        [SerializeField] private Text bossRewardTitleText;
+        [SerializeField] private Text bossRewardGoldText;
+        [SerializeField] private Text bossRewardAffinityText;
+        [SerializeField] private Image bossRewardGoldIconImage;
+        [SerializeField] private Image bossRewardAffinityIconImage;
+        [SerializeField] private Button bossRewardNextFloorButton;
         [SerializeField] private Image utilityPortraitImage;
         [SerializeField] private Text utilityText;
         [SerializeField] private Button utilityStatusButton;
@@ -248,6 +255,11 @@ namespace HwigiTower.UI
         public string CombatItemInspectMessage => combatItemInspectText == null ? string.Empty : combatItemInspectText.text;
         public bool PreRunPlaceholderVisible => preRunPlaceholderLayer != null && preRunPlaceholderLayer.gameObject.activeInHierarchy;
         public bool LowHpWarningVisible => lowHpWarningImage != null && lowHpWarningImage.gameObject.activeInHierarchy;
+        public bool BossRewardPopupVisible => bossRewardPanel != null && bossRewardPanel.gameObject.activeInHierarchy;
+        public string BossRewardPopupMessage => ((bossRewardTitleText == null ? string.Empty : bossRewardTitleText.text) + "\n" +
+            (bossRewardGoldText == null ? string.Empty : bossRewardGoldText.text) + "\n" +
+            (bossRewardAffinityText == null ? string.Empty : bossRewardAffinityText.text)).Trim();
+        public bool BossRewardNextFloorButtonVisible => bossRewardNextFloorButton != null && bossRewardNextFloorButton.gameObject.activeInHierarchy;
         public string CurrentCombatActionIconNames => string.Join("|", new[]
         {
             attackActionIconImage != null && attackActionIconImage.sprite != null ? attackActionIconImage.sprite.name : string.Empty,
@@ -1094,6 +1106,7 @@ namespace HwigiTower.UI
 
             HidePreRunPlaceholder();
             UpdateScreenLayers(snapshot);
+            UpdateBossRewardPopup(snapshot);
             UpdateNextFloorButton(snapshot);
             UpdateRouteActionButton(snapshot);
             UpdateRestartButton(snapshot);
@@ -1796,10 +1809,12 @@ namespace HwigiTower.UI
         {
             EnsureUtilityUi();
             var visible = !string.IsNullOrEmpty(snapshot.RunId) && !snapshot.RunCompleted;
-            SetButtonVisible(utilityStatusButton, visible);
-            SetButtonVisible(utilityMapButton, visible);
+            var routeResultLocked = snapshot.StairUnlocked || snapshot.RunClear || snapshot.RunFailed;
+            SetButtonVisible(utilityStatusButton, visible && !routeResultLocked);
+            SetButtonVisible(utilityMapButton, visible && !routeResultLocked);
             SetButtonVisible(utilityLoadoutButton, visible);
             var mapInteractable = visible &&
+                !routeResultLocked &&
                 snapshot.HasFloorMap &&
                 !snapshot.HasSelectedMapNode &&
                 !snapshot.IsInCombat &&
@@ -1812,7 +1827,7 @@ namespace HwigiTower.UI
                 utilityMapButton.interactable = mapInteractable;
             }
 
-            if (!visible)
+            if (!visible || (routeResultLocked && (_utilityMode == "status" || _utilityMode == "map")))
             {
                 HideUtilityPanel();
                 return;
@@ -3716,6 +3731,144 @@ namespace HwigiTower.UI
             }
         }
 
+        private void EnsureBossRewardPanel()
+        {
+            if (bossRewardPanel != null)
+            {
+                return;
+            }
+
+            var panelObject = new GameObject("Boss Reward Popup");
+            panelObject.transform.SetParent(HudParent, false);
+            bossRewardPanel = panelObject.AddComponent<RectTransform>();
+            bossRewardPanel.anchorMin = new Vector2(0.10f, 0.30f);
+            bossRewardPanel.anchorMax = new Vector2(0.90f, 0.72f);
+            bossRewardPanel.offsetMin = Vector2.zero;
+            bossRewardPanel.offsetMax = Vector2.zero;
+
+            var background = panelObject.AddComponent<Image>();
+            background.color = new Color(0.025f, 0.032f, 0.040f, 0.98f);
+            background.raycastTarget = false;
+
+            bossRewardTitleText = CreateCombatChildText(panelObject.transform, "Boss Reward Title", new Vector2(0.08f, 0.76f), new Vector2(0.92f, 0.94f), 34, TextAnchor.MiddleCenter);
+            bossRewardTitleText.text = string.Empty;
+
+            bossRewardGoldIconImage = CreateCombatImage(panelObject.transform, "Boss Reward Gold Icon", new Vector2(0.12f, 0.48f), new Vector2(0.25f, 0.66f));
+            bossRewardGoldText = CreateCombatChildText(panelObject.transform, "Boss Reward Gold Text", new Vector2(0.28f, 0.48f), new Vector2(0.86f, 0.66f), 30, TextAnchor.MiddleLeft);
+
+            bossRewardAffinityIconImage = CreateCombatImage(panelObject.transform, "Boss Reward Affinity Icon", new Vector2(0.12f, 0.28f), new Vector2(0.25f, 0.46f));
+            bossRewardAffinityText = CreateCombatChildText(panelObject.transform, "Boss Reward Affinity Text", new Vector2(0.28f, 0.28f), new Vector2(0.86f, 0.46f), 30, TextAnchor.MiddleLeft);
+
+            var buttonObject = new GameObject("Boss Reward Next Floor Button");
+            buttonObject.transform.SetParent(panelObject.transform, false);
+            var buttonRect = buttonObject.AddComponent<RectTransform>();
+            buttonRect.anchorMin = new Vector2(0.20f, 0.07f);
+            buttonRect.anchorMax = new Vector2(0.80f, 0.22f);
+            buttonRect.offsetMin = Vector2.zero;
+            buttonRect.offsetMax = Vector2.zero;
+            var buttonImage = buttonObject.AddComponent<Image>();
+            buttonImage.color = new Color(0.15f, 0.22f, 0.26f, 0.98f);
+            bossRewardNextFloorButton = buttonObject.AddComponent<Button>();
+            bossRewardNextFloorButton.targetGraphic = buttonImage;
+            bossRewardNextFloorButton.onClick.AddListener(ResolveNextFloor);
+            var label = CreateCombatChildText(buttonObject.transform, "Label", Vector2.zero, Vector2.one, 29, TextAnchor.MiddleCenter);
+            label.text = "다음 층";
+
+            bossRewardPanel.gameObject.SetActive(false);
+        }
+
+        private void UpdateBossRewardPopup(PrototypeRunSnapshot snapshot)
+        {
+            var visible = ShouldShowBossRewardPopup(snapshot);
+            if (!visible)
+            {
+                HideBossRewardPopup();
+                return;
+            }
+
+            EnsureBossRewardPanel();
+            if (bossRewardPanel == null)
+            {
+                return;
+            }
+
+            bossRewardPanel.gameObject.SetActive(true);
+            bossRewardPanel.transform.SetAsLastSibling();
+            if (bossRewardTitleText != null)
+            {
+                bossRewardTitleText.text = snapshot.RunClear ? "최종 보스 격파" : "보스 격파";
+            }
+
+            SetBossRewardIcon(bossRewardGoldIconImage, "resource.gold", "G");
+            SetBossRewardIcon(bossRewardAffinityIconImage, "resource.affinity", "신");
+            if (bossRewardGoldText != null)
+            {
+                bossRewardGoldText.text = "Gold " + ExtractBossRewardValue(_lastResultMessage, "gold reward ", snapshot.LastCombatGoldReward);
+            }
+
+            if (bossRewardAffinityText != null)
+            {
+                bossRewardAffinityText.text = "신뢰 " + ExtractBossRewardValue(_lastResultMessage, "affinity ", snapshot.LastCombatAffinityDelta);
+            }
+
+            var nextFloorVisible = snapshot.StairUnlocked && !snapshot.RunCompleted;
+            if (bossRewardNextFloorButton != null)
+            {
+                bossRewardNextFloorButton.gameObject.SetActive(nextFloorVisible);
+                bossRewardNextFloorButton.interactable = nextFloorVisible && _roomController != null;
+            }
+        }
+
+        private void HideBossRewardPopup()
+        {
+            if (bossRewardPanel != null)
+            {
+                bossRewardPanel.gameObject.SetActive(false);
+            }
+        }
+
+        private bool ShouldShowBossRewardPopup(PrototypeRunSnapshot snapshot)
+        {
+            return !showRawDebugText &&
+                !snapshot.IsInCombat &&
+                snapshot.LastCombatEnemyDefeated &&
+                snapshot.StairUnlocked &&
+                !snapshot.RunClear &&
+                IsBossClearResult(_lastResultMessage);
+        }
+
+        private void SetBossRewardIcon(Image image, string iconKey, string fallback)
+        {
+            if (image == null)
+            {
+                return;
+            }
+
+            image.sprite = ResolveIcon(iconKey);
+            image.color = image.sprite == null ? new Color(0.20f, 0.26f, 0.30f, 0.95f) : Color.white;
+            image.preserveAspect = true;
+            image.gameObject.SetActive(true);
+            var fallbackText = image.GetComponentInChildren<Text>();
+            if (fallbackText == null)
+            {
+                fallbackText = CreateCombatChildText(image.transform, "Fallback", Vector2.zero, Vector2.one, 20, TextAnchor.MiddleCenter);
+            }
+
+            fallbackText.text = image.sprite == null ? fallback : string.Empty;
+        }
+
+        private static string ExtractBossRewardValue(string message, string tokenPrefix, int fallback)
+        {
+            var token = ExtractTokenResult(message, tokenPrefix);
+            if (!string.IsNullOrEmpty(token))
+            {
+                var space = token.LastIndexOf(' ');
+                return space >= 0 ? token.Substring(space + 1).Trim() : token;
+            }
+
+            return fallback == 0 ? "+0" : FormatDelta(fallback);
+        }
+
         private void EnsureNextFloorButton()
         {
             if (nextFloorButton != null)
@@ -3769,7 +3922,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            nextFloorButton.gameObject.SetActive(snapshot.StairUnlocked && !snapshot.IsInCombat && !snapshot.RunCompleted);
+            nextFloorButton.gameObject.SetActive(snapshot.StairUnlocked && !snapshot.IsInCombat && !snapshot.RunCompleted && !ShouldShowBossRewardPopup(snapshot));
             nextFloorButton.interactable = nextFloorButton.gameObject.activeSelf && _roomController != null;
         }
 
@@ -3985,6 +4138,7 @@ namespace HwigiTower.UI
             HideEventCutsceneLayout();
             HideMerchantPresentation();
             HideNpcSpotlight();
+            HideBossRewardPopup();
             ClearChoices();
             ShowResultMessage(string.Empty);
             SetResultVisible(false);
@@ -4211,6 +4365,12 @@ namespace HwigiTower.UI
 
             if (_demoRouteLabels.Count == 0)
             {
+                if (!showRawDebugText && snapshot.StairUnlocked)
+                {
+                    routeText.text = BuildPublicRouteSummary(snapshot, 0);
+                    return;
+                }
+
                 if (!showRawDebugText && snapshot.HasFloorMap)
                 {
                     routeText.text = BuildPublicMapSummary(snapshot);
@@ -5042,7 +5202,8 @@ namespace HwigiTower.UI
                 !RestInteractionPanelVisible &&
                 !_shopPresentationActive &&
                 !_eventPresentationActive &&
-                !IsMapSelectionVisible(snapshot);
+                !IsMapSelectionVisible(snapshot) &&
+                !BossRewardPopupVisible;
             SetResultVisible(visible);
         }
 

@@ -470,10 +470,11 @@ namespace HwigiTower.Run
 
         public PrototypeRunSnapshot CreateSnapshot()
         {
+            var inCombat = IsInCombat;
             return new PrototypeRunSnapshot(
                 RunId,
-                _activeCombatPlayer?.Hp ?? _playerHp,
-                _activeCombatPlayer?.MaxHp ?? _playerMaxHp,
+                inCombat && _activeCombatPlayer != null ? _activeCombatPlayer.Hp : _playerHp,
+                inCombat && _activeCombatPlayer != null ? _activeCombatPlayer.MaxHp : _playerMaxHp,
                 _playerAttack,
                 _mental,
                 _gold,

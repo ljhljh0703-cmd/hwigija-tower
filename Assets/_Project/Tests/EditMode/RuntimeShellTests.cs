@@ -2294,6 +2294,24 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void RestInteraction_RecoverRefreshesPostCombatSnapshotHpImmediately()
+        {
+            var state = StartRuntimeCombat("run-rest-recover-refresh", "COMBAT_REST_REFRESH", "ENEMY_EMPTY_ARMOR");
+            state.ActiveCombatPlayer.ApplyDamage(18);
+            state.ActiveCombatEnemy.ApplyDamage(9);
+            state.ResolveCombatRoundInteractive(CombatAction.Defend);
+
+            var lowHpSnapshot = state.CreateSnapshot();
+            Assert.IsFalse(state.IsInCombat);
+            Assert.Less(lowHpSnapshot.PlayerHp, lowHpSnapshot.PlayerMaxHp);
+
+            state.ResolveRestInteraction("node.rest.refresh", "ENC_REST_01", "rest.recover", string.Empty);
+            var recovered = state.CreateSnapshot();
+
+            Assert.AreEqual(recovered.PlayerMaxHp, recovered.PlayerHp);
+        }
+
+        [Test]
         public void DemoProgression_OrderIsReproducibleForSameSeed()
         {
             var shop = CreateRuntimeEncounter("ENC_SHOP_DEMO_ORDER", CreateChoice("CHOICE_SHOP_ORDER", new EncounterRequirementRuntimeData[0], new[] { CreateEffect("ModifyGold", 1) }));

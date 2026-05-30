@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-05-30 22:49 — User smoke hotfix: Rest refresh and boss reward popup
+- **Phase**: W3-2 / Smoke Hotfix
+- **Done**:
+  - Rest 회복 직후 snapshot HP가 stale combat actor HP를 보지 않도록 수정해 Top HUD/party HP/low HP overlay가 즉시 갱신되게 함
+  - floor clear/result 상태에서 `상태`/`지도` utility 버튼을 숨기고 열린 panel을 닫아 objective/result copy가 깨지지 않게 함
+  - floor boss clear reward를 중앙 popup으로 분리하고 Gold/신뢰 보상과 `다음 층` CTA를 명확히 표시
+  - boss reward pool 확장은 구현하지 않고 OQ-027 후속 설계 항목으로 분리
+- **Files**: 변경 6개 (`PrototypeRunState.cs`, `PrototypeHud.cs`, EditMode tests, `hwiglija-tower-gdd.md`, progress log)
+- **GDD impact**: OQ-027 추가 / CHANGELOG 0.15.1
+- **Blockers**: PlayMode rest smoke는 기존 sparse route fixture가 `ENC_REST_01` selectable을 찾지 못해 실패. Screenshot harness는 지시대로 미사용
+- **Next**: APK에서 Rest 회복 직후 HP/low HP overlay, floor clear utility lock, boss reward popup만 사용자 smoke로 확인
+- **Agent**: Codex
+
 ### 2026-05-29 15:19 — D-035 ContextPolicy handoff docs-only commit
 - **Phase**: Game/System Track / Combat Brain Design
 - **Done**:

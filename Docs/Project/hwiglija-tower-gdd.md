@@ -112,6 +112,7 @@ deadline: 2026-05-18
 | 0.13.1 | 2026-05-25 | Map Flow / Route Commitment 검토 — OQ-012의 "맵 화면 없음/선택지 팝업" 구현 세부는 현재 런타임 지도 UI와 사용자 피드백에 의해 D-034 후보로 대체 검토. Sparse 3-lane route, irreversible node commitment, delayed Rest, next-floor map visibility를 제안하고 OQ-026을 등록. |
 | 0.14.0 | 2026-05-26 | D-035 신규 잠금 — AI Track Exp04-06 결과를 본편 runtime RL/ONNX가 아니라 `ContextPolicy` 기반 deterministic Mataios combat brain으로 전환. OQ-024 단순 table은 fallback으로 남기고, enemy threat/tempo/skill context를 읽는 명시 rule table을 다음 구현 기준으로 잠금. 본편 C# 변경 전 CodeGraph fresh status/sync/query/context 필수. |
 | 0.15.0 | 2026-05-27 | D-034 정식 잠금 + D-036 신규 잠금 — 2026-05-27 피드백을 반영해 pre-run placeholder, sparse route/reveal/commitment, resolver-owned combat preview, enemy stat surface, read-only combat item inspect, map/boss BGM reset, low HP P1 feedback 계약을 확정. OQ-026 close. OQ-019/OQ-025는 open 유지. |
+| 0.15.1 | 2026-05-30 | User smoke hotfix scope 기록 — Rest 회복 즉시 UI refresh, floor clear result utility lock, boss reward prominent popup은 runtime hotfix로 처리. 보스 보상 pool 확장은 이번 hotfix에서 구현하지 않고 OQ-027로 분리. |
 
 ---
 
@@ -714,6 +715,7 @@ CREATE TABLE player_utterances (
 | OQ-024 | Mataios deterministic policy thresholds/action constants: low HP 기준, finisher margin, protect/stabilize 강도와 우선순위 조정값 | 시스템 디자인 + 개발 | Mataios policy data entry 전 | ✅ closed 05-24 → 1차 rule table 확정. 05-26 D-035 이후에는 fallback/payload 기준으로 유지하고, 다음 구현의 primary selection logic은 ContextPolicy brain을 따른다 |
 | OQ-025 | Enemy intent system의 enemy별 첫 deck과 exact payload 숫자: normal/heavy/guard/charge/weak/special intent를 어떤 적에게 어떤 순서·피해·방어·charge 값으로 배치할지 | 시스템 디자인 + 개발 | Combat Core Rebuild Batch 2 구현 전 | ❓ open 05-24 → D-033은 intent role/counterplay를 잠그고, enemy별 numeric deck은 별도 확정 필요 |
 | OQ-026 | Map Flow / Route Commitment 확정: D-034 후보의 sparse 3-lane route, irreversible node commitment, Rest frequency/Floor 1 Rest, single-edge auto-open 여부를 잠글지 | PM + 시스템 디자인 | Map Flow 구현 전 | ✅ closed 05-27 → D-034. Pre-run placeholder, sparse route/reveal/commitment, delayed Rest, explicit tap first implementation으로 잠금. Rest exact weighted probability는 balance tuning으로 이관 |
+| OQ-027 | Boss clear reward pool expansion: 보스 클리어 보상 후보군, rarity, trust/Gold 외 보상 표면, popup copy density를 어떻게 확장할지 | PM + 시스템 디자인 | Boss reward pool runtime 확장 전 | ❓ open 05-30 → smoke hotfix는 prominent popup만 구현. 새 reward pool/밸런스 확장은 후속 설계 전까지 금지 |
 
 ---
 
