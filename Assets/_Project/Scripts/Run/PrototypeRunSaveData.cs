@@ -18,6 +18,13 @@ namespace HwigiTower.Run
         public int affinity;
         public int nodesResolved;
         public int battlesWon;
+        public int combatXp;
+        public int combatLevel = 1;
+        public int pendingLevelRewardChoices;
+        public int levelAttackBonus;
+        public int levelMaxHpBonus;
+        public int skillCooldownReduction;
+        public string lastGrowthMessage = string.Empty;
         public bool runCompleted;
         public bool runClear;
         public bool runFailed;

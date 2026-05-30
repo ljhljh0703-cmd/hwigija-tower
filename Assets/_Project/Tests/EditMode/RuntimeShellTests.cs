@@ -1166,6 +1166,75 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void CombatXpGain_TriggersLevelUpReward()
+        {
+            var state = new PrototypeRunState("run-level-xp", new GameFlowEventBus());
+
+            var gained = state.GainCombatXp(state.CombatXpToNextLevel);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual(state.CombatXpToNextLevel, gained);
+            Assert.AreEqual(2, snapshot.CombatLevel);
+            Assert.IsTrue(snapshot.LevelUpRewardPending);
+            StringAssert.Contains("보상 선택 가능", snapshot.LastGrowthMessage);
+        }
+
+        [Test]
+        public void LevelRewardChoice_UpdatesStatsImmediately()
+        {
+            var state = StartRuntimeCombat("run-level-reward-stat", "COMBAT_LEVEL_REWARD_STAT", "ENEMY_EMPTY_ARMOR");
+            var beforeAttack = state.ActiveCombatPlayer.Attack;
+            state.GainCombatXp(state.CombatXpToNextLevel);
+
+            Assert.IsTrue(state.ResolveLevelReward(PrototypeRunState.LevelRewardAttackId));
+
+            var snapshot = state.CreateSnapshot();
+            Assert.IsFalse(snapshot.LevelUpRewardPending);
+            Assert.AreEqual(beforeAttack + 1, snapshot.PlayerAttack);
+            Assert.AreEqual(beforeAttack + 1, state.ActiveCombatPlayer.Attack);
+            StringAssert.Contains("ATK +1", snapshot.CombatBuildSummary);
+            StringAssert.Contains((beforeAttack + 1).ToString(), PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Attack).PreviewText);
+        }
+
+        [Test]
+        public void LevelRewardChoice_SkillCooldownUpdatesCombatPreview()
+        {
+            var state = new PrototypeRunState("run-level-reward-skill", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.Abilities.Add(CreateAbility("ABILITY_ARTS_03", "술", ("skill.direct_damage", 8f), ("skill.cooldown_rounds", 4f)));
+            var encounter = CreateRuntimeEncounter(
+                "ENC_LEVEL_REWARD_SKILL",
+                CreateChoice(
+                    "CHOICE_LEVEL_REWARD_SKILL",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_LEVEL_REWARD_SKILL", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+            state.ResolveEncounterChoice(new DeterministicRunContext("run-level-reward-skill", 1001), "node.level.reward.skill", encounter, "CHOICE_LEVEL_REWARD_SKILL");
+            state.GainCombatXp(state.CombatXpToNextLevel);
+
+            Assert.IsTrue(state.ResolveLevelReward(PrototypeRunState.LevelRewardSkillCooldownId));
+
+            var skill = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Skill);
+            StringAssert.Contains("사용 후 CD 3", skill.PreviewText);
+            StringAssert.Contains("Skill CD -1", state.CreateSnapshot().CombatBuildSummary);
+        }
+
+        [Test]
+        public void MataiosAssistVisibility_LogsSupportAndProtectOutcomes()
+        {
+            var support = StartRuntimeCombat("run-assist-visible-support", "COMBAT_ASSIST_VISIBLE_SUPPORT", "ENEMY_EMPTY_ARMOR");
+            support.ResolveCombatRoundInteractive(CombatAction.Defend);
+            var supportSnapshot = support.CreateSnapshot();
+            StringAssert.Contains("mataios support", supportSnapshot.LastCombatRoundResult);
+            Assert.Greater(supportSnapshot.LastMataiosCombatDamage, 0);
+
+            var protect = StartRuntimeCombat("run-assist-visible-protect", "COMBAT_ASSIST_VISIBLE_PROTECT", "ENEMY_EMPTY_ARMOR");
+            protect.ActiveCombatPlayer.ApplyDamage(16);
+            protect.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var protectSnapshot = protect.CreateSnapshot();
+            StringAssert.Contains("mataios protect", protectSnapshot.LastCombatRoundResult);
+            Assert.Greater(protectSnapshot.LastMataiosProtectReduction, 0);
+        }
+
+        [Test]
         public void RestNode_RestoresHpAndReducesInternalGlitch()
         {
             var rest = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_01.asset");
@@ -2729,6 +2798,26 @@ namespace HwigiTower.Tests.EditMode
             state.ResolveEncounterChoice(new DeterministicRunContext(runId, 1001), "node." + combatId, encounter, "CHOICE_" + combatId);
             Assert.IsTrue(state.IsInCombat, combatId);
             return state;
+        }
+
+        private static AbilityData CreateAbility(string id, string tag, params (string Key, float Value)[] numericParams)
+        {
+            var ability = ScriptableObject.CreateInstance<AbilityData>();
+            var serialized = new SerializedObject(ability);
+            serialized.FindProperty("id").stringValue = id;
+            serialized.FindProperty("displayName").stringValue = id;
+            serialized.FindProperty("tag").stringValue = tag;
+            var paramsProperty = serialized.FindProperty("numericParams");
+            paramsProperty.arraySize = numericParams == null ? 0 : numericParams.Length;
+            for (var i = 0; i < paramsProperty.arraySize; i++)
+            {
+                var param = paramsProperty.GetArrayElementAtIndex(i);
+                param.FindPropertyRelative("key").stringValue = numericParams[i].Key;
+                param.FindPropertyRelative("value").floatValue = numericParams[i].Value;
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return ability;
         }
 
         private static PrototypeRunState CreateDemoOrderState(

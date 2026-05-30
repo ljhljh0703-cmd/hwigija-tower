@@ -61,7 +61,17 @@ namespace HwigiTower.Run
             string lastMataiosCombatAction = "",
             int lastMataiosCombatDamage = 0,
             int lastMataiosProtectReduction = 0,
-            bool lastMataiosDownEvent = false)
+            bool lastMataiosDownEvent = false,
+            int combatXp = 0,
+            int combatXpToNextLevel = 20,
+            int combatLevel = 1,
+            bool levelUpRewardPending = false,
+            int pendingLevelRewardChoices = 0,
+            int levelAttackBonus = 0,
+            int levelMaxHpBonus = 0,
+            int skillCooldownReduction = 0,
+            string lastGrowthMessage = "",
+            string combatBuildSummary = "")
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -74,6 +84,16 @@ namespace HwigiTower.Run
             NodesResolved = nodesResolved;
             BattlesWon = battlesWon;
             AbilityCount = abilityCount;
+            CombatXp = System.Math.Max(0, combatXp);
+            CombatXpToNextLevel = combatXpToNextLevel <= 0 ? 1 : combatXpToNextLevel;
+            CombatLevel = combatLevel < 1 ? 1 : combatLevel;
+            LevelUpRewardPending = levelUpRewardPending;
+            PendingLevelRewardChoices = System.Math.Max(0, pendingLevelRewardChoices);
+            LevelAttackBonus = System.Math.Max(0, levelAttackBonus);
+            LevelMaxHpBonus = System.Math.Max(0, levelMaxHpBonus);
+            SkillCooldownReduction = System.Math.Max(0, skillCooldownReduction);
+            LastGrowthMessage = lastGrowthMessage ?? string.Empty;
+            CombatBuildSummary = combatBuildSummary ?? string.Empty;
             RunCompleted = runCompleted;
             DemoStatus = demoStatus ?? string.Empty;
             NextDemoNodeId = nextDemoNodeId ?? string.Empty;
@@ -135,6 +155,16 @@ namespace HwigiTower.Run
         public int NodesResolved { get; }
         public int BattlesWon { get; }
         public int AbilityCount { get; }
+        public int CombatXp { get; }
+        public int CombatXpToNextLevel { get; }
+        public int CombatLevel { get; }
+        public bool LevelUpRewardPending { get; }
+        public int PendingLevelRewardChoices { get; }
+        public int LevelAttackBonus { get; }
+        public int LevelMaxHpBonus { get; }
+        public int SkillCooldownReduction { get; }
+        public string LastGrowthMessage { get; }
+        public string CombatBuildSummary { get; }
         public bool RunCompleted { get; }
         public string DemoStatus { get; }
         public string NextDemoNodeId { get; }
