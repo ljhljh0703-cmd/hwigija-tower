@@ -629,6 +629,8 @@ namespace HwigiTower.Run
             {
                 message +=
                     " | enemyDefeated " + snapshot.LastCombatEnemyDefeated +
+                    " | xp " + snapshot.CombatXp + "/" + snapshot.CombatXpToNextLevel +
+                    (snapshot.LevelUpRewardPending ? " | level reward ready" : string.Empty) +
                     " | gold reward " + snapshot.LastCombatGoldReward +
                     " | glitch " + FormatDelta(snapshot.LastCombatGlitchDelta) +
                     " | affinity " + FormatDelta(snapshot.LastCombatAffinityDelta);
@@ -653,6 +655,23 @@ namespace HwigiTower.Run
 
             SaveCurrentRun();
             return new PrototypeNodeResolution(snapshot.LastCombatId, snapshot.LastCombatResultId, message, snapshot.RunCompleted);
+        }
+
+        public PrototypeNodeResolution ResolveLevelReward(string rewardId)
+        {
+            if (RunState == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "level reward unavailable", false);
+            }
+
+            var applied = RunState.ResolveLevelReward(rewardId);
+            var snapshot = RunState.CreateSnapshot();
+            SaveCurrentRun();
+            return new PrototypeNodeResolution(
+                snapshot.LastCombatId,
+                applied ? rewardId : string.Empty,
+                applied ? "level reward applied | " + snapshot.LastGrowthMessage : "level reward unavailable",
+                snapshot.RunCompleted);
         }
 
         public PrototypeNodeResolution ResolveNode(InteractableNode node, EncounterSelection selection)

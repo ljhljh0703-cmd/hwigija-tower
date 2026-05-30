@@ -110,6 +110,14 @@ namespace HwigiTower.UI
         [SerializeField] private RectTransform combatItemInspectPanel;
         [SerializeField] private Text combatItemInspectText;
         [SerializeField] private Image lowHpWarningImage;
+        [SerializeField] private RectTransform levelRewardPanel;
+        [SerializeField] private Text levelRewardTitleText;
+        [SerializeField] private Text levelRewardBodyText;
+        [SerializeField] private Button levelRewardAttackButton;
+        [SerializeField] private Button levelRewardMaxHpButton;
+        [SerializeField] private Button levelRewardSkillButton;
+        [SerializeField] private Text combatEnemyDamageNumberText;
+        [SerializeField] private Text combatPlayerDamageNumberText;
         [SerializeField] private RectTransform bossRewardPanel;
         [SerializeField] private Text bossRewardTitleText;
         [SerializeField] private Text bossRewardGoldText;
@@ -157,11 +165,14 @@ namespace HwigiTower.UI
         private string _lastCombatVisualKey = string.Empty;
         private int _lastCombatVisualRound = -1;
         private int _lastCombatVisualEnemyHp = -1;
+        private int _lastCombatVisualPlayerHp = -1;
         private bool _combatEnemyFeedbackBaseCaptured;
         private Vector2 _combatEnemyImageBasePosition;
         private Vector3 _combatEnemyImageBaseScale = Vector3.one;
         private float _combatEnemyHitShakeTimer;
         private float _combatEnemyAttackPulseTimer;
+        private float _combatEnemyDamageNumberTimer;
+        private float _combatPlayerDamageNumberTimer;
 
         private enum NpcSpotlightMode
         {
@@ -214,6 +225,7 @@ namespace HwigiTower.UI
         private const float DenseLineSpacing = 0.92f;
         private const float CombatEnemyHitShakeDuration = 0.18f;
         private const float CombatEnemyAttackPulseDuration = 0.16f;
+        private const float CombatDamageNumberDuration = 0.70f;
         private const float CombatEnemyHitShakePixels = 11f;
         private const float CombatEnemyAttackPulseScale = 1.045f;
         private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
@@ -255,6 +267,14 @@ namespace HwigiTower.UI
         public string CombatItemInspectMessage => combatItemInspectText == null ? string.Empty : combatItemInspectText.text;
         public bool PreRunPlaceholderVisible => preRunPlaceholderLayer != null && preRunPlaceholderLayer.gameObject.activeInHierarchy;
         public bool LowHpWarningVisible => lowHpWarningImage != null && lowHpWarningImage.gameObject.activeInHierarchy;
+        public bool LevelRewardPopupVisible => levelRewardPanel != null && levelRewardPanel.gameObject.activeInHierarchy;
+        public string LevelRewardPopupMessage => ((levelRewardTitleText == null ? string.Empty : levelRewardTitleText.text) + "\n" +
+            (levelRewardBodyText == null ? string.Empty : levelRewardBodyText.text) + "\n" +
+            ResolveButtonLabel(levelRewardAttackButton) + "\n" +
+            ResolveButtonLabel(levelRewardMaxHpButton) + "\n" +
+            ResolveButtonLabel(levelRewardSkillButton)).Trim();
+        public string CombatDamageNumberMessage => ((combatEnemyDamageNumberText == null || !combatEnemyDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatEnemyDamageNumberText.text) + "|" +
+            (combatPlayerDamageNumberText == null || !combatPlayerDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatPlayerDamageNumberText.text)).Trim('|');
         public bool BossRewardPopupVisible => bossRewardPanel != null && bossRewardPanel.gameObject.activeInHierarchy;
         public string BossRewardPopupMessage => ((bossRewardTitleText == null ? string.Empty : bossRewardTitleText.text) + "\n" +
             (bossRewardGoldText == null ? string.Empty : bossRewardGoldText.text) + "\n" +
@@ -451,6 +471,7 @@ namespace HwigiTower.UI
         {
             HandleManualShortcuts();
             UpdateCombatEnemyFeedbackAnimation(Time.unscaledDeltaTime);
+            UpdateCombatDamageNumberAnimation(Time.unscaledDeltaTime);
         }
 
         public void Configure(Text focus, Text interaction, Text runState = null, Text result = null)
@@ -1107,6 +1128,7 @@ namespace HwigiTower.UI
             HidePreRunPlaceholder();
             UpdateScreenLayers(snapshot);
             UpdateBossRewardPopup(snapshot);
+            UpdateLevelRewardPopup(snapshot);
             UpdateNextFloorButton(snapshot);
             UpdateRouteActionButton(snapshot);
             UpdateRestartButton(snapshot);
@@ -1924,9 +1946,11 @@ namespace HwigiTower.UI
 
             return "플레이어\nHP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp +
                 "\nATK " + snapshot.PlayerAttack +
+                "\n성장 Lv " + snapshot.CombatLevel + " XP " + snapshot.CombatXp + "/" + snapshot.CombatXpToNextLevel +
                 "\n정신 " + snapshot.Mental +
                 "\n스킬 " + BuildOwnedSkillLine() +
-                "\n버프 " + BuildPlayerBuffChipLine(snapshot);
+                "\n버프 " + BuildPlayerBuffChipLine(snapshot) +
+                "\n" + snapshot.CombatBuildSummary;
         }
 
         private static string BuildUtilityMapSummary(PrototypeRunSnapshot snapshot)
@@ -3379,6 +3403,9 @@ namespace HwigiTower.UI
             combatEnemyTitleText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Title", new Vector2(0.06f, 0.83f), new Vector2(0.94f, 0.97f), 32, TextAnchor.MiddleCenter);
             enemyHpFill = CreateHpBar(combatEnemyStage, "Enemy HP Bar", new Vector2(0.07f, 0.765f), new Vector2(0.93f, 0.815f), new Color(0.84f, 0.24f, 0.24f, 1f));
             combatEnemyStatusText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Status Chips", new Vector2(0.07f, 0.705f), new Vector2(0.93f, 0.755f), 22, TextAnchor.MiddleCenter);
+            combatEnemyDamageNumberText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Damage Number", new Vector2(0.30f, 0.42f), new Vector2(0.70f, 0.58f), 42, TextAnchor.MiddleCenter);
+            combatEnemyDamageNumberText.color = new Color(1.00f, 0.76f, 0.36f, 1f);
+            combatEnemyDamageNumberText.gameObject.SetActive(false);
 
             combatLogPanel = CreateCombatPanelRect(panelObject.transform, "Combat Log Panel", new Vector2(0.04f, 0.345f), new Vector2(0.96f, 0.505f), new Color(0.02f, 0.025f, 0.030f, 0.84f));
             combatText = CreateCombatChildText(combatLogPanel, "Combat Status Text", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), CombatBodyFontSize, TextAnchor.MiddleLeft);
@@ -3393,6 +3420,9 @@ namespace HwigiTower.UI
             combatMataiosPortraitFrameImage = CreateCombatPortraitFrame(combatMataiosPortraitImage, "Combat Mataios Portrait Frame");
             combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
             combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.35f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
+            combatPlayerDamageNumberText = CreateCombatChildText(combatPlayerCard, "Combat Player Damage Number", new Vector2(0.04f, 0.48f), new Vector2(0.30f, 0.78f), 30, TextAnchor.MiddleCenter);
+            combatPlayerDamageNumberText.color = new Color(1.00f, 0.44f, 0.36f, 1f);
+            combatPlayerDamageNumberText.gameObject.SetActive(false);
             combatTrainingStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Training Status Icon", new Vector2(0.76f, 0.72f), new Vector2(0.84f, 0.90f));
             combatBandageStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Bandage Status Icon", new Vector2(0.84f, 0.72f), new Vector2(0.92f, 0.90f));
             combatRecallStatusIconImage = CreateCombatImage(combatPlayerCard, "Combat Recall Status Icon", new Vector2(0.68f, 0.72f), new Vector2(0.76f, 0.90f));
@@ -3825,6 +3855,98 @@ namespace HwigiTower.UI
             {
                 bossRewardPanel.gameObject.SetActive(false);
             }
+        }
+
+        private void EnsureLevelRewardPanel()
+        {
+            if (levelRewardPanel != null)
+            {
+                return;
+            }
+
+            var panelObject = new GameObject("Level Reward Popup");
+            panelObject.transform.SetParent(HudParent, false);
+            levelRewardPanel = panelObject.AddComponent<RectTransform>();
+            levelRewardPanel.anchorMin = new Vector2(0.09f, 0.24f);
+            levelRewardPanel.anchorMax = new Vector2(0.91f, 0.76f);
+            levelRewardPanel.offsetMin = Vector2.zero;
+            levelRewardPanel.offsetMax = Vector2.zero;
+
+            var background = panelObject.AddComponent<Image>();
+            background.color = new Color(0.026f, 0.034f, 0.040f, 0.98f);
+            background.raycastTarget = true;
+
+            levelRewardTitleText = CreateCombatChildText(panelObject.transform, "Level Reward Title", new Vector2(0.08f, 0.80f), new Vector2(0.92f, 0.95f), 34, TextAnchor.MiddleCenter);
+            levelRewardBodyText = CreateCombatChildText(panelObject.transform, "Level Reward Body", new Vector2(0.10f, 0.62f), new Vector2(0.90f, 0.78f), 25, TextAnchor.MiddleCenter);
+            levelRewardAttackButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Attack Button", new Vector2(0.12f, 0.43f), new Vector2(0.88f, 0.56f), "ATK +1", PrototypeRunState.LevelRewardAttackId);
+            levelRewardMaxHpButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Max HP Button", new Vector2(0.12f, 0.27f), new Vector2(0.88f, 0.40f), "Max HP +2", PrototypeRunState.LevelRewardMaxHpId);
+            levelRewardSkillButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Skill Button", new Vector2(0.12f, 0.11f), new Vector2(0.88f, 0.24f), "Skill CD -1", PrototypeRunState.LevelRewardSkillCooldownId);
+            levelRewardPanel.gameObject.SetActive(false);
+        }
+
+        private Button CreateLevelRewardButton(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, string labelText, string rewardId)
+        {
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.13f, 0.18f, 0.21f, 0.98f);
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(() => ResolveLevelReward(rewardId));
+            var label = CreateCombatChildText(buttonObject.transform, "Label", Vector2.zero, Vector2.one, 27, TextAnchor.MiddleCenter);
+            label.text = labelText;
+            return button;
+        }
+
+        private void UpdateLevelRewardPopup(PrototypeRunSnapshot snapshot)
+        {
+            if (!snapshot.LevelUpRewardPending)
+            {
+                HideLevelRewardPopup();
+                return;
+            }
+
+            EnsureLevelRewardPanel();
+            if (levelRewardPanel == null)
+            {
+                return;
+            }
+
+            levelRewardPanel.gameObject.SetActive(true);
+            levelRewardPanel.transform.SetAsLastSibling();
+            if (levelRewardTitleText != null)
+            {
+                levelRewardTitleText.text = "레벨 상승";
+            }
+
+            if (levelRewardBodyText != null)
+            {
+                levelRewardBodyText.text = "Lv " + snapshot.CombatLevel + "  XP " + snapshot.CombatXp + "/" + snapshot.CombatXpToNextLevel;
+            }
+        }
+
+        private void HideLevelRewardPopup()
+        {
+            if (levelRewardPanel != null)
+            {
+                levelRewardPanel.gameObject.SetActive(false);
+            }
+        }
+
+        private void ResolveLevelReward(string rewardId)
+        {
+            if (_roomController == null)
+            {
+                return;
+            }
+
+            _roomController.ResolveLevelReward(rewardId);
+            ShowRunState(_roomController.GetSnapshot());
         }
 
         private bool ShouldShowBossRewardPopup(PrototypeRunSnapshot snapshot)
@@ -4699,7 +4821,7 @@ namespace HwigiTower.UI
             UpdateCombatActionIcons();
             UpdateCombatItemInspect(snapshot);
 
-            var canAct = snapshot.IsInCombat && _roomController != null && !IsCutscenePlaying();
+            var canAct = snapshot.IsInCombat && !snapshot.LevelUpRewardPending && _roomController != null && !IsCutscenePlaying();
             if (attackButton != null)
             {
                 attackButton.interactable = canAct;
@@ -4798,6 +4920,7 @@ namespace HwigiTower.UI
                 _lastCombatVisualKey = visualKey;
                 _lastCombatVisualRound = snapshot.CombatRound;
                 _lastCombatVisualEnemyHp = snapshot.EnemyHp;
+                _lastCombatVisualPlayerHp = snapshot.PlayerHp;
                 ResetCombatEnemyFeedbackTransform();
                 return;
             }
@@ -4809,7 +4932,13 @@ namespace HwigiTower.UI
 
             if (_lastCombatVisualEnemyHp >= 0 && snapshot.EnemyHp < _lastCombatVisualEnemyHp)
             {
+                ShowCombatDamageNumber(combatEnemyDamageNumberText, "-" + (_lastCombatVisualEnemyHp - snapshot.EnemyHp), true);
                 TriggerCombatEnemyHitShake();
+            }
+
+            if (_lastCombatVisualPlayerHp >= 0 && snapshot.PlayerHp < _lastCombatVisualPlayerHp)
+            {
+                ShowCombatDamageNumber(combatPlayerDamageNumberText, "-" + (_lastCombatVisualPlayerHp - snapshot.PlayerHp), false);
             }
 
             if ((snapshot.LastCombatRoundResult ?? string.Empty).Contains("enemyDamage ", StringComparison.Ordinal))
@@ -4819,6 +4948,26 @@ namespace HwigiTower.UI
 
             _lastCombatVisualRound = snapshot.CombatRound;
             _lastCombatVisualEnemyHp = snapshot.EnemyHp;
+            _lastCombatVisualPlayerHp = snapshot.PlayerHp;
+        }
+
+        private void ShowCombatDamageNumber(Text text, string value, bool enemy)
+        {
+            if (text == null || string.IsNullOrEmpty(value))
+            {
+                return;
+            }
+
+            text.text = value;
+            text.gameObject.SetActive(true);
+            if (enemy)
+            {
+                _combatEnemyDamageNumberTimer = CombatDamageNumberDuration;
+            }
+            else
+            {
+                _combatPlayerDamageNumberTimer = CombatDamageNumberDuration;
+            }
         }
 
         private void TriggerCombatEnemyHitShake()
@@ -4899,8 +5048,42 @@ namespace HwigiTower.UI
             _lastCombatVisualKey = string.Empty;
             _lastCombatVisualRound = -1;
             _lastCombatVisualEnemyHp = -1;
+            _lastCombatVisualPlayerHp = -1;
             _combatEnemyHitShakeTimer = 0f;
             _combatEnemyAttackPulseTimer = 0f;
+            _combatEnemyDamageNumberTimer = 0f;
+            _combatPlayerDamageNumberTimer = 0f;
+            if (combatEnemyDamageNumberText != null)
+            {
+                combatEnemyDamageNumberText.gameObject.SetActive(false);
+            }
+
+            if (combatPlayerDamageNumberText != null)
+            {
+                combatPlayerDamageNumberText.gameObject.SetActive(false);
+            }
+        }
+
+        private void UpdateCombatDamageNumberAnimation(float deltaTime)
+        {
+            var step = Mathf.Max(0f, deltaTime);
+            if (_combatEnemyDamageNumberTimer > 0f)
+            {
+                _combatEnemyDamageNumberTimer = Mathf.Max(0f, _combatEnemyDamageNumberTimer - step);
+                if (_combatEnemyDamageNumberTimer <= 0f && combatEnemyDamageNumberText != null)
+                {
+                    combatEnemyDamageNumberText.gameObject.SetActive(false);
+                }
+            }
+
+            if (_combatPlayerDamageNumberTimer > 0f)
+            {
+                _combatPlayerDamageNumberTimer = Mathf.Max(0f, _combatPlayerDamageNumberTimer - step);
+                if (_combatPlayerDamageNumberTimer <= 0f && combatPlayerDamageNumberText != null)
+                {
+                    combatPlayerDamageNumberText.gameObject.SetActive(false);
+                }
+            }
         }
 
         private void UpdatePartyDock(PrototypeRunSnapshot snapshot)
@@ -5545,6 +5728,24 @@ namespace HwigiTower.UI
                 return;
             }
 
+            if (token.StartsWith("xp +", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "XP", "+" + token.Substring("xp +".Length).Trim().TrimStart('+'), string.Empty, new Color(0.26f, 0.48f, 0.72f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("xp ", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "XP", token.Substring("xp ".Length).Trim(), string.Empty, new Color(0.26f, 0.48f, 0.72f, 0.95f));
+                return;
+            }
+
+            if (token.StartsWith("level reward ready", StringComparison.Ordinal) || token.StartsWith("level ready", StringComparison.Ordinal))
+            {
+                AppendResultSummaryEntry(entries, "Level", "보상", string.Empty, new Color(0.38f, 0.64f, 0.62f, 0.95f));
+                return;
+            }
+
             if (token.StartsWith("Affinity ", StringComparison.Ordinal))
             {
                 AppendResultSummaryEntry(entries, "Affinity", token.Substring("Affinity ".Length).Trim(), "resource.affinity", new Color(0.55f, 0.34f, 0.72f, 0.95f));
@@ -6048,7 +6249,8 @@ namespace HwigiTower.UI
             var state = BuildCombatLogDetailLine(snapshot);
             return PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + " | 내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
                 ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 40) + "\n" +
-                ShortenPublicLine(state, 38);
+                ShortenPublicLine(state, 38) + "\n" +
+                ShortenPublicLine(BuildCombatBuildSummaryLine(snapshot), 42);
         }
 
         private string BuildCombatLogDetailLine(PrototypeRunSnapshot snapshot)
@@ -6062,12 +6264,12 @@ namespace HwigiTower.UI
 
             if (snapshot.LastMataiosProtectReduction > 0)
             {
-                highlights.Add("보호 -" + snapshot.LastMataiosProtectReduction);
+                highlights.Add("마타이오스 보호: 피해 " + snapshot.LastMataiosProtectReduction + " 감소");
             }
 
             if (snapshot.LastMataiosCombatDamage > 0)
             {
-                highlights.Add("지원 피해 " + snapshot.LastMataiosCombatDamage);
+                highlights.Add("마타이오스 지원: 추가 피해 " + snapshot.LastMataiosCombatDamage);
             }
 
             if (highlights.Count > 0)
@@ -6081,6 +6283,22 @@ namespace HwigiTower.UI
             }
 
             return HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" : "기술 불가: 보유 스킬 필요";
+        }
+
+        private static string BuildCombatBuildSummaryLine(PrototypeRunSnapshot snapshot)
+        {
+            if (!string.IsNullOrEmpty(snapshot.LastGrowthMessage))
+            {
+                return "성장: " + snapshot.LastGrowthMessage;
+            }
+
+            if (!string.IsNullOrEmpty(snapshot.CombatBuildSummary))
+            {
+                var firstBreak = snapshot.CombatBuildSummary.IndexOf('\n');
+                return firstBreak >= 0 ? snapshot.CombatBuildSummary.Substring(0, firstBreak) : snapshot.CombatBuildSummary;
+            }
+
+            return "성장 Lv " + snapshot.CombatLevel + " XP " + snapshot.CombatXp + "/" + snapshot.CombatXpToNextLevel;
         }
 
         private static string BuildCombatExtraLine(PrototypeRunSnapshot snapshot)
@@ -6198,6 +6416,21 @@ namespace HwigiTower.UI
             if (snapshot.LastCombatRoundResult.Contains("training +", StringComparison.Ordinal))
             {
                 chips.Add("훈련 +1");
+            }
+
+            if (snapshot.LevelAttackBonus > 0)
+            {
+                chips.Add("성장 ATK +" + snapshot.LevelAttackBonus);
+            }
+
+            if (snapshot.LevelMaxHpBonus > 0)
+            {
+                chips.Add("성장 HP +" + snapshot.LevelMaxHpBonus);
+            }
+
+            if (snapshot.SkillCooldownReduction > 0)
+            {
+                chips.Add("CD -" + snapshot.SkillCooldownReduction);
             }
 
             if (_roomController != null && _roomController.RunState != null && _roomController.RunState.GetItemCount("ITEM_FIELD_BANDAGE") > 0)

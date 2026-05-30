@@ -121,7 +121,7 @@ namespace HwigiTower.Run
             }
 
             var cooldownAfterUse = state.HasReadyArts03SkillForPreview
-                ? System.Math.Max(0, (int)state.GetAbilityNumericParamForPreview("ABILITY_ARTS_03", "skill.cooldown_rounds"))
+                ? state.EffectiveSkillCooldownRounds()
                 : 0;
             return new CombatActionPreview(CombatAction.Skill, label, "사용 가능 / 사용 후 CD " + cooldownAfterUse, true);
         }

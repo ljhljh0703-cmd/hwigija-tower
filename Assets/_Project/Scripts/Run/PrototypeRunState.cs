@@ -50,6 +50,13 @@ namespace HwigiTower.Run
         private const int MinAffinity = -100;
         private const int MaxAffinity = 100;
         private const int PrototypeShopAbilityCost = 10;
+        private const int CombatXpToLevelValue = 20;
+        private const int LevelRewardAttackBonusValue = 1;
+        private const int LevelRewardMaxHpBonusValue = 2;
+        private const int LevelRewardSkillCooldownReductionValue = 1;
+        public const string LevelRewardAttackId = "level_reward.attack_plus_1";
+        public const string LevelRewardMaxHpId = "level_reward.max_hp_plus_2";
+        public const string LevelRewardSkillCooldownId = "level_reward.skill_cooldown_minus_1";
 
         private readonly GameFlowEventBus _eventBus;
         private readonly ReflectionPipeline _reflectionPipeline;
@@ -83,6 +90,13 @@ namespace HwigiTower.Run
         private int _gold;
         private int _glitchLevel;
         private int _affinity;
+        private int _combatXp;
+        private int _combatLevel = 1;
+        private int _pendingLevelRewardChoices;
+        private int _levelAttackBonus;
+        private int _levelMaxHpBonus;
+        private int _skillCooldownReduction;
+        private string _lastGrowthMessage = string.Empty;
         private int _currentFloor = 1;
         private string _lastMemoryFragmentId = string.Empty;
         private string _lastMemoryFragmentTitleKey = string.Empty;
@@ -180,6 +194,15 @@ namespace HwigiTower.Run
         public int Gold => _gold;
         public int GlitchLevel => _glitchLevel;
         public int Affinity => _affinity;
+        public int CombatXp => _combatXp;
+        public int CombatXpToNextLevel => CombatXpToLevelValue;
+        public int CombatLevel => _combatLevel < 1 ? 1 : _combatLevel;
+        public bool LevelUpRewardPending => _pendingLevelRewardChoices > 0;
+        public int PendingLevelRewardChoices => _pendingLevelRewardChoices;
+        public int LevelAttackBonus => _levelAttackBonus;
+        public int LevelMaxHpBonus => _levelMaxHpBonus;
+        public int SkillCooldownReduction => _skillCooldownReduction;
+        public string LastGrowthMessage => _lastGrowthMessage;
         public IReadOnlyCollection<string> AbilityRefs => _abilityRefs;
         public IReadOnlyCollection<string> RewardBundleRefs => _rewardBundleRefs;
         public IReadOnlyCollection<string> MemoryFragmentRefs => _memoryFragmentRefs;
@@ -247,6 +270,13 @@ namespace HwigiTower.Run
                 affinity = _affinity,
                 nodesResolved = NodesResolved,
                 battlesWon = BattlesWon,
+                combatXp = _combatXp,
+                combatLevel = CombatLevel,
+                pendingLevelRewardChoices = _pendingLevelRewardChoices,
+                levelAttackBonus = _levelAttackBonus,
+                levelMaxHpBonus = _levelMaxHpBonus,
+                skillCooldownReduction = _skillCooldownReduction,
+                lastGrowthMessage = _lastGrowthMessage,
                 runCompleted = _runCompleted,
                 runClear = _runClear,
                 runFailed = _runFailed,
@@ -367,6 +397,13 @@ namespace HwigiTower.Run
             _selectedMapNodeId = IsSavedMapNodeSelectable(data.selectedMapNodeId) ? data.selectedMapNodeId : string.Empty;
             NodesResolved = data.nodesResolved < 0 ? 0 : data.nodesResolved;
             BattlesWon = data.battlesWon < 0 ? 0 : data.battlesWon;
+            _combatXp = data.combatXp < 0 ? 0 : data.combatXp;
+            _combatLevel = data.combatLevel < 1 ? 1 : data.combatLevel;
+            _pendingLevelRewardChoices = data.pendingLevelRewardChoices < 0 ? 0 : data.pendingLevelRewardChoices;
+            _levelAttackBonus = data.levelAttackBonus < 0 ? 0 : data.levelAttackBonus;
+            _levelMaxHpBonus = data.levelMaxHpBonus < 0 ? 0 : data.levelMaxHpBonus;
+            _skillCooldownReduction = data.skillCooldownReduction < 0 ? 0 : data.skillCooldownReduction;
+            _lastGrowthMessage = data.lastGrowthMessage ?? string.Empty;
             _mental = Clamp(data.mental, MinMental, MaxMental);
             _gold = Clamp(data.gold, MinGold, MaxGold);
             _glitchLevel = Clamp(data.glitchLevel, MinGlitchLevel, MaxGlitchLevel);
@@ -530,7 +567,17 @@ namespace HwigiTower.Run
                 _lastMataiosCombatAction,
                 _lastMataiosCombatDamage,
                 _lastMataiosProtectReduction,
-                _lastMataiosDownEvent);
+                _lastMataiosDownEvent,
+                combatXp: _combatXp,
+                combatXpToNextLevel: CombatXpToLevelValue,
+                combatLevel: CombatLevel,
+                levelUpRewardPending: LevelUpRewardPending,
+                pendingLevelRewardChoices: _pendingLevelRewardChoices,
+                levelAttackBonus: _levelAttackBonus,
+                levelMaxHpBonus: _levelMaxHpBonus,
+                skillCooldownReduction: _skillCooldownReduction,
+                lastGrowthMessage: _lastGrowthMessage,
+                combatBuildSummary: BuildCombatBuildSummary());
         }
 
         public string NextDemoNodeId
@@ -577,6 +624,64 @@ namespace HwigiTower.Run
         {
             _playerHp = Clamp(_playerHp + amount, 0, _playerMaxHp);
             return _playerHp;
+        }
+
+        public int GainCombatXp(int amount)
+        {
+            var gained = System.Math.Max(0, amount);
+            if (gained <= 0)
+            {
+                return 0;
+            }
+
+            _combatXp += gained;
+            while (_combatXp >= CombatXpToLevelValue)
+            {
+                _combatXp -= CombatXpToLevelValue;
+                _combatLevel++;
+                _pendingLevelRewardChoices++;
+            }
+
+            if (_pendingLevelRewardChoices > 0)
+            {
+                _lastGrowthMessage = "레벨 " + CombatLevel + " 보상 선택 가능";
+            }
+
+            return gained;
+        }
+
+        public bool ResolveLevelReward(string rewardId)
+        {
+            if (_pendingLevelRewardChoices <= 0)
+            {
+                return false;
+            }
+
+            var normalized = rewardId ?? string.Empty;
+            SyncPersistentPlayerHpFromCombat();
+            switch (normalized)
+            {
+                case LevelRewardAttackId:
+                    _levelAttackBonus += LevelRewardAttackBonusValue;
+                    _lastGrowthMessage = "ATK +" + LevelRewardAttackBonusValue;
+                    break;
+                case LevelRewardMaxHpId:
+                    _levelMaxHpBonus += LevelRewardMaxHpBonusValue;
+                    _lastGrowthMessage = "Max HP +" + LevelRewardMaxHpBonusValue;
+                    break;
+                case LevelRewardSkillCooldownId:
+                    _skillCooldownReduction += LevelRewardSkillCooldownReductionValue;
+                    _arts03CooldownRounds = System.Math.Max(0, _arts03CooldownRounds - LevelRewardSkillCooldownReductionValue);
+                    _lastGrowthMessage = "스킬 CD -" + LevelRewardSkillCooldownReductionValue;
+                    break;
+                default:
+                    return false;
+            }
+
+            _pendingLevelRewardChoices--;
+            RecalculatePlayerStats();
+            SyncActiveCombatPlayerStats();
+            return true;
         }
 
         public void SetFlag(string flag, bool value)
@@ -989,9 +1094,11 @@ namespace HwigiTower.Run
             while (!round.IsComplete && rounds < 12);
 
             NodesResolved++;
+            var gainedXp = 0;
             if (enemy.IsDefeated)
             {
                 BattlesWon++;
+                gainedXp = GainCombatXp(enemyData == null ? 0 : enemyData.XpReward);
             }
 
             _playerHp = player.Hp;
@@ -1009,7 +1116,8 @@ namespace HwigiTower.Run
                 ApplyNpcTrigger("battle.victory");
             }
 
-            var message = $"{resultId} | player {player.Hp}/{player.MaxHp} | enemy {enemy.Hp}/{enemy.MaxHp} | rounds {rounds}";
+            var message = $"{resultId} | player {player.Hp}/{player.MaxHp} | enemy {enemy.Hp}/{enemy.MaxHp} | rounds {rounds}" +
+                (gainedXp > 0 ? " | xp +" + gainedXp + (LevelUpRewardPending ? " | level ready" : string.Empty) : string.Empty);
             return new PrototypeNodeResolution(nodeId, encounterId, message, _runCompleted);
         }
 
@@ -1309,6 +1417,7 @@ namespace HwigiTower.Run
         private CombatantState _activeCombatEnemy;
         private CombatController _activeCombatController;
         private EncounterCombatHandoffRuntimeData _activeCombatHandoff;
+        private int _activeCombatXpReward;
         private string _activeCombatNodeId;
         private string _activeCombatEncounterId;
         private System.Action<PrototypeRunState, EncounterPostCombatEffectRuntimeData[]> _activeCombatEffectApplier;
@@ -1606,6 +1715,12 @@ namespace HwigiTower.Run
             var resultId = enemyDefeated ? "victory" : "defeat";
             _lastCombatResultId = resultId;
             _lastCombatEnemyDefeated = enemyDefeated;
+            var gainedXp = enemyDefeated ? GainCombatXp(_activeCombatXpReward) : 0;
+            if (gainedXp > 0)
+            {
+                _lastCombatRoundResult += " | xp +" + gainedXp + (LevelUpRewardPending ? " | level ready" : string.Empty);
+            }
+
             CapturePostCombatDeltas(enemyDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
             
             _activeCombatEffectApplier?.Invoke(this, enemyDefeated ? _activeCombatHandoff.onVictoryEffects : _activeCombatHandoff.onDefeatEffects);
@@ -1700,13 +1815,15 @@ namespace HwigiTower.Run
                 (combatStartRestore > 0 ? " | bandage " + combatStartRestore : string.Empty) +
                 (modifiers.PlayerMaxHpBonus > 0 ? " | maxHp +" + modifiers.PlayerMaxHpBonus : string.Empty) +
                 (HasAbilityRef("ABILITY_SCOUT") ? " | scout +" + modifiers.PlayerAttackBonus : string.Empty) +
-                (HasAbilityRef("ABILITY_RECALL_ANCHOR") && !HasFlag("FLAG_RECALL_ANCHOR_USED") ? " | recall ready" : string.Empty);
+                (HasAbilityRef("ABILITY_RECALL_ANCHOR") && !HasFlag("FLAG_RECALL_ANCHOR_USED") ? " | recall ready" : string.Empty) +
+                (!string.IsNullOrEmpty(_lastGrowthMessage) ? " | growth " + _lastGrowthMessage : string.Empty);
             _combatRound = 0;
             _lastCombatGoldReward = 0;
             _lastCombatGlitchDelta = 0;
             _lastCombatAffinityDelta = 0;
             _lastCombatEnemyDefeated = false;
             _lastCombatComboDamage = 0;
+            _activeCombatXpReward = enemyData == null ? 0 : enemyData.XpReward;
             _combatAttackCount = 0;
             _arts03CooldownRounds = 0;
             _lastCombatActionWasAttack = false;
@@ -1813,6 +1930,113 @@ namespace HwigiTower.Run
             }
 
             return total;
+        }
+
+        public string BuildCombatBuildSummary()
+        {
+            var lines = new List<string>();
+            var growth = "성장 Lv " + CombatLevel + " XP " + _combatXp + "/" + CombatXpToLevelValue;
+            var growthParts = new List<string>();
+            if (_levelAttackBonus > 0)
+            {
+                growthParts.Add("ATK +" + _levelAttackBonus);
+            }
+
+            if (_levelMaxHpBonus > 0)
+            {
+                growthParts.Add("Max HP +" + _levelMaxHpBonus);
+            }
+
+            if (_skillCooldownReduction > 0)
+            {
+                growthParts.Add("Skill CD -" + _skillCooldownReduction);
+            }
+
+            if (LevelUpRewardPending)
+            {
+                growthParts.Add("보상 대기");
+            }
+
+            lines.Add(growth + (growthParts.Count > 0 ? " | " + string.Join(" | ", growthParts) : string.Empty));
+
+            var effects = new List<string>();
+            if (HasAbilityRef("ABILITY_SCOUT"))
+            {
+                effects.Add("정찰: 스킬 추가 공격");
+            }
+
+            if (HasAbilityRef("ABILITY_ARTS_03"))
+            {
+                effects.Add("번개 방출: 직접 피해 " + (int)GetAbilityParam("ABILITY_ARTS_03", "skill.direct_damage") + ", CD " + EffectiveSkillCooldownRounds());
+            }
+
+            if (HasAbilityRef("ABILITY_RECALL_ANCHOR") && !HasFlag("FLAG_RECALL_ANCHOR_USED"))
+            {
+                effects.Add("회상 닻: 패배 1회 방지");
+            }
+
+            if (HasAbilityRef("ABILITY_SWORD_01"))
+            {
+                effects.Add("예리한 감각: ATK +" + (int)GetAbilityParam("ABILITY_SWORD_01", "player.attack_bonus"));
+            }
+
+            if (HasAbilityRef("ABILITY_GUARD_01"))
+            {
+                effects.Add("철벽: 피해 -" + (int)GetAbilityParam("ABILITY_GUARD_01", "player.damage_reduction"));
+            }
+
+            var bandage = GetItemCount("ITEM_FIELD_BANDAGE");
+            if (bandage > 0)
+            {
+                effects.Add("붕대 x" + bandage + ": 시작 HP +4 / Max HP +2");
+            }
+
+            AddSynergyProgressLine(effects, "검", "검 시너지");
+            lines.Add(effects.Count == 0 ? "빌드 효과 없음 | 특성 없음" : string.Join(" | ", effects) + " | 특성 없음");
+            return string.Join("\n", lines);
+        }
+
+        private void AddSynergyProgressLine(List<string> effects, string tag, string label)
+        {
+            var owned = CountAbilityTag(tag);
+            for (var i = 0; i < _activeSynergies.Count; i++)
+            {
+                var synergy = _activeSynergies[i].Synergy;
+                if (synergy == null || synergy.Tag != tag || synergy.RequiredCount <= 0)
+                {
+                    continue;
+                }
+
+                if (_activeSynergies[i].Active)
+                {
+                    effects.Add(label + " " + owned + "/" + synergy.RequiredCount + " 활성");
+                }
+                else if (owned >= System.Math.Max(1, synergy.RequiredCount - 1))
+                {
+                    effects.Add(label + " " + owned + "/" + synergy.RequiredCount + " 근접");
+                }
+
+                return;
+            }
+        }
+
+        private int CountAbilityTag(string tag)
+        {
+            if (string.IsNullOrEmpty(tag))
+            {
+                return 0;
+            }
+
+            var count = 0;
+            for (var i = 0; i < Abilities.Abilities.Count; i++)
+            {
+                if (Abilities.Abilities[i] != null && Abilities.Abilities[i].Tag == tag)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private string ApplyRestInteractionEffect(string actionId)
@@ -1936,8 +2160,8 @@ namespace HwigiTower.Run
         {
             var previousMaxHp = _playerMaxHp;
             var modifiers = CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData());
-            _playerMaxHp = System.Math.Max(1, BasePlayerMaxHp + modifiers.PlayerMaxHpBonus);
-            _playerAttack = System.Math.Max(0, BasePlayerAttack + modifiers.PlayerAttackBonus);
+            _playerMaxHp = System.Math.Max(1, BasePlayerMaxHp + modifiers.PlayerMaxHpBonus + _levelMaxHpBonus);
+            _playerAttack = System.Math.Max(0, BasePlayerAttack + modifiers.PlayerAttackBonus + _levelAttackBonus);
 
             if (_playerMaxHp > previousMaxHp)
             {
@@ -1945,6 +2169,24 @@ namespace HwigiTower.Run
             }
 
             _playerHp = System.Math.Max(0, System.Math.Min(_playerHp, _playerMaxHp));
+        }
+
+        private void SyncPersistentPlayerHpFromCombat()
+        {
+            if (_activeCombatPlayer != null)
+            {
+                _playerHp = Clamp(_activeCombatPlayer.Hp, 0, _playerMaxHp);
+            }
+        }
+
+        private void SyncActiveCombatPlayerStats()
+        {
+            if (_activeCombatPlayer == null || _activeCombatEnemy == null)
+            {
+                return;
+            }
+
+            _activeCombatPlayer = new CombatantState("player", _playerMaxHp, _playerAttack, _playerHp);
         }
 
         private List<HwigiTower.Items.ItemData> BuildOwnedItemData()
@@ -1985,7 +2227,7 @@ namespace HwigiTower.Run
         {
             if (artsSkillUsed)
             {
-                _arts03CooldownRounds = System.Math.Max(0, (int)GetAbilityParam("ABILITY_ARTS_03", "skill.cooldown_rounds"));
+                _arts03CooldownRounds = EffectiveSkillCooldownRounds();
                 return;
             }
 
@@ -1993,6 +2235,11 @@ namespace HwigiTower.Run
             {
                 _arts03CooldownRounds--;
             }
+        }
+
+        public int EffectiveSkillCooldownRounds()
+        {
+            return System.Math.Max(0, (int)GetAbilityParam("ABILITY_ARTS_03", "skill.cooldown_rounds") - _skillCooldownReduction);
         }
 
         private readonly struct Sword03AttackResolution

@@ -296,6 +296,37 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void Hud_LevelRewardPopupShowsGrowthChoices()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-level-popup",
+                18,
+                24,
+                5,
+                0,
+                10,
+                0,
+                0,
+                1,
+                1,
+                0,
+                false,
+                combatLevel: 2,
+                levelUpRewardPending: true,
+                pendingLevelRewardChoices: 1,
+                lastGrowthMessage: "레벨 2 보상 선택 가능");
+
+            hud.ShowRunState(snapshot);
+
+            Assert.IsTrue(hud.LevelRewardPopupVisible);
+            StringAssert.Contains("레벨 상승", hud.LevelRewardPopupMessage);
+            StringAssert.Contains("ATK +1", hud.LevelRewardPopupMessage);
+            StringAssert.Contains("Max HP +2", hud.LevelRewardPopupMessage);
+            StringAssert.Contains("Skill CD -1", hud.LevelRewardPopupMessage);
+        }
+
+        [Test]
         public void Hud_FloorClearResultHidesMapStatusButtonsAndKeepsObjective()
         {
             var hud = CreateHud(out _);
@@ -516,6 +547,44 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(22f / 34f, hud.CurrentEnemyHpFillAmount, 0.001f);
             Assert.AreEqual(15f / 24f, hud.CurrentPlayerHpFillAmount, 0.001f);
             Assert.AreEqual(1f, hud.CurrentMataiosHpFillAmount, 0.001f);
+        }
+
+        [Test]
+        public void Hud_CombatSummaryShowsBuildAndMataiosAssist()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-combat-build-ui",
+                15,
+                26,
+                7,
+                0,
+                9,
+                1,
+                1,
+                0,
+                0,
+                2,
+                false,
+                isInCombat: true,
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                enemyHp: 8,
+                enemyMaxHp: 12,
+                enemyAttack: 3,
+                combatRound: 2,
+                lastCombatRoundResult: "round 2 | action Defend | playerDamage 0 | enemyDamage 1 | mataios protect protect -2",
+                lastMataiosProtectReduction: 2,
+                levelAttackBonus: 1,
+                levelMaxHpBonus: 2,
+                skillCooldownReduction: 1,
+                combatBuildSummary: "성장 Lv 2 XP 0/20 | ATK +1 | Max HP +2 | Skill CD -1\n정찰: 스킬 추가 공격 | 특성 없음");
+
+            hud.ShowRunState(snapshot);
+
+            StringAssert.Contains("마타이오스 보호", hud.CombatMessage);
+            StringAssert.Contains("성장", hud.CombatMessage);
+            StringAssert.Contains("성장 ATK +1", hud.CombatPartyMessage);
+            StringAssert.Contains("성장 HP +2", hud.CombatPartyMessage);
         }
 
         [Test]
