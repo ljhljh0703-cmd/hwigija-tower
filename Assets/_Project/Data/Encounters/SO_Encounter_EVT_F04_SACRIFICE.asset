@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F04_SACRIFICE
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F04_SACRIFICE
+  type: 6
+  floor: 4
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F04_SACRIFICE
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F04_SACRIFICE.asset
+  sourceHash: sha256:09a0b2f0658878887a952fd8e24708e3cb780881e673adf4c664368924730a07
+  contentCategory: GeneralEncounter
+  npcStage: S4_COLLAPSE
+  bodyTextKey: EVT_F04_SACRIFICE_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F04_SACRIFICE_ACTION_113
+  - CHOICE_EVT_F04_SACRIFICE_ACTION_114
+  - CHOICE_EVT_F04_SACRIFICE_ACTION_115
+  choices:
+  - stableId: CHOICE_EVT_F04_SACRIFICE_ACTION_113
+    textKey: CHOICE_EVT_F04_SACRIFICE_ACTION_113_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_SACRIFICE_ACTION_113
+  - stableId: CHOICE_EVT_F04_SACRIFICE_ACTION_114
+    textKey: CHOICE_EVT_F04_SACRIFICE_ACTION_114_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_SACRIFICE_ACTION_114
+  - stableId: CHOICE_EVT_F04_SACRIFICE_ACTION_115
+    textKey: CHOICE_EVT_F04_SACRIFICE_ACTION_115_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_SACRIFICE_ACTION_115

@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F03_POLTERGEIST
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F03_POLTERGEIST
+  type: 6
+  floor: 3
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F03_POLTERGEIST
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F03_POLTERGEIST.asset
+  sourceHash: sha256:bbd0ef138bb3e75ec85bc6e7753b4f41759648fe0cf5ad32c71cf9dc16cfbc40
+  contentCategory: GeneralEncounter
+  npcStage: S3_FRACTURE
+  bodyTextKey: EVT_F03_POLTERGEIST_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F03_POLTERGEIST_ACTION_109
+  - CHOICE_EVT_F03_POLTERGEIST_ACTION_110
+  - CHOICE_EVT_F03_POLTERGEIST_ACTION_111
+  choices:
+  - stableId: CHOICE_EVT_F03_POLTERGEIST_ACTION_109
+    textKey: CHOICE_EVT_F03_POLTERGEIST_ACTION_109_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_POLTERGEIST_ACTION_109
+  - stableId: CHOICE_EVT_F03_POLTERGEIST_ACTION_110
+    textKey: CHOICE_EVT_F03_POLTERGEIST_ACTION_110_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_POLTERGEIST_ACTION_110
+  - stableId: CHOICE_EVT_F03_POLTERGEIST_ACTION_111
+    textKey: CHOICE_EVT_F03_POLTERGEIST_ACTION_111_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_POLTERGEIST_ACTION_111

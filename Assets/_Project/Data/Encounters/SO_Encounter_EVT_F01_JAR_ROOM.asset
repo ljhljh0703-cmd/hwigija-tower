@@ -19,39 +19,48 @@ MonoBehaviour:
   deterministicSeedKey: SEED_EVT_F01_JAR_ROOM
   enemy: {fileID: 0}
   assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_JAR_ROOM.asset
-  sourceHash: sha256:evt-f01-jar-room-placeholder
-  contentCategory: Event
+  sourceHash: sha256:5b121cb3395a99908ef85ab52a36dbbb5551c6f462fa4e4235a19084d851ac92
+  contentCategory: GeneralEncounter
   npcStage: S1_AWARENESS
-  bodyTextKey: PLACEHOLDER_EVT_F01_JAR_ROOM_BODY
-  writerStatus: placeholder
+  bodyTextKey: EVT_F01_JAR_ROOM_BODY
+  writerStatus: sheet-normalized
   glitchLevel: 0
   timeLimitSeconds: 0
   choiceStableIds:
-  - CHOICE_EVT_F01_JAR_PATTERNED
-  - CHOICE_EVT_F01_JAR_PLAIN
-  - CHOICE_EVT_F01_JAR_CRACKED
+  - CHOICE_EVT_F01_JAR_ROOM_PATTERNED
+  - CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+  - CHOICE_EVT_F01_JAR_ROOM_PLAIN
+  - CHOICE_EVT_F01_JAR_ROOM_CRACKED
   choices:
-  - stableId: CHOICE_EVT_F01_JAR_PATTERNED
-    textKey: PLACEHOLDER_CHOICE_EVT_F01_JAR_PATTERNED
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_PATTERNED
+    textKey: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_TEXT
     requirementMode: All
     requirements: []
     effects: []
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
-    npcReactionKey: NPC_REACT_EVENT_JAR_PATTERNED
-  - stableId: CHOICE_EVT_F01_JAR_PLAIN
-    textKey: PLACEHOLDER_CHOICE_EVT_F01_JAR_PLAIN
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_PATTERNED
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+    textKey: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT_TEXT
     requirementMode: All
     requirements: []
     effects: []
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
-    npcReactionKey: NPC_REACT_EVENT_JAR_PLAIN
-  - stableId: CHOICE_EVT_F01_JAR_CRACKED
-    textKey: PLACEHOLDER_CHOICE_EVT_F01_JAR_CRACKED
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_PLAIN
+    textKey: CHOICE_EVT_F01_JAR_ROOM_PLAIN_TEXT
     requirementMode: All
     requirements: []
     effects: []
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
-    npcReactionKey: NPC_REACT_EVENT_JAR_CRACKED
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_PLAIN
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_CRACKED
+    textKey: CHOICE_EVT_F01_JAR_ROOM_CRACKED_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_CRACKED
