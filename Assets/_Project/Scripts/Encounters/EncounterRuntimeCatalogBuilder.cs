@@ -297,6 +297,10 @@ namespace HwigiTower.Encounters
                     return "first_hit_per_combat";
                 case "ITEM_FIELD_BANDAGE":
                     return "combat_start";
+                case "ITEM_LANTERN_OIL":
+                    return "player_skill";
+                case "ITEM_TORN_CHARM":
+                    return "first_hit_per_combat";
                 default:
                     return string.Empty;
             }
@@ -330,6 +334,10 @@ namespace HwigiTower.Encounters
                         new NumericParamSpec("max_hp_bonus", 2f),
                         new NumericParamSpec("hp_restore", 4f)
                     };
+                case "ITEM_LANTERN_OIL":
+                    return new[] { new NumericParamSpec("skill_damage_bonus", 2f) };
+                case "ITEM_TORN_CHARM":
+                    return new[] { new NumericParamSpec("damage_reduce", 2f) };
                 default:
                     return new NumericParamSpec[0];
             }

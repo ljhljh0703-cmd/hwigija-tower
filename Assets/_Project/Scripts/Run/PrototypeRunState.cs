@@ -54,6 +54,9 @@ namespace HwigiTower.Run
         private const int LevelRewardAttackBonusValue = 1;
         private const int LevelRewardMaxHpBonusValue = 2;
         private const int LevelRewardSkillCooldownReductionValue = 1;
+        private const int GenericHeavyPressureAttackThreshold = 4;
+        private const int GenericHeavyPressureDamage = 1;
+        private const int GenericSkillOpeningDamageBonus = 2;
         public const string LevelRewardAttackId = "level_reward.attack_plus_1";
         public const string LevelRewardMaxHpId = "level_reward.max_hp_plus_2";
         public const string LevelRewardSkillCooldownId = "level_reward.skill_cooldown_minus_1";
@@ -1435,6 +1438,21 @@ namespace HwigiTower.Run
             return GetAbilityParam(abilityRef, key);
         }
 
+        public int GetSkillItemDamageBonusForPreview()
+        {
+            return CombatAbilityModifiers.From(Abilities.Abilities, _activeSynergies, BuildOwnedItemData()).SkillDamageBonus;
+        }
+
+        public bool HasGenericSkillOpeningForPreview()
+        {
+            return IsGenericSkillOpeningAvailable();
+        }
+
+        public int GetGenericSkillOpeningDamageBonusForPreview()
+        {
+            return GenericSkillOpeningDamageBonus;
+        }
+
         private readonly struct MataiosPolicyResolution
         {
             public MataiosPolicyResolution(MataiosActionPlan plan, int enemyDamage, int playerDamageReduction)
@@ -1480,18 +1498,24 @@ namespace HwigiTower.Run
 
             var mataiosPolicy = ResolveMataiosPolicy(action);
             var artsSkillUsed = action == CombatAction.Skill && HasReadyArts03Skill();
+            var skillItemDamage = action == CombatAction.Skill ? modifiers.SkillDamageBonus : 0;
             var secondAction = action == CombatAction.Skill && !artsSkillUsed && HasAbilityRef("ABILITY_SCOUT")
                 ? (CombatAction?)CombatAction.Attack
                 : null;
-            var skillDamage = artsSkillUsed ? (int?)GetAbilityParam("ABILITY_ARTS_03", "skill.direct_damage") : null;
+            var skillDamage = artsSkillUsed
+                ? (int?)((int)GetAbilityParam("ABILITY_ARTS_03", "skill.direct_damage") + skillItemDamage)
+                : null;
             var sword03 = PrepareSword03Attack(action);
+            var genericSkillOpeningAvailable = IsGenericSkillOpeningAvailable();
+            var frenzyActive = FindActiveSynergy("검") != null;
+            var frenzyBreak = frenzyActive && action != CombatAction.Attack && _lastCombatActionWasAttack;
             var result = _activeCombatController.ResolveRound(
                 _activeCombatPlayer,
                 _activeCombatEnemy,
                 action,
                 secondAction,
                 skillDamage,
-                sword03.DamageBonus,
+                sword03.DamageBonus + (action == CombatAction.Skill && !artsSkillUsed ? skillItemDamage : 0),
                 sword03.HpCost,
                 mataiosPolicy.EnemyDamage,
                 mataiosPolicy.PlayerDamageReduction);
@@ -1501,6 +1525,8 @@ namespace HwigiTower.Run
             var abilityStrikeDamage = sword03.DamageBonus + ApplySwordAttackEffects(action);
             var frenzyDamage = ApplyFrenzyAttackEffect(action);
             var firstHitMitigation = ApplyFirstHitMitigation(result.EnemyDamage, modifiers);
+            var heavyPressureDamage = ApplyGenericHeavyPressure(action);
+            var skillOpeningDamage = ApplyGenericSkillOpening(action, genericSkillOpeningAvailable);
             AdvanceArts03Cooldown(artsSkillUsed);
             var crackedJarBonus = 0;
             if (_crackedJarBuffCombats > 0 && result.PlayerDamage > 0 && !_activeCombatEnemy.IsDefeated)
@@ -1544,7 +1570,14 @@ namespace HwigiTower.Run
                 (sword03.HpCost > 0 ? " | blood cost " + sword03.HpCost : string.Empty) +
                 (sword03.Overload ? " | blood overload" : string.Empty) +
                 (abilityStrikeDamage > 0 ? " | sword strike " + abilityStrikeDamage : string.Empty) +
+                (skillItemDamage > 0 ? " | oil skill +" + skillItemDamage : string.Empty) +
                 (frenzyDamage > 0 ? " | frenzy " + frenzyDamage : string.Empty) +
+                (frenzyActive && action == CombatAction.Attack ? " | frenzy ready" : string.Empty) +
+                (frenzyBreak ? " | frenzy break" : string.Empty) +
+                (heavyPressureDamage > 0 ? " | heavy pressure +" + heavyPressureDamage : string.Empty) +
+                (heavyPressureDamage == 0 && IsGenericHeavyPressureActive() && action == CombatAction.Defend ? " | heavy pressure blocked" : string.Empty) +
+                (skillOpeningDamage > 0 ? " | skill opening +" + skillOpeningDamage : string.Empty) +
+                (genericSkillOpeningAvailable && action != CombatAction.Skill ? " | skill opening missed" : string.Empty) +
                 (firstHitMitigation > 0 ? " | first hit guard " + firstHitMitigation : string.Empty);
 
             if (action == CombatAction.Skill)
@@ -1991,9 +2024,39 @@ namespace HwigiTower.Run
                 effects.Add("붕대 x" + bandage + ": 시작 HP +4 / Max HP +2");
             }
 
-            AddSynergyProgressLine(effects, "검", "검 시너지");
+            var oil = GetItemCount("ITEM_LANTERN_OIL");
+            if (oil > 0)
+            {
+                effects.Add("등유 x" + oil + ": 스킬 피해 +2");
+            }
+
+            var charm = GetItemCount("ITEM_TORN_CHARM");
+            if (charm > 0)
+            {
+                effects.Add("찢어진 부적 x" + charm + ": 첫 피격 피해 -2");
+            }
+
+            AddFrenzyBuildLine(effects);
             lines.Add(effects.Count == 0 ? "빌드 효과 없음 | 특성 없음" : string.Join(" | ", effects) + " | 특성 없음");
             return string.Join("\n", lines);
+        }
+
+        private void AddFrenzyBuildLine(List<string> effects)
+        {
+            var frenzy = FindActiveSynergy("검");
+            if (frenzy != null)
+            {
+                if (_lastCombatRoundResult.Contains("frenzy break", System.StringComparison.Ordinal))
+                {
+                    effects.Add("광폭 끊김");
+                    return;
+                }
+
+                effects.Add(_lastCombatActionWasAttack ? "광폭 준비: 연속 공격 강화" : "광폭 준비");
+                return;
+            }
+
+            AddSynergyProgressLine(effects, "검", "광폭");
         }
 
         private void AddSynergyProgressLine(List<string> effects, string tag, string label)
@@ -2345,6 +2408,51 @@ namespace HwigiTower.Run
             var restored = System.Math.Min(enemyDamage, modifiers.FirstHitDamageReduce);
             _activeCombatPlayer.RestoreHp(restored);
             return restored;
+        }
+
+        private int ApplyGenericHeavyPressure(CombatAction action)
+        {
+            if (!IsGenericHeavyPressureActive() ||
+                action == CombatAction.Defend ||
+                _activeCombatPlayer == null ||
+                _activeCombatPlayer.IsDefeated ||
+                _activeCombatEnemy == null ||
+                _activeCombatEnemy.IsDefeated)
+            {
+                return 0;
+            }
+
+            _activeCombatPlayer.ApplyDamage(GenericHeavyPressureDamage);
+            return GenericHeavyPressureDamage;
+        }
+
+        private bool IsGenericHeavyPressureActive()
+        {
+            return _activeCombatEnemy != null &&
+                !_activeCombatEnemy.IsDefeated &&
+                _activeCombatEnemy.Attack >= GenericHeavyPressureAttackThreshold;
+        }
+
+        private int ApplyGenericSkillOpening(CombatAction action, bool openingAvailable)
+        {
+            if (!openingAvailable ||
+                action != CombatAction.Skill ||
+                _activeCombatEnemy == null ||
+                _activeCombatEnemy.IsDefeated)
+            {
+                return 0;
+            }
+
+            _activeCombatEnemy.ApplyDamage(GenericSkillOpeningDamageBonus);
+            return GenericSkillOpeningDamageBonus;
+        }
+
+        private bool IsGenericSkillOpeningAvailable()
+        {
+            return HasPlayableSkill() &&
+                _activeCombatEnemy != null &&
+                !_activeCombatEnemy.IsDefeated &&
+                _activeCombatEnemy.Hp * 2 <= _activeCombatEnemy.MaxHp;
         }
 
         private int ApplyFrenzyAttackEffect(CombatAction action)

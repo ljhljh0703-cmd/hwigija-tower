@@ -17,5 +17,7 @@ MonoBehaviour:
   descriptionKey: PLACEHOLDER_ITEM_TORN_CHARM_DESC
   maxStack: 99
   tier: 0
-  passiveTrigger:
-  numericParams: []
+  passiveTrigger: first_hit_per_combat
+  numericParams:
+  - key: damage_reduce
+    value: 2

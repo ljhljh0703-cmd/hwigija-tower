@@ -123,7 +123,19 @@ namespace HwigiTower.Run
             var cooldownAfterUse = state.HasReadyArts03SkillForPreview
                 ? state.EffectiveSkillCooldownRounds()
                 : 0;
-            return new CombatActionPreview(CombatAction.Skill, label, "사용 가능 / 사용 후 CD " + cooldownAfterUse, true);
+            var preview = "사용 가능";
+            var skillDamageBonus = state.GetSkillItemDamageBonusForPreview();
+            if (skillDamageBonus > 0)
+            {
+                preview += " / 피해 +" + skillDamageBonus;
+            }
+
+            if (state.HasGenericSkillOpeningForPreview())
+            {
+                preview += " / 빈틈 +" + state.GetGenericSkillOpeningDamageBonusForPreview();
+            }
+
+            return new CombatActionPreview(CombatAction.Skill, label, preview + " / 사용 후 CD " + cooldownAfterUse, true);
         }
 
         public static PrototypeEncounterChoiceResolution Resolve(PrototypeRunState state, EncounterData encounter, string choiceStableId)

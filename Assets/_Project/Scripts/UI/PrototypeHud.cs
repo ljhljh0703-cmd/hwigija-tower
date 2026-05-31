@@ -6313,6 +6313,41 @@ namespace HwigiTower.UI
                 return "훈련 보너스: 피해 +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "training +").Trim();
             }
 
+            if (snapshot.LastCombatRoundResult.Contains("frenzy break", StringComparison.Ordinal))
+            {
+                return "광폭 끊김";
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("frenzy ", StringComparison.Ordinal))
+            {
+                return "광폭 발동: 추가타 " + ExtractRoundNumber(snapshot.LastCombatRoundResult, "frenzy ").Trim();
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("oil skill +", StringComparison.Ordinal))
+            {
+                return "등유: 스킬 피해 +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "oil skill +").Trim();
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("skill opening +", StringComparison.Ordinal))
+            {
+                return "빈틈 공략: 피해 +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "skill opening +").Trim();
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("heavy pressure +", StringComparison.Ordinal))
+            {
+                return "중압: 피해 +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "heavy pressure +").Trim();
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("heavy pressure blocked", StringComparison.Ordinal))
+            {
+                return "방어: 중압 차단";
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("first hit guard ", StringComparison.Ordinal))
+            {
+                return "찢어진 부적: 피해 -" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "first hit guard ").Trim();
+            }
+
             if (snapshot.LastCombatRoundResult.Contains("bandage ", StringComparison.Ordinal))
             {
                 return "붕대: HP 회복 " + ExtractRoundNumber(snapshot.LastCombatRoundResult, "bandage ").Trim();
@@ -6340,6 +6375,16 @@ namespace HwigiTower.UI
                 chips.Add("중독");
             }
 
+            if (result.Contains("heavy pressure", StringComparison.Ordinal))
+            {
+                chips.Add("중압");
+            }
+
+            if (result.Contains("skill opening", StringComparison.Ordinal))
+            {
+                chips.Add("빈틈");
+            }
+
             if (chips.Count > 4)
             {
                 var overflow = chips.Count - 3;
@@ -6359,8 +6404,8 @@ namespace HwigiTower.UI
 
             var lines = new List<string>();
             AddCombatInspectItemLine(lines, "ITEM_FIELD_BANDAGE", "붕대", "전투 시작 HP 회복 +4 / 최대 HP +2");
-            AddCombatInspectItemLine(lines, "ITEM_LANTERN_OIL", "등유", "구현 효과 없음");
-            AddCombatInspectItemLine(lines, "ITEM_TORN_CHARM", "찢어진 부적", "구현 효과 없음");
+            AddCombatInspectItemLine(lines, "ITEM_LANTERN_OIL", "등유", "스킬 피해 +2");
+            AddCombatInspectItemLine(lines, "ITEM_TORN_CHARM", "찢어진 부적", "첫 피격 피해 -2");
             return lines.Count == 0 ? "아이템 없음" : string.Join("\n", lines);
         }
 
@@ -6433,9 +6478,32 @@ namespace HwigiTower.UI
                 chips.Add("CD -" + snapshot.SkillCooldownReduction);
             }
 
+            if (snapshot.LastCombatRoundResult.Contains("frenzy break", StringComparison.Ordinal))
+            {
+                chips.Add("광폭 끊김");
+            }
+            else if (snapshot.LastCombatRoundResult.Contains("frenzy ", StringComparison.Ordinal))
+            {
+                chips.Add("광폭 발동");
+            }
+            else if (snapshot.CombatBuildSummary.Contains("광폭 준비", StringComparison.Ordinal))
+            {
+                chips.Add("광폭 준비");
+            }
+
             if (_roomController != null && _roomController.RunState != null && _roomController.RunState.GetItemCount("ITEM_FIELD_BANDAGE") > 0)
             {
                 chips.Add("붕대");
+            }
+
+            if (_roomController != null && _roomController.RunState != null && _roomController.RunState.GetItemCount("ITEM_LANTERN_OIL") > 0)
+            {
+                chips.Add("등유");
+            }
+
+            if (_roomController != null && _roomController.RunState != null && _roomController.RunState.GetItemCount("ITEM_TORN_CHARM") > 0)
+            {
+                chips.Add("부적");
             }
 
             if (_roomController != null && _roomController.RunState != null && _roomController.RunState.HasAbilityRef("ABILITY_RECALL_ANCHOR"))
