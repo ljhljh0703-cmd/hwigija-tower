@@ -23,7 +23,7 @@ MonoBehaviour:
   contentCategory: GeneralEncounter
   npcStage: S1_AWARENESS
   bodyTextKey: EVT_F01_RESISTANCE_LINE_BODY
-  writerStatus: sheet-normalized
+  writerStatus: sheet-normalized-temp-effects
   glitchLevel: 0
   timeLimitSeconds: 0
   choiceStableIds:
@@ -36,7 +36,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F01_RESISTANCE_LINE_ACTION_70_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyGold
+      amount: 6
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F01_RESISTANCE_LINE_ACTION_70
@@ -44,7 +76,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F01_RESISTANCE_LINE_ACTION_71_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F01_RESISTANCE_LINE_ACTION_71
@@ -52,7 +116,103 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F01_RESISTANCE_LINE_ACTION_72_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: -5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyMental
+      amount: 2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_LINE_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F01_RESISTANCE_LINE_ACTION_72
@@ -60,7 +220,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F01_RESISTANCE_LINE_PASS_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F01_RESISTANCE_LINE_PASS

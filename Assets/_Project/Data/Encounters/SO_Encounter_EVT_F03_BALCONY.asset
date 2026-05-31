@@ -23,7 +23,7 @@ MonoBehaviour:
   contentCategory: GeneralEncounter
   npcStage: S3_FRACTURE
   bodyTextKey: EVT_F03_BALCONY_BODY
-  writerStatus: sheet-normalized
+  writerStatus: sheet-normalized-temp-effects
   glitchLevel: 0
   timeLimitSeconds: 0
   choiceStableIds:
@@ -42,7 +42,71 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_NORMAL_VIEW_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: 5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyMental
+      amount: 2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_NORMAL_VIEW
@@ -50,7 +114,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_MURKY_VIEW_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: AddAbility
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef: ABILITY_SWORD_02
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_MURKY_VIEW
@@ -58,7 +154,71 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_OMINOUS_VIEW_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: -5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyMental
+      amount: -2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_OMINOUS_VIEW
@@ -66,7 +226,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_SUNNY_VIEW_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: -5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_SUNNY_VIEW
@@ -74,7 +266,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_JUMP_INTO_SUNNY_VIEW_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: -999
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_JUMP_INTO_SUNNY_VIEW
@@ -82,7 +306,103 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_BASK_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: 8
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyMental
+      amount: 2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddAbility
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef: ABILITY_SWORD_01
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_BASK
@@ -90,7 +410,117 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: StartCombat
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId: TEMP_COMBAT_EVT_F03_BALCONY_APPROACHING_VIEW
+        sourceEncounterId: EVT_F03_BALCONY
+        sourceChoiceId: CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW
+        seedKey: SEED_TEMP_CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW
+        sourceHash: sha256:temporary-effect
+        floor: 3
+        enemyRefs:
+        - ENEMY_SKELETON_01
+        npcStage: S3_FRACTURE
+        onVictoryEffects:
+        - kind: AddItem
+          amount: 0
+          flag:
+          value: 0
+          itemRef: RELIC_LINE_01
+          count: 1
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey: CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW_COMBAT_VICTORY
+        defeatTextKey: CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW_COMBAT_DEFEAT
+        deathTextKey: CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW_COMBAT_DEATH
+        npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW_COMBAT
+        promptHash:
+        cacheKey:
+    - kind: ModifyHp
+      amount: -5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_LINE_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW
@@ -98,7 +528,85 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_FACE_IT_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: StartCombat
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId: TEMP_COMBAT_EVT_F03_BALCONY_FACE_IT
+        sourceEncounterId: EVT_F03_BALCONY
+        sourceChoiceId: CHOICE_EVT_F03_BALCONY_FACE_IT
+        seedKey: SEED_TEMP_CHOICE_EVT_F03_BALCONY_FACE_IT
+        sourceHash: sha256:temporary-effect
+        floor: 3
+        enemyRefs:
+        - ENEMY_SKELETON_01
+        npcStage: S3_FRACTURE
+        onVictoryEffects:
+        - kind: AddItem
+          amount: 0
+          flag:
+          value: 0
+          itemRef: RELIC_GENERIC_01
+          count: 1
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey: CHOICE_EVT_F03_BALCONY_FACE_IT_COMBAT_VICTORY
+        defeatTextKey: CHOICE_EVT_F03_BALCONY_FACE_IT_COMBAT_DEFEAT
+        deathTextKey: CHOICE_EVT_F03_BALCONY_FACE_IT_COMBAT_DEATH
+        npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_FACE_IT_COMBAT
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_GENERIC_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_FACE_IT
@@ -106,7 +614,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_WITHDRAW_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: -5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_WITHDRAW
@@ -114,7 +654,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F03_BALCONY_RETURN_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F03_BALCONY_RETURN

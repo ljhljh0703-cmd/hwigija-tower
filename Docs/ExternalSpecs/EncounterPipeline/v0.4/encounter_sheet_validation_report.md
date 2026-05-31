@@ -8,8 +8,9 @@
 - duplicate eventStableId: none
 - duplicate choiceStableId: none
 - missing stableId: none
-- unsupported effect/requirement syntax: none present; all DTO columns are blank
-- unknown item/ability/enemy/reward/memory refs: none present; all ref columns are blank
+- unsupported effect/requirement syntax in source sheet: none present; source DTO columns are blank
+- temporary runtime effects: assigned after source normalization; see `temporary_effect_assignment_report_v0.4.md`
+- temporary item/ability/enemy/reward/memory refs: all resolve against current repo data; see `temporary_effect_homework.csv` for replacement work
 - local structural problems: 0
 
 ## Unsupported / Author Review Markers
