@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F02_BANDIT_DEN
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F02_BANDIT_DEN
+  type: 6
+  floor: 2
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F02_BANDIT_DEN
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F02_BANDIT_DEN.asset
+  sourceHash: sha256:b3a35c93ba166ab0f4c901be03e32a05935a30f0f254ad27796f1a04b589a9cf
+  contentCategory: GeneralEncounter
+  npcStage: S2_COMPANION
+  bodyTextKey: EVT_F02_BANDIT_DEN_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_89
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_90
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_91
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_92
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_93
+  - CHOICE_EVT_F02_BANDIT_DEN_ATTACK
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_95
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_96
+  - CHOICE_EVT_F02_BANDIT_DEN_ACTION_97
+  choices:
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_89
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_89_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_89
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_90
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_90_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_90
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_91
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_91_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_91
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_92
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_92_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_92
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_93
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_93_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_93
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ATTACK
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ATTACK_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ATTACK
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_95
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_95_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_95
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_96
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_96_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_96
+  - stableId: CHOICE_EVT_F02_BANDIT_DEN_ACTION_97
+    textKey: CHOICE_EVT_F02_BANDIT_DEN_ACTION_97_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_BANDIT_DEN_ACTION_97

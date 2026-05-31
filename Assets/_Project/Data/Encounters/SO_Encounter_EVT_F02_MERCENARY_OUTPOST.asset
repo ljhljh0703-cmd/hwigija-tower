@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F02_MERCENARY_OUTPOST
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F02_MERCENARY_OUTPOST
+  type: 6
+  floor: 2
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F02_MERCENARY_OUTPOST
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F02_MERCENARY_OUTPOST.asset
+  sourceHash: sha256:d1fbb8816065462fc1af23b9c72cd51358961b97fff8146d11746de59bf02c09
+  contentCategory: GeneralEncounter
+  npcStage: S2_COMPANION
+  bodyTextKey: EVT_F02_MERCENARY_OUTPOST_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_LEADER
+  - CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_MERCENARIES
+  - CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_ADVICE
+  - CHOICE_EVT_F02_MERCENARY_OUTPOST_SMALL_TALK
+  - CHOICE_EVT_F02_MERCENARY_OUTPOST_ACTION_87
+  choices:
+  - stableId: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_LEADER
+    textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_LEADER_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_LEADER
+  - stableId: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_MERCENARIES
+    textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_MERCENARIES_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_MERCENARIES
+  - stableId: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_ADVICE
+    textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_ADVICE_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_ADVICE
+  - stableId: CHOICE_EVT_F02_MERCENARY_OUTPOST_SMALL_TALK
+    textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_SMALL_TALK_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_SMALL_TALK
+  - stableId: CHOICE_EVT_F02_MERCENARY_OUTPOST_ACTION_87
+    textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ACTION_87_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ACTION_87

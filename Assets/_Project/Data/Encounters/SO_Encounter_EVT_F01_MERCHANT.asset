@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F01_MERCHANT
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F01_MERCHANT
+  type: 2
+  floor: 1
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F01_MERCHANT
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_MERCHANT.asset
+  sourceHash: sha256:50a80428b8623432ca4b62ae68ca64ed5b06be76d795b0a3de912e102ad042e7
+  contentCategory: Shop
+  npcStage: S1_AWARENESS
+  bodyTextKey: EVT_F01_MERCHANT_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F01_MERCHANT_USE_SHOP
+  - CHOICE_EVT_F01_MERCHANT_ACTION_43
+  - CHOICE_EVT_F01_MERCHANT_LEAVE_SHOP
+  choices:
+  - stableId: CHOICE_EVT_F01_MERCHANT_USE_SHOP
+    textKey: CHOICE_EVT_F01_MERCHANT_USE_SHOP_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_MERCHANT_USE_SHOP
+  - stableId: CHOICE_EVT_F01_MERCHANT_ACTION_43
+    textKey: CHOICE_EVT_F01_MERCHANT_ACTION_43_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_MERCHANT_ACTION_43
+  - stableId: CHOICE_EVT_F01_MERCHANT_LEAVE_SHOP
+    textKey: CHOICE_EVT_F01_MERCHANT_LEAVE_SHOP_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_MERCHANT_LEAVE_SHOP

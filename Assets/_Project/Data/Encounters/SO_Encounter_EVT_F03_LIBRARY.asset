@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F03_LIBRARY
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F03_LIBRARY
+  type: 6
+  floor: 3
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F03_LIBRARY
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F03_LIBRARY.asset
+  sourceHash: sha256:0c162a6e1cb568a3e095af8dd07e970c696856a6fb7124d97b354d64a07299ae
+  contentCategory: GeneralEncounter
+  npcStage: S3_FRACTURE
+  bodyTextKey: EVT_F03_LIBRARY_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F03_LIBRARY_ACTION_104
+  - CHOICE_EVT_F03_LIBRARY_ACTION_105
+  - CHOICE_EVT_F03_LIBRARY_ACTION_106
+  - CHOICE_EVT_F03_LIBRARY_ACTION_107
+  choices:
+  - stableId: CHOICE_EVT_F03_LIBRARY_ACTION_104
+    textKey: CHOICE_EVT_F03_LIBRARY_ACTION_104_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_LIBRARY_ACTION_104
+  - stableId: CHOICE_EVT_F03_LIBRARY_ACTION_105
+    textKey: CHOICE_EVT_F03_LIBRARY_ACTION_105_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_LIBRARY_ACTION_105
+  - stableId: CHOICE_EVT_F03_LIBRARY_ACTION_106
+    textKey: CHOICE_EVT_F03_LIBRARY_ACTION_106_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_LIBRARY_ACTION_106
+  - stableId: CHOICE_EVT_F03_LIBRARY_ACTION_107
+    textKey: CHOICE_EVT_F03_LIBRARY_ACTION_107_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_LIBRARY_ACTION_107

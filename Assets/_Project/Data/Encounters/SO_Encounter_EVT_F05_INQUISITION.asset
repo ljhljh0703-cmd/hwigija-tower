@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F05_INQUISITION
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F05_INQUISITION
+  type: 4
+  floor: 5
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F05_INQUISITION
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F05_INQUISITION.asset
+  sourceHash: sha256:a4ab3f9a68a421295f4e647d559d2e0e7f05d1e81a830c0b0bb0e285c5c1c2ed
+  contentCategory: MoralChoice
+  npcStage: S5_REST_OR_CONTINUE
+  bodyTextKey: EVT_F05_INQUISITION_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F05_INQUISITION_SILENCE
+  - CHOICE_EVT_F05_INQUISITION_WITHDRAW
+  - CHOICE_EVT_F05_INQUISITION_PERSUADE
+  choices:
+  - stableId: CHOICE_EVT_F05_INQUISITION_SILENCE
+    textKey: CHOICE_EVT_F05_INQUISITION_SILENCE_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F05_INQUISITION_SILENCE
+  - stableId: CHOICE_EVT_F05_INQUISITION_WITHDRAW
+    textKey: CHOICE_EVT_F05_INQUISITION_WITHDRAW_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F05_INQUISITION_WITHDRAW
+  - stableId: CHOICE_EVT_F05_INQUISITION_PERSUADE
+    textKey: CHOICE_EVT_F05_INQUISITION_PERSUADE_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F05_INQUISITION_PERSUADE

@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F04_HAUNTED_ARMORY
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F04_HAUNTED_ARMORY
+  type: 6
+  floor: 4
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F04_HAUNTED_ARMORY
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F04_HAUNTED_ARMORY.asset
+  sourceHash: sha256:12efba2fe381866919da6e9c614eb253a3b521be0cdeca1c0fe1e5cf97c7fce7
+  contentCategory: GeneralEncounter
+  npcStage: S4_COLLAPSE
+  bodyTextKey: EVT_F04_HAUNTED_ARMORY_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_117
+  - CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_118
+  - CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_119
+  - CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_120
+  - CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_121
+  - CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_122
+  choices:
+  - stableId: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_117
+    textKey: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_117_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_117
+  - stableId: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_118
+    textKey: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_118_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_118
+  - stableId: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_119
+    textKey: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_119_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_119
+  - stableId: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_120
+    textKey: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_120_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_120
+  - stableId: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_121
+    textKey: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_121_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_121
+  - stableId: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_122
+    textKey: CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_122_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F04_HAUNTED_ARMORY_ACTION_122

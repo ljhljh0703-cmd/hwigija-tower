@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F01_PRIEST
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F01_PRIEST
+  type: 4
+  floor: 1
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F01_PRIEST
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_PRIEST.asset
+  sourceHash: sha256:a7b1201836128007a5def5feba2eba9fc70c19ad2c12bbba7de5bb76868ac36c
+  contentCategory: MoralChoice
+  npcStage: S1_AWARENESS
+  bodyTextKey: EVT_F01_PRIEST_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F01_PRIEST_PRAY
+  - CHOICE_EVT_F01_PRIEST_ASK_TEACHING
+  - CHOICE_EVT_F01_PRIEST_ATTACK
+  choices:
+  - stableId: CHOICE_EVT_F01_PRIEST_PRAY
+    textKey: CHOICE_EVT_F01_PRIEST_PRAY_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_PRIEST_PRAY
+  - stableId: CHOICE_EVT_F01_PRIEST_ASK_TEACHING
+    textKey: CHOICE_EVT_F01_PRIEST_ASK_TEACHING_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_PRIEST_ASK_TEACHING
+  - stableId: CHOICE_EVT_F01_PRIEST_ATTACK
+    textKey: CHOICE_EVT_F01_PRIEST_ATTACK_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_PRIEST_ATTACK

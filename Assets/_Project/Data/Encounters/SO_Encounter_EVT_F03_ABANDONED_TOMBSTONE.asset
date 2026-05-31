@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F03_ABANDONED_TOMBSTONE
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F03_ABANDONED_TOMBSTONE
+  type: 6
+  floor: 3
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F03_ABANDONED_TOMBSTONE
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F03_ABANDONED_TOMBSTONE.asset
+  sourceHash: sha256:bea6a6b88f2a8a86aafb1fb4bb42370ff02ceddcc70bf69d23448ad988cce572
+  contentCategory: GeneralEncounter
+  npcStage: S3_FRACTURE
+  bodyTextKey: EVT_F03_ABANDONED_TOMBSTONE_BODY
+  writerStatus: sheet-normalized
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_99
+  - CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_100
+  - CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_101
+  choices:
+  - stableId: CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_99
+    textKey: CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_99_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_99
+  - stableId: CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_100
+    textKey: CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_100_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_100
+  - stableId: CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_101
+    textKey: CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_101_TEXT
+    requirementMode: All
+    requirements: []
+    effects: []
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F03_ABANDONED_TOMBSTONE_ACTION_101
