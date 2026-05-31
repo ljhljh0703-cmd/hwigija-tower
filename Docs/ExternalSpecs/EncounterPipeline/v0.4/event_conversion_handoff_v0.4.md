@@ -244,8 +244,8 @@
 ## DTO Status
 - requirement DTOs: none supplied in sheet.
 - effect DTOs: none supplied in sheet.
-- generated assets keep empty runtime effects to avoid inventing gameplay outcomes.
-- rows with NEEDS_REF / NEEDS_AUTHOR_VALUE remain author-review blockers for meaningful gameplay resolution.
+- temporary runtime effects have been assigned directly to generated assets for playable resolution.
+- rows with NEEDS_REF / NEEDS_AUTHOR_VALUE remain author-review blockers for final gameplay resolution.
 
 ## Runtime Wiring
 - GeneralEncounter and MoralChoice assets are added to `SO_Node_Event` candidate pool.
@@ -286,3 +286,9 @@
 - Assets/_Project/Art/Encounters/evt_f05_inquisition_bg.png: missing in repo worktree
 - Assets/_Project/Art/Encounters/evt_f05_full_preparation_bg.png: missing in repo worktree
 - Assets/_Project/Art/Encounters/evt_f01_cultist_funeral_bg.png: missing in repo worktree
+
+## Temporary Effects Added
+- Temporary effects were added after initial conversion so every choice can resolve in runtime.
+- See `temporary_effect_assignment_report_v0.4.md` for exact mappings.
+- See `temporary_effect_homework.csv` for author/designer replacement work.
+- See `implementation_session_brief_temporary_effects_v0.4.md` for the next implementation session instructions.

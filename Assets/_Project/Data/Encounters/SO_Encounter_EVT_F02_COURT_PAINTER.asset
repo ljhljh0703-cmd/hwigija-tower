@@ -23,7 +23,7 @@ MonoBehaviour:
   contentCategory: GeneralEncounter
   npcStage: S2_COMPANION
   bodyTextKey: EVT_F02_COURT_PAINTER_BODY
-  writerStatus: sheet-normalized
+  writerStatus: sheet-normalized-temp-effects
   glitchLevel: 0
   timeLimitSeconds: 0
   choiceStableIds:
@@ -36,7 +36,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_COURT_PAINTER_PORTRAIT_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_ARTS_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_PORTRAIT
@@ -44,7 +76,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_COURT_PAINTER_STILL_LIFE_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyHp
+      amount: 5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_STILL_LIFE
@@ -52,7 +116,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_COURT_PAINTER_LANDSCAPE_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: AddAbility
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef: ABILITY_ARTS_03
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_LANDSCAPE
@@ -60,7 +156,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_COURT_PAINTER_ACTION_39_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_ARTS_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_ACTION_39

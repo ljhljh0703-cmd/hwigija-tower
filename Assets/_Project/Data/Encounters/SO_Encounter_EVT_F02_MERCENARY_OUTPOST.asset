@@ -23,7 +23,7 @@ MonoBehaviour:
   contentCategory: GeneralEncounter
   npcStage: S2_COMPANION
   bodyTextKey: EVT_F02_MERCENARY_OUTPOST_BODY
-  writerStatus: sheet-normalized
+  writerStatus: sheet-normalized-temp-effects
   glitchLevel: 0
   timeLimitSeconds: 0
   choiceStableIds:
@@ -37,7 +37,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_LEADER_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_LEADER
@@ -45,7 +77,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_MERCENARIES_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_MERCENARIES
@@ -53,7 +117,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_ADVICE_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyAffinity
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ASK_ADVICE
@@ -61,7 +157,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_SMALL_TALK_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: 1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_SMALL_TALK
@@ -69,7 +197,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F02_MERCENARY_OUTPOST_ACTION_87_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyGold
+      amount: 6
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F02_MERCENARY_OUTPOST_ACTION_87

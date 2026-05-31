@@ -36,5 +36,5 @@
 ## Notes
 - I~Z values were generated from source A~H rows only; previously corrupted helper columns were ignored.
 - Text stays in the v0.4 sidecar/table. Runtime assets store text keys only.
-- Sheet DTO fields are currently empty for every choice, so generated EncounterData choices intentionally have empty effects.
+- Sheet DTO fields are currently empty for every choice. Temporary runtime effects were assigned later and are tracked in `temporary_effect_assignment_report_v0.4.md`.
 - Shop/Rest/CombatGate entries are generated as assets, but existing shop/rest/combat node wiring is not replaced because sheet choices do not yet contain runtime effects or refs.

@@ -23,7 +23,7 @@ MonoBehaviour:
   contentCategory: Shop
   npcStage: S4_COLLAPSE
   bodyTextKey: EVT_F04_MERCHANT_BODY
-  writerStatus: sheet-normalized
+  writerStatus: sheet-normalized-temp-effects
   glitchLevel: 0
   timeLimitSeconds: 0
   choiceStableIds:
@@ -36,7 +36,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F04_MERCHANT_USE_SHOP_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F04_MERCHANT_USE_SHOP
@@ -44,7 +76,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F04_MERCHANT_ACTION_55_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F04_MERCHANT_ACTION_55
@@ -52,7 +116,85 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F04_MERCHANT_ACTION_56_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: StartCombat
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId: TEMP_COMBAT_EVT_F04_MERCHANT_ACTION_56
+        sourceEncounterId: EVT_F04_MERCHANT
+        sourceChoiceId: CHOICE_EVT_F04_MERCHANT_ACTION_56
+        seedKey: SEED_TEMP_CHOICE_EVT_F04_MERCHANT_ACTION_56
+        sourceHash: sha256:temporary-effect
+        floor: 4
+        enemyRefs:
+        - ENEMY_STATUE_01
+        npcStage: S4_COLLAPSE
+        onVictoryEffects:
+        - kind: ModifyGold
+          amount: 12
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey: CHOICE_EVT_F04_MERCHANT_ACTION_56_COMBAT_VICTORY
+        defeatTextKey: CHOICE_EVT_F04_MERCHANT_ACTION_56_COMBAT_DEFEAT
+        deathTextKey: CHOICE_EVT_F04_MERCHANT_ACTION_56_COMBAT_DEATH
+        npcReactionKey: NPC_REACT_CHOICE_EVT_F04_MERCHANT_ACTION_56_COMBAT
+        promptHash:
+        cacheKey:
+    - kind: ModifyAffinity
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F04_MERCHANT_ACTION_56
@@ -60,7 +202,39 @@ MonoBehaviour:
     textKey: CHOICE_EVT_F04_MERCHANT_LEAVE_SHOP_TEXT
     requirementMode: All
     requirements: []
-    effects: []
+    effects:
+    - kind: ModifyMental
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
     unavailablePolicyMode: DisabledVisible
     unavailableReasonTextKey:
     npcReactionKey: NPC_REACT_CHOICE_EVT_F04_MERCHANT_LEAVE_SHOP
