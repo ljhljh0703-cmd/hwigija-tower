@@ -778,9 +778,7 @@ namespace HwigiTower.Tests.EditMode
         [Test]
         public void EncounterRuntimeResolver_MemoryUnlockUpdatesRunStateDeterministically()
         {
-            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
             var state = new PrototypeRunState("run-001", new GameFlowEventBus()) { AutoResolveCombat = true };
-            state.AttachEncounterCatalog(catalog);
             var encounter = CreateRuntimeEncounter(
                 "encounter.memory.catalog",
                 CreateChoice(
@@ -794,8 +792,82 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.AreEqual("choice.memory.unlock", first.PayloadId);
             Assert.IsTrue(state.HasMemoryFragmentRef("MEM_FRAGMENT_01"));
+            StringAssert.Contains(PrototypeRunState.MemoryFragmentPublicFeedback, first.Message);
+            StringAssert.DoesNotContain("MEM_FRAGMENT_01", first.Message);
             Assert.IsFalse(viewsAfterUnlock[0].Visible);
             Assert.IsTrue(second.Message.Contains("already resolved: choice.memory.unlock"));
+        }
+
+        [Test]
+        public void RewardCacheMemory_ResolvesWithoutShowingRawLabel()
+        {
+            var state = new PrototypeRunState("run-memory-consequence", new GameFlowEventBus()) { AutoResolveCombat = true };
+            var encounter = CreateRuntimeEncounter(
+                "encounter.memory.consequence",
+                CreateChoice(
+                    "choice.memory.consequence",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateRewardBundleEffect(PrototypeRunState.MemoryConsequenceRewardBundleRef) }));
+
+            var resolution = state.ResolveEncounterChoice("node.memory.consequence", encounter, "choice.memory.consequence");
+
+            StringAssert.Contains(PrototypeRunState.MemoryConsequenceFeedback, resolution.Message);
+            StringAssert.DoesNotContain(PrototypeRunState.MemoryConsequenceRewardBundleRef, resolution.Message);
+            Assert.IsTrue(state.HasMemoryConsequenceKey(PrototypeRunState.MemoryConsequenceRewardBundleRef));
+            Assert.IsFalse(state.HasRewardBundleRef(PrototypeRunState.MemoryConsequenceRewardBundleRef));
+            Assert.AreEqual(0, state.GetItemCount("ITEM_09"));
+        }
+
+        [Test]
+        public void MemoryConsequence_DoesNotAffectCombatStatsOrPolicy()
+        {
+            var withMemory = new PrototypeRunState("run-memory-policy", new GameFlowEventBus()) { AutoResolveCombat = false };
+            var withoutMemory = new PrototypeRunState("run-memory-policy", new GameFlowEventBus()) { AutoResolveCombat = false };
+            Assert.IsTrue(withMemory.RecordMemoryConsequenceKey(PrototypeRunState.MemoryConsequenceRewardBundleRef));
+
+            Assert.AreEqual(withoutMemory.PlayerAttack, withMemory.PlayerAttack);
+            Assert.AreEqual(withoutMemory.PlayerMaxHp, withMemory.PlayerMaxHp);
+            Assert.AreEqual(withoutMemory.MataiosActionPower, withMemory.MataiosActionPower);
+            Assert.AreEqual(withoutMemory.MataiosMaxHp, withMemory.MataiosMaxHp);
+
+            var encounter = CreateRuntimeEncounter(
+                "encounter.memory.policy",
+                CreateChoice(
+                    "choice.memory.policy",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateCombatEffect("COMBAT_MEMORY_POLICY", "ENEMY_EMPTY_ARMOR", new EncounterPostCombatEffectRuntimeData[0]) }));
+            withoutMemory.ResolveEncounterChoice(new DeterministicRunContext("run-memory-policy", 1001), "node.memory.policy", encounter, "choice.memory.policy");
+            withMemory.ResolveEncounterChoice(new DeterministicRunContext("run-memory-policy", 1001), "node.memory.policy", encounter, "choice.memory.policy");
+
+            withoutMemory.ResolveCombatRoundInteractive(CombatAction.Attack);
+            withMemory.ResolveCombatRoundInteractive(CombatAction.Attack);
+
+            Assert.AreEqual(withoutMemory.LastMataiosCombatAction, withMemory.LastMataiosCombatAction);
+            Assert.AreEqual(withoutMemory.LastMataiosCombatDamage, withMemory.LastMataiosCombatDamage);
+            Assert.AreEqual(withoutMemory.LastMataiosProtectReduction, withMemory.LastMataiosProtectReduction);
+        }
+
+        [Test]
+        public void ConcreteRewardsStillShowNormallyWithMemoryConsequence()
+        {
+            var state = new PrototypeRunState("run-memory-plus-gold", new GameFlowEventBus()) { AutoResolveCombat = true };
+            var encounter = CreateRuntimeEncounter(
+                "encounter.memory.plus.gold",
+                CreateChoice(
+                    "choice.memory.plus.gold",
+                    new EncounterRequirementRuntimeData[0],
+                    new[]
+                    {
+                        CreateEffect("ModifyGold", 5),
+                        CreateRewardBundleEffect(PrototypeRunState.MemoryConsequenceRewardBundleRef)
+                    }));
+
+            var resolution = state.ResolveEncounterChoice("node.memory.plus.gold", encounter, "choice.memory.plus.gold");
+
+            Assert.AreEqual(5, state.Gold);
+            StringAssert.Contains("Gold +5", resolution.Message);
+            StringAssert.Contains(PrototypeRunState.MemoryConsequenceFeedback, resolution.Message);
+            StringAssert.DoesNotContain(PrototypeRunState.MemoryConsequenceRewardBundleRef, resolution.Message);
         }
 
         [Test]
@@ -2291,7 +2363,7 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_SMALL", out var smallReward));
             Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_MEMORY", out var memoryReward));
             Assert.AreEqual("ITEM_01", smallReward.Entries[0].ItemRef);
-            Assert.AreEqual("ITEM_09", memoryReward.Entries[0].ItemRef);
+            Assert.AreEqual(0, memoryReward.Entries.Length);
         }
 
         [Test]

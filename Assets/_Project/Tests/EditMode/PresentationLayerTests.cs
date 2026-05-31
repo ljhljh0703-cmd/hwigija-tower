@@ -834,9 +834,9 @@ namespace HwigiTower.Tests.EditMode
 
             StringAssert.Contains("Gold -5", result.text);
             StringAssert.Contains("아이템 +1", result.text);
-            StringAssert.Contains("기억 +1", result.text);
-            Assert.AreEqual("Gold|Item|Memory", hud.CurrentResultSummaryLabels);
-            Assert.AreEqual("-5|+1|+1", hud.CurrentResultSummaryValues);
+            StringAssert.Contains("기억의 잔향을 얻었습니다.", result.text);
+            Assert.AreEqual("Gold|Item|기억의 잔향", hud.CurrentResultSummaryLabels);
+            Assert.AreEqual("-5|+1|획득", hud.CurrentResultSummaryValues);
             StringAssert.DoesNotContain("기억 파편", result.text);
             Assert.LessOrEqual(result.text.Split('\n').Length, 4);
             StringAssert.DoesNotContain("choice applied", result.text);

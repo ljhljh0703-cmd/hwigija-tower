@@ -348,9 +348,11 @@ namespace HwigiTower.Run
                 case "AddAbility":
                     return string.IsNullOrEmpty(effect.abilityRef) ? "Ability" : effect.abilityRef;
                 case "GrantRewardBundle":
-                    return string.IsNullOrEmpty(effect.rewardBundleRef) ? "Reward" : effect.rewardBundleRef;
+                    return PrototypeRunState.IsMemoryConsequenceRewardBundleRef(effect.rewardBundleRef)
+                        ? PrototypeRunState.MemoryConsequenceFeedback
+                        : string.IsNullOrEmpty(effect.rewardBundleRef) ? "Reward" : effect.rewardBundleRef;
                 case "UnlockMemoryFragment":
-                    return "기억의 잔향 해금";
+                    return "기억의 잔향";
                 case "StartCombat":
                     return "Combat start";
                 default:
@@ -539,11 +541,15 @@ namespace HwigiTower.Run
                     return abilityAdded;
                 case "GrantRewardBundle":
                     var rewardGranted = state.GrantRewardBundleRef(effect.rewardBundleRef);
-                    summary = rewardGranted ? "reward " + effect.rewardBundleRef : string.Empty;
+                    summary = rewardGranted
+                        ? PrototypeRunState.IsMemoryConsequenceRewardBundleRef(effect.rewardBundleRef)
+                            ? PrototypeRunState.MemoryConsequenceFeedback
+                            : "reward " + effect.rewardBundleRef
+                        : string.Empty;
                     return rewardGranted;
                 case "UnlockMemoryFragment":
                     var unlocked = state.UnlockMemoryFragmentRef(effect.memoryFragmentId);
-                    summary = unlocked ? "memory unlocked " + effect.memoryFragmentId : string.Empty;
+                    summary = unlocked ? PrototypeRunState.MemoryFragmentPublicFeedback : string.Empty;
                     return unlocked;
                 case "StartCombat":
                     var combat = state.ResolveCombatHandoff(context, nodeId, encounter, effect.combatHandoff, ApplyPostCombatEffects);
@@ -675,9 +681,11 @@ namespace HwigiTower.Run
                 case "AddAbility":
                     return "ability " + effect.abilityRef;
                 case "GrantRewardBundle":
-                    return "reward " + effect.rewardBundleRef;
+                    return PrototypeRunState.IsMemoryConsequenceRewardBundleRef(effect.rewardBundleRef)
+                        ? PrototypeRunState.MemoryConsequenceFeedback
+                        : "reward " + effect.rewardBundleRef;
                 case "UnlockMemoryFragment":
-                    return "memory unlocked " + effect.memoryFragmentId;
+                    return PrototypeRunState.MemoryFragmentPublicFeedback;
                 default:
                     return string.Empty;
             }
