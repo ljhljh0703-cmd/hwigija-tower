@@ -13,7 +13,7 @@ sourceRow,eventStableId,choiceStableId,label,sourceResultHint,temporaryEffects,h
 17,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_MURKY_VIEW,혼탁한 풍경, 20%확률 강화,AddAbility(ABILITY_SWORD_02),Replace temp value/ref with author-approved DTO and balance value
 18,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_OMINOUS_VIEW,불길한 풍경,20%확률 저주,ModifyHp(-5); ModifyMental(-2),Replace temp value/ref with author-approved DTO and balance value
 19,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_SUNNY_VIEW,화창한 풍경,20%확률 엔딩 분기점,ModifyHp(-5),Replace temp value/ref with author-approved DTO and balance value
-20,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_JUMP_INTO_SUNNY_VIEW, 화창한 풍경 속으로 뛰어든다.,게임 오버,ModifyHp(-999),Replace temp value/ref with author-approved DTO and balance value
+20,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_JUMP_INTO_SUNNY_VIEW, 화창한 풍경 속으로 뛰어든다.,게임 오버,TriggerGameOver,Replace temp value/ref with author-approved DTO and balance value
 21,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_BASK,볕을 쬔다.,"버프, 체력, 스태미나 회복",ModifyHp(8); ModifyMental(2); AddAbility(ABILITY_SWORD_01),Replace temp value/ref with author-approved DTO and balance value
 22,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_APPROACHING_VIEW,다가오는 풍경,"20%확률 유물 획득, 엘리트 전투 기회",StartCombat(ENEMY_SKELETON_01); ModifyHp(-5); AddItem(RELIC_LINE_01),Replace temp value/ref with author-approved DTO and balance value
 23,EVT_F03_BALCONY,CHOICE_EVT_F03_BALCONY_FACE_IT,마주한다.,"해당 층 엘리트 전투, 전투 후 유물 획득",StartCombat(ENEMY_SKELETON_01); AddItem(RELIC_GENERIC_01),Replace temp value/ref with author-approved DTO and balance value

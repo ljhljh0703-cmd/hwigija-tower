@@ -333,6 +333,8 @@ namespace HwigiTower.Run
             {
                 case "ModifyHp":
                     return FormatDelta("HP", effect.amount);
+                case "TriggerGameOver":
+                    return "실패";
                 case "ModifyMental":
                     return FormatDelta("Mental", effect.amount);
                 case "ModifyGold":
@@ -507,6 +509,10 @@ namespace HwigiTower.Run
                     state.ModifyPlayerHp(effect.amount);
                     summary = FormatDelta("HP", effect.amount);
                     return true;
+                case "TriggerGameOver":
+                    state.TriggerGameOver();
+                    summary = "run.failed";
+                    return true;
                 case "ModifyMental":
                     state.ModifyMental(effect.amount);
                     summary = FormatDelta("Mental", effect.amount);
@@ -589,6 +595,9 @@ namespace HwigiTower.Run
                 case "ModifyHp":
                     state.ModifyPlayerHp(effect.amount);
                     return true;
+                case "TriggerGameOver":
+                    state.TriggerGameOver();
+                    return true;
                 case "ModifyMental":
                     state.ModifyMental(effect.amount);
                     return true;
@@ -664,6 +673,8 @@ namespace HwigiTower.Run
             {
                 case "ModifyHp":
                     return FormatDelta("HP", effect.amount);
+                case "TriggerGameOver":
+                    return "실패";
                 case "ModifyMental":
                     return FormatDelta("Mental", effect.amount);
                 case "ModifyGold":

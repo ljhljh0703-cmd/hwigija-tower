@@ -7217,6 +7217,11 @@ namespace HwigiTower.UI
             AddOwnedItemLine(items, "ITEM_05", "독침");
             AddOwnedItemLine(items, "ITEM_09", "마모된 부적");
             AddOwnedItemLine(items, "ITEM_10", "피의 계약서");
+            AddOwnedItemLine(items, "RELIC_GENERIC_01", "회귀자의 낡은 코트");
+            AddOwnedItemLine(items, "RELIC_SWORD_01", "피묻은 칼날");
+            AddOwnedItemLine(items, "RELIC_LINE_01", "저격수의 망원경");
+            AddOwnedItemLine(items, "RELIC_ARTS_01", "원소 수정");
+            AddOwnedItemLine(items, "RELIC_GUARD_01", "강화 방패");
             return items.Count == 0 ? "보유 아이템 없음" : string.Join("\n", items);
         }
 
@@ -7806,6 +7811,7 @@ namespace HwigiTower.UI
             }
 
             return value
+                .Replace("TriggerGameOver", "실패", StringComparison.Ordinal)
                 .Replace("MoralChoice", "선택", StringComparison.Ordinal)
                 .Replace("도덕 선택", "선택", StringComparison.Ordinal)
                 .Replace("MemoryFragment", "기억의 잔향", StringComparison.Ordinal)
@@ -7824,6 +7830,11 @@ namespace HwigiTower.UI
                 .Replace("ITEM_04", PublicRefName("ITEM_04"), StringComparison.Ordinal)
                 .Replace("ITEM_05", PublicRefName("ITEM_05"), StringComparison.Ordinal)
                 .Replace("ITEM_09", PublicRefName("ITEM_09"), StringComparison.Ordinal)
+                .Replace("RELIC_GENERIC_01", PublicRefName("RELIC_GENERIC_01"), StringComparison.Ordinal)
+                .Replace("RELIC_SWORD_01", PublicRefName("RELIC_SWORD_01"), StringComparison.Ordinal)
+                .Replace("RELIC_LINE_01", PublicRefName("RELIC_LINE_01"), StringComparison.Ordinal)
+                .Replace("RELIC_ARTS_01", PublicRefName("RELIC_ARTS_01"), StringComparison.Ordinal)
+                .Replace("RELIC_GUARD_01", PublicRefName("RELIC_GUARD_01"), StringComparison.Ordinal)
                 .Replace("ABILITY_SCOUT", PublicRefName("ABILITY_SCOUT"), StringComparison.Ordinal)
                 .Replace("ABILITY_RECALL_ANCHOR", PublicRefName("ABILITY_RECALL_ANCHOR"), StringComparison.Ordinal)
                 .Replace("ABILITY_SWORD_01", PublicRefName("ABILITY_SWORD_01"), StringComparison.Ordinal)
@@ -7854,6 +7865,11 @@ namespace HwigiTower.UI
                 "ITEM_05" => "독침",
                 "ITEM_09" => "마모된 부적",
                 "ITEM_10" => "피의 계약서",
+                "RELIC_GENERIC_01" => "회귀자의 낡은 코트",
+                "RELIC_SWORD_01" => "피묻은 칼날",
+                "RELIC_LINE_01" => "저격수의 망원경",
+                "RELIC_ARTS_01" => "원소 수정",
+                "RELIC_GUARD_01" => "강화 방패",
                 "ABILITY_SCOUT" => "정찰",
                 "ABILITY_RECALL_ANCHOR" => "회상 닻",
                 "ABILITY_SWORD_01" => "예리한 감각",

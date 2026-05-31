@@ -19,6 +19,34 @@ namespace HwigiTower.Tests.EditMode
 {
     public sealed class RuntimeShellTests
     {
+        private static readonly string[] RelicItemRefs =
+        {
+            "RELIC_GENERIC_01",
+            "RELIC_SWORD_01",
+            "RELIC_LINE_01",
+            "RELIC_ARTS_01",
+            "RELIC_GUARD_01"
+        };
+
+        private static readonly string[] SmokeInventoryRefs =
+        {
+            "ITEM_01",
+            "ITEM_02",
+            "ITEM_03",
+            "ITEM_04",
+            "ITEM_05",
+            "ITEM_09",
+            "ITEM_10",
+            "ITEM_FIELD_BANDAGE",
+            "ITEM_LANTERN_OIL",
+            "ITEM_TORN_CHARM",
+            "RELIC_GENERIC_01",
+            "RELIC_SWORD_01",
+            "RELIC_LINE_01",
+            "RELIC_ARTS_01",
+            "RELIC_GUARD_01"
+        };
+
         [Test]
         public void EncounterSelector_ReplaysSameChoiceForSameRunAndNode()
         {
@@ -816,6 +844,107 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(state.HasMemoryConsequenceKey(PrototypeRunState.MemoryConsequenceRewardBundleRef));
             Assert.IsFalse(state.HasRewardBundleRef(PrototypeRunState.MemoryConsequenceRewardBundleRef));
             Assert.AreEqual(0, state.GetItemCount("ITEM_09"));
+        }
+
+        [Test]
+        public void TriggerGameOver_MarksRunFailedAndTerminalState()
+        {
+            var state = new PrototypeRunState("run-trigger-game-over", new GameFlowEventBus()) { AutoResolveCombat = true };
+            var encounter = CreateRuntimeEncounter(
+                "encounter.trigger.gameover",
+                CreateChoice(
+                    "choice.trigger.gameover",
+                    new EncounterRequirementRuntimeData[0],
+                    new[] { CreateTriggerGameOverEffect() }));
+
+            var resolution = state.ResolveEncounterChoice("node.trigger.gameover", encounter, "choice.trigger.gameover");
+
+            Assert.AreEqual("choice.trigger.gameover", resolution.PayloadId);
+            Assert.AreEqual(0, state.PlayerHp);
+            Assert.IsTrue(state.RunFailed);
+            Assert.IsTrue(state.RunCompleted);
+            Assert.IsTrue(state.RestartReady);
+            StringAssert.Contains("run.failed", resolution.Message);
+            StringAssert.DoesNotContain("TriggerGameOver", resolution.Message);
+        }
+
+        [Test]
+        public void BalconyJumpChoice_TriggersTerminalRunFailure()
+        {
+            var state = new PrototypeRunState("run-balcony-gameover", new GameFlowEventBus()) { AutoResolveCombat = true };
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_EVT_F03_BALCONY.asset");
+
+            var resolution = state.ResolveEncounterChoice(
+                new DeterministicRunContext("run-balcony-gameover", 1001),
+                "node.evt.f03.balcony",
+                encounter,
+                "CHOICE_EVT_F03_BALCONY_JUMP_INTO_SUNNY_VIEW");
+
+            Assert.AreEqual("CHOICE_EVT_F03_BALCONY_JUMP_INTO_SUNNY_VIEW", resolution.PayloadId);
+            Assert.AreEqual(0, state.PlayerHp);
+            Assert.IsTrue(state.RunFailed);
+            Assert.IsTrue(state.RunCompleted);
+            Assert.IsTrue(state.RestartReady);
+            StringAssert.Contains("run.failed", resolution.Message);
+            StringAssert.DoesNotContain("TriggerGameOver", resolution.Message);
+        }
+
+        [Test]
+        public void RuntimeCatalog_ResolvesRelicRefs()
+        {
+            var catalog = LoadRuntimeCatalog();
+
+            AssertRelicRefsResolve(catalog);
+        }
+
+        [Test]
+        public void CatalogBackedRelicAddItem_ChangesInventoryState()
+        {
+            var catalog = LoadRuntimeCatalog();
+            var state = new PrototypeRunState("run-relic-add-item", new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachEncounterCatalog(catalog);
+
+            foreach (var relicRef in RelicItemRefs)
+            {
+                var next = state.AddItemRef(relicRef, 1);
+                Assert.AreEqual(1, next, relicRef);
+                Assert.AreEqual(1, state.GetItemCount(relicRef), relicRef);
+            }
+        }
+
+        [Test]
+        public void EventSmoke_AllTemporaryEventChoicesResolveAndCatalogRefsPass()
+        {
+            var catalog = LoadRuntimeCatalog();
+            AssertRelicRefsResolve(catalog);
+            var paths = AssetDatabase.FindAssets("t:EncounterData", new[] { "Assets/_Project/Data/Encounters" })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(path => Path.GetFileName(path).StartsWith("SO_Encounter_EVT_", System.StringComparison.Ordinal))
+                .OrderBy(path => path)
+                .ToArray();
+            var choiceCount = 0;
+
+            foreach (var path in paths)
+            {
+                var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>(path);
+                Assert.IsNotNull(encounter, path);
+                foreach (var choice in encounter.Choices)
+                {
+                    choiceCount++;
+                    AssertChoiceCatalogRefsResolve(catalog, choice, path + "::" + choice.stableId);
+                    var state = CreateEventSmokeState(catalog, "run-event-smoke-" + choiceCount);
+                    var resolution = state.ResolveEncounterChoice(
+                        new DeterministicRunContext(state.RunId, 1001),
+                        "node.event.smoke." + choiceCount,
+                        encounter,
+                        choice.stableId);
+
+                    Assert.AreEqual(choice.stableId, resolution.PayloadId, path + "::" + choice.stableId + " => " + resolution.Message);
+                    StringAssert.DoesNotContain("TriggerGameOver", resolution.Message, path + "::" + choice.stableId);
+                }
+            }
+
+            Assert.AreEqual(138, choiceCount);
         }
 
         [Test]
@@ -2932,6 +3061,14 @@ namespace HwigiTower.Tests.EditMode
             };
         }
 
+        private static EncounterEffectRuntimeData CreateTriggerGameOverEffect()
+        {
+            return new EncounterEffectRuntimeData
+            {
+                kind = "TriggerGameOver"
+            };
+        }
+
         private static EncounterEffectRuntimeData CreateFlagEffect(string flag, bool value)
         {
             return new EncounterEffectRuntimeData
@@ -3128,6 +3265,152 @@ namespace HwigiTower.Tests.EditMode
             state.AttachEncounterCatalog(catalog);
             state.AttachFloorRunPaths(room.FloorRunPaths, room.DemoRunPath);
             return state;
+        }
+
+        private static EncounterRuntimeCatalogData LoadRuntimeCatalog()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>(EncounterRuntimeCatalogBuilder.CatalogPath);
+            Assert.IsNotNull(catalog, EncounterRuntimeCatalogBuilder.CatalogPath);
+            return catalog;
+        }
+
+        private static PrototypeRunState CreateEventSmokeState(EncounterRuntimeCatalogData catalog, string runId)
+        {
+            var state = new PrototypeRunState(runId, new GameFlowEventBus()) { AutoResolveCombat = true };
+            state.AttachEncounterCatalog(catalog);
+            state.ModifyGold(999);
+            foreach (var itemRef in SmokeInventoryRefs)
+            {
+                state.AddItemRef(itemRef, 1);
+            }
+
+            return state;
+        }
+
+        private static void AssertRelicRefsResolve(EncounterRuntimeCatalogData catalog)
+        {
+            foreach (var relicRef in RelicItemRefs)
+            {
+                Assert.IsTrue(catalog.TryGetItem(relicRef, out _), relicRef);
+            }
+        }
+
+        private static void AssertChoiceCatalogRefsResolve(EncounterRuntimeCatalogData catalog, EncounterChoiceRuntimeData choice, string context)
+        {
+            Assert.IsNotNull(choice, context);
+            if (choice.requirements != null)
+            {
+                foreach (var requirement in choice.requirements)
+                {
+                    AssertRequirementCatalogRefsResolve(catalog, requirement, context);
+                }
+            }
+
+            if (choice.effects != null)
+            {
+                foreach (var effect in choice.effects)
+                {
+                    AssertEffectCatalogRefsResolve(catalog, effect, context);
+                }
+            }
+        }
+
+        private static void AssertRequirementCatalogRefsResolve(EncounterRuntimeCatalogData catalog, EncounterRequirementRuntimeData requirement, string context)
+        {
+            if (requirement == null)
+            {
+                return;
+            }
+
+            switch (requirement.kind)
+            {
+                case "HasItem":
+                    Assert.IsTrue(catalog.TryGetItem(requirement.itemRef, out _), context + " itemRef=" + requirement.itemRef);
+                    break;
+                case "HasAbility":
+                    Assert.IsTrue(catalog.TryGetAbility(requirement.abilityRef, out _), context + " abilityRef=" + requirement.abilityRef);
+                    break;
+                case "MemoryFragmentLocked":
+                    Assert.IsTrue(catalog.TryGetMemoryFragment(requirement.memoryFragmentId, out _), context + " memoryFragmentId=" + requirement.memoryFragmentId);
+                    break;
+            }
+        }
+
+        private static void AssertEffectCatalogRefsResolve(EncounterRuntimeCatalogData catalog, EncounterEffectRuntimeData effect, string context)
+        {
+            if (effect == null)
+            {
+                return;
+            }
+
+            switch (effect.kind)
+            {
+                case "AddItem":
+                case "RemoveItem":
+                    Assert.IsTrue(catalog.TryGetItem(effect.itemRef, out _), context + " itemRef=" + effect.itemRef);
+                    break;
+                case "AddAbility":
+                    Assert.IsTrue(catalog.TryGetAbility(effect.abilityRef, out _), context + " abilityRef=" + effect.abilityRef);
+                    break;
+                case "GrantRewardBundle":
+                    Assert.IsTrue(catalog.TryGetRewardBundle(effect.rewardBundleRef, out _), context + " rewardBundleRef=" + effect.rewardBundleRef);
+                    break;
+                case "UnlockMemoryFragment":
+                    Assert.IsTrue(catalog.TryGetMemoryFragment(effect.memoryFragmentId, out _), context + " memoryFragmentId=" + effect.memoryFragmentId);
+                    break;
+                case "StartCombat":
+                    AssertCombatHandoffRefsResolve(catalog, effect.combatHandoff, context);
+                    break;
+            }
+        }
+
+        private static void AssertCombatHandoffRefsResolve(EncounterRuntimeCatalogData catalog, EncounterCombatHandoffRuntimeData handoff, string context)
+        {
+            if (handoff == null || handoff.enemyRefs == null)
+            {
+                return;
+            }
+
+            foreach (var enemyRef in handoff.enemyRefs)
+            {
+                Assert.IsTrue(catalog.TryGetEnemy(enemyRef, out _), context + " enemyRef=" + enemyRef);
+            }
+
+            AssertPostCombatEffectRefsResolve(catalog, handoff.onVictoryEffects, context + ".onVictoryEffects");
+            AssertPostCombatEffectRefsResolve(catalog, handoff.onDefeatEffects, context + ".onDefeatEffects");
+        }
+
+        private static void AssertPostCombatEffectRefsResolve(EncounterRuntimeCatalogData catalog, EncounterPostCombatEffectRuntimeData[] effects, string context)
+        {
+            if (effects == null)
+            {
+                return;
+            }
+
+            foreach (var effect in effects)
+            {
+                if (effect == null)
+                {
+                    continue;
+                }
+
+                switch (effect.kind)
+                {
+                    case "AddItem":
+                    case "RemoveItem":
+                        Assert.IsTrue(catalog.TryGetItem(effect.itemRef, out _), context + " itemRef=" + effect.itemRef);
+                        break;
+                    case "AddAbility":
+                        Assert.IsTrue(catalog.TryGetAbility(effect.abilityRef, out _), context + " abilityRef=" + effect.abilityRef);
+                        break;
+                    case "GrantRewardBundle":
+                        Assert.IsTrue(catalog.TryGetRewardBundle(effect.rewardBundleRef, out _), context + " rewardBundleRef=" + effect.rewardBundleRef);
+                        break;
+                    case "UnlockMemoryFragment":
+                        Assert.IsTrue(catalog.TryGetMemoryFragment(effect.memoryFragmentId, out _), context + " memoryFragmentId=" + effect.memoryFragmentId);
+                        break;
+                }
+            }
         }
 
         private static void ResolveFullRouteToFinalBoss(PrototypeRunState state)
