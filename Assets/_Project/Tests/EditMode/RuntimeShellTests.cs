@@ -1031,13 +1031,16 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void FloorTwoBossGate_BalanceSupportsThreeToSixTurnClear()
+        public void FloorTwoBossGate_BalanceSupportsFiveToSevenTurnClear()
         {
             var boss = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_BOSS_GATE_01.asset");
+            var normal = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_ENEMY_EMPTY_ARMOR.asset");
             Assert.IsNotNull(boss);
+            Assert.IsNotNull(normal);
             Assert.AreEqual("BOSS_GATE_01", boss.Id);
-            Assert.GreaterOrEqual(boss.Hp, 24);
-            Assert.LessOrEqual(boss.Hp, 32);
+            Assert.AreEqual(48, boss.Hp);
+            Assert.Greater(boss.Hp, normal.Hp);
+            Assert.AreEqual(12, normal.Hp);
             Assert.GreaterOrEqual(boss.Attack, 3);
             Assert.LessOrEqual(boss.Attack, 5);
             Assert.GreaterOrEqual(boss.GoldReward, 12);
@@ -1516,10 +1519,13 @@ namespace HwigiTower.Tests.EditMode
         public void FinalBoss_BossApexBalanceSupportsVerticalSliceClear()
         {
             var boss = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_BOSS_APEX_02.asset");
+            var normal = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/Data/Enemies/SO_Enemy_ENEMY_EMPTY_ARMOR.asset");
             Assert.IsNotNull(boss);
+            Assert.IsNotNull(normal);
             Assert.AreEqual("BOSS_APEX_02", boss.Id);
-            Assert.GreaterOrEqual(boss.Hp, 28);
-            Assert.LessOrEqual(boss.Hp, 36);
+            Assert.AreEqual(64, boss.Hp);
+            Assert.Greater(boss.Hp, normal.Hp);
+            Assert.AreEqual(12, normal.Hp);
             Assert.GreaterOrEqual(boss.Attack, 4);
             Assert.LessOrEqual(boss.Attack, 5);
             Assert.GreaterOrEqual(boss.GoldReward, 24);
@@ -1693,12 +1699,13 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void FinalBoss_PreparedPlayerWinsInThreeToSixMeaningfulTurns()
+        public void FinalBoss_PreparedPlayerWinsInSevenToTenMeaningfulTurns()
         {
-            var catalog = EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog;
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
             var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset");
             var node = CreateNode("node.final.boss.balance", encounter);
             var state = new PrototypeRunState("run-final-boss-balance", new GameFlowEventBus()) { AutoResolveCombat = false };
+            Assert.IsNotNull(catalog);
             state.AttachEncounterCatalog(catalog);
             state.AddItemRef("ITEM_FIELD_BANDAGE", 2);
             state.AddAbilityRef("ABILITY_SCOUT");
@@ -1712,7 +1719,7 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("recall ready", state.CreateSnapshot().LastCombatRoundResult);
 
             var turns = 0;
-            while (state.IsInCombat && turns < 6)
+            while (state.IsInCombat && turns < 10)
             {
                 state.ResolveCombatRoundInteractive(turns == 0 ? CombatAction.Skill : CombatAction.Attack);
                 turns++;
@@ -1721,8 +1728,8 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsFalse(state.IsInCombat);
             Assert.IsTrue(state.RunClear);
             Assert.IsTrue(state.EndingChoicePending);
-            Assert.GreaterOrEqual(turns, 3);
-            Assert.LessOrEqual(turns, 6);
+            Assert.GreaterOrEqual(turns, 7);
+            Assert.LessOrEqual(turns, 10);
         }
 
         [Test]
