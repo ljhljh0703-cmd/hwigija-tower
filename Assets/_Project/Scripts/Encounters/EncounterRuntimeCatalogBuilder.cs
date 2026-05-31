@@ -740,9 +740,17 @@ namespace HwigiTower.Encounters
             var serialized = new SerializedObject(rewardBundle);
             serialized.FindProperty("stableId").stringValue = stableId;
             var entries = serialized.FindProperty("entries");
+            if (stableId == "REWARD_CACHE_MEMORY")
+            {
+                entries.arraySize = 0;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(rewardBundle);
+                return;
+            }
+
             entries.arraySize = 1;
             var entry = entries.GetArrayElementAtIndex(0);
-            entry.FindPropertyRelative("itemRef").stringValue = stableId == "REWARD_CACHE_MEMORY" ? "ITEM_09" : "ITEM_01";
+            entry.FindPropertyRelative("itemRef").stringValue = "ITEM_01";
             entry.FindPropertyRelative("itemCount").intValue = 1;
             entry.FindPropertyRelative("abilityRef").stringValue = string.Empty;
             serialized.ApplyModifiedPropertiesWithoutUndo();

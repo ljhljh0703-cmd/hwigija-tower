@@ -6242,7 +6242,19 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("memory unlocked ", StringComparison.Ordinal))
             {
-                AppendResultSummaryEntry(entries, "Memory", "+1", "resource.memory", new Color(0.30f, 0.50f, 0.68f, 0.95f));
+                AppendResultSummaryEntry(entries, "기억의 잔향", "획득", "resource.memory", new Color(0.30f, 0.50f, 0.68f, 0.95f));
+                return;
+            }
+
+            if (token == PrototypeRunState.MemoryFragmentPublicFeedback)
+            {
+                AppendResultSummaryEntry(entries, "기억의 잔향", "획득", "resource.memory", new Color(0.30f, 0.50f, 0.68f, 0.95f));
+                return;
+            }
+
+            if (token == PrototypeRunState.MemoryConsequenceFeedback)
+            {
+                AppendResultSummaryEntry(entries, "기억", "기록", "resource.memory", new Color(0.30f, 0.50f, 0.68f, 0.95f));
                 return;
             }
 
@@ -6555,12 +6567,23 @@ namespace HwigiTower.UI
 
             if (token.StartsWith("reward ", StringComparison.Ordinal))
             {
+                if (token.Contains(PrototypeRunState.MemoryConsequenceRewardBundleRef, StringComparison.Ordinal))
+                {
+                    return PrototypeRunState.MemoryConsequenceFeedback;
+                }
+
                 return "보상: " + NormalizeRefDelta(token.Substring("reward ".Length).Trim());
             }
 
             if (token.StartsWith("memory unlocked ", StringComparison.Ordinal))
             {
-                return "기억 +1";
+                return PrototypeRunState.MemoryFragmentPublicFeedback;
+            }
+
+            if (token == PrototypeRunState.MemoryFragmentPublicFeedback ||
+                token == PrototypeRunState.MemoryConsequenceFeedback)
+            {
+                return token;
             }
 
             if (token.StartsWith("action ", StringComparison.Ordinal))
@@ -7435,7 +7458,8 @@ namespace HwigiTower.UI
                 return;
             }
 
-            if (message.Contains("memory unlocked"))
+            if (message.Contains("memory unlocked", StringComparison.Ordinal) ||
+                message.Contains(PrototypeRunState.MemoryFragmentPublicFeedback, StringComparison.Ordinal))
             {
                 TryPlayCutsceneOnce(
                     encounterStableId,
@@ -7782,6 +7806,14 @@ namespace HwigiTower.UI
             }
 
             return value
+                .Replace("MoralChoice", "선택", StringComparison.Ordinal)
+                .Replace("도덕 선택", "선택", StringComparison.Ordinal)
+                .Replace("MemoryFragment", "기억의 잔향", StringComparison.Ordinal)
+                .Replace("MEM_FRAGMENT_01", "기억의 잔향", StringComparison.Ordinal)
+                .Replace("MEM_FRAGMENT_02", "기억의 잔향", StringComparison.Ordinal)
+                .Replace("MEM_FRAGMENT_03", "기억의 잔향", StringComparison.Ordinal)
+                .Replace("MEM_FRAGMENT_04", "기억의 잔향", StringComparison.Ordinal)
+                .Replace("MEM_FRAGMENT_05", "기억의 잔향", StringComparison.Ordinal)
                 .Replace("ITEM_FIELD_BANDAGE", PublicRefName("ITEM_FIELD_BANDAGE"), StringComparison.Ordinal)
                 .Replace("ITEM_LANTERN_OIL", PublicRefName("ITEM_LANTERN_OIL"), StringComparison.Ordinal)
                 .Replace("ITEM_TORN_CHARM", PublicRefName("ITEM_TORN_CHARM"), StringComparison.Ordinal)
@@ -7830,7 +7862,12 @@ namespace HwigiTower.UI
                 "ABILITY_ARTS_03" => "번개 방출",
                 "ABILITY_GUARD_01" => "철벽의 태세",
                 "REWARD_CACHE_SMALL" => "작은 보급품",
-                "REWARD_CACHE_MEMORY" => "기억 보급품",
+                "REWARD_CACHE_MEMORY" => PrototypeRunState.MemoryConsequenceFeedback,
+                "MEM_FRAGMENT_01" => "기억의 잔향",
+                "MEM_FRAGMENT_02" => "기억의 잔향",
+                "MEM_FRAGMENT_03" => "기억의 잔향",
+                "MEM_FRAGMENT_04" => "기억의 잔향",
+                "MEM_FRAGMENT_05" => "기억의 잔향",
                 _ => LooksLikeInternalLabel(reference) || reference.Contains("_", StringComparison.Ordinal) ? "획득물" : reference
             };
         }

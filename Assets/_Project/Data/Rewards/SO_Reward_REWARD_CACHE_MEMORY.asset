@@ -13,7 +13,4 @@ MonoBehaviour:
   m_Name: SO_Reward_REWARD_CACHE_MEMORY
   m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Rewards.RewardBundleData
   stableId: REWARD_CACHE_MEMORY
-  entries:
-  - itemRef: ITEM_09
-    itemCount: 1
-    abilityRef:
+  entries: []

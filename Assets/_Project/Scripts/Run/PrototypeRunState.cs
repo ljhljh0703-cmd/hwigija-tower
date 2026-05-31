@@ -58,6 +58,9 @@ namespace HwigiTower.Run
         private const int LevelRewardSkillCooldownReductionValue = 1;
         private const int ScoutNextAttackBonusValue = 2;
         private const int ScoutDamageReductionValue = 2;
+        public const string MemoryConsequenceRewardBundleRef = "REWARD_CACHE_MEMORY";
+        public const string MemoryConsequenceFeedback = "마타이오스가 이 선택을 기억합니다.";
+        public const string MemoryFragmentPublicFeedback = "기억의 잔향을 얻었습니다.";
         public const int CommandSlotLimit = 5;
         public const string CommandAttackId = "command.attack";
         public const string CommandDefendId = "command.defend";
@@ -81,6 +84,7 @@ namespace HwigiTower.Run
         private readonly List<string> _equippedCommandIds = new List<string>(CommandSlotLimit);
         private readonly HashSet<string> _rewardBundleRefs = new HashSet<string>();
         private readonly HashSet<string> _memoryFragmentRefs = new HashSet<string>();
+        private readonly HashSet<string> _memoryConsequenceKeys = new HashSet<string>();
         private readonly Dictionary<string, string> _resolvedEncounterChoices = new Dictionary<string, string>();
         private readonly List<PrototypeDemoRunStep> _demoRunPath = new List<PrototypeDemoRunStep>();
         private readonly List<PrototypeFloorRunPath> _floorRunPaths = new List<PrototypeFloorRunPath>();
@@ -234,6 +238,7 @@ namespace HwigiTower.Run
         public IReadOnlyCollection<string> AbilityRefs => _abilityRefs;
         public IReadOnlyCollection<string> RewardBundleRefs => _rewardBundleRefs;
         public IReadOnlyCollection<string> MemoryFragmentRefs => _memoryFragmentRefs;
+        public IReadOnlyCollection<string> MemoryConsequenceKeys => _memoryConsequenceKeys;
         public string LastMemoryFragmentId => _lastMemoryFragmentId;
         public string LastMemoryFragmentTitleKey => _lastMemoryFragmentTitleKey;
         public string LastMemoryFragmentBodyKey => _lastMemoryFragmentBodyKey;
@@ -327,6 +332,7 @@ namespace HwigiTower.Run
                 pendingCommandEquipId = _pendingCommandEquipId,
                 rewardBundleRefs = ToArray(_rewardBundleRefs),
                 memoryFragmentRefs = ToArray(_memoryFragmentRefs),
+                memoryConsequenceKeys = ToArray(_memoryConsequenceKeys),
                 resolvedChoices = resolvedChoices.ToArray(),
                 resolvedDemoStepKeys = ToArray(_resolvedDemoSteps),
                 completedMapNodeIds = completedMapNodeIds.ToArray(),
@@ -395,6 +401,8 @@ namespace HwigiTower.Run
             AddRange(_rewardBundleRefs, data.rewardBundleRefs);
             _memoryFragmentRefs.Clear();
             AddRange(_memoryFragmentRefs, data.memoryFragmentRefs);
+            _memoryConsequenceKeys.Clear();
+            AddRange(_memoryConsequenceKeys, data.memoryConsequenceKeys);
             _lastMemoryFragmentId = data.memoryFragmentRefs != null && data.memoryFragmentRefs.Length > 0 ? data.memoryFragmentRefs[data.memoryFragmentRefs.Length - 1] : string.Empty;
             if (!string.IsNullOrEmpty(_lastMemoryFragmentId) && EncounterCatalog != null && EncounterCatalog.TryGetMemoryFragment(_lastMemoryFragmentId, out var memoryFragment))
             {
@@ -1000,7 +1008,17 @@ namespace HwigiTower.Run
 
         public bool GrantRewardBundleRef(string rewardBundleRef)
         {
-            if (string.IsNullOrEmpty(rewardBundleRef) || !_rewardBundleRefs.Add(rewardBundleRef))
+            if (string.IsNullOrEmpty(rewardBundleRef))
+            {
+                return false;
+            }
+
+            if (IsMemoryConsequenceRewardBundleRef(rewardBundleRef))
+            {
+                return RecordMemoryConsequenceKey(rewardBundleRef);
+            }
+
+            if (!_rewardBundleRefs.Add(rewardBundleRef))
             {
                 return false;
             }
@@ -1057,6 +1075,26 @@ namespace HwigiTower.Run
         public bool HasMemoryFragmentRef(string memoryFragmentRef)
         {
             return !string.IsNullOrEmpty(memoryFragmentRef) && _memoryFragmentRefs.Contains(memoryFragmentRef);
+        }
+
+        public bool RecordMemoryConsequenceKey(string consequenceKey)
+        {
+            if (string.IsNullOrEmpty(consequenceKey))
+            {
+                return false;
+            }
+
+            return _memoryConsequenceKeys.Add(consequenceKey);
+        }
+
+        public bool HasMemoryConsequenceKey(string consequenceKey)
+        {
+            return !string.IsNullOrEmpty(consequenceKey) && _memoryConsequenceKeys.Contains(consequenceKey);
+        }
+
+        public static bool IsMemoryConsequenceRewardBundleRef(string rewardBundleRef)
+        {
+            return rewardBundleRef == MemoryConsequenceRewardBundleRef;
         }
 
         public bool HasResolvedEncounterChoice(string nodeId, string encounterId)

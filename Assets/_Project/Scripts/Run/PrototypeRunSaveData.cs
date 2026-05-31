@@ -47,6 +47,7 @@ namespace HwigiTower.Run
         public string pendingCommandEquipId = string.Empty;
         public string[] rewardBundleRefs = Array.Empty<string>();
         public string[] memoryFragmentRefs = Array.Empty<string>();
+        public string[] memoryConsequenceKeys = Array.Empty<string>();
         public PrototypeRunSaveResolvedChoice[] resolvedChoices = Array.Empty<PrototypeRunSaveResolvedChoice>();
         public string[] resolvedDemoStepKeys = Array.Empty<string>();
         public string[] completedMapNodeIds = Array.Empty<string>();
