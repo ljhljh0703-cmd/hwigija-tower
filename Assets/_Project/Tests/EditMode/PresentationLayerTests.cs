@@ -150,7 +150,7 @@ namespace HwigiTower.Tests.EditMode
         public void Hud_RestActionCardLabelsStayPublicAndHideGlitch()
         {
             AssertRestActionCardLabel("rest.ask_mood", "대화", "마타이오스와 대화");
-            AssertRestActionCardLabel("rest.train", "훈련", "다음 전투 피해 +1");
+            AssertRestActionCardLabel("rest.train", "단련", "다음 전투 보너스");
             AssertRestActionCardLabel("rest.recover", "휴식", "HP 회복");
         }
 
@@ -317,8 +317,9 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(hud.LevelRewardPopupVisible);
             StringAssert.Contains("레벨 상승", hud.LevelRewardPopupMessage);
-            StringAssert.Contains("ATK +1", hud.LevelRewardPopupMessage);
-            StringAssert.Contains("Max HP +2", hud.LevelRewardPopupMessage);
+            StringAssert.Contains("공격력 +1", hud.LevelRewardPopupMessage);
+            StringAssert.Contains("최대 HP +4", hud.LevelRewardPopupMessage);
+            StringAssert.Contains("마타이오스 HP +3", hud.LevelRewardPopupMessage);
             StringAssert.Contains("Skill CD -1", hud.LevelRewardPopupMessage);
         }
 
@@ -573,14 +574,14 @@ namespace HwigiTower.Tests.EditMode
                 levelAttackBonus: 1,
                 levelMaxHpBonus: 2,
                 skillCooldownReduction: 1,
-                combatBuildSummary: "성장 Lv 2 XP 0/20 | ATK +1 | Max HP +2 | Skill CD -1\n정찰: 스킬 추가 공격 | 특성 없음");
+                combatBuildSummary: "성장 Lv 2 XP 0/20 | ATK +1 | Max HP +4 | Skill CD -1\n정찰: 다음 공격 강화 / 피해 감소 1회 | 특성 없음");
 
             hud.ShowRunState(snapshot);
 
             StringAssert.Contains("마타이오스 보호", hud.CombatMessage);
             StringAssert.Contains("성장", hud.CombatMessage);
             StringAssert.Contains("성장 ATK +1", hud.CombatPartyMessage);
-            StringAssert.Contains("성장 HP +2", hud.CombatPartyMessage);
+            StringAssert.Contains("성장 HP +4", hud.CombatPartyMessage);
         }
 
         [Test]
@@ -618,7 +619,7 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void Hud_DamagePresentationSeparatesPlayerAndMataios()
+        public void CombatPresentation_StillSeparatesPlayerAndMataiosDamage()
         {
             var hud = CreateHud(out _);
             var before = new PrototypeRunSnapshot(
@@ -888,14 +889,15 @@ namespace HwigiTower.Tests.EditMode
                 enemyHp: 14,
                 enemyMaxHp: 30,
                 combatRound: 2,
-                lastCombatRoundResult: "round 2 | action Attack | playerDamage 6 | enemyDamage 3");
+                lastCombatRoundResult: "round 2 | action Attack | playerDamage 6 | enemyDamage 3",
+                combatBuildSummary: "정찰: 다음 공격 강화 / 피해 감소 1회");
 
             hud.ShowRunState(snapshot);
 
             Assert.IsEmpty(hud.RouteMessage);
             StringAssert.Contains("선택 공격 | 적 피해 6", hud.CombatMessage);
             StringAssert.Contains("받은 피해 3", hud.CombatMessage);
-            StringAssert.Contains("정찰 기술: 추가 공격", hud.CombatMessage);
+            StringAssert.Contains("정찰: 다음 공격 강화", hud.CombatMessage);
             StringAssert.DoesNotContain("ENC_COMBAT_GATE_03", hud.RouteMessage);
         }
 

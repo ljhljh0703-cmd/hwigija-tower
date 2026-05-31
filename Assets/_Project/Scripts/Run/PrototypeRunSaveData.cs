@@ -23,8 +23,12 @@ namespace HwigiTower.Run
         public int pendingLevelRewardChoices;
         public int levelAttackBonus;
         public int levelMaxHpBonus;
+        public int mataiosActionPowerBonus;
+        public int mataiosMaxHpBonus;
         public int skillCooldownReduction;
         public string lastGrowthMessage = string.Empty;
+        public bool scoutAttackReady;
+        public bool scoutDamageReductionReady;
         public bool runCompleted;
         public bool runClear;
         public bool runFailed;
@@ -38,6 +42,9 @@ namespace HwigiTower.Run
         public string[] flags = Array.Empty<string>();
         public PrototypeRunSaveItemEntry[] items = Array.Empty<PrototypeRunSaveItemEntry>();
         public string[] abilityRefs = Array.Empty<string>();
+        public string[] ownedCommandIds = Array.Empty<string>();
+        public string[] equippedCommandIds = Array.Empty<string>();
+        public string pendingCommandEquipId = string.Empty;
         public string[] rewardBundleRefs = Array.Empty<string>();
         public string[] memoryFragmentRefs = Array.Empty<string>();
         public PrototypeRunSaveResolvedChoice[] resolvedChoices = Array.Empty<PrototypeRunSaveResolvedChoice>();

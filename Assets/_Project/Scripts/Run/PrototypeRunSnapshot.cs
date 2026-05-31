@@ -71,7 +71,15 @@ namespace HwigiTower.Run
             int levelMaxHpBonus = 0,
             int skillCooldownReduction = 0,
             string lastGrowthMessage = "",
-            string combatBuildSummary = "")
+            string combatBuildSummary = "",
+            int mataiosActionPowerBonus = 0,
+            int mataiosMaxHpBonus = 0,
+            bool scoutAttackReady = false,
+            bool scoutDamageReductionReady = false,
+            int commandSlotLimit = 5,
+            string[] ownedCommandIds = null,
+            string[] equippedCommandIds = null,
+            string pendingCommandEquipId = "")
         {
             RunId = runId ?? string.Empty;
             PlayerHp = playerHp;
@@ -94,6 +102,14 @@ namespace HwigiTower.Run
             SkillCooldownReduction = System.Math.Max(0, skillCooldownReduction);
             LastGrowthMessage = lastGrowthMessage ?? string.Empty;
             CombatBuildSummary = combatBuildSummary ?? string.Empty;
+            MataiosActionPowerBonus = System.Math.Max(0, mataiosActionPowerBonus);
+            MataiosMaxHpBonus = System.Math.Max(0, mataiosMaxHpBonus);
+            ScoutAttackReady = scoutAttackReady;
+            ScoutDamageReductionReady = scoutDamageReductionReady;
+            CommandSlotLimit = commandSlotLimit <= 0 ? 5 : commandSlotLimit;
+            OwnedCommandIds = ownedCommandIds ?? System.Array.Empty<string>();
+            EquippedCommandIds = equippedCommandIds ?? System.Array.Empty<string>();
+            PendingCommandEquipId = pendingCommandEquipId ?? string.Empty;
             RunCompleted = runCompleted;
             DemoStatus = demoStatus ?? string.Empty;
             NextDemoNodeId = nextDemoNodeId ?? string.Empty;
@@ -165,6 +181,15 @@ namespace HwigiTower.Run
         public int SkillCooldownReduction { get; }
         public string LastGrowthMessage { get; }
         public string CombatBuildSummary { get; }
+        public int MataiosActionPowerBonus { get; }
+        public int MataiosMaxHpBonus { get; }
+        public bool ScoutAttackReady { get; }
+        public bool ScoutDamageReductionReady { get; }
+        public int CommandSlotLimit { get; }
+        public string[] OwnedCommandIds { get; }
+        public string[] EquippedCommandIds { get; }
+        public string PendingCommandEquipId { get; }
+        public bool CommandReplacementPending => !string.IsNullOrEmpty(PendingCommandEquipId);
         public bool RunCompleted { get; }
         public string DemoStatus { get; }
         public string NextDemoNodeId { get; }
@@ -215,5 +240,23 @@ namespace HwigiTower.Run
         public bool LastMataiosDownEvent { get; }
         public bool HasFloorMap => FloorMapNodes.Length > 0;
         public bool HasSelectedMapNode => !string.IsNullOrEmpty(SelectedMapNodeId);
+
+        public bool IsCommandEquipped(string commandId)
+        {
+            if (string.IsNullOrEmpty(commandId) || EquippedCommandIds == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < EquippedCommandIds.Length; i++)
+            {
+                if (EquippedCommandIds[i] == commandId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
