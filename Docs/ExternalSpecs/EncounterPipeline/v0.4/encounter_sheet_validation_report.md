@@ -64,37 +64,6 @@
 | 1 | EVT_F01_CULTIST_FUNERAL | 사교도의 장례식 | GeneralEncounter | 14 | evt_f01_cultist_funeral_bg.png | 14 |
 
 ## Image Availability
-- available expected images: 1
-- missing expected images: 32
-- Assets/_Project/Art/Encounters/evt_f01_priest_bg.png
-- Assets/_Project/Art/Encounters/evt_f02_magic_anvil_bg.png
-- Assets/_Project/Art/Encounters/evt_f03_balcony_bg.png
-- Assets/_Project/Art/Encounters/evt_f01_treasure_bg.png
-- Assets/_Project/Art/Encounters/evt_f03_high_and_low_bg.png
-- Assets/_Project/Art/Encounters/evt_f02_court_painter_bg.png
-- Assets/_Project/Art/Encounters/evt_f01_merchant_bg.png
-- Assets/_Project/Art/Encounters/evt_f02_merchant_bg.png
-- Assets/_Project/Art/Encounters/evt_f03_merchant_bg.png
-- Assets/_Project/Art/Encounters/evt_f04_merchant_bg.png
-- Assets/_Project/Art/Encounters/evt_f01_rest_bg.png
-- Assets/_Project/Art/Encounters/evt_f01_gatekeeper_bg.png
-- Assets/_Project/Art/Encounters/evt_f01_resistance_line_bg.png
-- Assets/_Project/Art/Encounters/evt_f01_last_words_bg.png
-- Assets/_Project/Art/Encounters/evt_f02_garden_bg.png
-- Assets/_Project/Art/Encounters/evt_f02_mercenary_outpost_bg.png
-- Assets/_Project/Art/Encounters/evt_f02_bandit_den_bg.png
-- Assets/_Project/Art/Encounters/evt_f03_abandoned_tombstone_bg.png
-- Assets/_Project/Art/Encounters/evt_f03_library_bg.png
-- Assets/_Project/Art/Encounters/evt_f03_poltergeist_bg.png
-- Assets/_Project/Art/Encounters/evt_f04_sacrifice_bg.png
-- Assets/_Project/Art/Encounters/evt_f04_haunted_armory_bg.png
-- Assets/_Project/Art/Encounters/evt_f04_cult_leader_bg.png
-- Assets/_Project/Art/Encounters/evt_f04_forbidden_book_bg.png
-- Assets/_Project/Art/Encounters/evt_f04_ritual_altar_bg.png
-- Assets/_Project/Art/Encounters/evt_f04_life_creation_bg.png
-- Assets/_Project/Art/Encounters/evt_f05_oath_of_loyalty_bg.png
-- Assets/_Project/Art/Encounters/evt_f05_cradle_of_outer_gods_bg.png
-- Assets/_Project/Art/Encounters/evt_f05_ancient_seed_bg.png
-- Assets/_Project/Art/Encounters/evt_f05_inquisition_bg.png
-- Assets/_Project/Art/Encounters/evt_f05_full_preparation_bg.png
+- available expected images: 32
+- missing expected images: 1
 - Assets/_Project/Art/Encounters/evt_f01_cultist_funeral_bg.png
