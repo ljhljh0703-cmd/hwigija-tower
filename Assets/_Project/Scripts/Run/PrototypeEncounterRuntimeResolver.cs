@@ -81,6 +81,11 @@ namespace HwigiTower.Run
         private static CombatActionPreview BuildAttackPreview(PrototypeRunState state, string label)
         {
             var attack = state.ActiveCombatPlayer == null ? 0 : state.ActiveCombatPlayer.Attack;
+            if (state.ScoutAttackReady)
+            {
+                attack += state.ScoutNextAttackBonusForPreview;
+            }
+
             if (attack <= 0)
             {
                 return new CombatActionPreview(CombatAction.Attack, label, string.Empty, true);
@@ -104,13 +109,14 @@ namespace HwigiTower.Run
             return new CombatActionPreview(
                 CombatAction.Defend,
                 label,
-                "피해 감소 " + System.Math.Max(1, enemyAttack / 2),
+                "피해 감소 " + (System.Math.Max(1, enemyAttack / 2) + (state.ScoutDamageReductionReady ? state.ScoutDamageReductionForPreview : 0)),
                 true);
         }
 
         private static CombatActionPreview BuildSkillPreview(PrototypeRunState state, string label)
         {
-            if (state.Arts03CooldownRounds > 0)
+            var scoutEquipped = state.IsCommandEquipped(PrototypeRunState.CommandScoutId) && state.HasAbilityRef("ABILITY_SCOUT");
+            if (state.Arts03CooldownRounds > 0 && !scoutEquipped)
             {
                 return new CombatActionPreview(CombatAction.Skill, label, "CD " + state.Arts03CooldownRounds + "턴", false);
             }
@@ -123,6 +129,11 @@ namespace HwigiTower.Run
             var cooldownAfterUse = state.HasReadyArts03SkillForPreview
                 ? state.EffectiveSkillCooldownRounds()
                 : 0;
+            if (scoutEquipped && !state.HasReadyArts03SkillForPreview)
+            {
+                return new CombatActionPreview(CombatAction.Skill, "정찰", "다음 공격 강화 / 다음 피해 감소 1회", true);
+            }
+
             var preview = "사용 가능";
             var skillDamageBonus = state.GetSkillItemDamageBonusForPreview();
             if (skillDamageBonus > 0)

@@ -33,8 +33,8 @@ namespace HwigiTower.Run
     {
         private const int BasePlayerMaxHp = 24;
         private const int BasePlayerAttack = 5;
-        private const int MataiosMaxHpValue = 16;
-        private const int MataiosActionPowerValue = 3;
+        private const int MataiosBaseMaxHpValue = 16;
+        private const int MataiosBaseActionPowerValue = 3;
         private const int MataiosProtectDamageReduction = 2;
         private const int MataiosCounterAssistDamage = 2;
         private const int MataiosCollapseDelta = 5;
@@ -51,14 +51,23 @@ namespace HwigiTower.Run
         private const int MaxAffinity = 100;
         private const int PrototypeShopAbilityCost = 10;
         private const int CombatXpToLevelValue = 20;
-        private const int LevelRewardAttackBonusValue = 1;
-        private const int LevelRewardMaxHpBonusValue = 2;
+        private const int AttackTrainingPlayerAttackBonusValue = 1;
+        private const int AttackTrainingMataiosPowerBonusValue = 1;
+        private const int SurvivalTrainingPlayerMaxHpBonusValue = 4;
+        private const int SurvivalTrainingMataiosMaxHpBonusValue = 3;
         private const int LevelRewardSkillCooldownReductionValue = 1;
+        private const int ScoutNextAttackBonusValue = 2;
+        private const int ScoutDamageReductionValue = 2;
+        public const int CommandSlotLimit = 5;
+        public const string CommandAttackId = "command.attack";
+        public const string CommandDefendId = "command.defend";
+        public const string CommandScoutId = "command.skill.scout";
+        public const string CommandArts03Id = "command.skill.arts_03";
         private const int GenericHeavyPressureAttackThreshold = 4;
         private const int GenericHeavyPressureDamage = 1;
         private const int GenericSkillOpeningDamageBonus = 2;
-        public const string LevelRewardAttackId = "level_reward.attack_plus_1";
-        public const string LevelRewardMaxHpId = "level_reward.max_hp_plus_2";
+        public const string LevelRewardAttackId = "level_reward.attack_training";
+        public const string LevelRewardMaxHpId = "level_reward.survival_training";
         public const string LevelRewardSkillCooldownId = "level_reward.skill_cooldown_minus_1";
 
         private readonly GameFlowEventBus _eventBus;
@@ -68,6 +77,8 @@ namespace HwigiTower.Run
         private readonly HashSet<string> _flags = new HashSet<string>();
         private readonly Dictionary<string, int> _items = new Dictionary<string, int>();
         private readonly HashSet<string> _abilityRefs = new HashSet<string>();
+        private readonly HashSet<string> _ownedCommandIds = new HashSet<string>();
+        private readonly List<string> _equippedCommandIds = new List<string>(CommandSlotLimit);
         private readonly HashSet<string> _rewardBundleRefs = new HashSet<string>();
         private readonly HashSet<string> _memoryFragmentRefs = new HashSet<string>();
         private readonly Dictionary<string, string> _resolvedEncounterChoices = new Dictionary<string, string>();
@@ -87,7 +98,7 @@ namespace HwigiTower.Run
         private int _playerHp = BasePlayerMaxHp;
         private int _playerMaxHp = BasePlayerMaxHp;
         private int _playerAttack = BasePlayerAttack;
-        private int _mataiosHp = MataiosMaxHpValue;
+        private int _mataiosHp = MataiosBaseMaxHpValue;
         private bool _mataiosDown;
         private int _mental;
         private int _gold;
@@ -98,8 +109,13 @@ namespace HwigiTower.Run
         private int _pendingLevelRewardChoices;
         private int _levelAttackBonus;
         private int _levelMaxHpBonus;
+        private int _mataiosActionPowerBonus;
+        private int _mataiosMaxHpBonus;
         private int _skillCooldownReduction;
         private string _lastGrowthMessage = string.Empty;
+        private bool _scoutAttackReady;
+        private bool _scoutDamageReductionReady;
+        private string _pendingCommandEquipId = string.Empty;
         private int _currentFloor = 1;
         private string _lastMemoryFragmentId = string.Empty;
         private string _lastMemoryFragmentTitleKey = string.Empty;
@@ -154,6 +170,7 @@ namespace HwigiTower.Run
             _reflectionPipeline = new ReflectionPipeline(MemoryRepo, LLMProvider, eventBus);
             _synergyDetector = new SynergyDetector(eventBus, RunId);
             Abilities = new AbilityInventory(eventBus, RunId);
+            InitializeDefaultCommands();
         }
 
         public string RunId { get; }
@@ -185,8 +202,8 @@ namespace HwigiTower.Run
         public int PlayerMaxHp => _playerMaxHp;
         public int PlayerAttack => _playerAttack;
         public int MataiosHp => IsInCombat && _activeCombatMataios != null ? _activeCombatMataios.Hp : _mataiosHp;
-        public int MataiosMaxHp => MataiosMaxHpValue;
-        public int MataiosActionPower => MataiosActionPowerValue;
+        public int MataiosMaxHp => MataiosBaseMaxHpValue + _mataiosMaxHpBonus;
+        public int MataiosActionPower => MataiosBaseActionPowerValue + _mataiosActionPowerBonus;
         public bool MataiosDown => IsInCombat && _activeCombatMataios != null ? _activeCombatMataios.IsDefeated : _mataiosDown;
         public bool MataiosTargetable => !MataiosDown;
         public string LastMataiosCombatAction => _lastMataiosCombatAction;
@@ -204,8 +221,16 @@ namespace HwigiTower.Run
         public int PendingLevelRewardChoices => _pendingLevelRewardChoices;
         public int LevelAttackBonus => _levelAttackBonus;
         public int LevelMaxHpBonus => _levelMaxHpBonus;
+        public int MataiosActionPowerBonus => _mataiosActionPowerBonus;
+        public int MataiosMaxHpBonus => _mataiosMaxHpBonus;
         public int SkillCooldownReduction => _skillCooldownReduction;
         public string LastGrowthMessage => _lastGrowthMessage;
+        public bool ScoutAttackReady => _scoutAttackReady;
+        public bool ScoutDamageReductionReady => _scoutDamageReductionReady;
+        public IReadOnlyCollection<string> OwnedCommandIds => _ownedCommandIds;
+        public IReadOnlyList<string> EquippedCommandIds => _equippedCommandIds;
+        public string PendingCommandEquipId => _pendingCommandEquipId;
+        public bool CommandReplacementPending => !string.IsNullOrEmpty(_pendingCommandEquipId);
         public IReadOnlyCollection<string> AbilityRefs => _abilityRefs;
         public IReadOnlyCollection<string> RewardBundleRefs => _rewardBundleRefs;
         public IReadOnlyCollection<string> MemoryFragmentRefs => _memoryFragmentRefs;
@@ -278,8 +303,12 @@ namespace HwigiTower.Run
                 pendingLevelRewardChoices = _pendingLevelRewardChoices,
                 levelAttackBonus = _levelAttackBonus,
                 levelMaxHpBonus = _levelMaxHpBonus,
+                mataiosActionPowerBonus = _mataiosActionPowerBonus,
+                mataiosMaxHpBonus = _mataiosMaxHpBonus,
                 skillCooldownReduction = _skillCooldownReduction,
                 lastGrowthMessage = _lastGrowthMessage,
+                scoutAttackReady = _scoutAttackReady,
+                scoutDamageReductionReady = _scoutDamageReductionReady,
                 runCompleted = _runCompleted,
                 runClear = _runClear,
                 runFailed = _runFailed,
@@ -293,6 +322,9 @@ namespace HwigiTower.Run
                 flags = ToArray(_flags),
                 items = items.ToArray(),
                 abilityRefs = ToArray(_abilityRefs),
+                ownedCommandIds = ToArray(_ownedCommandIds),
+                equippedCommandIds = _equippedCommandIds.ToArray(),
+                pendingCommandEquipId = _pendingCommandEquipId,
                 rewardBundleRefs = ToArray(_rewardBundleRefs),
                 memoryFragmentRefs = ToArray(_memoryFragmentRefs),
                 resolvedChoices = resolvedChoices.ToArray(),
@@ -357,6 +389,8 @@ namespace HwigiTower.Run
                 }
             }
 
+            RestoreCommandLoadout(data.ownedCommandIds, data.equippedCommandIds, data.pendingCommandEquipId);
+
             _rewardBundleRefs.Clear();
             AddRange(_rewardBundleRefs, data.rewardBundleRefs);
             _memoryFragmentRefs.Clear();
@@ -405,8 +439,12 @@ namespace HwigiTower.Run
             _pendingLevelRewardChoices = data.pendingLevelRewardChoices < 0 ? 0 : data.pendingLevelRewardChoices;
             _levelAttackBonus = data.levelAttackBonus < 0 ? 0 : data.levelAttackBonus;
             _levelMaxHpBonus = data.levelMaxHpBonus < 0 ? 0 : data.levelMaxHpBonus;
+            _mataiosActionPowerBonus = data.mataiosActionPowerBonus < 0 ? 0 : data.mataiosActionPowerBonus;
+            _mataiosMaxHpBonus = data.mataiosMaxHpBonus < 0 ? 0 : data.mataiosMaxHpBonus;
             _skillCooldownReduction = data.skillCooldownReduction < 0 ? 0 : data.skillCooldownReduction;
             _lastGrowthMessage = data.lastGrowthMessage ?? string.Empty;
+            _scoutAttackReady = data.scoutAttackReady;
+            _scoutDamageReductionReady = data.scoutDamageReductionReady;
             _mental = Clamp(data.mental, MinMental, MaxMental);
             _gold = Clamp(data.gold, MinGold, MaxGold);
             _glitchLevel = Clamp(data.glitchLevel, MinGlitchLevel, MaxGlitchLevel);
@@ -420,7 +458,7 @@ namespace HwigiTower.Run
             RecalculatePlayerStats();
             _playerMaxHp = data.playerMaxHp <= 0 ? _playerMaxHp : data.playerMaxHp;
             _playerHp = Clamp(data.playerHp, 0, _playerMaxHp);
-            _mataiosHp = Clamp(data.mataiosHp <= 0 && !data.mataiosDown ? MataiosMaxHpValue : data.mataiosHp, 0, MataiosMaxHpValue);
+            _mataiosHp = Clamp(data.mataiosHp <= 0 && !data.mataiosDown ? MataiosMaxHp : data.mataiosHp, 0, MataiosMaxHp);
             _mataiosDown = data.mataiosDown || _mataiosHp <= 0;
             _lastCombatResultId = string.Empty;
             _lastCombatRoundResult = "loaded save";
@@ -580,7 +618,15 @@ namespace HwigiTower.Run
                 levelMaxHpBonus: _levelMaxHpBonus,
                 skillCooldownReduction: _skillCooldownReduction,
                 lastGrowthMessage: _lastGrowthMessage,
-                combatBuildSummary: BuildCombatBuildSummary());
+                combatBuildSummary: BuildCombatBuildSummary(),
+                mataiosActionPowerBonus: _mataiosActionPowerBonus,
+                mataiosMaxHpBonus: _mataiosMaxHpBonus,
+                scoutAttackReady: _scoutAttackReady,
+                scoutDamageReductionReady: _scoutDamageReductionReady,
+                commandSlotLimit: CommandSlotLimit,
+                ownedCommandIds: ToArray(_ownedCommandIds),
+                equippedCommandIds: _equippedCommandIds.ToArray(),
+                pendingCommandEquipId: _pendingCommandEquipId);
         }
 
         public string NextDemoNodeId
@@ -662,15 +708,19 @@ namespace HwigiTower.Run
 
             var normalized = rewardId ?? string.Empty;
             SyncPersistentPlayerHpFromCombat();
+            SyncPersistentMataiosHpFromCombat();
             switch (normalized)
             {
                 case LevelRewardAttackId:
-                    _levelAttackBonus += LevelRewardAttackBonusValue;
-                    _lastGrowthMessage = "ATK +" + LevelRewardAttackBonusValue;
+                    _levelAttackBonus += AttackTrainingPlayerAttackBonusValue;
+                    _mataiosActionPowerBonus += AttackTrainingMataiosPowerBonusValue;
+                    _lastGrowthMessage = "공격 단련: 공격력 +" + AttackTrainingPlayerAttackBonusValue + " / 마타이오스 지원 +" + AttackTrainingMataiosPowerBonusValue;
                     break;
                 case LevelRewardMaxHpId:
-                    _levelMaxHpBonus += LevelRewardMaxHpBonusValue;
-                    _lastGrowthMessage = "Max HP +" + LevelRewardMaxHpBonusValue;
+                    _levelMaxHpBonus += SurvivalTrainingPlayerMaxHpBonusValue;
+                    _mataiosMaxHpBonus += SurvivalTrainingMataiosMaxHpBonusValue;
+                    _mataiosHp = Clamp(_mataiosHp + SurvivalTrainingMataiosMaxHpBonusValue, 0, MataiosMaxHp);
+                    _lastGrowthMessage = "생존 단련: 최대 HP +" + SurvivalTrainingPlayerMaxHpBonusValue + " / 마타이오스 HP +" + SurvivalTrainingMataiosMaxHpBonusValue;
                     break;
                 case LevelRewardSkillCooldownId:
                     _skillCooldownReduction += LevelRewardSkillCooldownReductionValue;
@@ -684,6 +734,7 @@ namespace HwigiTower.Run
             _pendingLevelRewardChoices--;
             RecalculatePlayerStats();
             SyncActiveCombatPlayerStats();
+            SyncActiveCombatMataiosStats();
             return true;
         }
 
@@ -763,8 +814,170 @@ namespace HwigiTower.Run
             }
 
             EvaluateCatalogSynergies();
+            GrantCommandForAbility(abilityRef);
             RecalculatePlayerStats();
             return true;
+        }
+
+        public bool AddOwnedCommand(string commandId)
+        {
+            if (string.IsNullOrEmpty(commandId))
+            {
+                return false;
+            }
+
+            var added = _ownedCommandIds.Add(commandId);
+            if (!_equippedCommandIds.Contains(commandId))
+            {
+                if (_equippedCommandIds.Count < CommandSlotLimit)
+                {
+                    _equippedCommandIds.Add(commandId);
+                }
+                else if (added || string.IsNullOrEmpty(_pendingCommandEquipId))
+                {
+                    _pendingCommandEquipId = commandId;
+                }
+            }
+
+            return added;
+        }
+
+        public bool TryReplacePendingCommand(string equippedCommandId)
+        {
+            if (string.IsNullOrEmpty(_pendingCommandEquipId) || string.IsNullOrEmpty(equippedCommandId))
+            {
+                return false;
+            }
+
+            var index = _equippedCommandIds.IndexOf(equippedCommandId);
+            if (index < 0 || !CanUnequipCommand(equippedCommandId, _pendingCommandEquipId))
+            {
+                return false;
+            }
+
+            _equippedCommandIds[index] = _pendingCommandEquipId;
+            _pendingCommandEquipId = string.Empty;
+            return true;
+        }
+
+        public bool TryUnequipCommand(string commandId)
+        {
+            var index = _equippedCommandIds.IndexOf(commandId);
+            if (index < 0 || !CanUnequipCommand(commandId, string.Empty))
+            {
+                return false;
+            }
+
+            _equippedCommandIds.RemoveAt(index);
+            return true;
+        }
+
+        public void CancelCommandReplacement()
+        {
+            _pendingCommandEquipId = string.Empty;
+        }
+
+        public bool IsCommandEquipped(string commandId)
+        {
+            return !string.IsNullOrEmpty(commandId) && _equippedCommandIds.Contains(commandId);
+        }
+
+        public bool HasEquippedSkillCommand()
+        {
+            for (var i = 0; i < _equippedCommandIds.Count; i++)
+            {
+                if (IsSkillCommand(_equippedCommandIds[i]) && IsCommandUsable(_equippedCommandIds[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool IsCommandUsable(string commandId)
+        {
+            switch (commandId)
+            {
+                case CommandAttackId:
+                case CommandDefendId:
+                    return true;
+                case CommandScoutId:
+                    return HasAbilityRef("ABILITY_SCOUT");
+                case CommandArts03Id:
+                    return HasReadyArts03Skill();
+                default:
+                    return _ownedCommandIds.Contains(commandId);
+            }
+        }
+
+        private void GrantCommandForAbility(string abilityRef)
+        {
+            switch (abilityRef)
+            {
+                case "ABILITY_SCOUT":
+                    AddOwnedCommand(CommandScoutId);
+                    break;
+                case "ABILITY_ARTS_03":
+                    AddOwnedCommand(CommandArts03Id);
+                    break;
+            }
+        }
+
+        private bool EquipCommand(string commandId)
+        {
+            if (string.IsNullOrEmpty(commandId) || !_ownedCommandIds.Contains(commandId) || _equippedCommandIds.Contains(commandId))
+            {
+                return false;
+            }
+
+            if (_equippedCommandIds.Count >= CommandSlotLimit)
+            {
+                _pendingCommandEquipId = commandId;
+                return false;
+            }
+
+            _equippedCommandIds.Add(commandId);
+            return true;
+        }
+
+        private bool CanUnequipCommand(string commandId, string replacementCommandId)
+        {
+            if (!IsOffensiveCommand(commandId))
+            {
+                return true;
+            }
+
+            if (IsOffensiveCommand(replacementCommandId))
+            {
+                return true;
+            }
+
+            return CountEquippedOffensiveCommands() > 1;
+        }
+
+        private int CountEquippedOffensiveCommands()
+        {
+            var count = 0;
+            for (var i = 0; i < _equippedCommandIds.Count; i++)
+            {
+                if (IsOffensiveCommand(_equippedCommandIds[i]))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private static bool IsSkillCommand(string commandId)
+        {
+            return commandId == CommandScoutId || commandId == CommandArts03Id || (!string.IsNullOrEmpty(commandId) && commandId.StartsWith("command.skill.", System.StringComparison.Ordinal));
+        }
+
+        private static bool IsOffensiveCommand(string commandId)
+        {
+            return commandId != CommandDefendId && !string.IsNullOrEmpty(commandId);
         }
 
         public bool HasAbilityRef(string abilityRef)
@@ -1432,6 +1645,8 @@ namespace HwigiTower.Run
         public int Arts03CooldownRounds => _arts03CooldownRounds;
         public bool HasAnyPlayableCombatSkill => HasPlayableSkill();
         public bool HasReadyArts03SkillForPreview => HasReadyArts03Skill();
+        public int ScoutNextAttackBonusForPreview => ScoutNextAttackBonusValue;
+        public int ScoutDamageReductionForPreview => ScoutDamageReductionValue;
 
         public float GetAbilityNumericParamForPreview(string abilityRef, string key)
         {
@@ -1497,14 +1712,15 @@ namespace HwigiTower.Run
             }
 
             var mataiosPolicy = ResolveMataiosPolicy(action);
-            var artsSkillUsed = action == CombatAction.Skill && HasReadyArts03Skill();
+            var artsSkillUsed = action == CombatAction.Skill && IsCommandEquipped(CommandArts03Id) && HasReadyArts03Skill();
+            var scoutSkillUsed = action == CombatAction.Skill && !artsSkillUsed && IsCommandEquipped(CommandScoutId) && HasAbilityRef("ABILITY_SCOUT");
             var skillItemDamage = action == CombatAction.Skill ? modifiers.SkillDamageBonus : 0;
-            var secondAction = action == CombatAction.Skill && !artsSkillUsed && HasAbilityRef("ABILITY_SCOUT")
-                ? (CombatAction?)CombatAction.Attack
-                : null;
+            var secondAction = (CombatAction?)null;
             var skillDamage = artsSkillUsed
                 ? (int?)((int)GetAbilityParam("ABILITY_ARTS_03", "skill.direct_damage") + skillItemDamage)
-                : null;
+                : scoutSkillUsed ? 0 : null;
+            var scoutAttackBonus = action == CombatAction.Attack && _scoutAttackReady ? ScoutNextAttackBonusValue : 0;
+            var scoutDamageReduction = _scoutDamageReductionReady ? ScoutDamageReductionValue : 0;
             var sword03 = PrepareSword03Attack(action);
             var genericSkillOpeningAvailable = IsGenericSkillOpeningAvailable();
             var frenzyActive = FindActiveSynergy("검") != null;
@@ -1515,12 +1731,25 @@ namespace HwigiTower.Run
                 action,
                 secondAction,
                 skillDamage,
-                sword03.DamageBonus + (action == CombatAction.Skill && !artsSkillUsed ? skillItemDamage : 0),
+                sword03.DamageBonus + scoutAttackBonus + (action == CombatAction.Skill && !artsSkillUsed && !scoutSkillUsed ? skillItemDamage : 0),
                 sword03.HpCost,
                 mataiosPolicy.EnemyDamage,
-                mataiosPolicy.PlayerDamageReduction);
+                mataiosPolicy.PlayerDamageReduction + scoutDamageReduction);
             _combatRound++;
             _mataiosTempoReady = !mataiosPolicy.Plan.ConsumesTempo && result.PlayerDamagePrevented > 0;
+            if (scoutAttackBonus > 0)
+            {
+                _scoutAttackReady = false;
+            }
+
+            var scoutMitigationApplied = scoutDamageReduction > 0 && result.EnemyDamage + result.PlayerDamagePrevented > 0
+                ? System.Math.Min(scoutDamageReduction, result.EnemyDamage + result.PlayerDamagePrevented)
+                : 0;
+            if (scoutDamageReduction > 0 && scoutMitigationApplied > 0)
+            {
+                _scoutDamageReductionReady = false;
+            }
+
             var itemStrikeDamage = ApplyAttackItemDamage(action, modifiers);
             var abilityStrikeDamage = sword03.DamageBonus + ApplySwordAttackEffects(action);
             var frenzyDamage = ApplyFrenzyAttackEffect(action);
@@ -1552,7 +1781,7 @@ namespace HwigiTower.Run
             _lastCombatComboDamage = result.ComboDamage;
             _lastMataiosCombatAction = mataiosPolicy.ActionId;
             _lastMataiosCombatDamage = result.AllyDamage;
-            _lastMataiosProtectReduction = result.PlayerDamagePrevented;
+            _lastMataiosProtectReduction = System.Math.Max(0, result.PlayerDamagePrevented - scoutMitigationApplied);
             _lastCombatRoundResult =
                 "round " + _combatRound +
                 " | action " + action +
@@ -1561,16 +1790,18 @@ namespace HwigiTower.Run
                 " | enemyHp " + enemyHpBefore + "->" + _activeCombatEnemy.Hp +
                 " | playerHp " + playerHpBefore + "->" + _activeCombatPlayer.Hp +
                 " | mataiosHp " + mataiosHpBefore + "->" + MataiosHp +
-                BuildMataiosRoundLog(mataiosPolicy, result) +
+                BuildMataiosRoundLog(mataiosPolicy, result.AllyDamage, _lastMataiosProtectReduction) +
                 (crackedJarBonus > 0 ? " | cracked jar +" + crackedJarBonus : string.Empty) +
                 (trainingBonus > 0 ? " | training +" + trainingBonus : string.Empty) +
+                (scoutAttackBonus > 0 ? " | scout attack +" + scoutAttackBonus : string.Empty) +
+                (scoutMitigationApplied > 0 ? " | scout guard " + scoutMitigationApplied : string.Empty) +
                 (result.ComboDamage > 0 ? " | combo " + result.ComboDamage : string.Empty) +
                 (poisonDamage > 0 ? " | poison " + poisonDamage : string.Empty) +
                 (itemStrikeDamage > 0 ? " | item strike " + itemStrikeDamage : string.Empty) +
                 (sword03.HpCost > 0 ? " | blood cost " + sword03.HpCost : string.Empty) +
                 (sword03.Overload ? " | blood overload" : string.Empty) +
                 (abilityStrikeDamage > 0 ? " | sword strike " + abilityStrikeDamage : string.Empty) +
-                (skillItemDamage > 0 ? " | oil skill +" + skillItemDamage : string.Empty) +
+                (skillItemDamage > 0 && !scoutSkillUsed ? " | oil skill +" + skillItemDamage : string.Empty) +
                 (frenzyDamage > 0 ? " | frenzy " + frenzyDamage : string.Empty) +
                 (frenzyActive && action == CombatAction.Attack ? " | frenzy ready" : string.Empty) +
                 (frenzyBreak ? " | frenzy break" : string.Empty) +
@@ -1582,7 +1813,16 @@ namespace HwigiTower.Run
 
             if (action == CombatAction.Skill)
             {
-                _lastCombatRoundResult += artsSkillUsed ? " | arts skill" : " | scout skill";
+                if (scoutSkillUsed)
+                {
+                    _scoutAttackReady = true;
+                    _scoutDamageReductionReady = true;
+                    _lastCombatRoundResult += " | scout skill | scout attack ready | scout guard ready";
+                }
+                else
+                {
+                    _lastCombatRoundResult += artsSkillUsed ? " | arts skill" : " | skill";
+                }
             }
 
             if (action == CombatAction.Defend)
@@ -1616,6 +1856,68 @@ namespace HwigiTower.Run
             return result;
         }
 
+        private void InitializeDefaultCommands()
+        {
+            _ownedCommandIds.Clear();
+            _equippedCommandIds.Clear();
+            _pendingCommandEquipId = string.Empty;
+            _ownedCommandIds.Add(CommandAttackId);
+            _ownedCommandIds.Add(CommandDefendId);
+            _equippedCommandIds.Add(CommandAttackId);
+            _equippedCommandIds.Add(CommandDefendId);
+        }
+
+        private void RestoreCommandLoadout(string[] ownedCommandIds, string[] equippedCommandIds, string pendingCommandEquipId)
+        {
+            InitializeDefaultCommands();
+            if (ownedCommandIds != null)
+            {
+                for (var i = 0; i < ownedCommandIds.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(ownedCommandIds[i]))
+                    {
+                        _ownedCommandIds.Add(ownedCommandIds[i]);
+                    }
+                }
+            }
+
+            SyncOwnedCommandsFromAbilities();
+            if (equippedCommandIds != null && equippedCommandIds.Length > 0)
+            {
+                _equippedCommandIds.Clear();
+                for (var i = 0; i < equippedCommandIds.Length && _equippedCommandIds.Count < CommandSlotLimit; i++)
+                {
+                    var commandId = equippedCommandIds[i];
+                    if (!string.IsNullOrEmpty(commandId) && _ownedCommandIds.Contains(commandId) && !_equippedCommandIds.Contains(commandId))
+                    {
+                        _equippedCommandIds.Add(commandId);
+                    }
+                }
+            }
+
+            if (CountEquippedOffensiveCommands() <= 0)
+            {
+                EquipCommand(CommandAttackId);
+            }
+
+            _pendingCommandEquipId = !string.IsNullOrEmpty(pendingCommandEquipId) && _ownedCommandIds.Contains(pendingCommandEquipId)
+                ? pendingCommandEquipId
+                : string.Empty;
+        }
+
+        private void SyncOwnedCommandsFromAbilities()
+        {
+            if (HasAbilityRef("ABILITY_SCOUT"))
+            {
+                AddOwnedCommand(CommandScoutId);
+            }
+
+            if (HasAbilityRef("ABILITY_ARTS_03"))
+            {
+                AddOwnedCommand(CommandArts03Id);
+            }
+        }
+
         public int ApplyMataiosCombatDamage(int amount)
         {
             var damage = System.Math.Max(0, amount);
@@ -1630,7 +1932,7 @@ namespace HwigiTower.Run
             }
             else
             {
-                _mataiosHp = Clamp(_mataiosHp - damage, 0, MataiosMaxHpValue);
+                _mataiosHp = Clamp(_mataiosHp - damage, 0, MataiosMaxHp);
             }
 
             ApplyMataiosDownIfNeeded();
@@ -1649,7 +1951,7 @@ namespace HwigiTower.Run
                 _activeCombatMataios == null ? 0 : _activeCombatMataios.MaxHp,
                 _activeCombatEnemy == null ? 0 : _activeCombatEnemy.Hp,
                 _activeCombatEnemy == null ? 0 : _activeCombatEnemy.MaxHp,
-                MataiosActionPowerValue,
+                MataiosActionPower,
                 false,
                 false,
                 HasPlayableSkill(),
@@ -1662,18 +1964,18 @@ namespace HwigiTower.Run
                 ResolveMataiosPlayerDamageReduction(plan));
         }
 
-        private static int ResolveMataiosEnemyDamage(MataiosActionPlan plan)
+        private int ResolveMataiosEnemyDamage(MataiosActionPlan plan)
         {
             switch (plan.PayloadKey)
             {
                 case MataiosCombatBrain.ActionFinishAttack:
                 case MataiosCombatBrain.ActionPressureAttack:
                 case MataiosCombatBrain.ActionTempoAttack:
-                    return MataiosActionPowerValue;
+                    return MataiosActionPower;
                 case MataiosCombatBrain.ActionCounterAssist:
                 case MataiosCombatBrain.ActionSkillSetupAssist:
                 case MataiosCombatBrain.ActionSupportAttack:
-                    return MataiosCounterAssistDamage;
+                    return MataiosCounterAssistDamage + _mataiosActionPowerBonus;
                 default:
                     return 0;
             }
@@ -1693,7 +1995,7 @@ namespace HwigiTower.Run
             }
         }
 
-        private static string BuildMataiosRoundLog(MataiosPolicyResolution policy, CombatRoundResult result)
+        private static string BuildMataiosRoundLog(MataiosPolicyResolution policy, int allyDamage, int playerDamagePrevented)
         {
             if (policy.IsNone)
             {
@@ -1701,8 +2003,8 @@ namespace HwigiTower.Run
             }
 
             return " | mataios " + policy.ActionId +
-                (result.AllyDamage > 0 ? " " + result.AllyDamage : string.Empty) +
-                (result.PlayerDamagePrevented > 0 ? " protect -" + result.PlayerDamagePrevented : string.Empty);
+                (allyDamage > 0 ? " " + allyDamage : string.Empty) +
+                (playerDamagePrevented > 0 ? " protect -" + playerDamagePrevented : string.Empty);
         }
 
         private void ApplyMataiosDownIfNeeded()
@@ -1794,8 +2096,8 @@ namespace HwigiTower.Run
             }
 
             var current = _activeCombatMataios?.Hp ?? _mataiosHp;
-            var restore = System.Math.Max(3, MataiosMaxHpValue / 4);
-            _mataiosHp = Clamp(current + restore, 0, MataiosMaxHpValue);
+            var restore = System.Math.Max(3, MataiosMaxHp / 4);
+            _mataiosHp = Clamp(current + restore, 0, MataiosMaxHp);
             _mataiosDown = _mataiosHp <= 0;
         }
 
@@ -1837,7 +2139,7 @@ namespace HwigiTower.Run
             var enemy = enemyData != null
                 ? CreateEnemyState(enemyData)
                 : new CombatantState(enemyId, FallbackEnemyHp, FallbackEnemyAttack);
-            var mataios = new CombatantState("mataios", MataiosMaxHpValue, MataiosActionPowerValue, _mataiosDown ? 0 : _mataiosHp);
+            var mataios = new CombatantState("mataios", MataiosMaxHp, MataiosActionPower, _mataiosDown ? 0 : _mataiosHp);
             var combat = new CombatController(context, string.IsNullOrEmpty(handoff.seedKey) ? combatId : handoff.seedKey);
 
             _lastCombatId = combatId;
@@ -1847,7 +2149,7 @@ namespace HwigiTower.Run
                 " | mataios " + mataios.Hp + "/" + mataios.MaxHp +
                 (combatStartRestore > 0 ? " | bandage " + combatStartRestore : string.Empty) +
                 (modifiers.PlayerMaxHpBonus > 0 ? " | maxHp +" + modifiers.PlayerMaxHpBonus : string.Empty) +
-                (HasAbilityRef("ABILITY_SCOUT") ? " | scout +" + modifiers.PlayerAttackBonus : string.Empty) +
+                (HasAbilityRef("ABILITY_SCOUT") ? " | scout setup" : string.Empty) +
                 (HasAbilityRef("ABILITY_RECALL_ANCHOR") && !HasFlag("FLAG_RECALL_ANCHOR_USED") ? " | recall ready" : string.Empty) +
                 (!string.IsNullOrEmpty(_lastGrowthMessage) ? " | growth " + _lastGrowthMessage : string.Empty);
             _combatRound = 0;
@@ -1860,6 +2162,8 @@ namespace HwigiTower.Run
             _combatAttackCount = 0;
             _arts03CooldownRounds = 0;
             _lastCombatActionWasAttack = false;
+            _scoutAttackReady = false;
+            _scoutDamageReductionReady = false;
             _sword03OverloadUsed = false;
             _mataiosDownPenaltyConsumedThisCombat = false;
             _mataiosDownThisCombat = false;
@@ -1985,6 +2289,16 @@ namespace HwigiTower.Run
                 growthParts.Add("Skill CD -" + _skillCooldownReduction);
             }
 
+            if (_mataiosActionPowerBonus > 0)
+            {
+                growthParts.Add("마타이오스 지원 +" + _mataiosActionPowerBonus);
+            }
+
+            if (_mataiosMaxHpBonus > 0)
+            {
+                growthParts.Add("마타이오스 HP +" + _mataiosMaxHpBonus);
+            }
+
             if (LevelUpRewardPending)
             {
                 growthParts.Add("보상 대기");
@@ -1995,7 +2309,9 @@ namespace HwigiTower.Run
             var effects = new List<string>();
             if (HasAbilityRef("ABILITY_SCOUT"))
             {
-                effects.Add("정찰: 스킬 추가 공격");
+                effects.Add("정찰: 다음 공격 강화 / 피해 감소 1회" +
+                    (_scoutAttackReady ? " (공격 준비)" : string.Empty) +
+                    (_scoutDamageReductionReady ? " (방어 준비)" : string.Empty));
             }
 
             if (HasAbilityRef("ABILITY_ARTS_03"))
@@ -2130,7 +2446,7 @@ namespace HwigiTower.Run
 
         private void RecoverMataiosAtRest()
         {
-            _mataiosHp = MataiosMaxHpValue;
+            _mataiosHp = MataiosMaxHp;
             _mataiosDown = false;
             _lastMataiosDownEvent = false;
         }
@@ -2242,6 +2558,15 @@ namespace HwigiTower.Run
             }
         }
 
+        private void SyncPersistentMataiosHpFromCombat()
+        {
+            if (_activeCombatMataios != null)
+            {
+                _mataiosHp = Clamp(_activeCombatMataios.Hp, 0, MataiosMaxHp);
+                _mataiosDown = _activeCombatMataios.IsDefeated;
+            }
+        }
+
         private void SyncActiveCombatPlayerStats()
         {
             if (_activeCombatPlayer == null || _activeCombatEnemy == null)
@@ -2250,6 +2575,19 @@ namespace HwigiTower.Run
             }
 
             _activeCombatPlayer = new CombatantState("player", _playerMaxHp, _playerAttack, _playerHp);
+        }
+
+        private void SyncActiveCombatMataiosStats()
+        {
+            if (_activeCombatMataios == null || _activeCombatEnemy == null)
+            {
+                return;
+            }
+
+            var hp = Clamp(_mataiosHp, 0, MataiosMaxHp);
+            _activeCombatMataios = new CombatantState("mataios", MataiosMaxHp, MataiosActionPower, hp);
+            _mataiosHp = hp;
+            _mataiosDown = _activeCombatMataios.IsDefeated;
         }
 
         private List<HwigiTower.Items.ItemData> BuildOwnedItemData()
@@ -2278,7 +2616,7 @@ namespace HwigiTower.Run
 
         private bool HasPlayableSkill()
         {
-            return HasAbilityRef("ABILITY_SCOUT") || HasReadyArts03Skill();
+            return HasEquippedSkillCommand();
         }
 
         private bool HasReadyArts03Skill()

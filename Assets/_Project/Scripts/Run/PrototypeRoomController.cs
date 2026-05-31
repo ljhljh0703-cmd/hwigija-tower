@@ -430,6 +430,11 @@ namespace HwigiTower.Run
             return PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(RunState, action);
         }
 
+        public CombatActionPreview BuildCombatCommandPreview(string commandId)
+        {
+            return PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(RunState, ResolveCommandAction(commandId));
+        }
+
         public PrototypeEncounterChoiceView[] BuildEncounterChoiceViews(EncounterSelection selection)
         {
             if (RunState == null)
@@ -655,6 +660,46 @@ namespace HwigiTower.Run
 
             SaveCurrentRun();
             return new PrototypeNodeResolution(snapshot.LastCombatId, snapshot.LastCombatResultId, message, snapshot.RunCompleted);
+        }
+
+        public PrototypeNodeResolution ReplacePendingCommand(string equippedCommandId)
+        {
+            if (RunState == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "command replacement unavailable", false);
+            }
+
+            var applied = RunState.TryReplacePendingCommand(equippedCommandId);
+            SaveCurrentRun();
+            var snapshot = RunState.CreateSnapshot();
+            return new PrototypeNodeResolution(
+                snapshot.LastCombatId,
+                applied ? "command.replaced" : string.Empty,
+                applied ? "command replaced" : "command replacement blocked",
+                snapshot.RunCompleted);
+        }
+
+        public PrototypeNodeResolution CancelPendingCommandReplacement()
+        {
+            if (RunState == null)
+            {
+                return new PrototypeNodeResolution(string.Empty, string.Empty, "command replacement unavailable", false);
+            }
+
+            RunState.CancelCommandReplacement();
+            SaveCurrentRun();
+            var snapshot = RunState.CreateSnapshot();
+            return new PrototypeNodeResolution(snapshot.LastCombatId, "command.cancel", "command replacement canceled", snapshot.RunCompleted);
+        }
+
+        private static CombatAction ResolveCommandAction(string commandId)
+        {
+            return commandId switch
+            {
+                PrototypeRunState.CommandAttackId => CombatAction.Attack,
+                PrototypeRunState.CommandDefendId => CombatAction.Defend,
+                _ => CombatAction.Skill
+            };
         }
 
         public PrototypeNodeResolution ResolveLevelReward(string rewardId)

@@ -2709,7 +2709,7 @@ namespace HwigiTower.UI
             return actionId switch
             {
                 "rest.ask_mood" => "대화",
-                "rest.train" => "훈련",
+                "rest.train" => "단련",
                 "rest.recover" => "휴식",
                 _ => "행동"
             };
@@ -2720,7 +2720,7 @@ namespace HwigiTower.UI
             return actionId switch
             {
                 "rest.ask_mood" => "마타이오스와 대화",
-                "rest.train" => "다음 전투 피해 +1",
+                "rest.train" => "다음 전투 보너스",
                 "rest.recover" => "HP 회복",
                 _ => "선택"
             };
@@ -2874,7 +2874,7 @@ namespace HwigiTower.UI
             var effect = actionId switch
             {
                 "rest.ask_mood" => "결과: 신뢰 +2",
-                "rest.train" => "결과: 다음 전투 피해 +1",
+                "rest.train" => "결과: 다음 전투 단련 보너스",
                 "rest.recover" => "결과: HP 회복",
                 _ => "결과: 완료"
             };
@@ -3918,8 +3918,8 @@ namespace HwigiTower.UI
 
             levelRewardTitleText = CreateCombatChildText(panelObject.transform, "Level Reward Title", new Vector2(0.08f, 0.80f), new Vector2(0.92f, 0.95f), 34, TextAnchor.MiddleCenter);
             levelRewardBodyText = CreateCombatChildText(panelObject.transform, "Level Reward Body", new Vector2(0.10f, 0.62f), new Vector2(0.90f, 0.78f), 25, TextAnchor.MiddleCenter);
-            levelRewardAttackButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Attack Button", new Vector2(0.12f, 0.43f), new Vector2(0.88f, 0.56f), "ATK +1", PrototypeRunState.LevelRewardAttackId);
-            levelRewardMaxHpButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Max HP Button", new Vector2(0.12f, 0.27f), new Vector2(0.88f, 0.40f), "Max HP +2", PrototypeRunState.LevelRewardMaxHpId);
+            levelRewardAttackButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Attack Button", new Vector2(0.12f, 0.43f), new Vector2(0.88f, 0.56f), "공격 단련\n공격력 +1 / 마타이오스 지원 +1", PrototypeRunState.LevelRewardAttackId);
+            levelRewardMaxHpButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Max HP Button", new Vector2(0.12f, 0.27f), new Vector2(0.88f, 0.40f), "생존 단련\n최대 HP +4 / 마타이오스 HP +3", PrototypeRunState.LevelRewardMaxHpId);
             levelRewardSkillButton = CreateLevelRewardButton(panelObject.transform, "Level Reward Skill Button", new Vector2(0.12f, 0.11f), new Vector2(0.88f, 0.24f), "Skill CD -1", PrototypeRunState.LevelRewardSkillCooldownId);
             levelRewardPanel.gameObject.SetActive(false);
         }
@@ -4824,7 +4824,7 @@ namespace HwigiTower.UI
             var buff = "버프 없음";
             if (snapshot.LastCombatRoundResult.Contains("training +", StringComparison.Ordinal))
             {
-                buff = "훈련 피해 +1";
+                buff = "단련 피해 +1";
             }
             else if (_roomController != null && _roomController.RunState != null && _roomController.RunState.GetItemCount("ITEM_FIELD_BANDAGE") > 0)
             {
@@ -4931,6 +4931,7 @@ namespace HwigiTower.UI
             UpdatePartyDock(snapshot);
             UpdateCombatActionIcons();
             UpdateCombatItemInspect(snapshot);
+            UpdateCommandReplacementFlow(snapshot);
 
             var canAct = snapshot.IsInCombat &&
                 !defeatFeedback &&
@@ -4940,20 +4941,24 @@ namespace HwigiTower.UI
                 _combatIntroTimer <= 0f;
             if (attackButton != null)
             {
-                attackButton.interactable = canAct;
+                attackButton.gameObject.SetActive(snapshot.IsInCombat && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId));
+                attackButton.interactable = canAct && attackButton.gameObject.activeSelf;
                 SetCombatActionButtonPreview(attackButton, _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Attack));
             }
 
             if (defendButton != null)
             {
-                defendButton.interactable = canAct;
+                defendButton.gameObject.SetActive(snapshot.IsInCombat && snapshot.IsCommandEquipped(PrototypeRunState.CommandDefendId));
+                defendButton.interactable = canAct && defendButton.gameObject.activeSelf;
                 SetCombatActionButtonPreview(defendButton, _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Defend));
             }
 
             if (skillButton != null)
             {
                 var preview = _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Skill);
-                skillButton.interactable = canAct && preview.Usable;
+                var skillEquipped = snapshot.IsCommandEquipped(PrototypeRunState.CommandScoutId) || snapshot.IsCommandEquipped(PrototypeRunState.CommandArts03Id);
+                skillButton.gameObject.SetActive(snapshot.IsInCombat && skillEquipped);
+                skillButton.interactable = canAct && skillButton.gameObject.activeSelf && preview.Usable;
                 SetCombatActionButtonPreview(skillButton, preview);
             }
         }
@@ -5716,6 +5721,94 @@ namespace HwigiTower.UI
                 var text = CreateCombatChildText(buttonObject.transform, "Label", Vector2.zero, Vector2.one, 22, TextAnchor.MiddleCenter);
                 text.text = skills[i];
             }
+        }
+
+        private void UpdateCommandReplacementFlow(PrototypeRunSnapshot snapshot)
+        {
+            if (!snapshot.CommandReplacementPending)
+            {
+                return;
+            }
+
+            EnsureSkillPickerPanel();
+            if (skillPickerPanel == null)
+            {
+                return;
+            }
+
+            for (var i = skillPickerPanel.childCount - 1; i >= 0; i--)
+            {
+                Destroy(skillPickerPanel.GetChild(i).gameObject);
+            }
+
+            CreateCommandReplacementLabel(0, "새 command 장착: " + PublicCommandName(snapshot.PendingCommandEquipId));
+            for (var i = 0; i < snapshot.EquippedCommandIds.Length; i++)
+            {
+                var commandId = snapshot.EquippedCommandIds[i];
+                CreateCommandReplacementButton(i + 1, PublicCommandName(commandId), () =>
+                {
+                    var resolution = _roomController == null ? default : _roomController.ReplacePendingCommand(commandId);
+                    HideSkillPicker();
+                    ShowResult(resolution);
+                    if (_roomController != null)
+                    {
+                        ShowRunState(_roomController.GetSnapshot());
+                    }
+                });
+            }
+
+            CreateCommandReplacementButton(snapshot.EquippedCommandIds.Length + 1, "취소", () =>
+            {
+                var resolution = _roomController == null ? default : _roomController.CancelPendingCommandReplacement();
+                HideSkillPicker();
+                ShowResult(resolution);
+                if (_roomController != null)
+                {
+                    ShowRunState(_roomController.GetSnapshot());
+                }
+            });
+            skillPickerPanel.gameObject.SetActive(true);
+        }
+
+        private void CreateCommandReplacementLabel(int row, string labelText)
+        {
+            var labelObject = new GameObject("Command Replacement Label");
+            labelObject.transform.SetParent(skillPickerPanel, false);
+            var rect = labelObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.sizeDelta = new Vector2(0f, 52f);
+            rect.anchoredPosition = new Vector2(0f, -row * 56f);
+            var text = labelObject.AddComponent<Text>();
+            text.font = ResolveFont();
+            text.fontSize = 20;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 14;
+            text.resizeTextMaxSize = 20;
+            text.raycastTarget = false;
+            text.color = PrimaryTextColor;
+            text.text = labelText;
+        }
+
+        private void CreateCommandReplacementButton(int row, string labelText, UnityEngine.Events.UnityAction action)
+        {
+            var buttonObject = new GameObject("Command Replacement Option");
+            buttonObject.transform.SetParent(skillPickerPanel, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.sizeDelta = new Vector2(0f, 48f);
+            rect.anchoredPosition = new Vector2(0f, -row * 52f);
+            var image = buttonObject.AddComponent<Image>();
+            image.color = new Color(0.12f, 0.17f, 0.20f, 0.98f);
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(action);
+            var text = CreateCombatChildText(buttonObject.transform, "Label", Vector2.zero, Vector2.one, 20, TextAnchor.MiddleCenter);
+            text.text = labelText;
         }
 
         private void UpdateDemoCompletePanel(PrototypeRunSnapshot snapshot)
@@ -6643,6 +6736,16 @@ namespace HwigiTower.UI
                 highlights.Add("플레이어: " + playerDamage + " 피해");
             }
 
+            if (snapshot.LastCombatRoundResult.Contains("scout attack +", StringComparison.Ordinal))
+            {
+                highlights.Add("정찰: +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "scout attack +").Trim());
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("scout guard ", StringComparison.Ordinal))
+            {
+                highlights.Add("정찰: 다음 피해 감소 " + ExtractRoundNumber(snapshot.LastCombatRoundResult, "scout guard ").Trim());
+            }
+
             if (snapshot.LastMataiosProtectReduction > 0)
             {
                 highlights.Add("마타이오스 보호: 피해 " + snapshot.LastMataiosProtectReduction + " 감소");
@@ -6663,7 +6766,7 @@ namespace HwigiTower.UI
                 return "번개 방출: 직접 피해";
             }
 
-            return HasScoutSkill(snapshot) ? "정찰 기술: 추가 공격" : "기술 불가: 보유 스킬 필요";
+            return HasScoutSkill(snapshot) ? "정찰: 다음 공격 강화" : "기술 불가: 보유 스킬 필요";
         }
 
         private static string BuildCombatBuildSummaryLine(PrototypeRunSnapshot snapshot)
@@ -6686,12 +6789,22 @@ namespace HwigiTower.UI
         {
             if (snapshot.LastCombatComboDamage > 0)
             {
-                return "정찰 기술: 추가 공격 " + snapshot.LastCombatComboDamage;
+                return "연속 행동: 추가 공격 " + snapshot.LastCombatComboDamage;
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("scout attack ready", StringComparison.Ordinal))
+            {
+                return "정찰: 다음 공격 강화";
+            }
+
+            if (snapshot.LastCombatRoundResult.Contains("scout guard ready", StringComparison.Ordinal))
+            {
+                return "정찰: 다음 피해 감소 1회";
             }
 
             if (snapshot.LastCombatRoundResult.Contains("training +", StringComparison.Ordinal))
             {
-                return "훈련 보너스: 피해 +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "training +").Trim();
+                return "단련 보너스: 피해 +" + ExtractRoundNumber(snapshot.LastCombatRoundResult, "training +").Trim();
             }
 
             if (snapshot.LastCombatRoundResult.Contains("frenzy break", StringComparison.Ordinal))
@@ -6814,7 +6927,7 @@ namespace HwigiTower.UI
                 return "의도: 압박 지속";
             }
 
-            if (result.Contains("action Skill", StringComparison.Ordinal) || result.Contains("scout +", StringComparison.Ordinal))
+            if (result.Contains("action Skill", StringComparison.Ordinal) || result.Contains("scout attack +", StringComparison.Ordinal))
             {
                 return "의도: 빈틈 노출";
             }
@@ -6841,7 +6954,7 @@ namespace HwigiTower.UI
             var chips = new List<string>();
             if (snapshot.LastCombatRoundResult.Contains("training +", StringComparison.Ordinal))
             {
-                chips.Add("훈련 +1");
+                chips.Add("단련 +1");
             }
 
             if (snapshot.LevelAttackBonus > 0)
@@ -6962,10 +7075,9 @@ namespace HwigiTower.UI
             if (roundResult.Contains("ready", StringComparison.OrdinalIgnoreCase))
             {
                 var ready = "전투 준비";
-                if (roundResult.Contains("scout ", StringComparison.Ordinal))
+                if (roundResult.Contains("scout setup", StringComparison.Ordinal))
                 {
-                    var scout = ExtractRoundNumber(roundResult, "scout +").Trim();
-                    ready += string.IsNullOrEmpty(scout) ? " | 정찰 준비" : " | 정찰 공격 +" + scout;
+                    ready += " | 정찰 준비";
                 }
 
                 return ready;
@@ -6988,8 +7100,12 @@ namespace HwigiTower.UI
 
             if (roundResult.Contains("Skill", StringComparison.Ordinal))
             {
+                if (roundResult.Contains("scout skill", StringComparison.Ordinal))
+                {
+                    return "선택 정찰 | 다음 공격 강화 | 다음 피해 감소 1회";
+                }
+
                 return "선택 스킬 | 적 피해 " + ExtractRoundNumber(roundResult, "playerDamage ").Trim() +
-                    " + 추가 " + ExtractRoundNumber(roundResult, "combo ").Trim() +
                     " | 받은 피해 " + enemyDamage;
             }
 
@@ -7716,6 +7832,18 @@ namespace HwigiTower.UI
                 "REWARD_CACHE_SMALL" => "작은 보급품",
                 "REWARD_CACHE_MEMORY" => "기억 보급품",
                 _ => LooksLikeInternalLabel(reference) || reference.Contains("_", StringComparison.Ordinal) ? "획득물" : reference
+            };
+        }
+
+        private static string PublicCommandName(string commandId)
+        {
+            return commandId switch
+            {
+                PrototypeRunState.CommandAttackId => "공격",
+                PrototypeRunState.CommandDefendId => "방어",
+                PrototypeRunState.CommandScoutId => "정찰",
+                PrototypeRunState.CommandArts03Id => "번개 방출",
+                _ => string.IsNullOrEmpty(commandId) ? "command" : "스킬"
             };
         }
 

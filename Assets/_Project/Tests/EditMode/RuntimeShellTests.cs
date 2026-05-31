@@ -1186,10 +1186,11 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void LevelRewardChoice_UpdatesStatsImmediately()
+        public void AttackTraining_UpdatesPlayerAtkAndMataiosPower()
         {
             var state = StartRuntimeCombat("run-level-reward-stat", "COMBAT_LEVEL_REWARD_STAT", "ENEMY_EMPTY_ARMOR");
             var beforeAttack = state.ActiveCombatPlayer.Attack;
+            var beforeMataiosPower = state.MataiosActionPower;
             state.GainCombatXp(state.CombatXpToNextLevel);
 
             Assert.IsTrue(state.ResolveLevelReward(PrototypeRunState.LevelRewardAttackId));
@@ -1198,8 +1199,122 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsFalse(snapshot.LevelUpRewardPending);
             Assert.AreEqual(beforeAttack + 1, snapshot.PlayerAttack);
             Assert.AreEqual(beforeAttack + 1, state.ActiveCombatPlayer.Attack);
+            Assert.AreEqual(beforeMataiosPower + 1, snapshot.MataiosAttack);
             StringAssert.Contains("ATK +1", snapshot.CombatBuildSummary);
+            StringAssert.Contains("마타이오스 지원 +1", snapshot.CombatBuildSummary);
             StringAssert.Contains((beforeAttack + 1).ToString(), PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Attack).PreviewText);
+        }
+
+        [Test]
+        public void SurvivalTraining_UpdatesPlayerAndMataiosMaxHp()
+        {
+            var state = StartRuntimeCombat("run-survival-training", "COMBAT_SURVIVAL_TRAINING", "ENEMY_EMPTY_ARMOR");
+            var beforePlayerMax = state.PlayerMaxHp;
+            var beforeMataiosMax = state.MataiosMaxHp;
+            state.GainCombatXp(state.CombatXpToNextLevel);
+
+            Assert.IsTrue(state.ResolveLevelReward(PrototypeRunState.LevelRewardMaxHpId));
+
+            var snapshot = state.CreateSnapshot();
+            Assert.AreEqual(beforePlayerMax + 4, snapshot.PlayerMaxHp);
+            Assert.AreEqual(beforeMataiosMax + 3, snapshot.MataiosMaxHp);
+            StringAssert.Contains("Max HP +4", snapshot.CombatBuildSummary);
+            StringAssert.Contains("마타이오스 HP +3", snapshot.CombatBuildSummary);
+        }
+
+        [Test]
+        public void Scout_GrantsNextAttackBonusWithoutImmediateDamage()
+        {
+            var state = StartRuntimeCombat("run-scout-setup", "COMBAT_SCOUT_SETUP", "ENEMY_EMPTY_ARMOR");
+            state.AddAbilityRef("ABILITY_SCOUT");
+
+            var result = state.ResolveCombatRoundInteractive(CombatAction.Skill);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual(0, result.PlayerDamage);
+            Assert.AreEqual(0, result.ComboDamage);
+            Assert.IsTrue(snapshot.ScoutAttackReady);
+            Assert.IsTrue(snapshot.ScoutDamageReductionReady);
+            StringAssert.Contains("scout skill", snapshot.LastCombatRoundResult);
+            StringAssert.Contains("scout attack ready", snapshot.LastCombatRoundResult);
+        }
+
+        [Test]
+        public void Scout_ReducesNextIncomingDamageOnce()
+        {
+            var state = StartRuntimeCombat("run-scout-guard", "COMBAT_SCOUT_GUARD", "BOSS_APEX_02", true);
+            state.AddAbilityRef("ABILITY_SCOUT");
+            state.ResolveCombatRoundInteractive(CombatAction.Skill);
+
+            var result = state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.Greater(result.PlayerDamagePrevented, 0);
+            StringAssert.Contains("scout guard", snapshot.LastCombatRoundResult);
+            Assert.IsFalse(snapshot.ScoutDamageReductionReady);
+        }
+
+        [Test]
+        public void Scout_BonusAppearsSeparateFromMataiosDamage()
+        {
+            var state = StartRuntimeCombat("run-scout-breakdown", "COMBAT_SCOUT_BREAKDOWN", "BOSS_APEX_02", true);
+            state.AddAbilityRef("ABILITY_SCOUT");
+            state.ResolveCombatRoundInteractive(CombatAction.Skill);
+
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var snapshot = state.CreateSnapshot();
+
+            StringAssert.Contains("scout attack +", snapshot.LastCombatRoundResult);
+            StringAssert.Contains("mataios", snapshot.LastCombatRoundResult);
+        }
+
+        [Test]
+        public void CommandSlots_StartWithAttackAndDefendEquipped()
+        {
+            var state = new PrototypeRunState("run-command-default", new GameFlowEventBus());
+
+            CollectionAssert.Contains(state.EquippedCommandIds, PrototypeRunState.CommandAttackId);
+            CollectionAssert.Contains(state.EquippedCommandIds, PrototypeRunState.CommandDefendId);
+            Assert.AreEqual(2, state.EquippedCommandIds.Count);
+        }
+
+        [Test]
+        public void CommandSlots_NewSkillFillsEmptySlot()
+        {
+            var state = new PrototypeRunState("run-command-skill", new GameFlowEventBus());
+
+            state.AddAbilityRef("ABILITY_SCOUT");
+
+            CollectionAssert.Contains(state.OwnedCommandIds, PrototypeRunState.CommandScoutId);
+            CollectionAssert.Contains(state.EquippedCommandIds, PrototypeRunState.CommandScoutId);
+            Assert.IsFalse(state.CommandReplacementPending);
+        }
+
+        [Test]
+        public void CommandSlots_FullSlotReplacementUnequipsButDoesNotDelete()
+        {
+            var state = new PrototypeRunState("run-command-replace", new GameFlowEventBus());
+            state.AddOwnedCommand("command.skill.test_1");
+            state.AddOwnedCommand("command.skill.test_2");
+            state.AddOwnedCommand("command.skill.test_3");
+
+            state.AddOwnedCommand("command.skill.test_4");
+            Assert.IsTrue(state.CommandReplacementPending);
+            Assert.IsTrue(state.TryReplacePendingCommand(PrototypeRunState.CommandAttackId));
+
+            CollectionAssert.Contains(state.OwnedCommandIds, PrototypeRunState.CommandAttackId);
+            CollectionAssert.DoesNotContain(state.EquippedCommandIds, PrototypeRunState.CommandAttackId);
+            CollectionAssert.Contains(state.EquippedCommandIds, "command.skill.test_4");
+            Assert.IsFalse(state.CommandReplacementPending);
+        }
+
+        [Test]
+        public void CommandSlots_PreventsNoOffensiveCommandState()
+        {
+            var state = new PrototypeRunState("run-command-guard", new GameFlowEventBus());
+
+            Assert.IsFalse(state.TryUnequipCommand(PrototypeRunState.CommandAttackId));
+            CollectionAssert.Contains(state.EquippedCommandIds, PrototypeRunState.CommandAttackId);
         }
 
         [Test]
@@ -1207,6 +1322,7 @@ namespace HwigiTower.Tests.EditMode
         {
             var state = new PrototypeRunState("run-level-reward-skill", new GameFlowEventBus()) { AutoResolveCombat = false };
             state.Abilities.Add(CreateAbility("ABILITY_ARTS_03", "술", ("skill.direct_damage", 8f), ("skill.cooldown_rounds", 4f)));
+            state.AddOwnedCommand(PrototypeRunState.CommandArts03Id);
             var encounter = CreateRuntimeEncounter(
                 "ENC_LEVEL_REWARD_SKILL",
                 CreateChoice(
@@ -1533,7 +1649,7 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void CombatSkill_RequiresScoutAndCreatesReadableCombo()
+        public void CombatSkill_RequiresScoutAndCreatesReadableSetup()
         {
             var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset");
             var node = CreateNode("node.skill.readable", encounter);
@@ -1556,8 +1672,8 @@ namespace HwigiTower.Tests.EditMode
 
             var skill = withScout.ResolveCombatRoundInteractive(CombatAction.Skill);
 
-            Assert.Greater(skill.PlayerDamage, 0);
-            Assert.Greater(skill.ComboDamage, 0);
+            Assert.AreEqual(0, skill.PlayerDamage);
+            Assert.AreEqual(0, skill.ComboDamage);
             StringAssert.Contains("scout skill", withScout.CreateSnapshot().LastCombatRoundResult);
         }
 
