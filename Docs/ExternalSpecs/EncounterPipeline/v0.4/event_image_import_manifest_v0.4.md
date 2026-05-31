@@ -33,10 +33,10 @@
 - `evt_f05_ancient_seed_bg.png` <- `5층_고대의씨앗.png` (941x1672)
 - `evt_f05_inquisition_bg.png` <- `5층_이단심판.png` (941x1672)
 - `evt_f05_full_preparation_bg.png` <- `5층_만반의준비.png` (941x1672)
-- `evt_f01_merchant_bg.png` <- `enc_shop_01_bg.png` (900x1748)
-- `evt_f02_merchant_bg.png` <- `enc_shop_02_bg.png` (902x1744)
-- `evt_f03_merchant_bg.png` <- `enc_shop_03_bg.png` (941x1672)
-- `evt_f04_merchant_bg.png` <- `enc_shop_04_bg.png` (941x1672)
+- `evt_f01_merchant_bg.png` <- `Assets/_Project/Art/Characters/Merchants/merchant_human.png` (2000x2000)
+- `evt_f02_merchant_bg.png` <- `Assets/_Project/Art/Characters/Merchants/merchant_human.png` (2000x2000)
+- `evt_f03_merchant_bg.png` <- `Assets/_Project/Art/Characters/Merchants/merchant_human.png` (2000x2000)
+- `evt_f04_merchant_bg.png` <- `Assets/_Project/Art/Characters/Merchants/merchant_otherworld.png` (2000x2000; floor 4~5 merchant)
 
 ## Still Missing
 - `Assets/_Project/Art/Encounters/evt_f01_cultist_funeral_bg.png`
