@@ -254,37 +254,37 @@
 
 ## Image Assets Needed
 - Assets/_Project/Art/Encounters/evt_f01_jar_room_bg.png: present
-- Assets/_Project/Art/Encounters/evt_f01_priest_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f02_magic_anvil_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f03_balcony_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f01_treasure_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f03_high_and_low_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f02_court_painter_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f01_merchant_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f02_merchant_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f03_merchant_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f04_merchant_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f01_rest_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f01_gatekeeper_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f01_resistance_line_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f01_last_words_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f02_garden_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f02_mercenary_outpost_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f02_bandit_den_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f03_abandoned_tombstone_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f03_library_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f03_poltergeist_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f04_sacrifice_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f04_haunted_armory_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f04_cult_leader_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f04_forbidden_book_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f04_ritual_altar_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f04_life_creation_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f05_oath_of_loyalty_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f05_cradle_of_outer_gods_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f05_ancient_seed_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f05_inquisition_bg.png: missing in repo worktree
-- Assets/_Project/Art/Encounters/evt_f05_full_preparation_bg.png: missing in repo worktree
+- Assets/_Project/Art/Encounters/evt_f01_priest_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f02_magic_anvil_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f03_balcony_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f01_treasure_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f03_high_and_low_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f02_court_painter_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f01_merchant_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f02_merchant_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f03_merchant_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f04_merchant_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f01_rest_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f01_gatekeeper_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f01_resistance_line_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f01_last_words_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f02_garden_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f02_mercenary_outpost_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f02_bandit_den_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f03_abandoned_tombstone_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f03_library_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f03_poltergeist_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f04_sacrifice_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f04_haunted_armory_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f04_cult_leader_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f04_forbidden_book_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f04_ritual_altar_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f04_life_creation_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f05_oath_of_loyalty_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f05_cradle_of_outer_gods_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f05_ancient_seed_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f05_inquisition_bg.png: present
+- Assets/_Project/Art/Encounters/evt_f05_full_preparation_bg.png: present
 - Assets/_Project/Art/Encounters/evt_f01_cultist_funeral_bg.png: missing in repo worktree
 
 ## Temporary Effects Added
