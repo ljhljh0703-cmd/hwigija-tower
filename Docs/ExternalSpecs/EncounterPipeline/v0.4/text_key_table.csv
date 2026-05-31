@@ -1,6 +1,6 @@
 key,kind,eventStableId,choiceStableId,sourceRow,text,previewOrResultHint,background,notes
-EVT_F01_JAR_ROOM_BODY,body,EVT_F01_JAR_ROOM,,2,"항아리들이 잔뜩 있는 방이다. 항아리들 마다 신기한 냄새가 난다. 
-어떤 항아리를 열어볼까? 
+EVT_F01_JAR_ROOM_BODY,body,EVT_F01_JAR_ROOM,,2,"항아리들이 잔뜩 있는 방이다. 항아리들 마다 신기한 냄새가 난다.
+어떤 항아리를 열어볼까?
 ",,단지들이 잔뜩 있는 창고,
 CHOICE_EVT_F01_JAR_ROOM_PATTERNED_TEXT,choiceLabel,EVT_F01_JAR_ROOM,CHOICE_EVT_F01_JAR_ROOM_PATTERNED,3,신기한 문양이 각인 된 항아리,80% 확률 골드 획득,,
 CHOICE_EVT_F01_JAR_ROOM_PATTERNED_RESULT,resultText,EVT_F01_JAR_ROOM,CHOICE_EVT_F01_JAR_ROOM_PATTERNED,3,"항아리를 열자, 안에서 빛나는 동전을 발견 할 수 있었다.",80% 확률 골드 획득,,
@@ -277,7 +277,7 @@ CHOICE_EVT_F05_ANCIENT_SEED_HEART_TEXT,choiceLabel,EVT_F05_ANCIENT_SEED,CHOICE_E
 CHOICE_EVT_F05_ANCIENT_SEED_HEART_RESULT,resultText,EVT_F05_ANCIENT_SEED,CHOICE_EVT_F05_ANCIENT_SEED_HEART,155,,"최대 체력 감소, 유물 획득",,
 CHOICE_EVT_F05_ANCIENT_SEED_LEG_TEXT,choiceLabel,EVT_F05_ANCIENT_SEED,CHOICE_EVT_F05_ANCIENT_SEED_LEG,156,다리에,"최대 체력 감소, 버프",,
 CHOICE_EVT_F05_ANCIENT_SEED_LEG_RESULT,resultText,EVT_F05_ANCIENT_SEED,CHOICE_EVT_F05_ANCIENT_SEED_LEG,156,,"최대 체력 감소, 버프",,
-EVT_F05_INQUISITION_BODY,body,EVT_F05_INQUISITION,,157,"복도의 반대편에서 환한 무엇인가가 길을 막고 서 있었다. 더 가까이 다가가 보니, 이단심문관으로 보이는 자가 검을 붉게 물들인 채 심문선언서를 읽고 있었다. 투구 안쪽으로 비쳐보이는 악에 받힌 눈빛은, 우리까지 이단으로 간주하여 정화 할 생각이라는것을 투명히 알 수 있었다. 어떻게 할까. ",,,"(2번의 대화 기회, 강력한 증거 제시 못 할 시 설득 실패) 
+EVT_F05_INQUISITION_BODY,body,EVT_F05_INQUISITION,,157,"복도의 반대편에서 환한 무엇인가가 길을 막고 서 있었다. 더 가까이 다가가 보니, 이단심문관으로 보이는 자가 검을 붉게 물들인 채 심문선언서를 읽고 있었다. 투구 안쪽으로 비쳐보이는 악에 받힌 눈빛은, 우리까지 이단으로 간주하여 정화 할 생각이라는것을 투명히 알 수 있었다. 어떻게 할까. ",,,"(2번의 대화 기회, 강력한 증거 제시 못 할 시 설득 실패)
 이단 심판
 event_inquisitor"
 CHOICE_EVT_F05_INQUISITION_SILENCE_TEXT,choiceLabel,EVT_F05_INQUISITION,CHOICE_EVT_F05_INQUISITION_SILENCE,158,침묵한다,아무 일도 일어나지 않았다.,,
