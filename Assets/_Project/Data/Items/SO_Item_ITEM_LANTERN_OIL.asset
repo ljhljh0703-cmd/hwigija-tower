@@ -17,5 +17,7 @@ MonoBehaviour:
   descriptionKey: PLACEHOLDER_ITEM_LANTERN_OIL_DESC
   maxStack: 99
   tier: 0
-  passiveTrigger:
-  numericParams: []
+  passiveTrigger: player_skill
+  numericParams:
+  - key: skill_damage_bonus
+    value: 2

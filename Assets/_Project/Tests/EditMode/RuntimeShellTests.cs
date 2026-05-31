@@ -379,8 +379,10 @@ namespace HwigiTower.Tests.EditMode
             SetNumericParams(firstHit, ("damage_reduce", 4f));
             var start = CreateItem("item.start", "combat_start");
             SetNumericParams(start, ("hp_restore", 5f), ("poison_damage_per_round", 1f));
+            var skill = CreateItem("item.skill", "player_skill");
+            SetNumericParams(skill, ("skill_damage_bonus", 2f));
 
-            var modifiers = CombatAbilityModifiers.From(null, null, new[] { attack, defend, firstHit, start });
+            var modifiers = CombatAbilityModifiers.From(null, null, new[] { attack, defend, firstHit, start, skill });
 
             Assert.AreEqual(1, modifiers.PlayerAttackBonus);
             Assert.AreEqual(2, modifiers.FlatDamageBonus);
@@ -388,6 +390,7 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(4, modifiers.FirstHitDamageReduce);
             Assert.AreEqual(5, modifiers.CombatStartHpRestore);
             Assert.AreEqual(1, modifiers.PoisonDamagePerRound);
+            Assert.AreEqual(2, modifiers.SkillDamageBonus);
         }
 
         [Test]
@@ -1215,6 +1218,77 @@ namespace HwigiTower.Tests.EditMode
             var skill = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Skill);
             StringAssert.Contains("사용 후 CD 3", skill.PreviewText);
             StringAssert.Contains("Skill CD -1", state.CreateSnapshot().CombatBuildSummary);
+
+            state.ResolveCombatRoundInteractive(CombatAction.Skill);
+            Assert.AreEqual(3, state.Arts03CooldownRounds);
+
+            state.ResolveCombatRoundInteractive(CombatAction.Defend);
+            Assert.AreEqual(2, state.Arts03CooldownRounds);
+        }
+
+        [Test]
+        public void CombatItemPassives_OilAndCharmAffectCombatRound()
+        {
+            var state = StartRuntimeCombat("run-item-passive-hooks", "COMBAT_ITEM_PASSIVE_HOOKS", "BOSS_APEX_02", true);
+            state.AddAbilityRef("ABILITY_ARTS_03");
+            state.AddItemRef("ITEM_LANTERN_OIL", 1);
+            state.AddItemRef("ITEM_TORN_CHARM", 1);
+
+            var skillPreview = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(state, CombatAction.Skill);
+            StringAssert.Contains("피해 +2", skillPreview.PreviewText);
+
+            var result = state.ResolveCombatRoundInteractive(CombatAction.Skill);
+            var snapshot = state.CreateSnapshot();
+
+            Assert.AreEqual(10, result.PlayerDamage);
+            StringAssert.Contains("oil skill +2", snapshot.LastCombatRoundResult);
+            StringAssert.Contains("first hit guard 2", snapshot.LastCombatRoundResult);
+            StringAssert.Contains("등유 x1: 스킬 피해 +2", snapshot.CombatBuildSummary);
+            StringAssert.Contains("찢어진 부적 x1: 첫 피격 피해 -2", snapshot.CombatBuildSummary);
+        }
+
+        [Test]
+        public void Frenzy_AttackChainShowsReadyActivationAndBreak()
+        {
+            var state = StartRuntimeCombat("run-frenzy-stage1b", "COMBAT_FRENZY_STAGE1B", "BOSS_APEX_02", true);
+            state.AddAbilityRef("ABILITY_SWORD_01");
+            state.AddAbilityRef("ABILITY_SWORD_02");
+            state.AddAbilityRef("ABILITY_SWORD_03");
+
+            StringAssert.Contains("광폭 준비", state.CreateSnapshot().CombatBuildSummary);
+
+            state.ResolveCombatRoundInteractive(CombatAction.Attack);
+            var attackSnapshot = state.CreateSnapshot();
+            StringAssert.Contains("frenzy", attackSnapshot.LastCombatRoundResult);
+            StringAssert.Contains("frenzy ready", attackSnapshot.LastCombatRoundResult);
+            StringAssert.Contains("광폭 준비: 연속 공격 강화", attackSnapshot.CombatBuildSummary);
+
+            state.ResolveCombatRoundInteractive(CombatAction.Defend);
+            var breakSnapshot = state.CreateSnapshot();
+            StringAssert.Contains("frenzy break", breakSnapshot.LastCombatRoundResult);
+            StringAssert.Contains("광폭 끊김", breakSnapshot.CombatBuildSummary);
+        }
+
+        [Test]
+        public void GenericCounterplay_HeavyPressureAndSkillOpeningChangeChoices()
+        {
+            var attack = StartRuntimeCombat("run-heavy-pressure", "COMBAT_HEAVY_PRESSURE", "BOSS_APEX_02", true);
+            attack.ResolveCombatRoundInteractive(CombatAction.Attack);
+            StringAssert.Contains("heavy pressure +1", attack.CreateSnapshot().LastCombatRoundResult);
+
+            var defend = StartRuntimeCombat("run-heavy-pressure-defend", "COMBAT_HEAVY_PRESSURE_DEFEND", "BOSS_APEX_02", true);
+            defend.ResolveCombatRoundInteractive(CombatAction.Defend);
+            StringAssert.Contains("heavy pressure blocked", defend.CreateSnapshot().LastCombatRoundResult);
+
+            var skill = StartRuntimeCombat("run-skill-opening", "COMBAT_SKILL_OPENING", "BOSS_APEX_02", true);
+            skill.AddAbilityRef("ABILITY_ARTS_03");
+            skill.ActiveCombatEnemy.ApplyDamage(15);
+
+            var preview = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(skill, CombatAction.Skill);
+            StringAssert.Contains("빈틈 +2", preview.PreviewText);
+
+            skill.ResolveCombatRoundInteractive(CombatAction.Skill);
+            StringAssert.Contains("skill opening +2", skill.CreateSnapshot().LastCombatRoundResult);
         }
 
         [Test]
@@ -2786,7 +2860,8 @@ namespace HwigiTower.Tests.EditMode
             var state = new PrototypeRunState(runId, new GameFlowEventBus()) { AutoResolveCombat = false };
             if (attachCatalog)
             {
-                state.AttachEncounterCatalog(EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog);
+                var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
+                state.AttachEncounterCatalog(catalog != null ? catalog : EncounterRuntimeCatalogBuilder.BuildDefaultCatalog().Catalog);
             }
 
             var encounter = CreateRuntimeEncounter(

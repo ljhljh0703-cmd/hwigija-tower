@@ -14,7 +14,8 @@ namespace HwigiTower.Abilities
             int defendDamageReduce,
             int combatStartHpRestore,
             int poisonDamagePerRound,
-            int firstHitDamageReduce)
+            int firstHitDamageReduce,
+            int skillDamageBonus)
         {
             PlayerMaxHpBonus = playerMaxHpBonus;
             PlayerAttackBonus = playerAttackBonus;
@@ -23,6 +24,7 @@ namespace HwigiTower.Abilities
             CombatStartHpRestore = combatStartHpRestore;
             PoisonDamagePerRound = poisonDamagePerRound;
             FirstHitDamageReduce = firstHitDamageReduce;
+            SkillDamageBonus = skillDamageBonus;
         }
 
         // 스탯 보정 (CombatantState 생성 시 반영)
@@ -35,6 +37,7 @@ namespace HwigiTower.Abilities
         public int CombatStartHpRestore { get; }   // trigger: combat_start — 전투 시작 시 HP 회복
         public int PoisonDamagePerRound { get; }   // trigger: round_start — 매 라운드 적 HP 감소 (독)
         public int FirstHitDamageReduce { get; }   // trigger: first_hit_per_combat — 첫 피격 1회 감소
+        public int SkillDamageBonus { get; }        // trigger: player_skill — 스킬 피해 보너스
 
         public static CombatAbilityModifiers From(
             IReadOnlyList<AbilityData> abilities,
@@ -48,6 +51,7 @@ namespace HwigiTower.Abilities
             var combatStartHp = 0f;
             var poison = 0f;
             var firstHitReduce = 0f;
+            var skillDamage = 0f;
 
             if (abilities != null)
             {
@@ -105,6 +109,10 @@ namespace HwigiTower.Abilities
                     {
                         firstHitReduce += NumericParamLookup.Sum(item.NumericParams, "damage_reduce");
                     }
+                    else if (item.PassiveTrigger == "player_skill")
+                    {
+                        skillDamage += NumericParamLookup.Sum(item.NumericParams, "skill_damage_bonus");
+                    }
                 }
             }
 
@@ -115,7 +123,8 @@ namespace HwigiTower.Abilities
                 (int)Math.Round(defendReduce),
                 (int)Math.Round(combatStartHp),
                 (int)Math.Round(poison),
-                (int)Math.Round(firstHitReduce));
+                (int)Math.Round(firstHitReduce),
+                (int)Math.Round(skillDamage));
         }
     }
 }
