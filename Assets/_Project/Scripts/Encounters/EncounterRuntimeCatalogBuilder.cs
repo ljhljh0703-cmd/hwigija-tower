@@ -50,7 +50,12 @@ namespace HwigiTower.Encounters
             "ITEM_10",
             "ITEM_FIELD_BANDAGE",
             "ITEM_LANTERN_OIL",
-            "ITEM_TORN_CHARM"
+            "ITEM_TORN_CHARM",
+            "RELIC_GENERIC_01",
+            "RELIC_SWORD_01",
+            "RELIC_LINE_01",
+            "RELIC_ARTS_01",
+            "RELIC_GUARD_01"
         };
 
         private static readonly string[] AbilityIds =

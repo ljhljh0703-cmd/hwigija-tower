@@ -683,6 +683,18 @@ namespace HwigiTower.Run
             return _playerHp;
         }
 
+        public void TriggerGameOver()
+        {
+            SyncPersistentPlayerHpFromCombat();
+            _playerHp = 0;
+            if (_activeCombatPlayer != null && _activeCombatPlayer.Hp > 0)
+            {
+                _activeCombatPlayer.ApplyDamage(_activeCombatPlayer.Hp);
+            }
+
+            FailRun();
+        }
+
         public int GainCombatXp(int amount)
         {
             var gained = System.Math.Max(0, amount);

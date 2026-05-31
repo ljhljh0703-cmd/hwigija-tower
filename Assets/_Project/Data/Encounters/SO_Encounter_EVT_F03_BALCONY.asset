@@ -267,8 +267,8 @@ MonoBehaviour:
     requirementMode: All
     requirements: []
     effects:
-    - kind: ModifyHp
-      amount: -999
+    - kind: TriggerGameOver
+      amount: 0
       flag:
       value: 0
       itemRef:

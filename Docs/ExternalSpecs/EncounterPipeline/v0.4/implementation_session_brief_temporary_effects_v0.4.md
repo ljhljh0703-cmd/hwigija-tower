@@ -12,7 +12,7 @@ Replace the temporary effect assignments generated from the Google Sheet with au
 ## Do Not Treat As Final
 - Any `TEMP_*` combat handoff stableId.
 - Any generic item/relic/ability/reward mapping in `temporary_effect_assignment_report_v0.4.md`.
-- The fatal `ModifyHp(-999)` handling for the balcony game-over choice.
+- The fatal balcony game-over choice now uses explicit `TriggerGameOver` runtime handling.
 
 ## Replacement Tasks
 1. Open `temporary_effect_homework.csv`.

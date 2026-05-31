@@ -45,6 +45,11 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsTrue(catalog.TryGetItem("ITEM_05", out _));
             Assert.IsTrue(catalog.TryGetItem("ITEM_09", out _));
             Assert.IsTrue(catalog.TryGetItem("ITEM_10", out _));
+            Assert.IsTrue(catalog.TryGetItem("RELIC_GENERIC_01", out _));
+            Assert.IsTrue(catalog.TryGetItem("RELIC_SWORD_01", out _));
+            Assert.IsTrue(catalog.TryGetItem("RELIC_LINE_01", out _));
+            Assert.IsTrue(catalog.TryGetItem("RELIC_ARTS_01", out _));
+            Assert.IsTrue(catalog.TryGetItem("RELIC_GUARD_01", out _));
             Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_MEMORY", out _));
             Assert.IsTrue(catalog.TryGetRewardBundle("REWARD_CACHE_SMALL", out _));
             Assert.IsTrue(catalog.TryGetAbility("ABILITY_SCOUT", out _));

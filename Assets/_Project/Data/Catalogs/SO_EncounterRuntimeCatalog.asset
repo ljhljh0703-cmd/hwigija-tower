@@ -23,6 +23,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 67386d8b61a4c4abcb54cebabeff46ce, type: 2}
   - {fileID: 11400000, guid: e84639d80adfa470181f7840e17d162c, type: 2}
   - {fileID: 11400000, guid: 0bad0857033784f79bfb7df39e013df8, type: 2}
+  - {fileID: 11400000, guid: c63cf428bf02a41499a5f56b4ac0cf40, type: 2}
+  - {fileID: 11400000, guid: a4041e234de7f4a34ae7235172503e9c, type: 2}
+  - {fileID: 11400000, guid: 4e743718dbc924a33b8c865e8d54b5ad, type: 2}
+  - {fileID: 11400000, guid: ee212b860c3004cc6af6cfa58cfb331e, type: 2}
+  - {fileID: 11400000, guid: fa2b7ddf6a84b4914811e86b9d95f5a8, type: 2}
   rewardBundles:
   - {fileID: 11400000, guid: 7757078df03474964a5ca69439953ef3, type: 2}
   - {fileID: 11400000, guid: 6daef0d45282f4eacb7af756cfa233a4, type: 2}
