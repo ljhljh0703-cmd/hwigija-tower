@@ -239,7 +239,7 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void BossGateChoices_ShowOnlyFightAfterMapCommit()
+        public void BossGateChoices_DoNotShowManualFightButtonAfterMapCommit()
         {
             var boss = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset");
             Assert.IsNotNull(boss);
@@ -249,13 +249,9 @@ namespace HwigiTower.Tests.EditMode
 
             hud.ShowChoices(boss, views, _ => { });
 
-            Assert.AreEqual(1, hud.ChoiceButtonCount);
-            var fight = hud.GetChoiceButton(0).GetComponentInChildren<Text>();
-            Assert.IsNotNull(fight);
-            StringAssert.Contains("전투 시작", fight.text);
-            StringAssert.DoesNotContain("돌아간다", fight.text);
-            StringAssert.DoesNotContain("준비", fight.text);
-            StringAssert.DoesNotContain("CHOICE_", fight.text);
+            Assert.AreEqual(0, hud.ChoiceButtonCount);
+            StringAssert.DoesNotContain("전투 시작", hud.ResultMessage);
+            StringAssert.DoesNotContain("CHOICE_", hud.ResultMessage);
         }
 
         [Test]
@@ -585,6 +581,191 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("성장", hud.CombatMessage);
             StringAssert.Contains("성장 ATK +1", hud.CombatPartyMessage);
             StringAssert.Contains("성장 HP +2", hud.CombatPartyMessage);
+        }
+
+        [Test]
+        public void Hud_CombatIntroBlocksActionsWithoutManualStartButton()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-combat-intro",
+                24,
+                24,
+                5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false,
+                lastCombatId: "COMBAT_TEST",
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                lastCombatResultId: "started",
+                lastCombatRoundResult: "round 0 | ready",
+                isInCombat: true,
+                enemyHp: 12,
+                enemyMaxHp: 12,
+                enemyAttack: 3);
+
+            hud.ShowRunState(snapshot);
+
+            Assert.IsTrue(hud.CombatPanelVisible);
+            Assert.IsTrue(hud.CombatIntroOverlayVisible);
+            Assert.AreEqual(0, hud.ChoiceButtonCount);
+            StringAssert.DoesNotContain("전투 시작", hud.ResultMessage);
+        }
+
+        [Test]
+        public void Hud_DamagePresentationSeparatesPlayerAndMataios()
+        {
+            var hud = CreateHud(out _);
+            var before = new PrototypeRunSnapshot(
+                "run-combat-damage",
+                20,
+                24,
+                5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false,
+                lastCombatId: "COMBAT_TEST",
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                lastCombatResultId: "started",
+                lastCombatRoundResult: "round 0 | ready",
+                isInCombat: true,
+                enemyHp: 12,
+                enemyMaxHp: 12,
+                enemyAttack: 3,
+                combatRound: 0);
+            var after = new PrototypeRunSnapshot(
+                "run-combat-damage",
+                18,
+                24,
+                5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false,
+                lastCombatId: "COMBAT_TEST",
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                lastCombatResultId: "started",
+                lastCombatRoundResult: "round 1 | action Attack | playerDamage 7 | enemyDamage 2 | enemyHp 12->3 | playerHp 20->18 | mataios support 2",
+                isInCombat: true,
+                enemyHp: 3,
+                enemyMaxHp: 12,
+                enemyAttack: 3,
+                combatRound: 1,
+                lastMataiosCombatDamage: 2);
+
+            hud.ShowRunState(before);
+            hud.ShowRunState(after);
+
+            StringAssert.Contains("-7", hud.CombatDamageNumberMessage);
+            StringAssert.Contains("마타이오스 -2", hud.CombatDamageNumberMessage);
+            StringAssert.Contains("플레이어: 7 피해", hud.CombatMessage);
+            StringAssert.Contains("마타이오스: 2 지원 피해", hud.CombatMessage);
+        }
+
+        [Test]
+        public void Hud_PlayerHitFeedbackShowsLocalDamageState()
+        {
+            var hud = CreateHud(out _);
+            var before = new PrototypeRunSnapshot(
+                "run-player-hit",
+                20,
+                24,
+                5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false,
+                lastCombatId: "COMBAT_TEST",
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                lastCombatResultId: "started",
+                lastCombatRoundResult: "round 0 | ready",
+                isInCombat: true,
+                enemyHp: 12,
+                enemyMaxHp: 12,
+                enemyAttack: 3,
+                combatRound: 0);
+            var after = new PrototypeRunSnapshot(
+                "run-player-hit",
+                17,
+                24,
+                5,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false,
+                lastCombatId: "COMBAT_TEST",
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                lastCombatResultId: "started",
+                lastCombatRoundResult: "round 1 | action Defend | playerDamage 0 | enemyDamage 3 | enemyHp 12->12 | playerHp 20->17",
+                isInCombat: true,
+                enemyHp: 12,
+                enemyMaxHp: 12,
+                enemyAttack: 3,
+                combatRound: 1);
+
+            hud.ShowRunState(before);
+            hud.ShowRunState(after);
+
+            StringAssert.Contains("-3", hud.CombatDamageNumberMessage);
+            Assert.IsTrue(hud.CombatPlayerHitFeedbackActive);
+        }
+
+        [Test]
+        public void Hud_EnemyDefeatFeedbackAppearsBeforeResultSurface()
+        {
+            var hud = CreateHud(out _);
+            var defeated = new PrototypeRunSnapshot(
+                "run-defeat-feedback",
+                18,
+                24,
+                5,
+                0,
+                8,
+                0,
+                1,
+                0,
+                0,
+                0,
+                false,
+                lastCombatId: "COMBAT_BOSS",
+                lastCombatEnemyId: "BOSS_GATE_01",
+                lastCombatResultId: "victory",
+                lastCombatRoundResult: "round 3 | action Attack | playerDamage 8 | enemyDamage 0 | enemyHp 8->0 | playerHp 18->18",
+                isInCombat: false,
+                enemyHp: 0,
+                enemyMaxHp: 48,
+                enemyAttack: 4,
+                combatRound: 3,
+                lastCombatEnemyDefeated: true);
+
+            hud.ShowRunState(defeated);
+
+            Assert.IsTrue(hud.CombatPanelVisible);
+            Assert.IsTrue(hud.CombatDefeatFeedbackVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+            StringAssert.Contains("보스 격파", hud.CombatDefeatFeedbackMessage);
         }
 
         [Test]
