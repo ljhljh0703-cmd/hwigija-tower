@@ -117,7 +117,10 @@ namespace HwigiTower.UI
         [SerializeField] private Button levelRewardMaxHpButton;
         [SerializeField] private Button levelRewardSkillButton;
         [SerializeField] private Text combatEnemyDamageNumberText;
+        [SerializeField] private Text combatMataiosDamageNumberText;
         [SerializeField] private Text combatPlayerDamageNumberText;
+        [SerializeField] private Text combatDefeatFeedbackText;
+        [SerializeField] private RectTransform combatIntroOverlay;
         [SerializeField] private RectTransform bossRewardPanel;
         [SerializeField] private Text bossRewardTitleText;
         [SerializeField] private Text bossRewardGoldText;
@@ -169,10 +172,21 @@ namespace HwigiTower.UI
         private bool _combatEnemyFeedbackBaseCaptured;
         private Vector2 _combatEnemyImageBasePosition;
         private Vector3 _combatEnemyImageBaseScale = Vector3.one;
+        private bool _combatPlayerFeedbackBaseCaptured;
+        private Vector2 _combatPlayerCardBasePosition;
+        private Vector3 _combatPlayerCardBaseScale = Vector3.one;
+        private Color _combatPlayerCardBaseColor = Color.white;
         private float _combatEnemyHitShakeTimer;
         private float _combatEnemyAttackPulseTimer;
         private float _combatEnemyDamageNumberTimer;
+        private float _combatMataiosDamageNumberTimer;
         private float _combatPlayerDamageNumberTimer;
+        private float _combatPlayerHitShakeTimer;
+        private float _combatPlayerHpPulseTimer;
+        private float _combatIntroTimer;
+        private float _combatDefeatFeedbackTimer;
+        private string _combatIntroKey = string.Empty;
+        private string _combatDefeatFeedbackKey = string.Empty;
 
         private enum NpcSpotlightMode
         {
@@ -225,9 +239,15 @@ namespace HwigiTower.UI
         private const float DenseLineSpacing = 0.92f;
         private const float CombatEnemyHitShakeDuration = 0.18f;
         private const float CombatEnemyAttackPulseDuration = 0.16f;
+        private const float CombatPlayerHitShakeDuration = 0.20f;
+        private const float CombatPlayerHpPulseDuration = 0.22f;
         private const float CombatDamageNumberDuration = 0.70f;
+        private const float CombatIntroDuration = 0.45f;
+        private const float CombatDefeatFeedbackDuration = 0.65f;
         private const float CombatEnemyHitShakePixels = 11f;
+        private const float CombatPlayerHitShakePixels = 9f;
         private const float CombatEnemyAttackPulseScale = 1.045f;
+        private const float CombatPlayerHpPulseScale = 1.06f;
         private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
         private static readonly Color ResultTextColor = new Color(0.88f, 0.93f, 0.95f, 1f);
         private static readonly Color PanelColor = new Color(0.035f, 0.045f, 0.055f, 0.88f);
@@ -274,7 +294,12 @@ namespace HwigiTower.UI
             ResolveButtonLabel(levelRewardMaxHpButton) + "\n" +
             ResolveButtonLabel(levelRewardSkillButton)).Trim();
         public string CombatDamageNumberMessage => ((combatEnemyDamageNumberText == null || !combatEnemyDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatEnemyDamageNumberText.text) + "|" +
+            (combatMataiosDamageNumberText == null || !combatMataiosDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatMataiosDamageNumberText.text) + "|" +
             (combatPlayerDamageNumberText == null || !combatPlayerDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatPlayerDamageNumberText.text)).Trim('|');
+        public bool CombatIntroOverlayVisible => combatIntroOverlay != null && combatIntroOverlay.gameObject.activeInHierarchy;
+        public bool CombatPlayerHitFeedbackActive => _combatPlayerHitShakeTimer > 0f || _combatPlayerHpPulseTimer > 0f;
+        public bool CombatDefeatFeedbackVisible => combatDefeatFeedbackText != null && combatDefeatFeedbackText.gameObject.activeInHierarchy;
+        public string CombatDefeatFeedbackMessage => combatDefeatFeedbackText == null ? string.Empty : combatDefeatFeedbackText.text;
         public bool BossRewardPopupVisible => bossRewardPanel != null && bossRewardPanel.gameObject.activeInHierarchy;
         public string BossRewardPopupMessage => ((bossRewardTitleText == null ? string.Empty : bossRewardTitleText.text) + "\n" +
             (bossRewardGoldText == null ? string.Empty : bossRewardGoldText.text) + "\n" +
@@ -470,7 +495,10 @@ namespace HwigiTower.UI
         private void Update()
         {
             HandleManualShortcuts();
+            UpdateCombatIntro(Time.unscaledDeltaTime);
+            UpdateCombatDefeatFeedback(Time.unscaledDeltaTime);
             UpdateCombatEnemyFeedbackAnimation(Time.unscaledDeltaTime);
+            UpdateCombatPlayerFeedbackAnimation(Time.unscaledDeltaTime);
             UpdateCombatDamageNumberAnimation(Time.unscaledDeltaTime);
         }
 
@@ -720,6 +748,11 @@ namespace HwigiTower.UI
             {
                 var view = choiceViews[i];
                 if (!view.Visible)
+                {
+                    continue;
+                }
+
+                if (!showRawDebugText && ChoiceStartsCombat(encounter, view.ChoiceStableId))
                 {
                     continue;
                 }
@@ -3406,6 +3439,12 @@ namespace HwigiTower.UI
             combatEnemyDamageNumberText = CreateCombatChildText(combatEnemyStage, "Combat Enemy Damage Number", new Vector2(0.30f, 0.42f), new Vector2(0.70f, 0.58f), 42, TextAnchor.MiddleCenter);
             combatEnemyDamageNumberText.color = new Color(1.00f, 0.76f, 0.36f, 1f);
             combatEnemyDamageNumberText.gameObject.SetActive(false);
+            combatMataiosDamageNumberText = CreateCombatChildText(combatEnemyStage, "Combat Mataios Damage Number", new Vector2(0.52f, 0.56f), new Vector2(0.94f, 0.70f), 29, TextAnchor.MiddleCenter);
+            combatMataiosDamageNumberText.color = new Color(0.46f, 0.78f, 1.00f, 1f);
+            combatMataiosDamageNumberText.gameObject.SetActive(false);
+            combatDefeatFeedbackText = CreateCombatChildText(combatEnemyStage, "Combat Defeat Feedback", new Vector2(0.20f, 0.26f), new Vector2(0.80f, 0.43f), 44, TextAnchor.MiddleCenter);
+            combatDefeatFeedbackText.color = new Color(1.00f, 0.90f, 0.58f, 1f);
+            combatDefeatFeedbackText.gameObject.SetActive(false);
 
             combatLogPanel = CreateCombatPanelRect(panelObject.transform, "Combat Log Panel", new Vector2(0.04f, 0.345f), new Vector2(0.96f, 0.505f), new Color(0.02f, 0.025f, 0.030f, 0.84f));
             combatText = CreateCombatChildText(combatLogPanel, "Combat Status Text", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.92f), CombatBodyFontSize, TextAnchor.MiddleLeft);
@@ -3434,6 +3473,7 @@ namespace HwigiTower.UI
             skillButton = CreateCombatButton(combatPartyDock, "Combat Button Skill", "스킬", new Vector2(0.78f, 0.045f), CombatAction.Skill, out skillActionIconImage);
             combatItemInspectButton = CreateCombatItemInspectButton(combatPartyDock);
             skillButton.interactable = false;
+            EnsureCombatIntroOverlay();
             EnsureSkillPickerPanel();
             EnsureCombatItemInspectPanel();
             ApplyCombatStatusIconSprites();
@@ -4348,6 +4388,18 @@ namespace HwigiTower.UI
                 return;
             }
 
+            if (TryGetAutoCombatStartChoice(selection, out var combatStartChoiceId))
+            {
+                ClearChoices();
+                HideEventCutsceneLayout();
+                HideUtilityPanel();
+                SetResultVisible(false);
+                var resolution = _roomController.ResolveCurrentRouteChoice(selection, combatStartChoiceId);
+                ShowResult(resolution);
+                ShowRunState(_roomController.GetSnapshot());
+                return;
+            }
+
             if (_roomController.HasEncounterChoices(selection))
             {
                 ShowEncounterChoicesForSelection(selection);
@@ -4357,6 +4409,62 @@ namespace HwigiTower.UI
             var nodeResolution = _roomController.ResolveCurrentRouteNode(selection);
             ShowResult(nodeResolution);
             ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private bool TryGetAutoCombatStartChoice(EncounterSelection selection, out string choiceStableId)
+        {
+            choiceStableId = string.Empty;
+            if (_roomController == null || !selection.HasEncounter || selection.Encounter == null)
+            {
+                return false;
+            }
+
+            var views = _roomController.BuildEncounterChoiceViews(selection);
+            if (views == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < views.Length; i++)
+            {
+                var view = views[i];
+                if (!view.Visible || !view.Enabled || !ChoiceStartsCombat(selection.Encounter, view.ChoiceStableId))
+                {
+                    continue;
+                }
+
+                choiceStableId = view.ChoiceStableId;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool ChoiceStartsCombat(EncounterData encounter, string choiceStableId)
+        {
+            if (encounter == null || encounter.Choices == null || string.IsNullOrEmpty(choiceStableId))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < encounter.Choices.Length; i++)
+            {
+                var choice = encounter.Choices[i];
+                if (choice == null || choice.stableId != choiceStableId || choice.effects == null)
+                {
+                    continue;
+                }
+
+                for (var j = 0; j < choice.effects.Length; j++)
+                {
+                    if (choice.effects[j] != null && choice.effects[j].kind == "StartCombat")
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void ShowEncounterChoicesForSelection(EncounterSelection selection)
@@ -4761,7 +4869,9 @@ namespace HwigiTower.UI
                 return;
             }
 
-            var hasCombat = snapshot.IsInCombat;
+            StartCombatDefeatFeedbackIfNeeded(snapshot);
+            var defeatFeedback = ShouldShowCombatDefeatFeedback(snapshot);
+            var hasCombat = snapshot.IsInCombat || defeatFeedback;
             if (hasCombat)
             {
                 HideEventCutsceneLayout(restoreRouteText: false);
@@ -4802,6 +4912,7 @@ namespace HwigiTower.UI
             {
                 HideSkillPicker();
                 ResetCombatEnemyFeedbackState();
+                ResetCombatPlayerFeedbackState();
                 return;
             }
 
@@ -4821,7 +4932,12 @@ namespace HwigiTower.UI
             UpdateCombatActionIcons();
             UpdateCombatItemInspect(snapshot);
 
-            var canAct = snapshot.IsInCombat && !snapshot.LevelUpRewardPending && _roomController != null && !IsCutscenePlaying();
+            var canAct = snapshot.IsInCombat &&
+                !defeatFeedback &&
+                !snapshot.LevelUpRewardPending &&
+                _roomController != null &&
+                !IsCutscenePlaying() &&
+                _combatIntroTimer <= 0f;
             if (attackButton != null)
             {
                 attackButton.interactable = canAct;
@@ -4840,6 +4956,30 @@ namespace HwigiTower.UI
                 skillButton.interactable = canAct && preview.Usable;
                 SetCombatActionButtonPreview(skillButton, preview);
             }
+        }
+
+        private void EnsureCombatIntroOverlay()
+        {
+            if (combatIntroOverlay != null || combatPanel == null)
+            {
+                return;
+            }
+
+            var overlayObject = new GameObject("Combat Intro Overlay");
+            overlayObject.transform.SetParent(combatPanel, false);
+            combatIntroOverlay = overlayObject.AddComponent<RectTransform>();
+            combatIntroOverlay.anchorMin = Vector2.zero;
+            combatIntroOverlay.anchorMax = Vector2.one;
+            combatIntroOverlay.offsetMin = Vector2.zero;
+            combatIntroOverlay.offsetMax = Vector2.zero;
+
+            var image = overlayObject.AddComponent<Image>();
+            image.color = new Color(0f, 0f, 0f, 0.72f);
+            image.raycastTarget = true;
+
+            var label = CreateCombatChildText(overlayObject.transform, "Combat Intro Label", new Vector2(0.18f, 0.44f), new Vector2(0.82f, 0.56f), 34, TextAnchor.MiddleCenter);
+            label.text = string.Empty;
+            overlayObject.SetActive(false);
         }
 
         private static void SetCombatActionButtonPreview(Button button, CombatActionPreview preview)
@@ -4874,6 +5014,9 @@ namespace HwigiTower.UI
                     ? enemySlot.EnemySprite
                     : slot == null ? null : slot.EnemySprite;
                 combatEnemyImage.gameObject.SetActive(combatEnemyImage.sprite != null);
+                combatEnemyImage.color = ShouldShowCombatDefeatFeedback(snapshot)
+                    ? new Color(1f, 1f, 1f, 0.48f)
+                    : Color.white;
             }
 
             if (combatEnemyTitleText != null)
@@ -4907,7 +5050,8 @@ namespace HwigiTower.UI
 
         private void TrackCombatEnemyFeedback(PrototypeRunSnapshot snapshot)
         {
-            if (!snapshot.IsInCombat || combatEnemyImage == null)
+            var defeatFeedback = ShouldShowCombatDefeatFeedback(snapshot);
+            if ((!snapshot.IsInCombat && !defeatFeedback) || combatEnemyImage == null)
             {
                 ResetCombatEnemyFeedbackState();
                 return;
@@ -4922,6 +5066,7 @@ namespace HwigiTower.UI
                 _lastCombatVisualEnemyHp = snapshot.EnemyHp;
                 _lastCombatVisualPlayerHp = snapshot.PlayerHp;
                 ResetCombatEnemyFeedbackTransform();
+                StartCombatIntro(visualKey, snapshot);
                 return;
             }
 
@@ -4932,13 +5077,26 @@ namespace HwigiTower.UI
 
             if (_lastCombatVisualEnemyHp >= 0 && snapshot.EnemyHp < _lastCombatVisualEnemyHp)
             {
-                ShowCombatDamageNumber(combatEnemyDamageNumberText, "-" + (_lastCombatVisualEnemyHp - snapshot.EnemyHp), true);
+                var totalDamage = _lastCombatVisualEnemyHp - snapshot.EnemyHp;
+                var mataiosDamage = Mathf.Clamp(snapshot.LastMataiosCombatDamage, 0, totalDamage);
+                var playerDamage = Mathf.Max(0, totalDamage - mataiosDamage);
+                if (playerDamage > 0)
+                {
+                    ShowCombatDamageNumber(combatEnemyDamageNumberText, "-" + playerDamage, CombatDamageNumberRole.Enemy);
+                }
+
+                if (mataiosDamage > 0)
+                {
+                    ShowCombatDamageNumber(combatMataiosDamageNumberText, "마타이오스 -" + mataiosDamage, CombatDamageNumberRole.Mataios);
+                }
+
                 TriggerCombatEnemyHitShake();
             }
 
             if (_lastCombatVisualPlayerHp >= 0 && snapshot.PlayerHp < _lastCombatVisualPlayerHp)
             {
-                ShowCombatDamageNumber(combatPlayerDamageNumberText, "-" + (_lastCombatVisualPlayerHp - snapshot.PlayerHp), false);
+                ShowCombatDamageNumber(combatPlayerDamageNumberText, "-" + (_lastCombatVisualPlayerHp - snapshot.PlayerHp), CombatDamageNumberRole.Player);
+                TriggerCombatPlayerHitFeedback();
             }
 
             if ((snapshot.LastCombatRoundResult ?? string.Empty).Contains("enemyDamage ", StringComparison.Ordinal))
@@ -4951,7 +5109,14 @@ namespace HwigiTower.UI
             _lastCombatVisualPlayerHp = snapshot.PlayerHp;
         }
 
-        private void ShowCombatDamageNumber(Text text, string value, bool enemy)
+        private enum CombatDamageNumberRole
+        {
+            Enemy,
+            Mataios,
+            Player
+        }
+
+        private void ShowCombatDamageNumber(Text text, string value, CombatDamageNumberRole role)
         {
             if (text == null || string.IsNullOrEmpty(value))
             {
@@ -4960,9 +5125,13 @@ namespace HwigiTower.UI
 
             text.text = value;
             text.gameObject.SetActive(true);
-            if (enemy)
+            if (role == CombatDamageNumberRole.Enemy)
             {
                 _combatEnemyDamageNumberTimer = CombatDamageNumberDuration;
+            }
+            else if (role == CombatDamageNumberRole.Mataios)
+            {
+                _combatMataiosDamageNumberTimer = CombatDamageNumberDuration;
             }
             else
             {
@@ -4980,6 +5149,68 @@ namespace HwigiTower.UI
         {
             CaptureCombatEnemyFeedbackBase();
             _combatEnemyAttackPulseTimer = CombatEnemyAttackPulseDuration;
+        }
+
+        private void TriggerCombatPlayerHitFeedback()
+        {
+            CaptureCombatPlayerFeedbackBase();
+            _combatPlayerHitShakeTimer = CombatPlayerHitShakeDuration;
+            _combatPlayerHpPulseTimer = CombatPlayerHpPulseDuration;
+        }
+
+        private void StartCombatIntro(string visualKey, PrototypeRunSnapshot snapshot)
+        {
+            if (!snapshot.IsInCombat || _combatIntroKey == visualKey)
+            {
+                return;
+            }
+
+            EnsureCombatIntroOverlay();
+            _combatIntroKey = visualKey;
+            _combatIntroTimer = CombatIntroDuration;
+            if (combatIntroOverlay != null)
+            {
+                combatIntroOverlay.gameObject.SetActive(true);
+                combatIntroOverlay.transform.SetAsLastSibling();
+            }
+        }
+
+        private bool ShouldShowCombatDefeatFeedback(PrototypeRunSnapshot snapshot)
+        {
+            return !snapshot.IsInCombat &&
+                snapshot.LastCombatEnemyDefeated &&
+                !string.IsNullOrEmpty(snapshot.LastCombatId) &&
+                _combatDefeatFeedbackTimer > 0f &&
+                _combatDefeatFeedbackKey == BuildCombatDefeatFeedbackKey(snapshot);
+        }
+
+        private string BuildCombatDefeatFeedbackKey(PrototypeRunSnapshot snapshot)
+        {
+            return (snapshot.LastCombatId ?? string.Empty) + "|" + snapshot.CombatRound + "|" + (snapshot.LastCombatEnemyId ?? string.Empty);
+        }
+
+        private void StartCombatDefeatFeedbackIfNeeded(PrototypeRunSnapshot snapshot)
+        {
+            if (snapshot.IsInCombat || !snapshot.LastCombatEnemyDefeated || string.IsNullOrEmpty(snapshot.LastCombatId))
+            {
+                return;
+            }
+
+            var key = BuildCombatDefeatFeedbackKey(snapshot);
+            if (_combatDefeatFeedbackKey == key)
+            {
+                return;
+            }
+
+            _combatDefeatFeedbackKey = key;
+            _combatDefeatFeedbackTimer = CombatDefeatFeedbackDuration;
+            if (combatDefeatFeedbackText != null)
+            {
+                combatDefeatFeedbackText.text = IsBossEnemyId(snapshot.LastCombatEnemyId) ? "보스 격파" : "격파";
+                combatDefeatFeedbackText.gameObject.SetActive(true);
+            }
+
+            TriggerCombatEnemyHitShake();
         }
 
         private void UpdateCombatEnemyFeedbackAnimation(float deltaTime)
@@ -5017,6 +5248,47 @@ namespace HwigiTower.UI
             }
         }
 
+        private void UpdateCombatPlayerFeedbackAnimation(float deltaTime)
+        {
+            if (combatPlayerCard == null || (!_combatPlayerFeedbackBaseCaptured && _combatPlayerHitShakeTimer <= 0f && _combatPlayerHpPulseTimer <= 0f))
+            {
+                return;
+            }
+
+            CaptureCombatPlayerFeedbackBase();
+            _combatPlayerHitShakeTimer = Mathf.Max(0f, _combatPlayerHitShakeTimer - Mathf.Max(0f, deltaTime));
+            _combatPlayerHpPulseTimer = Mathf.Max(0f, _combatPlayerHpPulseTimer - Mathf.Max(0f, deltaTime));
+
+            var shakeOffset = 0f;
+            if (_combatPlayerHitShakeTimer > 0f)
+            {
+                var progress = 1f - _combatPlayerHitShakeTimer / CombatPlayerHitShakeDuration;
+                shakeOffset = Mathf.Sin(progress * Mathf.PI * 7f) * CombatPlayerHitShakePixels * (1f - progress);
+            }
+
+            var pulseScale = 1f;
+            if (_combatPlayerHpPulseTimer > 0f)
+            {
+                var progress = 1f - _combatPlayerHpPulseTimer / CombatPlayerHpPulseDuration;
+                pulseScale = Mathf.Lerp(CombatPlayerHpPulseScale, 1f, progress);
+            }
+
+            combatPlayerCard.anchoredPosition = _combatPlayerCardBasePosition + new Vector2(shakeOffset, 0f);
+            combatPlayerCard.localScale = _combatPlayerCardBaseScale * pulseScale;
+            var cardImage = combatPlayerCard.GetComponent<Image>();
+            if (cardImage != null)
+            {
+                cardImage.color = _combatPlayerHitShakeTimer > 0f
+                    ? new Color(0.24f, 0.08f, 0.08f, 0.98f)
+                    : _combatPlayerCardBaseColor;
+            }
+
+            if (_combatPlayerHitShakeTimer <= 0f && _combatPlayerHpPulseTimer <= 0f)
+            {
+                ResetCombatPlayerFeedbackTransform();
+            }
+        }
+
         private void CaptureCombatEnemyFeedbackBase()
         {
             if (_combatEnemyFeedbackBaseCaptured || combatEnemyImage == null)
@@ -5042,6 +5314,43 @@ namespace HwigiTower.UI
             rect.localScale = _combatEnemyImageBaseScale;
         }
 
+        private void CaptureCombatPlayerFeedbackBase()
+        {
+            if (_combatPlayerFeedbackBaseCaptured || combatPlayerCard == null)
+            {
+                return;
+            }
+
+            _combatPlayerCardBasePosition = combatPlayerCard.anchoredPosition;
+            _combatPlayerCardBaseScale = combatPlayerCard.localScale;
+            var image = combatPlayerCard.GetComponent<Image>();
+            _combatPlayerCardBaseColor = image == null ? Color.white : image.color;
+            _combatPlayerFeedbackBaseCaptured = true;
+        }
+
+        private void ResetCombatPlayerFeedbackTransform()
+        {
+            if (!_combatPlayerFeedbackBaseCaptured || combatPlayerCard == null)
+            {
+                return;
+            }
+
+            combatPlayerCard.anchoredPosition = _combatPlayerCardBasePosition;
+            combatPlayerCard.localScale = _combatPlayerCardBaseScale;
+            var image = combatPlayerCard.GetComponent<Image>();
+            if (image != null)
+            {
+                image.color = _combatPlayerCardBaseColor;
+            }
+        }
+
+        private void ResetCombatPlayerFeedbackState()
+        {
+            ResetCombatPlayerFeedbackTransform();
+            _combatPlayerHitShakeTimer = 0f;
+            _combatPlayerHpPulseTimer = 0f;
+        }
+
         private void ResetCombatEnemyFeedbackState()
         {
             ResetCombatEnemyFeedbackTransform();
@@ -5052,15 +5361,26 @@ namespace HwigiTower.UI
             _combatEnemyHitShakeTimer = 0f;
             _combatEnemyAttackPulseTimer = 0f;
             _combatEnemyDamageNumberTimer = 0f;
+            _combatMataiosDamageNumberTimer = 0f;
             _combatPlayerDamageNumberTimer = 0f;
             if (combatEnemyDamageNumberText != null)
             {
                 combatEnemyDamageNumberText.gameObject.SetActive(false);
             }
 
+            if (combatMataiosDamageNumberText != null)
+            {
+                combatMataiosDamageNumberText.gameObject.SetActive(false);
+            }
+
             if (combatPlayerDamageNumberText != null)
             {
                 combatPlayerDamageNumberText.gameObject.SetActive(false);
+            }
+
+            if (combatDefeatFeedbackText != null)
+            {
+                combatDefeatFeedbackText.gameObject.SetActive(false);
             }
         }
 
@@ -5076,6 +5396,15 @@ namespace HwigiTower.UI
                 }
             }
 
+            if (_combatMataiosDamageNumberTimer > 0f)
+            {
+                _combatMataiosDamageNumberTimer = Mathf.Max(0f, _combatMataiosDamageNumberTimer - step);
+                if (_combatMataiosDamageNumberTimer <= 0f && combatMataiosDamageNumberText != null)
+                {
+                    combatMataiosDamageNumberText.gameObject.SetActive(false);
+                }
+            }
+
             if (_combatPlayerDamageNumberTimer > 0f)
             {
                 _combatPlayerDamageNumberTimer = Mathf.Max(0f, _combatPlayerDamageNumberTimer - step);
@@ -5083,6 +5412,51 @@ namespace HwigiTower.UI
                 {
                     combatPlayerDamageNumberText.gameObject.SetActive(false);
                 }
+            }
+        }
+
+        private void UpdateCombatIntro(float deltaTime)
+        {
+            if (_combatIntroTimer <= 0f)
+            {
+                return;
+            }
+
+            _combatIntroTimer = Mathf.Max(0f, _combatIntroTimer - Mathf.Max(0f, deltaTime));
+            if (combatIntroOverlay != null)
+            {
+                var image = combatIntroOverlay.GetComponent<Image>();
+                if (image != null)
+                {
+                    image.color = new Color(0f, 0f, 0f, Mathf.Lerp(0f, 0.72f, _combatIntroTimer / CombatIntroDuration));
+                }
+
+                combatIntroOverlay.gameObject.SetActive(_combatIntroTimer > 0f);
+            }
+
+            if (_combatIntroTimer <= 0f)
+            {
+                ShowRunState(_lastSnapshot);
+            }
+        }
+
+        private void UpdateCombatDefeatFeedback(float deltaTime)
+        {
+            if (_combatDefeatFeedbackTimer <= 0f)
+            {
+                return;
+            }
+
+            _combatDefeatFeedbackTimer = Mathf.Max(0f, _combatDefeatFeedbackTimer - Mathf.Max(0f, deltaTime));
+            if (combatDefeatFeedbackText != null)
+            {
+                combatDefeatFeedbackText.gameObject.SetActive(_combatDefeatFeedbackTimer > 0f);
+            }
+
+            if (_combatDefeatFeedbackTimer <= 0f)
+            {
+                ResetCombatEnemyFeedbackTransform();
+                ShowRunState(_lastSnapshot);
             }
         }
 
@@ -5382,6 +5756,7 @@ namespace HwigiTower.UI
             }
 
             var visible = !snapshot.IsInCombat &&
+                !ShouldShowCombatDefeatFeedback(snapshot) &&
                 !RestInteractionPanelVisible &&
                 !_shopPresentationActive &&
                 !_eventPresentationActive &&
@@ -6249,7 +6624,7 @@ namespace HwigiTower.UI
             var state = BuildCombatLogDetailLine(snapshot);
             return PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + " | 내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
                 ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 40) + "\n" +
-                ShortenPublicLine(state, 38) + "\n" +
+                ShortenPublicLine(state, 52) + "\n" +
                 ShortenPublicLine(BuildCombatBuildSummaryLine(snapshot), 42);
         }
 
@@ -6262,6 +6637,12 @@ namespace HwigiTower.UI
                 highlights.Add(extra);
             }
 
+            var playerDamage = ExtractRoundNumber(snapshot.LastCombatRoundResult, "playerDamage ").Trim();
+            if (!string.IsNullOrEmpty(playerDamage) && playerDamage != "0")
+            {
+                highlights.Add("플레이어: " + playerDamage + " 피해");
+            }
+
             if (snapshot.LastMataiosProtectReduction > 0)
             {
                 highlights.Add("마타이오스 보호: 피해 " + snapshot.LastMataiosProtectReduction + " 감소");
@@ -6269,7 +6650,7 @@ namespace HwigiTower.UI
 
             if (snapshot.LastMataiosCombatDamage > 0)
             {
-                highlights.Add("마타이오스 지원: 추가 피해 " + snapshot.LastMataiosCombatDamage);
+                highlights.Add("마타이오스: " + snapshot.LastMataiosCombatDamage + " 지원 피해");
             }
 
             if (highlights.Count > 0)
@@ -7361,6 +7742,11 @@ namespace HwigiTower.UI
                 "BOSS_APEX_02" => "최종 보스",
                 _ => "적"
             };
+        }
+
+        private static bool IsBossEnemyId(string enemyId)
+        {
+            return enemyId == "BOSS_GATE_01" || enemyId == "BOSS_APEX_02";
         }
 
         private static string PublicCombatActionName(string action)
