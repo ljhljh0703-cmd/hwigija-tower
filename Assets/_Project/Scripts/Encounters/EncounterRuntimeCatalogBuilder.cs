@@ -439,9 +439,9 @@ namespace HwigiTower.Encounters
             switch (stableId)
             {
                 case "BOSS_APEX_02":
-                    return 30;
+                    return 64;
                 case "BOSS_GATE_01":
-                    return 28;
+                    return 48;
                 case "ENEMY_WRAITH_04":
                     return 12;
                 case "ENEMY_COLLAPSE_ECHO":
