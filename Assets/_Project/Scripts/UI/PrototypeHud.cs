@@ -755,7 +755,10 @@ namespace HwigiTower.UI
                     continue;
                 }
 
-                if (!showRawDebugText && ChoiceStartsCombat(encounter, view.ChoiceStableId))
+                if (!showRawDebugText &&
+                    encounter != null &&
+                    encounter.Type == EncounterType.Battle &&
+                    ChoiceStartsCombat(encounter, view.ChoiceStableId))
                 {
                     continue;
                 }
@@ -4450,7 +4453,9 @@ namespace HwigiTower.UI
             if (_roomController == null ||
                 !selection.HasEncounter ||
                 selection.Encounter == null ||
-                selection.Encounter.Type != EncounterType.Battle)
+                selection.Encounter.Type != EncounterType.Battle ||
+                selection.Node == null ||
+                selection.Node.Kind != NodeKind.Battle)
             {
                 return false;
             }
@@ -4575,7 +4580,14 @@ namespace HwigiTower.UI
                     ShowEncounterChoicesForSelection(selection);
                 }
 
-                ShowRunState(_roomController.GetSnapshot());
+                var snapshot = _roomController.GetSnapshot();
+                if (!snapshot.IsInCombat && snapshot.HasFloorMap && !snapshot.HasSelectedMapNode)
+                {
+                    HideEventCutsceneLayout();
+                    HideLegacyEncounterVisuals(hideBackground: true);
+                }
+
+                ShowRunState(snapshot);
             });
             ShowRunState(_roomController.GetSnapshot());
         }

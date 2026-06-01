@@ -1331,6 +1331,53 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void Floor1_FirstLayer_DoesNotClassifyJarEventAsCombat()
+        {
+            var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            Assert.IsNotNull(room);
+            var state = new PrototypeRunState("run-floor1-map-contract", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachFloorRunPaths(room.FloorRunPaths, room.DemoRunPath);
+
+            var nodes = state.CreateSnapshot().FloorMapNodes;
+            Assert.IsTrue(nodes.Any(node => node.Layer == 1 && node.MapNodeId.Contains(".EVT_F01_JAR_ROOM") && node.Type == PrototypeFloorMapNodeType.Event));
+            Assert.IsFalse(nodes.Any(node => node.MapNodeId.Contains(".EVT_F01_JAR_ROOM") && node.Type == PrototypeFloorMapNodeType.Combat));
+
+            var combatGateNodes = nodes.Where(node => node.MapNodeId.Contains(".ENC_COMBAT_GATE_01")).ToArray();
+            Assert.Greater(combatGateNodes.Length, 0);
+            Assert.IsTrue(combatGateNodes.All(node => node.Type == PrototypeFloorMapNodeType.Combat || node.Type == PrototypeFloorMapNodeType.Boss));
+        }
+
+        [Test]
+        public void Floor1_EventChoice_CompletesNodeAndReturnsToSelectableMap()
+        {
+            var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            Assert.IsNotNull(room);
+            var state = new PrototypeRunState("run-floor1-event-choice-contract", new GameFlowEventBus()) { AutoResolveCombat = false };
+            state.AttachEncounterCatalog(LoadRuntimeCatalog());
+            state.AttachFloorRunPaths(room.FloorRunPaths, room.DemoRunPath);
+
+            var jarNode = state.GetSelectableMapNodeViews()
+                .FirstOrDefault(node => node.MapNodeId.Contains(".EVT_F01_JAR_ROOM"));
+            Assert.IsFalse(string.IsNullOrEmpty(jarNode.MapNodeId), "Expected selectable Floor 1 jar event node.");
+            Assert.IsTrue(state.TrySelectMapNode(jarNode.MapNodeId, out var step));
+            Assert.AreEqual("EVT_F01_JAR_ROOM", step.EncounterId);
+
+            var resolution = state.ResolveEncounterChoice(
+                new DeterministicRunContext("run-floor1-event-choice-contract", 1001),
+                step.NodeId,
+                step.Encounter,
+                "CHOICE_EVT_F01_JAR_ROOM_PLAIN");
+
+            Assert.AreEqual("CHOICE_EVT_F01_JAR_ROOM_PLAIN", resolution.PayloadId);
+            Assert.IsFalse(state.IsInCombat);
+            var snapshot = state.CreateSnapshot();
+            Assert.IsFalse(snapshot.HasSelectedMapNode);
+            Assert.IsTrue(snapshot.FloorMapNodes.Single(node => node.MapNodeId == jarNode.MapNodeId).Completed);
+            Assert.Greater(state.GetSelectableMapNodeViews().Length, 0);
+            StringAssert.DoesNotContain("결과\n-", resolution.Message);
+        }
+
+        [Test]
         public void BranchingFloorMap_OnlyConnectedNodesBecomeSelectable()
         {
             var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
@@ -1657,17 +1704,18 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsNotNull(node);
 
             var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(new PrototypeRunState("run-jar-views", new GameFlowEventBus()), jar);
-            Assert.AreEqual(3, views.Length);
+            Assert.AreEqual(4, views.Length);
             StringAssert.Contains("80%: 골드 획득", views[0].HintText);
             StringAssert.Contains("20%: 엘리트 전투", views[0].HintText);
-            StringAssert.Contains("HP 회복", views[1].HintText);
-            StringAssert.Contains("다음 3회 전투 피해 증가", views[2].HintText);
+            StringAssert.Contains("20%: 엘리트 전투", views[1].HintText);
+            StringAssert.Contains("HP 회복", views[2].HintText);
+            StringAssert.Contains("다음 3회 전투 피해 증가", views[3].HintText);
 
             var goldState = new PrototypeRunState("run-jar-gold", new GameFlowEventBus()) { AutoResolveCombat = true };
             goldState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, jar) });
-            var patterned = goldState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-gold", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_PATTERNED");
-            Assert.AreEqual("CHOICE_EVT_F01_JAR_PATTERNED", patterned.PayloadId);
-            Assert.IsTrue(patterned.Message.Contains("Gold +8") || patterned.Message.Contains("elite combat"));
+            var patterned = goldState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-gold", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_ROOM_PATTERNED");
+            Assert.AreEqual("CHOICE_EVT_F01_JAR_ROOM_PATTERNED", patterned.PayloadId);
+            Assert.IsTrue(patterned.Message.Contains("Gold +10") || patterned.Message.Contains("전투"));
 
             var plainState = new PrototypeRunState("run-jar-plain", new GameFlowEventBus()) { AutoResolveCombat = true };
             plainState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, jar) });
@@ -1675,13 +1723,13 @@ namespace HwigiTower.Tests.EditMode
             plainState.ModifyMental(-6);
             var hpBefore = plainState.PlayerHp;
             var mentalBefore = plainState.Mental;
-            plainState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-plain", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_PLAIN");
+            plainState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-plain", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_ROOM_PLAIN");
             Assert.Greater(plainState.PlayerHp, hpBefore);
             Assert.Greater(plainState.Mental, mentalBefore);
 
             var buffState = new PrototypeRunState("run-jar-buff", new GameFlowEventBus()) { AutoResolveCombat = true };
             buffState.AttachDemoRunPath(new[] { new PrototypeDemoRunStep(node, jar) });
-            buffState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-buff", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_CRACKED");
+            buffState.ResolveEncounterChoice(new DeterministicRunContext("run-jar-buff", 1001), node.NodeId, jar, "CHOICE_EVT_F01_JAR_ROOM_CRACKED");
             Assert.IsTrue(buffState.HasFlag("FLAG_CRACKED_JAR_DAMAGE_BUFF"));
         }
 
@@ -3469,7 +3517,7 @@ namespace HwigiTower.Tests.EditMode
             switch (step.EncounterId)
             {
                 case "EVT_F01_JAR_ROOM":
-                    preferredChoiceId = "CHOICE_EVT_F01_JAR_PLAIN";
+                    preferredChoiceId = "CHOICE_EVT_F01_JAR_ROOM_PLAIN";
                     break;
                 case "ENC_MORAL_CHOICE_01":
                     preferredChoiceId = "CHOICE_MORAL_01_REFUSE";

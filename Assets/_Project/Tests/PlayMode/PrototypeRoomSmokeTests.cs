@@ -151,7 +151,7 @@ namespace HwigiTower.Tests.PlayMode
             StringAssert.Contains("항아리 방", hud.EventCutsceneMessage);
             StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", hud.EventCutsceneMessage);
             StringAssert.DoesNotContain("Glitch", hud.EventCutsceneMessage);
-            var patternedJar = FindChoiceButton(hud, "CHOICE_EVT_F01_JAR_PATTERNED");
+            var patternedJar = FindChoiceButton(hud, "CHOICE_EVT_F01_JAR_ROOM_PATTERNED");
             Assert.IsNotNull(patternedJar, DescribeChoiceButtons(hud));
             var label = ReadButtonText(patternedJar);
             StringAssert.Contains("신기한 문양이 각인된 항아리", label);
@@ -182,9 +182,31 @@ namespace HwigiTower.Tests.PlayMode
             yield return null;
 
             Assert.IsTrue(hud.NodeMapVisible, "Fresh run should show Floor 1 map after pre-run.");
-            var combatSelection = controller.CreateQaEncounterSelection("ENC_COMBAT_GATE_01");
-            Assert.AreEqual("ENC_COMBAT_GATE_01", combatSelection.EncounterId);
-            OpenSelectedRouteStepForTest(hud, combatSelection);
+            StringAssert.Contains("node_event", hud.CurrentMapNodeIconNames);
+            StringAssert.Contains("node_combat", hud.CurrentMapNodeIconNames);
+
+            yield return AdvanceMapUntilEncounterSelectableStrict(hud, "EVT_F01_JAR_ROOM");
+            var eventButton = FindMapChoiceButton(hud, "EVT_F01_JAR_ROOM");
+            Assert.IsNotNull(eventButton, DescribeChoiceButtons(hud));
+            eventButton.onClick.Invoke();
+            yield return null;
+
+            var plainJar = FindChoiceButton(hud, "CHOICE_EVT_F01_JAR_ROOM_PLAIN");
+            Assert.IsNotNull(plainJar, DescribeChoiceButtons(hud));
+            plainJar.onClick.Invoke();
+            yield return null;
+
+            Assert.IsFalse(controller.RunState.IsInCombat);
+            Assert.IsFalse(controller.GetSnapshot().HasSelectedMapNode);
+            OpenMapChoicesIfNeeded(hud);
+            yield return null;
+            Assert.IsTrue(hud.NodeMapVisible, "Event choice should complete and return to selectable map.");
+            Assert.IsNotNull(FindFirstInteractableMapChoiceButton(hud), DescribeChoiceButtons(hud));
+
+            yield return AdvanceMapUntilEncounterSelectableStrict(hud, "ENC_COMBAT_GATE_01");
+            var combatMapButton = FindMapChoiceButton(hud, "ENC_COMBAT_GATE_01");
+            Assert.IsNotNull(combatMapButton, DescribeChoiceButtons(hud));
+            combatMapButton.onClick.Invoke();
             yield return null;
 
             Assert.IsTrue(controller.RunState.IsInCombat);
@@ -730,6 +752,52 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsTrue(
                 FindMapChoiceButton(hud, expectedEncounterId) != null || IsExpectedEncounterOpen(hud, expectedEncounterId),
                 "Could not advance map toward " + expectedEncounterId);
+        }
+
+        private static IEnumerator AdvanceMapUntilEncounterSelectableStrict(PrototypeHud hud, string expectedEncounterId)
+        {
+            var guard = 0;
+            OpenMapChoicesIfNeeded(hud);
+            yield return null;
+            while (FindMapChoiceButton(hud, expectedEncounterId) == null && !IsExpectedEncounterOpen(hud, expectedEncounterId) && guard++ < 20)
+            {
+                if (IsAnyEncounterOpen(hud) || hud.RestInteractionPanelVisible)
+                {
+                    yield return ResolveOpenEncounterForMapAdvance(hud);
+                    if (hud.RouteActionButtonVisible)
+                    {
+                        hud.GetRouteActionButton().onClick.Invoke();
+                        yield return null;
+                    }
+
+                    OpenMapChoicesIfNeeded(hud);
+                    yield return null;
+                    continue;
+                }
+
+                var next = FindPreferredAdvanceMapChoiceButton(hud, expectedEncounterId);
+                Assert.IsNotNull(next, "Missing selectable map node while advancing toward " + expectedEncounterId + " among " + DescribeChoiceButtons(hud));
+                next.onClick.Invoke();
+                yield return null;
+                if (IsExpectedEncounterOpen(hud, expectedEncounterId))
+                {
+                    break;
+                }
+
+                yield return ResolveOpenEncounterForMapAdvance(hud);
+                if (hud.RouteActionButtonVisible)
+                {
+                    hud.GetRouteActionButton().onClick.Invoke();
+                    yield return null;
+                }
+
+                OpenMapChoicesIfNeeded(hud);
+                yield return null;
+            }
+
+            Assert.IsTrue(
+                FindMapChoiceButton(hud, expectedEncounterId) != null || IsExpectedEncounterOpen(hud, expectedEncounterId),
+                "Could not advance map toward " + expectedEncounterId + " through visible route nodes.");
         }
 
         private static void OpenMapChoicesIfNeeded(PrototypeHud hud)

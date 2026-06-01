@@ -173,7 +173,7 @@ namespace HwigiTower.Run
                 return new PrototypeEncounterChoiceResolution(choice.stableId, false, "choice failed: requirements not met");
             }
 
-            if (encounter.Id == "EVT_F01_JAR_ROOM")
+            if (encounter.Id == "EVT_F01_JAR_ROOM" && UsesLegacyJarChoiceContract(choice.stableId))
             {
                 return state.ResolveJarRoomChoice(context, nodeId, choice.stableId);
             }
@@ -286,6 +286,13 @@ namespace HwigiTower.Run
                 "CHOICE_EVT_F01_JAR_ROOM_CRACKED" => "다음 3회 전투 피해 증가",
                 _ => string.Empty
             };
+        }
+
+        private static bool UsesLegacyJarChoiceContract(string choiceStableId)
+        {
+            return choiceStableId == "CHOICE_EVT_F01_JAR_PATTERNED" ||
+                choiceStableId == "CHOICE_EVT_F01_JAR_PLAIN" ||
+                choiceStableId == "CHOICE_EVT_F01_JAR_CRACKED";
         }
 
         private static string BuildUnavailableReason(EncounterChoiceRuntimeData choice, PrototypeRunState state)
