@@ -271,7 +271,7 @@ namespace HwigiTower.UI
         public bool HasPresentationData => presentationData != null;
         public bool HasPortraitRoot => portraitRoot != null && portraitRoot.gameObject.activeInHierarchy;
         public Vector2 PortraitRootSize => portraitRoot == null ? Vector2.zero : portraitRoot.sizeDelta;
-        public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
+        public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.gameObject.activeInHierarchy && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
         public string CurrentCombatEnemySpriteName => combatEnemyImage != null && combatEnemyImage.sprite != null ? combatEnemyImage.sprite.name : string.Empty;
         public string CurrentCombatPlayerPortraitSpriteName => combatPlayerPortraitImage != null && combatPlayerPortraitImage.sprite != null ? combatPlayerPortraitImage.sprite.name : string.Empty;
         public string CurrentCombatMataiosPortraitSpriteName => combatMataiosPortraitImage != null && combatMataiosPortraitImage.sprite != null ? combatMataiosPortraitImage.sprite.name : string.Empty;
@@ -817,7 +817,7 @@ namespace HwigiTower.UI
             {
                 if (_choiceButtons[i] != null)
                 {
-                    Destroy(_choiceButtons[i].gameObject);
+                    DestroyHudObject(_choiceButtons[i].gameObject);
                 }
             }
 
@@ -880,11 +880,28 @@ namespace HwigiTower.UI
             {
                 if (_mapDecorations[i] != null)
                 {
-                    Destroy(_mapDecorations[i]);
+                    DestroyHudObject(_mapDecorations[i]);
                 }
             }
 
             _mapDecorations.Clear();
+        }
+
+        private static void DestroyHudObject(GameObject target)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            if (Application.isPlaying)
+            {
+                Destroy(target);
+            }
+            else
+            {
+                DestroyImmediate(target);
+            }
         }
 
         private void ApplyFloorMapBackground(PrototypeFloorMapNodeView[] nodes)
@@ -1159,6 +1176,7 @@ namespace HwigiTower.UI
             }
 
             HidePreRunPlaceholder();
+            AutoShowMapIfNeeded(snapshot);
             UpdateScreenLayers(snapshot);
             UpdateBossRewardPopup(snapshot);
             UpdateLevelRewardPopup(snapshot);
@@ -1182,7 +1200,7 @@ namespace HwigiTower.UI
         {
             EnsureScreenLayers();
             var restVisible = RestInteractionPanelVisible;
-            var mapVisible = IsMapSelectionVisible(snapshot);
+            var mapVisible = IsMapRouteState(snapshot);
             var shopVisible = !snapshot.IsInCombat && !restVisible && _shopPresentationActive;
             var eventVisible = _eventPresentationActive;
             SetLayerVisible(topStatusLayer, true);
@@ -1197,15 +1215,23 @@ namespace HwigiTower.UI
 
         private bool IsMapSelectionVisible(PrototypeRunSnapshot snapshot)
         {
-            return snapshot.HasFloorMap &&
-                !snapshot.IsInCombat &&
-                !snapshot.RunCompleted &&
-                !RestInteractionPanelVisible &&
-                !_shopPresentationActive &&
+            return IsMapRouteState(snapshot) &&
                 choiceContainer != null &&
                 nodeMapLayer != null &&
                 choiceContainer.parent == nodeMapLayer &&
                 _choiceButtons.Count > 0;
+        }
+
+        private bool IsMapRouteState(PrototypeRunSnapshot snapshot)
+        {
+            return snapshot.HasFloorMap &&
+                !snapshot.IsInCombat &&
+                !snapshot.RunCompleted &&
+                !snapshot.StairUnlocked &&
+                !snapshot.HasSelectedMapNode &&
+                !RestInteractionPanelVisible &&
+                !_shopPresentationActive &&
+                !_eventPresentationActive;
         }
 
         private void AutoShowMapIfNeeded(PrototypeRunSnapshot snapshot)
@@ -1217,9 +1243,20 @@ namespace HwigiTower.UI
                 snapshot.RunCompleted ||
                 snapshot.StairUnlocked ||
                 RestInteractionPanelVisible ||
-                _choiceButtons.Count > 0)
+                _shopPresentationActive ||
+                _eventPresentationActive)
             {
                 return;
+            }
+
+            if (IsMapSelectionVisible(snapshot))
+            {
+                return;
+            }
+
+            if (_choiceButtons.Count > 0)
+            {
+                ClearChoices();
             }
 
             var mapNodes = _roomController.GetFloorMapNodes();
@@ -4694,7 +4731,7 @@ namespace HwigiTower.UI
                 _eventPresentationActive ||
                 _shopPresentationActive ||
                 RestInteractionPanelVisible ||
-                IsMapSelectionVisible(snapshot);
+                IsMapRouteState(snapshot);
             interactionText.gameObject.SetActive(!hiddenByEncounterState);
         }
 
@@ -4777,7 +4814,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            if ((_eventPresentationActive || _shopPresentationActive || RestInteractionPanelVisible || IsMapSelectionVisible(snapshot)) && !showRawDebugText)
+            if ((_eventPresentationActive || _shopPresentationActive || RestInteractionPanelVisible || IsMapRouteState(snapshot)) && !showRawDebugText)
             {
                 memoryText.gameObject.SetActive(false);
                 memoryText.text = string.Empty;
@@ -4908,7 +4945,7 @@ namespace HwigiTower.UI
                     !_eventPresentationActive &&
                     !_shopPresentationActive &&
                     !RestInteractionPanelVisible &&
-                    !IsMapSelectionVisible(snapshot));
+                    !IsMapRouteState(snapshot));
             }
 
             if (routeText != null && hasCombat && !showRawDebugText)
@@ -5866,7 +5903,7 @@ namespace HwigiTower.UI
                 !RestInteractionPanelVisible &&
                 !_shopPresentationActive &&
                 !_eventPresentationActive &&
-                !IsMapSelectionVisible(snapshot) &&
+                !IsMapRouteState(snapshot) &&
                 !BossRewardPopupVisible;
             SetResultVisible(visible);
         }
@@ -7298,13 +7335,15 @@ namespace HwigiTower.UI
                 return;
             }
 
-            var slot = ResolveCurrentPresentationSlot(snapshot);
-            ApplyPresentationSlot(slot);
-            if (IsMapSelectionVisible(snapshot))
+            if (IsMapRouteState(snapshot))
             {
                 HideLegacyEncounterVisuals(hideBackground: true);
+                return;
             }
-            else if (_shopPresentationActive || snapshot.IsInCombat || _eventPresentationActive)
+
+            var slot = ResolveCurrentPresentationSlot(snapshot);
+            ApplyPresentationSlot(slot);
+            if (_shopPresentationActive || snapshot.IsInCombat || _eventPresentationActive)
             {
                 HideLegacyEncounterVisuals(hideBackground: false);
             }

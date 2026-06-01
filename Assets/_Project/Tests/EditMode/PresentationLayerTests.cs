@@ -524,11 +524,108 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("node_shop", hud.CurrentMapNodeIconNames);
             StringAssert.Contains("node_boss", hud.CurrentMapNodeIconNames);
             Assert.AreEqual(4, hud.ChoiceButtonCount);
-            StringAssert.Contains("결과", result.text);
+            Assert.IsFalse(hud.ResultPanelVisible);
+            StringAssert.DoesNotContain("결과\n-", result.text);
             var first = hud.GetChoiceButton(0).GetComponentInChildren<Text>();
             Assert.IsNotNull(first);
             StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", first.text);
             StringAssert.DoesNotContain("floor1.layer1", first.text);
+        }
+
+        [Test]
+        public void FreshRun_Floor1MapShowsSelectableNodes()
+        {
+            var hud = CreateHud(out _);
+            var controller = CreateConfiguredRoomController(hud);
+            try
+            {
+                controller.BeginRun();
+                controller.ConfirmPreRunPlaceholder();
+
+                hud.ShowRunState(controller.GetSnapshot());
+
+                Assert.IsTrue(hud.NodeMapVisible);
+                Assert.Greater(hud.ChoiceButtonCount, 0);
+                Assert.IsNotNull(FindFirstInteractableMapChoiceButton(hud));
+                Assert.IsFalse(hud.ResultPanelVisible);
+                Assert.IsFalse(hud.EventCutsceneVisible);
+            }
+            finally
+            {
+                Object.DestroyImmediate(controller.gameObject);
+                Object.DestroyImmediate(hud.gameObject);
+            }
+        }
+
+        [Test]
+        public void MapState_DoesNotShowEventResultPanel()
+        {
+            var hud = CreateHud(out var result);
+            var nodes = CreateFloorOneMapNodes();
+
+            hud.ShowResultMessage(string.Empty);
+            hud.ShowMapChoices(nodes, _ => { });
+
+            Assert.IsTrue(hud.NodeMapVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+            StringAssert.DoesNotContain("결과\n-", result.text);
+        }
+
+        [Test]
+        public void MapState_DoesNotUseEventPresentationBackground()
+        {
+            var hud = CreateHud(out _);
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_JAR_ROOM.asset");
+            Assert.IsNotNull(data);
+            Assert.IsNotNull(catalog);
+            Assert.IsNotNull(encounter);
+            hud.SetPresentationData(data);
+            var state = new PrototypeRunState("run-map-bg", new GameFlowEventBus());
+            state.AttachEncounterCatalog(catalog);
+
+            hud.ShowChoices(encounter, PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, encounter), _ => { });
+            Assert.IsTrue(hud.EventCutsceneVisible);
+            Assert.AreEqual("evt_f01_jar_room_bg", hud.CurrentBackgroundSpriteName);
+
+            hud.ShowMapChoices(CreateFloorOneMapNodes(), _ => { });
+
+            Assert.IsTrue(hud.NodeMapVisible);
+            Assert.IsFalse(hud.EventCutsceneVisible);
+            Assert.AreEqual(string.Empty, hud.CurrentBackgroundSpriteName);
+        }
+
+        [Test]
+        public void CombatNodeTap_EntersCombatState()
+        {
+            var hud = CreateHud(out _);
+            var room = CreateCombatFirstRoomDefinition();
+            var controller = CreateConfiguredRoomController(hud, room);
+            try
+            {
+                controller.AutoResolveCombat = false;
+                controller.BeginRun();
+                controller.ConfirmPreRunPlaceholder();
+                hud.ShowRunState(controller.GetSnapshot());
+
+                var combatNode = FindFirstInteractableMapChoiceButton(hud, "ENC_COMBAT");
+                Assert.IsNotNull(combatNode, "Expected a selectable Floor 1 combat map node.");
+
+                combatNode.onClick.Invoke();
+
+                Assert.IsTrue(controller.RunState.IsInCombat);
+                Assert.IsTrue(hud.CombatPanelVisible);
+                Assert.IsFalse(hud.NodeMapVisible);
+                StringAssert.Contains("공격", hud.CombatActionButtonLabels);
+                StringAssert.Contains("방어", hud.CombatActionButtonLabels);
+            }
+            finally
+            {
+                Object.DestroyImmediate(controller.gameObject);
+                Object.DestroyImmediate(hud.gameObject);
+                Object.DestroyImmediate(room);
+            }
         }
 
         [Test]
@@ -1129,6 +1226,97 @@ namespace HwigiTower.Tests.EditMode
                     effect.FindPropertyRelative("abilityRef").stringValue = effects[i].reference;
                 }
             }
+        }
+
+        private static PrototypeRoomController CreateConfiguredRoomController(PrototypeHud hud, PrototypeRoomDefinition roomOverride = null)
+        {
+            var room = roomOverride != null
+                ? roomOverride
+                : AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
+            var presentation = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            Assert.IsNotNull(room);
+            Assert.IsNotNull(catalog);
+            Assert.IsNotNull(presentation);
+
+            hud.SetPresentationData(presentation);
+            var controllerObject = new GameObject("PrototypeRoomController Map Flow Test");
+            var controller = controllerObject.AddComponent<PrototypeRoomController>();
+            controller.Configure(room, catalog);
+            controller.SetDemoPresentationData(presentation);
+            var serialized = new SerializedObject(controller);
+            serialized.FindProperty("hud").objectReferenceValue = hud;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            hud.BindRoomController(controller);
+            return controller;
+        }
+
+        private static PrototypeRoomDefinition CreateCombatFirstRoomDefinition()
+        {
+            var room = ScriptableObject.CreateInstance<PrototypeRoomDefinition>();
+            var node = AssetDatabase.LoadAssetAtPath<PrototypeNodeDefinition>("Assets/_Project/Data/Prototype/Nodes/SO_Node_Battle.asset");
+            var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_01.asset");
+            Assert.IsNotNull(node);
+            Assert.IsNotNull(encounter);
+
+            var serialized = new SerializedObject(room);
+            serialized.FindProperty("roomId").stringValue = "room.test.combat-first";
+            serialized.FindProperty("deterministicSeed").intValue = 1001;
+            var availableNodes = serialized.FindProperty("availableNodes");
+            availableNodes.arraySize = 1;
+            availableNodes.GetArrayElementAtIndex(0).objectReferenceValue = node;
+
+            var demoRunPath = serialized.FindProperty("demoRunPath");
+            demoRunPath.arraySize = 1;
+            AssignRunStep(demoRunPath.GetArrayElementAtIndex(0), node, encounter);
+
+            var floorRunPaths = serialized.FindProperty("floorRunPaths");
+            floorRunPaths.arraySize = 1;
+            var floorRunPath = floorRunPaths.GetArrayElementAtIndex(0);
+            floorRunPath.FindPropertyRelative("floor").intValue = 1;
+            var steps = floorRunPath.FindPropertyRelative("steps");
+            steps.arraySize = 1;
+            AssignRunStep(steps.GetArrayElementAtIndex(0), node, encounter);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return room;
+        }
+
+        private static void AssignRunStep(SerializedProperty step, PrototypeNodeDefinition node, EncounterData encounter)
+        {
+            step.FindPropertyRelative("node").objectReferenceValue = node;
+            step.FindPropertyRelative("encounter").objectReferenceValue = encounter;
+        }
+
+        private static PrototypeFloorMapNodeView[] CreateFloorOneMapNodes()
+        {
+            return new[]
+            {
+                new PrototypeFloorMapNodeView("floor1.layer1.event.EVT_F01_JAR_ROOM", PrototypeFloorMapNodeType.Event, 1, 1, 0, true, false, false),
+                new PrototypeFloorMapNodeView("floor1.layer1.combat.ENC_COMBAT_GATE_01", PrototypeFloorMapNodeType.Combat, 1, 1, 1, true, false, false),
+                new PrototypeFloorMapNodeView("floor1.layer4.shop.ENC_SHOP_01", PrototypeFloorMapNodeType.Shop, 1, 4, 0, false, false, true),
+                new PrototypeFloorMapNodeView("floor1.layer5.boss.ENC_COMBAT_GATE_01", PrototypeFloorMapNodeType.Boss, 1, 5, 0, false, false, true)
+            };
+        }
+
+        private static Button FindFirstInteractableMapChoiceButton(PrototypeHud hud, string requiredNamePart = null)
+        {
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var button = hud.GetChoiceButton(i);
+                if (button == null ||
+                    !button.interactable ||
+                    !button.name.StartsWith("Map Node Button ", System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(requiredNamePart) || button.name.Contains(requiredNamePart))
+                {
+                    return button;
+                }
+            }
+
+            return null;
         }
 
         private static PrototypeHud CreateHud(out Text result)
