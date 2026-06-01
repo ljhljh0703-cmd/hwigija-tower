@@ -2487,12 +2487,7 @@ namespace HwigiTower.UI
                 return "방 한가운데 놓인 항아리들이 낮게 울린다.\n무엇을 건드릴지 고르면 결과가 결정된다.";
             }
 
-            if (slot != null && !string.IsNullOrEmpty(slot.BodyTextKey))
-            {
-                return "임시 이벤트 텍스트\n" + slot.BodyTextKey;
-            }
-
-            return "임시 이벤트 텍스트\n선택 전 결과와 위험을 확인하세요.";
+            return "이벤트\n선택 전 결과와 위험을 확인하세요.";
         }
 
         private void ShowRestInteraction(EncounterSelection selection)
@@ -4861,6 +4856,24 @@ namespace HwigiTower.UI
             return value.Substring(0, Mathf.Max(1, maxLength - 1)).TrimEnd() + "…";
         }
 
+        private static string JoinCompactChips(List<string> chips, int visibleLimit)
+        {
+            if (chips == null || chips.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var limit = Mathf.Clamp(visibleLimit, 1, chips.Count);
+            if (chips.Count <= limit)
+            {
+                return string.Join("  ", chips);
+            }
+
+            var visible = chips.GetRange(0, limit);
+            visible.Add("+" + (chips.Count - limit));
+            return string.Join("  ", visible);
+        }
+
         private void UpdateCombatPanel(PrototypeRunSnapshot snapshot)
         {
             EnsureCombatPanel();
@@ -6739,9 +6752,9 @@ namespace HwigiTower.UI
         {
             var state = BuildCombatLogDetailLine(snapshot);
             return PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + " | 내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
-                ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 40) + "\n" +
-                ShortenPublicLine(state, 52) + "\n" +
-                ShortenPublicLine(BuildCombatBuildSummaryLine(snapshot), 42);
+                ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 42) + "\n" +
+                ShortenPublicLine(state, 56) + "\n" +
+                ShortenPublicLine(BuildCombatBuildSummaryLine(snapshot), 34);
         }
 
         private string BuildCombatLogDetailLine(PrototypeRunSnapshot snapshot)
@@ -6757,6 +6770,12 @@ namespace HwigiTower.UI
             if (!string.IsNullOrEmpty(playerDamage) && playerDamage != "0")
             {
                 highlights.Add("플레이어: " + playerDamage + " 피해");
+            }
+
+            var hpChange = ExtractRoundNumber(snapshot.LastCombatRoundResult, "playerHp ").Trim();
+            if (!string.IsNullOrEmpty(hpChange) && !IsNoOpDelta(hpChange))
+            {
+                highlights.Add("HP " + hpChange);
             }
 
             if (snapshot.LastCombatRoundResult.Contains("scout attack +", StringComparison.Ordinal))
@@ -6781,7 +6800,7 @@ namespace HwigiTower.UI
 
             if (highlights.Count > 0)
             {
-                return string.Join(" | ", highlights);
+                return JoinCompactChips(highlights, 4);
             }
 
             if (HasArtsSkill())
@@ -6799,13 +6818,13 @@ namespace HwigiTower.UI
                 return "성장: " + snapshot.LastGrowthMessage;
             }
 
-            if (!string.IsNullOrEmpty(snapshot.CombatBuildSummary))
+            if (!string.IsNullOrEmpty(snapshot.CombatBuildSummary) &&
+                snapshot.CombatBuildSummary.Contains("정찰:", StringComparison.Ordinal))
             {
-                var firstBreak = snapshot.CombatBuildSummary.IndexOf('\n');
-                return firstBreak >= 0 ? snapshot.CombatBuildSummary.Substring(0, firstBreak) : snapshot.CombatBuildSummary;
+                return "성장 Lv " + snapshot.CombatLevel + " · 정찰: 다음 공격 강화 · 상세 접힘";
             }
 
-            return "성장 Lv " + snapshot.CombatLevel + " XP " + snapshot.CombatXp + "/" + snapshot.CombatXpToNextLevel;
+            return "성장 Lv " + snapshot.CombatLevel + " XP " + snapshot.CombatXp + "/" + snapshot.CombatXpToNextLevel + " · 상세 접힘";
         }
 
         private static string BuildCombatExtraLine(PrototypeRunSnapshot snapshot)
@@ -6969,7 +6988,7 @@ namespace HwigiTower.UI
         {
             return "마타이오스\n" +
                 "HP " + BuildMataiosHp(snapshot) + "  ATK " + BuildMataiosAttack(snapshot) + "\n" +
-                "버프 " + BuildMataiosBuffLine(snapshot);
+                BuildMataiosBuffLine(snapshot);
         }
 
         private string BuildPlayerBuffChipLine(PrototypeRunSnapshot snapshot)
@@ -7028,7 +7047,7 @@ namespace HwigiTower.UI
                 chips.Add("회상 닻");
             }
 
-            return chips.Count == 0 ? "버프 없음" : string.Join("  ", chips);
+            return chips.Count == 0 ? "상태 없음" : JoinCompactChips(chips, 2);
         }
 
         private static string BuildMataiosChipLine(PrototypeRunSnapshot snapshot)
@@ -7075,7 +7094,7 @@ namespace HwigiTower.UI
                 buffs.Add("붕괴도 +5");
             }
 
-            return buffs.Count == 0 ? "없음" : string.Join("  ", buffs);
+            return buffs.Count == 0 ? "상태 없음" : JoinCompactChips(buffs, 2);
         }
 
         private static string BuildCombatFeedback(string roundResult)
@@ -7622,17 +7641,18 @@ namespace HwigiTower.UI
                     return "상점 나가기";
                 }
 
-                if (choiceStableId == "CHOICE_EVT_F01_JAR_PATTERNED")
+                if (choiceStableId == "CHOICE_EVT_F01_JAR_ROOM_PATTERNED" ||
+                    choiceStableId == "CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT")
                 {
                     return "신기한 문양이 각인된 항아리";
                 }
 
-                if (choiceStableId == "CHOICE_EVT_F01_JAR_PLAIN")
+                if (choiceStableId == "CHOICE_EVT_F01_JAR_ROOM_PLAIN")
                 {
                     return "평범한 항아리";
                 }
 
-                if (choiceStableId == "CHOICE_EVT_F01_JAR_CRACKED")
+                if (choiceStableId == "CHOICE_EVT_F01_JAR_ROOM_CRACKED")
                 {
                     return "금 간 항아리";
                 }

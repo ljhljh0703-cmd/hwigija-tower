@@ -924,6 +924,7 @@ namespace HwigiTower.Tests.EditMode
                 .ToArray();
             var choiceCount = 0;
 
+            Assert.AreEqual(33, paths.Length);
             foreach (var path in paths)
             {
                 var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>(path);
@@ -940,7 +941,7 @@ namespace HwigiTower.Tests.EditMode
                         choice.stableId);
 
                     Assert.AreEqual(choice.stableId, resolution.PayloadId, path + "::" + choice.stableId + " => " + resolution.Message);
-                    StringAssert.DoesNotContain("TriggerGameOver", resolution.Message, path + "::" + choice.stableId);
+                    AssertNoRawPlayerFacingLabels(resolution.Message, path + "::" + choice.stableId);
                 }
             }
 
@@ -3293,6 +3294,16 @@ namespace HwigiTower.Tests.EditMode
             {
                 Assert.IsTrue(catalog.TryGetItem(relicRef, out _), relicRef);
             }
+        }
+
+        private static void AssertNoRawPlayerFacingLabels(string message, string context)
+        {
+            Assert.IsNotNull(message, context);
+            StringAssert.DoesNotContain("REWARD_CACHE_MEMORY", message, context);
+            StringAssert.DoesNotContain("MoralChoice", message, context);
+            StringAssert.DoesNotContain("도덕 선택", message, context);
+            StringAssert.DoesNotContain("MEM_FRAGMENT_", message, context);
+            StringAssert.DoesNotContain("TriggerGameOver", message, context);
         }
 
         private static void AssertChoiceCatalogRefsResolve(EncounterRuntimeCatalogData catalog, EncounterChoiceRuntimeData choice, string context)
