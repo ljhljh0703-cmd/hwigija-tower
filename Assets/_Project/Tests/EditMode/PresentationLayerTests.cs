@@ -629,6 +629,95 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void FreshRun_FirstCombatNodeTap_AutoStartsCombat()
+        {
+            var hud = CreateHud(out _);
+            var room = CreateCombatFirstRoomDefinition();
+            var controller = CreateConfiguredRoomController(hud, room);
+            try
+            {
+                controller.AutoResolveCombat = false;
+                controller.BeginRun();
+                controller.ConfirmPreRunPlaceholder();
+                hud.ShowRunState(controller.GetSnapshot());
+
+                var combatNode = FindFirstInteractableMapChoiceButton(hud, "ENC_COMBAT");
+                Assert.IsNotNull(combatNode, "Expected a selectable combat map node.");
+                combatNode.onClick.Invoke();
+
+                Assert.IsTrue(controller.GetSnapshot().IsInCombat);
+                Assert.IsTrue(controller.RunState.IsInCombat);
+            }
+            finally
+            {
+                Object.DestroyImmediate(controller.gameObject);
+                Object.DestroyImmediate(hud.gameObject);
+                Object.DestroyImmediate(room);
+            }
+        }
+
+        [Test]
+        public void CombatAutoStart_HidesMapResultAndMemorySurfaces()
+        {
+            var hud = CreateHud(out _);
+            var room = CreateCombatFirstRoomDefinition();
+            var controller = CreateConfiguredRoomController(hud, room);
+            try
+            {
+                controller.AutoResolveCombat = false;
+                controller.BeginRun();
+                controller.ConfirmPreRunPlaceholder();
+                hud.ShowRunState(controller.GetSnapshot());
+
+                FindFirstInteractableMapChoiceButton(hud, "ENC_COMBAT").onClick.Invoke();
+
+                Assert.IsFalse(hud.NodeMapVisible);
+                Assert.IsFalse(hud.ResultPanelVisible);
+                Assert.IsFalse(hud.EventCutsceneVisible);
+                Assert.IsFalse(hud.MemoryPanelVisible);
+                Assert.IsFalse(hud.RouteHeaderVisible);
+                StringAssert.DoesNotContain("결과\n-", hud.ResultMessage);
+                StringAssert.DoesNotContain("갈림길 선택", hud.RouteMessage);
+            }
+            finally
+            {
+                Object.DestroyImmediate(controller.gameObject);
+                Object.DestroyImmediate(hud.gameObject);
+                Object.DestroyImmediate(room);
+            }
+        }
+
+        [Test]
+        public void CombatAutoStart_ShowsEnemyAndActionButtons()
+        {
+            var hud = CreateHud(out _);
+            var room = CreateCombatFirstRoomDefinition();
+            var controller = CreateConfiguredRoomController(hud, room);
+            try
+            {
+                controller.AutoResolveCombat = false;
+                controller.BeginRun();
+                controller.ConfirmPreRunPlaceholder();
+                hud.ShowRunState(controller.GetSnapshot());
+
+                FindFirstInteractableMapChoiceButton(hud, "ENC_COMBAT").onClick.Invoke();
+
+                Assert.IsTrue(hud.CombatPanelVisible);
+                Assert.IsTrue(hud.CombatEnemyVisible);
+                StringAssert.Contains("적 HP", hud.CombatMessage);
+                StringAssert.Contains("공격", hud.CombatActionButtonLabels);
+                StringAssert.Contains("방어", hud.CombatActionButtonLabels);
+                StringAssert.Contains("스킬", hud.CombatActionButtonLabels);
+            }
+            finally
+            {
+                Object.DestroyImmediate(controller.gameObject);
+                Object.DestroyImmediate(hud.gameObject);
+                Object.DestroyImmediate(room);
+            }
+        }
+
+        [Test]
         public void Hud_PortraitShellUsesMobileBoundsAndHidesGlitch()
         {
             var hud = CreateHud(out _);
