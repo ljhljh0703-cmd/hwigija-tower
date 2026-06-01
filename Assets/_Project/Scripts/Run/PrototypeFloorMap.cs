@@ -646,7 +646,7 @@ namespace HwigiTower.Run
             for (var i = steps.Count - 1; i >= 0; i--)
             {
                 var step = steps[i];
-                if (step != null && step.IsValid && HasStartCombatEffect(step.Encounter))
+                if (step != null && step.IsValid && IsCombatGateEncounter(step.EncounterId))
                 {
                     return i;
                 }
@@ -682,9 +682,22 @@ namespace HwigiTower.Run
                 return PrototypeFloorMapNodeType.Event;
             }
 
-            if (HasStartCombatEffect(step.Encounter))
+            if (IsCombatGateEncounter(step.EncounterId))
             {
                 return PrototypeFloorMapNodeType.Combat;
+            }
+
+            if (step.Node != null)
+            {
+                switch (step.Node.Kind)
+                {
+                    case NodeKind.Battle:
+                        return PrototypeFloorMapNodeType.Combat;
+                    case NodeKind.Rest:
+                        return PrototypeFloorMapNodeType.Rest;
+                    case NodeKind.Shop:
+                        return PrototypeFloorMapNodeType.Shop;
+                }
             }
 
             return step.Encounter.Type switch
@@ -696,32 +709,10 @@ namespace HwigiTower.Run
             };
         }
 
-        private static bool HasStartCombatEffect(EncounterData encounter)
+        private static bool IsCombatGateEncounter(string encounterId)
         {
-            if (encounter == null || encounter.Choices == null)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < encounter.Choices.Length; i++)
-            {
-                var choice = encounter.Choices[i];
-                if (choice == null || choice.effects == null)
-                {
-                    continue;
-                }
-
-                for (var e = 0; e < choice.effects.Length; e++)
-                {
-                    var effect = choice.effects[e];
-                    if (effect != null && effect.kind == "StartCombat")
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return !string.IsNullOrEmpty(encounterId) &&
+                encounterId.StartsWith("ENC_COMBAT_GATE_", System.StringComparison.Ordinal);
         }
 
         private static string BuildMapNodeId(int floor, int layer, int index, PrototypeDemoRunStep step)

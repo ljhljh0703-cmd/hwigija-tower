@@ -1,3 +1,4 @@
+using System.Linq;
 using HwigiTower.UI;
 using HwigiTower.Combat;
 using HwigiTower.Core;
@@ -317,7 +318,7 @@ namespace HwigiTower.Tests.EditMode
 
             hud.ShowChoices(jar, views, _ => { });
 
-            Assert.AreEqual(3, hud.ChoiceButtonCount);
+            Assert.AreEqual(4, hud.ChoiceButtonCount);
             Assert.IsTrue(hud.EventCutsceneVisible);
             StringAssert.Contains("항아리 방", hud.EventCutsceneMessage);
             StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", hud.EventCutsceneMessage);
@@ -329,6 +330,11 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("20%: 엘리트 전투", patterned.text);
             StringAssert.DoesNotContain("CHOICE_EVT_F01_JAR_PATTERNED", patterned.text);
             StringAssert.DoesNotContain("EVT_F01_JAR_ROOM", patterned.text);
+            var eliteCombat = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
+            Assert.IsNotNull(eliteCombat);
+            StringAssert.Contains("신기한 문양이 각인된 항아리", eliteCombat.text);
+            StringAssert.Contains("20%: 엘리트 전투", eliteCombat.text);
+            StringAssert.DoesNotContain("CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT", eliteCombat.text);
         }
 
         [Test]
@@ -632,16 +638,16 @@ namespace HwigiTower.Tests.EditMode
         public void FreshRun_FirstCombatNodeTap_AutoStartsCombat()
         {
             var hud = CreateHud(out _);
-            var room = CreateCombatFirstRoomDefinition();
-            var controller = CreateConfiguredRoomController(hud, room);
+            var controller = CreateConfiguredRoomController(hud);
             try
             {
                 controller.AutoResolveCombat = false;
                 controller.BeginRun();
                 controller.ConfirmPreRunPlaceholder();
+                AdvanceRunStateUntilEncounterSelectable(controller.RunState, "ENC_COMBAT_GATE_01");
                 hud.ShowRunState(controller.GetSnapshot());
 
-                var combatNode = FindFirstInteractableMapChoiceButton(hud, "ENC_COMBAT");
+                var combatNode = FindFirstInteractableMapChoiceButton(hud, "ENC_COMBAT_GATE_01");
                 Assert.IsNotNull(combatNode, "Expected a selectable combat map node.");
                 combatNode.onClick.Invoke();
 
@@ -652,7 +658,6 @@ namespace HwigiTower.Tests.EditMode
             {
                 Object.DestroyImmediate(controller.gameObject);
                 Object.DestroyImmediate(hud.gameObject);
-                Object.DestroyImmediate(room);
             }
         }
 
@@ -1406,6 +1411,58 @@ namespace HwigiTower.Tests.EditMode
             }
 
             return null;
+        }
+
+        private static void AdvanceRunStateUntilEncounterSelectable(PrototypeRunState state, string expectedEncounterId)
+        {
+            var guard = 0;
+            while (guard++ < 16)
+            {
+                var selectable = state.GetSelectableMapNodeViews();
+                var match = selectable.FirstOrDefault(node => node.MapNodeId.Contains("." + expectedEncounterId));
+                if (!string.IsNullOrEmpty(match.MapNodeId))
+                {
+                    return;
+                }
+
+                Assert.Greater(selectable.Length, 0, "Expected selectable map nodes while advancing toward " + expectedEncounterId);
+                var selected = selectable.FirstOrDefault(node => !node.MapNodeId.Contains(".ENC_COMBAT_GATE_"));
+                if (string.IsNullOrEmpty(selected.MapNodeId))
+                {
+                    selected = selectable[0];
+                }
+
+                Assert.IsTrue(state.TrySelectMapNode(selected.MapNodeId, out var step), "Expected selectable map node " + selected.MapNodeId);
+                Assert.IsFalse(step.EncounterId == expectedEncounterId, "Expected target node to remain selectable for UI tap.");
+                var choiceStableId = ResolvePreferredRouteChoiceId(step);
+                var resolution = state.ResolveEncounterChoice(new DeterministicRunContext(state.RunId, 1001), step.NodeId, step.Encounter, choiceStableId);
+                Assert.AreEqual(choiceStableId, resolution.PayloadId);
+                Assert.IsFalse(state.IsInCombat, "Route setup should not start combat before tapping " + expectedEncounterId);
+            }
+
+            Assert.Fail("Could not make encounter selectable: " + expectedEncounterId);
+        }
+
+        private static string ResolvePreferredRouteChoiceId(PrototypeDemoRunStep step)
+        {
+            switch (step.EncounterId)
+            {
+                case "EVT_F01_JAR_ROOM":
+                    return "CHOICE_EVT_F01_JAR_ROOM_PLAIN";
+                case "ENC_SHOP_01":
+                    return "CHOICE_SHOP_01_LEAVE";
+                case "ENC_REST_01":
+                    return "CHOICE_REST_01_REST";
+                case "ENC_MORAL_CHOICE_01":
+                    return "CHOICE_MORAL_01_REFUSE";
+                case "ENC_MEMORY_FRAGMENT_01":
+                    return "CHOICE_MEMORY_01_UNLOCK";
+                default:
+                    Assert.IsNotNull(step.Encounter);
+                    Assert.IsNotNull(step.Encounter.Choices);
+                    Assert.Greater(step.Encounter.Choices.Length, 0, "Missing route choice for " + step.EncounterId);
+                    return step.Encounter.Choices[0].stableId;
+            }
         }
 
         private static PrototypeHud CreateHud(out Text result)
