@@ -175,11 +175,25 @@ namespace HwigiTower.Tests.PlayMode
             controller.AutoResolveCombat = false;
             controller.RunState.AddItemRef("ITEM_FIELD_BANDAGE", 1);
             hud.ShowRunState(controller.GetSnapshot());
-            yield return OpenQaEncounterChoice(controller, hud, "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
+            Assert.IsTrue(hud.PreRunPlaceholderVisible);
+            var preRunConfirm = GameObject.Find("Pre Run Confirm Button").GetComponent<Button>();
+            Assert.IsNotNull(preRunConfirm);
+            preRunConfirm.onClick.Invoke();
+            yield return null;
+
+            Assert.IsTrue(hud.NodeMapVisible, "Fresh run should show Floor 1 map after pre-run.");
+            var combatSelection = controller.CreateQaEncounterSelection("ENC_COMBAT_GATE_01");
+            Assert.AreEqual("ENC_COMBAT_GATE_01", combatSelection.EncounterId);
+            OpenSelectedRouteStepForTest(hud, combatSelection);
+            yield return null;
 
             Assert.IsTrue(controller.RunState.IsInCombat);
             Assert.IsFalse(string.IsNullOrEmpty(controller.RunState.LastCombatEnemyId));
             Assert.IsTrue(hud.CombatPanelVisible);
+            Assert.IsFalse(hud.NodeMapVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+            Assert.IsFalse(hud.MemoryPanelVisible);
+            Assert.IsFalse(hud.RouteHeaderVisible);
             Assert.IsTrue(hud.CombatPartyDockVisible);
             Assert.IsTrue(hud.CombatItemInspectButtonVisible);
             Assert.AreEqual("char_player_portrait_01", hud.CurrentCombatPlayerPortraitSpriteName);
@@ -187,6 +201,9 @@ namespace HwigiTower.Tests.PlayMode
             StringAssert.Contains("적 HP", hud.CombatMessage);
             StringAssert.Contains("예상 피해", hud.CombatActionButtonLabels);
             StringAssert.Contains("피해 감소", hud.CombatActionButtonLabels);
+            StringAssert.Contains("스킬", hud.CombatActionButtonLabels);
+            StringAssert.DoesNotContain("결과\n-", hud.ResultMessage);
+            StringAssert.DoesNotContain("갈림길 선택", hud.RouteMessage);
             GameObject.Find("Combat Item Inspect Button").GetComponent<Button>().onClick.Invoke();
             yield return null;
             Assert.IsTrue(hud.CombatItemInspectVisible);

@@ -259,9 +259,12 @@ namespace HwigiTower.UI
         public string MemoryMessage => memoryText == null ? string.Empty : memoryText.text;
         public string CombatMessage => combatText == null ? string.Empty : combatText.text;
         public bool CombatPanelVisible => combatPanel != null && combatPanel.gameObject.activeSelf;
+        public bool CombatEnemyVisible => combatEnemyImage != null && combatEnemyImage.gameObject.activeInHierarchy;
         public bool PortraitVisible => npcPortraitImage != null && npcPortraitImage.gameObject.activeSelf;
         public bool NodeMapVisible => nodeMapLayer != null && nodeMapLayer.gameObject.activeInHierarchy;
         public bool ResultPanelVisible => resultLayer != null && resultLayer.gameObject.activeInHierarchy;
+        public bool RouteHeaderVisible => routeText != null && routeText.gameObject.activeInHierarchy;
+        public bool MemoryPanelVisible => memoryText != null && memoryText.gameObject.activeInHierarchy;
         public bool RouteActionButtonVisible => routeActionButton != null && routeActionButton.gameObject.activeSelf;
         public bool EndingRestButtonVisible => endingRestButton != null && endingRestButton.gameObject.activeSelf;
         public bool EndingContinueButtonVisible => endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
@@ -1161,7 +1164,7 @@ namespace HwigiTower.UI
                 runStateText.text = $"Floor {snapshot.CurrentFloor}{status}  HP {snapshot.PlayerHp}/{snapshot.PlayerMaxHp}  Gold {snapshot.Gold}  이성 {snapshot.Mental}";
             }
 
-            if (snapshot.RunCompleted)
+            if (snapshot.RunCompleted || snapshot.IsInCombat)
             {
                 ClearChoices();
             }
@@ -1176,6 +1179,11 @@ namespace HwigiTower.UI
             }
 
             HidePreRunPlaceholder();
+            if (snapshot.IsInCombat)
+            {
+                HideMapAndResultSurfacesForCombat();
+            }
+
             AutoShowMapIfNeeded(snapshot);
             UpdateScreenLayers(snapshot);
             UpdateBossRewardPopup(snapshot);
@@ -4420,15 +4428,8 @@ namespace HwigiTower.UI
                 return;
             }
 
-            if (TryGetAutoCombatStartChoice(selection, out var combatStartChoiceId))
+            if (TryAutoStartCombat(selection))
             {
-                ClearChoices();
-                HideEventCutsceneLayout();
-                HideUtilityPanel();
-                SetResultVisible(false);
-                var resolution = _roomController.ResolveCurrentRouteChoice(selection, combatStartChoiceId);
-                ShowResult(resolution);
-                ShowRunState(_roomController.GetSnapshot());
                 return;
             }
 
@@ -4446,7 +4447,10 @@ namespace HwigiTower.UI
         private bool TryGetAutoCombatStartChoice(EncounterSelection selection, out string choiceStableId)
         {
             choiceStableId = string.Empty;
-            if (_roomController == null || !selection.HasEncounter || selection.Encounter == null)
+            if (_roomController == null ||
+                !selection.HasEncounter ||
+                selection.Encounter == null ||
+                selection.Encounter.Type != EncounterType.Battle)
             {
                 return false;
             }
@@ -4470,6 +4474,55 @@ namespace HwigiTower.UI
             }
 
             return false;
+        }
+
+        private bool TryAutoStartCombat(EncounterSelection selection)
+        {
+            if (_roomController == null || !TryGetAutoCombatStartChoice(selection, out var combatStartChoiceId))
+            {
+                return false;
+            }
+
+            HideMapAndResultSurfacesForCombat();
+            var resolution = _roomController.ResolveCurrentRouteChoice(selection, combatStartChoiceId);
+            var snapshot = _roomController.GetSnapshot();
+            if (!snapshot.IsInCombat)
+            {
+                ShowResult(resolution);
+            }
+
+            ShowRunState(snapshot);
+            return true;
+        }
+
+        private void HideMapAndResultSurfacesForCombat()
+        {
+            ClearChoices();
+            HideEventCutsceneLayout(restoreRouteText: false);
+            HideUtilityPanel();
+            HideRestInteractionPanel();
+            HideMerchantPresentation();
+            HideNpcSpotlight();
+            SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(actionLayer, false);
+            SetLayerVisible(resultLayer, false);
+            SetResultVisible(false);
+            HideLegacyEncounterVisuals(hideBackground: true);
+            if (routeText != null && !showRawDebugText)
+            {
+                routeText.gameObject.SetActive(false);
+            }
+
+            if (interactionText != null && !showRawDebugText)
+            {
+                interactionText.gameObject.SetActive(false);
+            }
+
+            if (memoryText != null && !showRawDebugText)
+            {
+                memoryText.text = string.Empty;
+                memoryText.gameObject.SetActive(false);
+            }
         }
 
         private static bool ChoiceStartsCombat(EncounterData encounter, string choiceStableId)
@@ -4502,6 +4555,11 @@ namespace HwigiTower.UI
         private void ShowEncounterChoicesForSelection(EncounterSelection selection)
         {
             if (_roomController == null || !selection.HasEncounter)
+            {
+                return;
+            }
+
+            if (TryAutoStartCombat(selection))
             {
                 return;
             }
