@@ -63,6 +63,52 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void DemoPresentationData_AllEventEncountersHavePresentationSlots()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            var guids = AssetDatabase.FindAssets("t:EncounterData", new[] { "Assets/_Project/Data/Encounters" });
+            var eventCount = 0;
+            var missingSlots = 0;
+
+            Assert.IsNotNull(data);
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (!System.IO.Path.GetFileName(path).StartsWith("SO_Encounter_EVT_", System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                eventCount++;
+                var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>(path);
+                Assert.IsNotNull(encounter, path);
+                if (!data.TryGetSlot(encounter.Id, out var slot))
+                {
+                    missingSlots++;
+                    continue;
+                }
+
+                Assert.IsNotNull(slot.BackgroundSprite, encounter.Id);
+                var expectedBackgroundPath = "Assets/_Project/Art/Encounters/" + encounter.Id.ToLowerInvariant() + "_bg.png";
+                var expectedBackground = AssetDatabase.LoadAssetAtPath<Sprite>(expectedBackgroundPath);
+                if (expectedBackground != null)
+                {
+                    Assert.AreEqual(expectedBackground.name, slot.BackgroundSprite.name, encounter.Id);
+                }
+            }
+
+            Assert.AreEqual(33, eventCount);
+            Assert.AreEqual(0, missingSlots);
+        }
+
+        [Test]
+        public void ProjectSettings_UseFinalAndroidIdentity()
+        {
+            Assert.AreEqual("com.godju.hwigitower", PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android));
+            Assert.AreEqual("회귀자는 탑을 오른다", PlayerSettings.productName);
+        }
+
+        [Test]
         public void DemoPresentationData_BindsNodeIcons()
         {
             var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
