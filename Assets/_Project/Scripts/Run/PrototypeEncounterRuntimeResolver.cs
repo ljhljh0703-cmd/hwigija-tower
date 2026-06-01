@@ -280,9 +280,10 @@ namespace HwigiTower.Run
         {
             return choiceStableId switch
             {
-                "CHOICE_EVT_F01_JAR_PATTERNED" => "80%: 골드 획득\n20%: 엘리트 전투",
-                "CHOICE_EVT_F01_JAR_PLAIN" => "HP 회복\nMental 회복",
-                "CHOICE_EVT_F01_JAR_CRACKED" => "다음 3회 전투 피해 증가",
+                "CHOICE_EVT_F01_JAR_ROOM_PATTERNED" => "80%: 골드 획득\n20%: 엘리트 전투",
+                "CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT" => "80%: 골드 획득\n20%: 엘리트 전투",
+                "CHOICE_EVT_F01_JAR_ROOM_PLAIN" => "HP 회복\n이성 회복",
+                "CHOICE_EVT_F01_JAR_ROOM_CRACKED" => "다음 3회 전투 피해 증가",
                 _ => string.Empty
             };
         }

@@ -102,6 +102,53 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void RepresentativeEventEditorSmoke_UsesPublicPresentationSurface()
+        {
+            var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
+            var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>("Assets/_Project/Data/Catalogs/SO_EncounterRuntimeCatalog.asset");
+            var eventIds = new[]
+            {
+                "EVT_F01_JAR_ROOM",
+                "EVT_F01_CULTIST_FUNERAL",
+                "EVT_F02_GARDEN",
+                "EVT_F03_BALCONY",
+                "EVT_F04_RITUAL_ALTAR",
+                "EVT_F05_CRADLE_OF_OUTER_GODS",
+                "EVT_F05_OATH_OF_LOYALTY"
+            };
+
+            Assert.IsNotNull(data);
+            Assert.IsNotNull(catalog);
+            for (var i = 0; i < eventIds.Length; i++)
+            {
+                var eventId = eventIds[i];
+                var encounter = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_" + eventId + ".asset");
+                Assert.IsNotNull(encounter, eventId);
+                Assert.IsTrue(data.TryGetSlot(eventId, out var slot), eventId);
+                Assert.IsNotNull(slot.BackgroundSprite, eventId);
+
+                var state = new PrototypeRunState("run-event-ui-" + i, new GameFlowEventBus());
+                state.AttachEncounterCatalog(catalog);
+                state.ModifyGold(999);
+                var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, encounter);
+                var hud = CreateHud(out _);
+                hud.SetPresentationData(data);
+
+                hud.ShowChoices(encounter, views, _ => { });
+
+                Assert.IsTrue(hud.EventCutsceneVisible, eventId);
+                Assert.IsNotEmpty(hud.CurrentBackgroundSpriteName, eventId);
+                AssertPublicSurface(hud.EventCutsceneMessage, eventId);
+                for (var choiceIndex = 0; choiceIndex < hud.ChoiceButtonCount; choiceIndex++)
+                {
+                    var label = hud.GetChoiceButton(choiceIndex).GetComponentInChildren<Text>();
+                    Assert.IsNotNull(label, eventId + " choice " + choiceIndex);
+                    AssertPublicSurface(label.text, eventId + " choice " + choiceIndex);
+                }
+            }
+        }
+
+        [Test]
         public void ProjectSettings_UseFinalAndroidIdentity()
         {
             Assert.AreEqual("com.godju.hwigitower", PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android));
@@ -618,7 +665,7 @@ namespace HwigiTower.Tests.EditMode
                 lastCombatRoundResult: "round 2 | action Defend | playerDamage 0 | enemyDamage 1 | mataios protect protect -2",
                 lastMataiosProtectReduction: 2,
                 levelAttackBonus: 1,
-                levelMaxHpBonus: 2,
+                levelMaxHpBonus: 4,
                 skillCooldownReduction: 1,
                 combatBuildSummary: "성장 Lv 2 XP 0/20 | ATK +1 | Max HP +4 | Skill CD -1\n정찰: 다음 공격 강화 / 피해 감소 1회 | 특성 없음");
 
@@ -626,6 +673,8 @@ namespace HwigiTower.Tests.EditMode
 
             StringAssert.Contains("마타이오스 보호", hud.CombatMessage);
             StringAssert.Contains("성장", hud.CombatMessage);
+            StringAssert.Contains("상세 접힘", hud.CombatMessage);
+            StringAssert.DoesNotContain("Skill CD -1", hud.CombatMessage);
             StringAssert.Contains("성장 ATK +1", hud.CombatPartyMessage);
             StringAssert.Contains("성장 HP +4", hud.CombatPartyMessage);
         }
@@ -720,6 +769,7 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("-7", hud.CombatDamageNumberMessage);
             StringAssert.Contains("마타이오스 -2", hud.CombatDamageNumberMessage);
             StringAssert.Contains("플레이어: 7 피해", hud.CombatMessage);
+            StringAssert.Contains("HP 20->18", hud.CombatMessage);
             StringAssert.Contains("마타이오스: 2 지원 피해", hud.CombatMessage);
         }
 
@@ -1173,6 +1223,17 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains(title, label);
             StringAssert.Contains(preview, label);
             StringAssert.DoesNotContain("Glitch", label);
+        }
+
+        private static void AssertPublicSurface(string text, string context)
+        {
+            Assert.IsNotNull(text, context);
+            StringAssert.DoesNotContain("REWARD_CACHE_MEMORY", text, context);
+            StringAssert.DoesNotContain("MoralChoice", text, context);
+            StringAssert.DoesNotContain("도덕 선택", text, context);
+            StringAssert.DoesNotContain("MEM_FRAGMENT_", text, context);
+            StringAssert.DoesNotContain("TriggerGameOver", text, context);
+            StringAssert.DoesNotContain("PLACEHOLDER_EVT_", text, context);
         }
 
         private static void AssertPublicLabel(DemoPresentationData data, string stableId, string expected)
