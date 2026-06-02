@@ -241,6 +241,31 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(PrototypeAudioContext.CombatAttack, PrototypeAudioService.Instance.LastPlayedSfxContext);
             StringAssert.Contains("선택 공격", hud.CombatMessage);
             StringAssert.Contains("받은 피해", hud.CombatMessage);
+
+            var guard = 0;
+            while (controller.RunState.IsInCombat && guard++ < 16)
+            {
+                yield return WaitForCombatAttackButtonReady(controller, 2.0f);
+                attackButton = GameObject.Find("Combat Button Attack").GetComponent<Button>();
+                Assert.IsNotNull(attackButton);
+                attackButton.onClick.Invoke();
+                yield return null;
+            }
+
+            Assert.Less(guard, 16, "Combat did not resolve through visible attack buttons.");
+            Assert.IsFalse(controller.RunState.IsInCombat);
+            Assert.IsTrue(controller.GetSnapshot().LastCombatEnemyDefeated);
+            Assert.IsTrue(hud.CombatDefeatFeedbackVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+            StringAssert.Contains("격파", hud.CombatDefeatFeedbackMessage);
+
+            yield return new WaitForSecondsRealtime(1.0f);
+            Assert.IsTrue(hud.CombatDefeatFeedbackVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+
+            yield return new WaitForSecondsRealtime(1.15f);
+            Assert.IsFalse(hud.CombatDefeatFeedbackVisible);
+            Assert.IsTrue(hud.ResultPanelVisible || hud.BossRewardPopupVisible);
         }
 
         [UnityTest]
@@ -798,6 +823,32 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsTrue(
                 FindMapChoiceButton(hud, expectedEncounterId) != null || IsExpectedEncounterOpen(hud, expectedEncounterId),
                 "Could not advance map toward " + expectedEncounterId + " through visible route nodes.");
+        }
+
+        private static IEnumerator WaitForCombatAttackButtonReady(Run.PrototypeRoomController controller, float timeoutSeconds)
+        {
+            var timeoutAt = Time.realtimeSinceStartup + Mathf.Max(0.1f, timeoutSeconds);
+            while (controller != null && controller.RunState.IsInCombat && Time.realtimeSinceStartup < timeoutAt)
+            {
+                var buttonObject = GameObject.Find("Combat Button Attack");
+                var button = buttonObject == null ? null : buttonObject.GetComponent<Button>();
+                if (button != null && button.gameObject.activeInHierarchy && button.interactable)
+                {
+                    yield break;
+                }
+
+                yield return null;
+            }
+
+            if (controller == null || !controller.RunState.IsInCombat)
+            {
+                yield break;
+            }
+
+            var lastButtonObject = GameObject.Find("Combat Button Attack");
+            var lastButton = lastButtonObject == null ? null : lastButtonObject.GetComponent<Button>();
+            Assert.IsNotNull(lastButton, "Missing attack button while combat is active.");
+            Assert.IsTrue(lastButton.interactable, "Attack should become usable while combat is active.");
         }
 
         private static void OpenMapChoicesIfNeeded(PrototypeHud hud)

@@ -1378,6 +1378,70 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void FloorRoute_CombatNodesOnlyOpenBattleEncounters()
+        {
+            var room = LoadPrototypeRoomDefinition();
+            foreach (var path in room.FloorRunPaths)
+            {
+                Assert.IsNotNull(path);
+                var steps = path.Steps;
+                foreach (var step in steps.Where(step => step != null && step.IsValid && step.Node.Kind == NodeKind.Battle))
+                {
+                    Assert.IsTrue(IsCombatEncounterContract(step), BuildRouteContractMessage(path.Floor, step, "Battle node must open combat content"));
+                }
+
+                var state = new PrototypeRunState("run-route-combat-contract-" + path.Floor, new GameFlowEventBus()) { AutoResolveCombat = false };
+                state.AttachDemoRunPath(steps);
+                foreach (var node in state.CreateSnapshot().FloorMapNodes.Where(node => node.Type == PrototypeFloorMapNodeType.Combat || node.Type == PrototypeFloorMapNodeType.Boss))
+                {
+                    var step = FindStepByMapNodeId(steps, node.MapNodeId);
+                    Assert.IsTrue(IsCombatEncounterContract(step), BuildRouteContractMessage(path.Floor, step, "Combat visual must open combat content"));
+                }
+            }
+        }
+
+        [Test]
+        public void FloorRoute_EventNodesOnlyOpenEventEncounters()
+        {
+            var room = LoadPrototypeRoomDefinition();
+            foreach (var path in room.FloorRunPaths)
+            {
+                Assert.IsNotNull(path);
+                var steps = path.Steps;
+                foreach (var step in steps.Where(step => step != null && step.IsValid && step.Node.Kind == NodeKind.Encounter))
+                {
+                    Assert.IsTrue(IsEventEncounterContract(step), BuildRouteContractMessage(path.Floor, step, "Event node must open event content"));
+                }
+
+                var state = new PrototypeRunState("run-route-event-contract-" + path.Floor, new GameFlowEventBus()) { AutoResolveCombat = false };
+                state.AttachDemoRunPath(steps);
+                foreach (var node in state.CreateSnapshot().FloorMapNodes.Where(node => node.Type == PrototypeFloorMapNodeType.Event))
+                {
+                    var step = FindStepByMapNodeId(steps, node.MapNodeId);
+                    Assert.IsTrue(IsEventEncounterContract(step), BuildRouteContractMessage(path.Floor, step, "Event visual must open event content"));
+                }
+            }
+        }
+
+        [Test]
+        public void FloorRoute_NodeVisualTypeMatchesEncounterContract()
+        {
+            var room = LoadPrototypeRoomDefinition();
+            foreach (var path in room.FloorRunPaths)
+            {
+                Assert.IsNotNull(path);
+                var state = new PrototypeRunState("run-route-visual-contract-" + path.Floor, new GameFlowEventBus()) { AutoResolveCombat = false };
+                state.AttachDemoRunPath(path.Steps);
+                foreach (var node in state.CreateSnapshot().FloorMapNodes)
+                {
+                    var step = FindStepByMapNodeId(path.Steps, node.MapNodeId);
+                    var expected = ExpectedMapNodeTypeForContract(step, node.Type == PrototypeFloorMapNodeType.Boss);
+                    Assert.AreEqual(expected, node.Type, BuildRouteContractMessage(path.Floor, step, "Map visual must match encounter contract"));
+                }
+            }
+        }
+
+        [Test]
         public void BranchingFloorMap_OnlyConnectedNodesBecomeSelectable()
         {
             var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
@@ -3321,6 +3385,83 @@ namespace HwigiTower.Tests.EditMode
             var catalog = AssetDatabase.LoadAssetAtPath<EncounterRuntimeCatalogData>(EncounterRuntimeCatalogBuilder.CatalogPath);
             Assert.IsNotNull(catalog, EncounterRuntimeCatalogBuilder.CatalogPath);
             return catalog;
+        }
+
+        private static PrototypeRoomDefinition LoadPrototypeRoomDefinition()
+        {
+            var room = AssetDatabase.LoadAssetAtPath<PrototypeRoomDefinition>("Assets/_Project/Data/Prototype/Rooms/SO_Room_Prototype.asset");
+            Assert.IsNotNull(room);
+            return room;
+        }
+
+        private static PrototypeDemoRunStep FindStepByMapNodeId(IReadOnlyList<PrototypeDemoRunStep> steps, string mapNodeId)
+        {
+            Assert.IsNotNull(steps);
+            for (var i = 0; i < steps.Count; i++)
+            {
+                var step = steps[i];
+                if (step != null && step.IsValid && mapNodeId.EndsWith("." + step.EncounterId, System.StringComparison.Ordinal))
+                {
+                    return step;
+                }
+            }
+
+            Assert.Fail("Missing route step for map node " + mapNodeId);
+            return null;
+        }
+
+        private static bool IsCombatEncounterContract(PrototypeDemoRunStep step)
+        {
+            return step != null &&
+                step.IsValid &&
+                (step.Encounter.Type == EncounterType.Battle || IsCombatGateEncounter(step.EncounterId));
+        }
+
+        private static bool IsEventEncounterContract(PrototypeDemoRunStep step)
+        {
+            return step != null &&
+                step.IsValid &&
+                !IsCombatEncounterContract(step) &&
+                step.Encounter.Type != EncounterType.Rest &&
+                step.Encounter.Type != EncounterType.Shop;
+        }
+
+        private static PrototypeFloorMapNodeType ExpectedMapNodeTypeForContract(PrototypeDemoRunStep step, bool boss)
+        {
+            if (boss)
+            {
+                return PrototypeFloorMapNodeType.Boss;
+            }
+
+            if (IsCombatEncounterContract(step))
+            {
+                return PrototypeFloorMapNodeType.Combat;
+            }
+
+            if (step != null && step.IsValid && step.Encounter.Type == EncounterType.Rest)
+            {
+                return PrototypeFloorMapNodeType.Rest;
+            }
+
+            if (step != null && step.IsValid && step.Encounter.Type == EncounterType.Shop)
+            {
+                return PrototypeFloorMapNodeType.Shop;
+            }
+
+            return PrototypeFloorMapNodeType.Event;
+        }
+
+        private static bool IsCombatGateEncounter(string encounterId)
+        {
+            return !string.IsNullOrEmpty(encounterId) &&
+                encounterId.StartsWith("ENC_COMBAT_GATE_", System.StringComparison.Ordinal);
+        }
+
+        private static string BuildRouteContractMessage(int floor, PrototypeDemoRunStep step, string issue)
+        {
+            var node = step == null || step.Node == null ? "node:-" : "node:" + step.Node.Kind + "/" + step.NodeId;
+            var encounter = step == null || step.Encounter == null ? "encounter:-" : "encounter:" + step.Encounter.Type + "/" + step.EncounterId;
+            return "floor " + floor + " " + issue + " (" + node + " -> " + encounter + ")";
         }
 
         private static PrototypeRunState CreateEventSmokeState(EncounterRuntimeCatalogData catalog, string runId)

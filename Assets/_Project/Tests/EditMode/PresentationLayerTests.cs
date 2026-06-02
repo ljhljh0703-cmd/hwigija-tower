@@ -1057,6 +1057,50 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
+        public void CombatVictory_ResultPanelDelayedUntilDefeatFeedbackCompletes()
+        {
+            var hud = CreateHud(out _);
+            var defeated = new PrototypeRunSnapshot(
+                "run-result-delay",
+                18,
+                24,
+                5,
+                0,
+                8,
+                0,
+                1,
+                0,
+                0,
+                0,
+                false,
+                lastCombatId: "COMBAT_DELAY",
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                lastCombatResultId: "victory",
+                lastCombatRoundResult: "round 2 | action Attack | playerDamage 12 | enemyDamage 0 | enemyHp 12->0 | playerHp 18->18",
+                isInCombat: false,
+                enemyHp: 0,
+                enemyMaxHp: 12,
+                enemyAttack: 3,
+                combatRound: 2,
+                lastCombatEnemyDefeated: true);
+
+            hud.ShowResultMessage("combat victory | enemyDefeated True | gold reward 4");
+            hud.ShowRunState(defeated);
+
+            Assert.IsTrue(hud.CombatDefeatFeedbackVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+
+            AdvanceCombatDefeatFeedback(hud, 1.99f);
+            Assert.IsTrue(hud.CombatDefeatFeedbackVisible);
+            Assert.IsFalse(hud.ResultPanelVisible);
+
+            AdvanceCombatDefeatFeedback(hud, 0.02f);
+            Assert.IsFalse(hud.CombatDefeatFeedbackVisible);
+            Assert.IsTrue(hud.ResultPanelVisible);
+            StringAssert.Contains("Gold", hud.ResultMessage);
+        }
+
+        [Test]
         public void Hud_LowHpWarningUsesConfiguredThresholdAndClearsOnHeal()
         {
             var hud = CreateHud(out _);
@@ -1411,6 +1455,15 @@ namespace HwigiTower.Tests.EditMode
             }
 
             return null;
+        }
+
+        private static void AdvanceCombatDefeatFeedback(PrototypeHud hud, float seconds)
+        {
+            var method = typeof(PrototypeHud).GetMethod(
+                "UpdateCombatDefeatFeedback",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            Assert.IsNotNull(method);
+            method.Invoke(hud, new object[] { seconds });
         }
 
         private static void AdvanceRunStateUntilEncounterSelectable(PrototypeRunState state, string expectedEncounterId)
