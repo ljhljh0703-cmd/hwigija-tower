@@ -687,19 +687,6 @@ namespace HwigiTower.Run
                 return PrototypeFloorMapNodeType.Combat;
             }
 
-            if (step.Node != null)
-            {
-                switch (step.Node.Kind)
-                {
-                    case NodeKind.Battle:
-                        return PrototypeFloorMapNodeType.Combat;
-                    case NodeKind.Rest:
-                        return PrototypeFloorMapNodeType.Rest;
-                    case NodeKind.Shop:
-                        return PrototypeFloorMapNodeType.Shop;
-                }
-            }
-
             return step.Encounter.Type switch
             {
                 EncounterType.Battle => PrototypeFloorMapNodeType.Combat,

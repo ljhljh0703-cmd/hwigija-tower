@@ -243,7 +243,7 @@ namespace HwigiTower.UI
         private const float CombatPlayerHpPulseDuration = 0.22f;
         private const float CombatDamageNumberDuration = 0.70f;
         private const float CombatIntroDuration = 0.45f;
-        private const float CombatDefeatFeedbackDuration = 0.65f;
+        private const float CombatDefeatFeedbackDuration = 2.0f;
         private const float CombatEnemyHitShakePixels = 11f;
         private const float CombatPlayerHitShakePixels = 9f;
         private const float CombatEnemyAttackPulseScale = 1.045f;
@@ -1185,6 +1185,12 @@ namespace HwigiTower.UI
             if (snapshot.IsInCombat)
             {
                 HideMapAndResultSurfacesForCombat();
+            }
+
+            if (!snapshot.IsInCombat && snapshot.LastCombatEnemyDefeated)
+            {
+                EnsureCombatPanel();
+                StartCombatDefeatFeedbackIfNeeded(snapshot);
             }
 
             AutoShowMapIfNeeded(snapshot);
@@ -3988,7 +3994,7 @@ namespace HwigiTower.UI
 
         private void UpdateLevelRewardPopup(PrototypeRunSnapshot snapshot)
         {
-            if (!snapshot.LevelUpRewardPending)
+            if (!snapshot.LevelUpRewardPending || ShouldShowCombatDefeatFeedback(snapshot))
             {
                 HideLevelRewardPopup();
                 return;
@@ -4037,6 +4043,7 @@ namespace HwigiTower.UI
             return !showRawDebugText &&
                 !snapshot.IsInCombat &&
                 snapshot.LastCombatEnemyDefeated &&
+                !ShouldShowCombatDefeatFeedback(snapshot) &&
                 snapshot.StairUnlocked &&
                 !snapshot.RunClear &&
                 IsBossClearResult(_lastResultMessage);
@@ -4127,7 +4134,11 @@ namespace HwigiTower.UI
                 return;
             }
 
-            nextFloorButton.gameObject.SetActive(snapshot.StairUnlocked && !snapshot.IsInCombat && !snapshot.RunCompleted && !ShouldShowBossRewardPopup(snapshot));
+            nextFloorButton.gameObject.SetActive(snapshot.StairUnlocked &&
+                !snapshot.IsInCombat &&
+                !snapshot.RunCompleted &&
+                !ShouldShowCombatDefeatFeedback(snapshot) &&
+                !ShouldShowBossRewardPopup(snapshot));
             nextFloorButton.interactable = nextFloorButton.gameObject.activeSelf && _roomController != null;
         }
 
