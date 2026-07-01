@@ -561,6 +561,36 @@
       margin-bottom: 6px;
     }
 
+    .proof-flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0 8px;
+    }
+
+    .proof-step {
+      border: 1px solid rgba(246, 239, 227, 0.12);
+      border-radius: var(--radius);
+      padding: 13px;
+      background: rgba(6, 7, 8, 0.58);
+    }
+
+    .proof-step strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .proof-step span {
+      color: var(--ink-soft);
+      font-size: 13px;
+      word-break: keep-all;
+    }
+
     .capture-card {
       overflow: hidden;
       background: rgba(6, 7, 8, 0.86);
@@ -771,6 +801,7 @@
       .loop-grid,
       .design-grid,
       .target-grid,
+      .proof-flow,
       .capture-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -813,6 +844,7 @@
       .loop-grid,
       .design-grid,
       .target-grid,
+      .proof-flow,
       .capture-grid {
         grid-template-columns: 1fr;
       }
@@ -1026,10 +1058,65 @@
           </article>
         </div>
         <div class="capture-head">
-          <h3>Implementation proof</h3>
+          <h3>Implementation remaster pass</h3>
           <p>
-            아래 캡처는 repo에 보존된 실제 Unity 프로토타입 화면입니다. 최신 RC와 일부 UI 문구/수치는 다를 수 있지만,
-            아이디어가 실제 화면과 조우 파이프라인으로 구현됐다는 증거로 남깁니다.
+            원본 Unity 캡처의 기능 증거는 유지하되, 대외 포트폴리오용 화면 품질은 GPT 리마스터로 먼저 끌어올립니다.
+            여기서 끝내지 않고, UI/Asset 세션이 이 컨셉을 실제 Unity 레이어로 분해해 런타임 캡처로 바꾸는 제작 기술을 도입합니다.
+          </p>
+        </div>
+        <div class="capture-grid">
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_combat_01.jpg" alt="전투 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Combat remaster</b>
+              <span>전투 로그, 피해 분리, 마타이오스 지원, command button hierarchy를 포트폴리오용 화면 품질로 재정리한 목표입니다.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_shop_01.jpg" alt="상점 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Shop remaster</b>
+              <span>상점은 자원 선택과 아이템 효과를 한 번에 읽히게 하고, 동행자 반응을 하단 패널에 붙이는 방향입니다.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_memory_01.jpg" alt="기억 이벤트 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Memory remaster</b>
+              <span>기억 이벤트는 raw ref가 아니라 consequence feedback과 보상 row가 중심이 되도록 화면 언어를 정리합니다.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_encounter_01.jpg" alt="전투 조우 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Encounter remaster</b>
+              <span>전투 진입 전 위협, 보상, 마타이오스 지원 가능 여부를 먼저 읽게 하는 조우 presentation 목표입니다.</span>
+            </div>
+          </article>
+        </div>
+        <div class="proof-flow" aria-label="컨셉 이미지를 런타임 캡처로 바꾸는 작업 흐름">
+          <div class="proof-step">
+            <strong>01 Source capture</strong>
+            <span>조잡하지만 실제 동작한 Unity prototype capture를 문제 증거로 보존합니다.</span>
+          </div>
+          <div class="proof-step">
+            <strong>02 GPT remaster</strong>
+            <span>GPT visual pass로 소비자용 화면 품질과 정보 계층의 목표를 빠르게 만듭니다.</span>
+          </div>
+          <div class="proof-step">
+            <strong>03 Layer split</strong>
+            <span>UI/Asset 세션이 배경, 카드, 버튼, 아이콘, 폰트, 데미지 숫자를 Unity 레이어로 분해합니다.</span>
+          </div>
+          <div class="proof-step">
+            <strong>04 Runtime capture</strong>
+            <span>게임 안에 반영한 뒤 Android/Editor 런타임에서 다시 캡처해 최종 proof로 교체합니다.</span>
+          </div>
+        </div>
+        <div class="capture-head">
+          <h3>Source implementation captures</h3>
+          <p>
+            아래는 repo에 보존된 실제 Unity 프로토타입 화면입니다. 최신 RC와 일부 UI 문구/수치는 다를 수 있지만,
+            리마스터 대상이 된 원본 구현 증거로 남깁니다.
           </p>
         </div>
         <div class="capture-grid">

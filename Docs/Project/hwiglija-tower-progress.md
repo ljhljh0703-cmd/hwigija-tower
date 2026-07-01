@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 08:23 — Implementation proof 리마스터와 concept-to-runtime 파이프라인 추가
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - 조잡한 원본 Unity prototype capture를 그대로 노출하는 리스크를 줄이기 위해 `Implementation remaster pass`를 추가
+  - 전투, 상점, 기억 이벤트, 전투 조우 화면의 GPT 리마스터 목표 화면 4장을 생성해 포트폴리오 assets에 추가
+  - `Source capture → GPT remaster → UI/Asset layer split → Unity runtime capture` 작업 흐름을 HTML에 명시
+  - 원본 캡처는 `Source implementation captures`로 내려서 실제 구현 증거와 목표 비주얼을 분리
+- **Files**: 변경/추가 6개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, remaster assets 4개, progress log)
+- **GDD impact**: 없음 — 포트폴리오 presentation 개선, 게임 런타임 변경 없음
+- **Next**: UI/Asset 세션은 remaster 화면을 배경/카드/버튼/아이콘/폰트/데미지 숫자 레이어로 분해해 Unity에 반영하고, 런타임 캡처로 교체
+- **Agent**: Codex
+
 ### 2026-07-02 00:38 — portfolio page에 GPT target visual pass 추가
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
