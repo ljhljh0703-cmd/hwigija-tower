@@ -225,7 +225,7 @@ namespace HwigiTower.UI
         private const int ResultFontSize = 28;
         private const int StatFontSize = 26;
         private const int CaptionFontSize = 23;
-        private const int CombatBodyFontSize = 28;
+        private const int CombatBodyFontSize = 24;
         private const float CombatActionButtonSize = 118f;
         private const int ChoiceFontSize = ButtonFontSize;
         private const int MapNodeFontSize = 29;
@@ -3506,8 +3506,8 @@ namespace HwigiTower.UI
             combatMataiosPortraitImage = CreateCombatPortraitBox(combatMataiosCard, "Combat Mataios Portrait", new Vector2(0.04f, 0.16f), new Vector2(0.31f, 0.90f), new Color(0.12f, 0.14f, 0.18f, 1f), string.Empty, out _);
             combatPlayerPortraitFrameImage = CreateCombatPortraitFrame(combatPlayerPortraitImage, "Combat Player Portrait Frame");
             combatMataiosPortraitFrameImage = CreateCombatPortraitFrame(combatMataiosPortraitImage, "Combat Mataios Portrait Frame");
-            combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
-            combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.35f, 0.18f), new Vector2(0.96f, 0.92f), 24, TextAnchor.MiddleLeft);
+            combatPlayerCardText = CreateCombatChildText(combatPlayerCard, "Combat Player Card Text", new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.92f), 22, TextAnchor.MiddleLeft);
+            combatMataiosCardText = CreateCombatChildText(combatMataiosCard, "Combat Mataios Card Text", new Vector2(0.35f, 0.18f), new Vector2(0.96f, 0.92f), 22, TextAnchor.MiddleLeft);
             combatPlayerDamageNumberText = CreateCombatChildText(combatPlayerCard, "Combat Player Damage Number", new Vector2(0.04f, 0.48f), new Vector2(0.30f, 0.78f), 30, TextAnchor.MiddleCenter);
             combatPlayerDamageNumberText.color = new Color(1.00f, 0.44f, 0.36f, 1f);
             combatPlayerDamageNumberText.gameObject.SetActive(false);
@@ -5070,18 +5070,23 @@ namespace HwigiTower.UI
                 _roomController != null &&
                 !IsCutscenePlaying() &&
                 _combatIntroTimer <= 0f;
+            var recommendedAction = ResolveRecommendedCombatAction(snapshot);
             if (attackButton != null)
             {
+                var preview = _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Attack);
                 attackButton.gameObject.SetActive(snapshot.IsInCombat && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId));
                 attackButton.interactable = canAct && attackButton.gameObject.activeSelf;
-                SetCombatActionButtonPreview(attackButton, _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Attack));
+                SetCombatActionButtonPreview(attackButton, preview);
+                ApplyCombatActionButtonVisualState(attackButton, recommendedAction == CombatAction.Attack && preview.Usable, attackButton.interactable);
             }
 
             if (defendButton != null)
             {
+                var preview = _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Defend);
                 defendButton.gameObject.SetActive(snapshot.IsInCombat && snapshot.IsCommandEquipped(PrototypeRunState.CommandDefendId));
                 defendButton.interactable = canAct && defendButton.gameObject.activeSelf;
-                SetCombatActionButtonPreview(defendButton, _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Defend));
+                SetCombatActionButtonPreview(defendButton, preview);
+                ApplyCombatActionButtonVisualState(defendButton, recommendedAction == CombatAction.Defend && preview.Usable, defendButton.interactable);
             }
 
             if (skillButton != null)
@@ -5091,6 +5096,7 @@ namespace HwigiTower.UI
                 skillButton.gameObject.SetActive(snapshot.IsInCombat && skillEquipped);
                 skillButton.interactable = canAct && skillButton.gameObject.activeSelf && preview.Usable;
                 SetCombatActionButtonPreview(skillButton, preview);
+                ApplyCombatActionButtonVisualState(skillButton, recommendedAction == CombatAction.Skill && preview.Usable, skillButton.interactable);
             }
         }
 
@@ -5134,10 +5140,39 @@ namespace HwigiTower.UI
             label.text = string.IsNullOrEmpty(preview.Label)
                 ? string.Empty
                 : preview.HasPreview ? preview.Label + "\n" + preview.PreviewText : preview.Label;
-            label.fontSize = preview.HasPreview ? 21 : 28;
-            label.resizeTextMinSize = preview.HasPreview ? 15 : 22;
-            label.resizeTextMaxSize = preview.HasPreview ? 21 : 28;
+            label.fontSize = preview.HasPreview ? 19 : 28;
+            label.resizeTextMinSize = preview.HasPreview ? 13 : 22;
+            label.resizeTextMaxSize = preview.HasPreview ? 19 : 28;
             label.lineSpacing = 0.92f;
+        }
+
+        private static void ApplyCombatActionButtonVisualState(Button button, bool recommended, bool usable)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            var image = button.GetComponent<Image>();
+            if (image == null)
+            {
+                return;
+            }
+
+            if (!button.gameObject.activeSelf)
+            {
+                return;
+            }
+
+            if (!usable)
+            {
+                image.color = new Color(0.07f, 0.08f, 0.10f, 0.90f);
+                return;
+            }
+
+            image.color = recommended
+                ? new Color(0.18f, 0.34f, 0.30f, 0.99f)
+                : new Color(0.12f, 0.17f, 0.20f, 0.98f);
         }
 
         private void UpdateCombatVisuals(PrototypeRunSnapshot snapshot)
@@ -6868,11 +6903,29 @@ namespace HwigiTower.UI
 
         private string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
-            var state = BuildCombatLogDetailLine(snapshot);
-            return PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + " | 내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n" +
-                ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 42) + "\n" +
-                ShortenPublicLine(state, 56) + "\n" +
-                ShortenPublicLine(BuildCombatBuildSummaryLine(snapshot), 34);
+            var lines = new List<string>
+            {
+                PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + " | 내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp,
+                ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 48),
+                ShortenPublicLine(BuildCombatDecisionLine(snapshot), 50)
+            };
+
+            var detail = BuildCombatLogDetailLine(snapshot);
+            var build = BuildCombatBuildSummaryLine(snapshot);
+            if (!string.IsNullOrEmpty(detail) && !string.IsNullOrEmpty(build))
+            {
+                lines.Add(ShortenPublicLine(detail + " | " + build, 62));
+            }
+            else if (!string.IsNullOrEmpty(detail))
+            {
+                lines.Add(ShortenPublicLine(detail, 62));
+            }
+            else if (!string.IsNullOrEmpty(build))
+            {
+                lines.Add(ShortenPublicLine(build, 62));
+            }
+
+            return string.Join("\n", lines);
         }
 
         private string BuildCombatLogDetailLine(PrototypeRunSnapshot snapshot)
@@ -6933,16 +6986,36 @@ namespace HwigiTower.UI
         {
             if (!string.IsNullOrEmpty(snapshot.LastGrowthMessage))
             {
-                return "성장: " + snapshot.LastGrowthMessage;
+                return "보상: " + snapshot.LastGrowthMessage;
             }
 
-            if (!string.IsNullOrEmpty(snapshot.CombatBuildSummary) &&
-                snapshot.CombatBuildSummary.Contains("정찰:", StringComparison.Ordinal))
+            var chips = new List<string>();
+            if (snapshot.ScoutAttackReady)
             {
-                return "성장 Lv " + snapshot.CombatLevel + " · 정찰: 다음 공격 강화 · 상세 접힘";
+                chips.Add("정찰 공격 준비");
             }
 
-            return "성장 Lv " + snapshot.CombatLevel + " XP " + snapshot.CombatXp + "/" + snapshot.CombatXpToNextLevel + " · 상세 접힘";
+            if (snapshot.ScoutDamageReductionReady)
+            {
+                chips.Add("정찰 피해감소 준비");
+            }
+
+            if (snapshot.LevelAttackBonus > 0)
+            {
+                chips.Add("ATK +" + snapshot.LevelAttackBonus);
+            }
+
+            if (snapshot.LevelMaxHpBonus > 0)
+            {
+                chips.Add("HP +" + snapshot.LevelMaxHpBonus);
+            }
+
+            if (snapshot.SkillCooldownReduction > 0)
+            {
+                chips.Add("CD -" + snapshot.SkillCooldownReduction);
+            }
+
+            return chips.Count == 0 ? string.Empty : "상태: " + JoinCompactChips(chips, 3);
         }
 
         private static string BuildCombatExtraLine(PrototypeRunSnapshot snapshot)
@@ -7093,6 +7166,111 @@ namespace HwigiTower.UI
             }
 
             return "의도: 반격 준비";
+        }
+
+        private static string BuildCombatDecisionLine(PrototypeRunSnapshot snapshot)
+        {
+            if (!snapshot.IsInCombat)
+            {
+                return "판단: 전투 결과 확인";
+            }
+
+            var result = snapshot.LastCombatRoundResult ?? string.Empty;
+            if (snapshot.ScoutAttackReady && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId))
+            {
+                return "판단: 공격으로 정찰 보너스 발동";
+            }
+
+            if (HasSkillOpeningCue(snapshot) && HasCombatSkillEquipped(snapshot))
+            {
+                return result.Contains("skill opening missed", StringComparison.Ordinal)
+                    ? "판단: 빈틈을 놓침 - 다음엔 스킬"
+                    : "판단: 빈틈 - 스킬로 추가 피해";
+            }
+
+            if (HasHeavyPressureCue(snapshot))
+            {
+                return result.Contains("heavy pressure blocked", StringComparison.Ordinal)
+                    ? "판단: 중압 차단 성공"
+                    : "판단: 중압 - 방어로 추가 피해 차단";
+            }
+
+            if (result.Contains("frenzy ready", StringComparison.Ordinal) && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId))
+            {
+                return "판단: 공격 유지 시 광폭 연결";
+            }
+
+            if (snapshot.EnemyHp > 0 && snapshot.EnemyHp <= snapshot.PlayerAttack + 2 && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId))
+            {
+                return "판단: 공격으로 마무리 가능";
+            }
+
+            if (snapshot.EnemyAttack > 0)
+            {
+                return "판단: 적 ATK " + snapshot.EnemyAttack + " - 피해 관리 필요";
+            }
+
+            return "판단: 공격으로 압박";
+        }
+
+        private static CombatAction? ResolveRecommendedCombatAction(PrototypeRunSnapshot snapshot)
+        {
+            if (!snapshot.IsInCombat)
+            {
+                return null;
+            }
+
+            if (snapshot.ScoutAttackReady && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId))
+            {
+                return CombatAction.Attack;
+            }
+
+            if (HasSkillOpeningCue(snapshot) && HasCombatSkillEquipped(snapshot))
+            {
+                return CombatAction.Skill;
+            }
+
+            if (HasHeavyPressureCue(snapshot) && snapshot.IsCommandEquipped(PrototypeRunState.CommandDefendId))
+            {
+                return CombatAction.Defend;
+            }
+
+            if (snapshot.EnemyHp > 0 && snapshot.EnemyHp <= snapshot.PlayerAttack + 2 && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId))
+            {
+                return CombatAction.Attack;
+            }
+
+            if (snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId))
+            {
+                return CombatAction.Attack;
+            }
+
+            if (snapshot.IsCommandEquipped(PrototypeRunState.CommandDefendId))
+            {
+                return CombatAction.Defend;
+            }
+
+            return HasCombatSkillEquipped(snapshot) ? CombatAction.Skill : (CombatAction?)null;
+        }
+
+        private static bool HasCombatSkillEquipped(PrototypeRunSnapshot snapshot)
+        {
+            return snapshot.IsCommandEquipped(PrototypeRunState.CommandScoutId) ||
+                snapshot.IsCommandEquipped(PrototypeRunState.CommandArts03Id);
+        }
+
+        private static bool HasHeavyPressureCue(PrototypeRunSnapshot snapshot)
+        {
+            var result = snapshot.LastCombatRoundResult ?? string.Empty;
+            return snapshot.EnemyAttack >= 4 ||
+                result.Contains("heavy pressure", StringComparison.Ordinal);
+        }
+
+        private static bool HasSkillOpeningCue(PrototypeRunSnapshot snapshot)
+        {
+            var result = snapshot.LastCombatRoundResult ?? string.Empty;
+            return snapshot.EnemyMaxHp > 0 && snapshot.EnemyHp * 2 <= snapshot.EnemyMaxHp ||
+                result.Contains("skill opening", StringComparison.Ordinal);
         }
 
         private string BuildCombatPlayerCardText(PrototypeRunSnapshot snapshot)
