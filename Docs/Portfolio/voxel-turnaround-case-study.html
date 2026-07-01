@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<!--
+  Voxel Turnaround Case Study
+  Basis: Tools/VoxelTurnaround demo manifest + verify output.
+  Design basis: Vault portfolio-impact/html-sensory guidance; bespoke page, not ParkDal legacy.
+-->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2D Concept to 8-Direction Game Asset Pipeline</title>
+  <meta name="description" content="front/side 2D concept images to voxel visual hull, 8-direction reference sprites, contact sheet, and SHA-backed verification manifest.">
+  <meta property="og:title" content="2D Concept to 8-Direction Game Asset Pipeline">
+  <meta property="og:description" content="A verified AI-assisted game asset prepass for turning 2D concept views into 8-direction sprite references.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="assets/voxel-turnaround-sheet.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0d0e10;
+      --ink-2: #25282d;
+      --muted: #697078;
+      --faint: #9aa1aa;
+      --line: #e4e7ea;
+      --line-2: #c9d0d6;
+      --paper: #ffffff;
+      --paper-2: #f6f8f9;
+      --paper-3: #edf2f3;
+      --accent: #23c7bd;
+      --accent-dark: #087a78;
+      --maxw: 1120px;
+      --r: 8px;
+      --sans: "IBM Plex Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.68;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      letter-spacing: 0;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::selection { background: rgba(35, 199, 189, .24); }
+    a { color: inherit; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 {
+      line-height: 1.16;
+      letter-spacing: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    img { display: block; max-width: 100%; }
+    code, pre, .mono { font-family: var(--mono); font-feature-settings: "tnum"; }
+    .wrap { width: min(var(--maxw), calc(100% - 48px)); margin: 0 auto; }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: .74rem;
+      line-height: 1.2;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .progress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      height: 2px;
+      width: 0;
+      background: var(--accent);
+      z-index: 30;
+    }
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(13, 14, 16, .08);
+    }
+    .nav-inner {
+      width: min(var(--maxw), calc(100% - 48px));
+      margin: 0 auto;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+    .brand { font-weight: 700; letter-spacing: 0; }
+    .nav-links { margin-left: auto; display: flex; gap: 20px; font-size: .9rem; color: var(--muted); }
+    .nav-links a { text-decoration: none; }
+    .nav-links a:hover { color: var(--ink); }
+
+    .hero {
+      padding: 112px 0 56px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(35, 199, 189, .08), transparent 42%),
+        radial-gradient(900px 520px at 78% 0%, rgba(13, 14, 16, .06), transparent 64%),
+        var(--paper);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 60px;
+      align-items: end;
+    }
+    .hero-grid > *,
+    .visual-stack,
+    .visual-main,
+    .input-card,
+    .card,
+    .stat {
+      min-width: 0;
+    }
+    .hero h1 {
+      margin-top: 18px;
+      font-size: 5.1rem;
+      max-width: 11ch;
+      font-weight: 700;
+    }
+    .hero h1 span { display: block; }
+    .lead {
+      margin-top: 24px;
+      max-width: 58ch;
+      color: var(--ink-2);
+      font-size: 1.18rem;
+      overflow-wrap: anywhere;
+    }
+    .meta-line {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: .94rem;
+      overflow-wrap: anywhere;
+    }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 12px 18px;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn.primary { background: var(--ink); color: white; }
+    .btn.secondary { border: 1px solid var(--line-2); color: var(--ink); background: rgba(255, 255, 255, .68); }
+    .btn:hover { transform: translateY(-2px); }
+    .visual-stack {
+      display: grid;
+      gap: 16px;
+    }
+    .visual-main {
+      border: 1px solid var(--line-2);
+      border-radius: var(--r);
+      background: #050607;
+      padding: 22px;
+      box-shadow: 0 24px 70px rgba(15, 25, 32, .16);
+      overflow: hidden;
+      aspect-ratio: 1120 / 368;
+    }
+    .visual-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .input-strip {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .input-card {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(255, 255, 255, .82);
+      padding: 14px;
+    }
+    .input-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      image-rendering: pixelated;
+      background: repeating-conic-gradient(#f7f9fa 0% 25%, #edf1f2 0% 50%) 50% / 16px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+    .input-card span {
+      display: block;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 46px;
+    }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(255, 255, 255, .74);
+      padding: 18px;
+    }
+    .stat .num {
+      font-family: var(--mono);
+      font-size: 2.62rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .stat .label { margin-top: 10px; font-weight: 700; }
+    .stat .sub { margin-top: 3px; color: var(--muted); font-size: .83rem; }
+    .stat.win { background: var(--ink); color: white; border-color: var(--ink); }
+    .stat.win .sub { color: #b8c0c7; }
+
+    section.block {
+      padding: 104px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 34px;
+    }
+    .snum {
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: .86rem;
+      padding-top: 8px;
+    }
+    .section-head h2 { font-size: 3rem; max-width: 16ch; }
+    .intro {
+      color: var(--ink-2);
+      font-size: 1.08rem;
+      max-width: 66ch;
+      margin-bottom: 28px;
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 22px;
+      background: var(--paper-2);
+    }
+    .card .lab {
+      font-family: var(--mono);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-size: .72rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card h3 { font-size: 1.1rem; margin-bottom: 9px; }
+    .card p { color: var(--ink-2); font-size: .95rem; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 34px;
+    }
+    .flow-step {
+      min-height: 150px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      border-radius: var(--r);
+      padding: 18px;
+      position: relative;
+    }
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      right: -9px;
+      top: 50%;
+      width: 8px;
+      height: 1px;
+      background: var(--line-2);
+    }
+    .flow-step:last-child::after { display: none; }
+    .flow-step strong { display: block; margin-bottom: 8px; }
+    .flow-step span { color: var(--muted); font-size: .87rem; }
+
+    .code-panel {
+      border-radius: var(--r);
+      background: #0c0e11;
+      color: #eef4f4;
+      padding: 22px;
+      overflow-x: auto;
+      border: 1px solid #1f252a;
+      margin-top: 22px;
+      position: relative;
+    }
+    .code-panel pre {
+      margin: 0;
+      line-height: 1.7;
+      font-size: .86rem;
+      white-space: pre-wrap;
+    }
+    .code-panel .muted { color: #879098; }
+    .copy {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      border: 1px solid #2d363b;
+      background: #151a1e;
+      color: #d9f7f4;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font: 600 .72rem var(--mono);
+      cursor: pointer;
+    }
+
+    .proof-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .proof {
+      border-left: 3px solid var(--accent);
+      background: var(--paper-2);
+      padding: 16px 18px;
+      border-radius: 0 var(--r) var(--r) 0;
+    }
+    .proof strong { display: block; }
+    .proof span { display: block; margin-top: 3px; color: var(--muted); font-size: .9rem; }
+
+    .sheet-frame {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: #050607;
+      overflow-x: auto;
+      padding: 18px;
+      margin-top: 30px;
+    }
+    .sheet-frame img {
+      min-width: 780px;
+      width: 100%;
+      image-rendering: pixelated;
+    }
+    .caption {
+      text-align: center;
+      color: var(--muted);
+      font-size: .84rem;
+      margin-top: 12px;
+    }
+
+    .manifest {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .92rem;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden;
+      display: table;
+    }
+    .manifest th, .manifest td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .manifest tr:last-child th, .manifest tr:last-child td { border-bottom: 0; }
+    .manifest th {
+      width: 220px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .8rem;
+      font-weight: 600;
+      background: var(--paper-2);
+    }
+
+    .closing {
+      padding: 112px 0;
+      background: var(--ink);
+      color: white;
+      text-align: center;
+    }
+    .closing h2 {
+      max-width: 18ch;
+      margin: 0 auto;
+      font-size: 3.6rem;
+    }
+    .closing p {
+      max-width: 58ch;
+      margin: 20px auto 0;
+      color: #b7bec5;
+    }
+    footer {
+      padding: 34px 0 54px;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; }
+
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);
+    }
+    .js .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      .hero { padding-top: 84px; }
+      .hero-grid { gap: 34px; }
+      .hero h1 { font-size: 3.35rem; max-width: 12ch; }
+      .lead { font-size: 1.08rem; }
+      .stat .num { font-size: 2.28rem; }
+      section.block { padding: 78px 0; }
+      .section-head h2 { font-size: 2.35rem; }
+      .closing { padding: 86px 0; }
+      .closing h2 { font-size: 2.8rem; }
+      .hero-grid, .grid-2, .grid-3, .proof-list { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .flow { grid-template-columns: 1fr; }
+      .flow-step { min-height: auto; }
+      .flow-step::after { display: none; }
+      .section-head { grid-template-columns: 1fr; gap: 10px; }
+      .snum { padding-top: 0; }
+    }
+    @media (max-width: 560px) {
+      .wrap,
+      .nav-inner {
+        width: calc(100% - 32px);
+        max-width: 342px;
+        margin-left: 16px;
+        margin-right: 16px;
+      }
+      .stats { grid-template-columns: 1fr; }
+      .hero { padding: 72px 0 42px; }
+      .hero h1 { font-size: 2.38rem; max-width: 10ch; }
+      .hero-grid,
+      .visual-stack,
+      .visual-main,
+      .input-strip,
+      .input-card,
+      .cta-row {
+        width: 100%;
+        max-width: 100%;
+      }
+      .lead,
+      .meta-line {
+        max-width: 30ch;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      .btn {
+        padding: 11px 14px;
+        font-size: .92rem;
+      }
+      .lead { font-size: 1rem; }
+      .visual-main {
+        inline-size: 100%;
+        max-inline-size: 342px;
+        padding: 14px;
+      }
+      .visual-main img {
+        inline-size: 100%;
+        max-inline-size: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .section-head h2 { font-size: 1.95rem; }
+      .closing h2 { font-size: 2.15rem; }
+      .input-strip { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .manifest { display: block; overflow-x: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+      .js .reveal { opacity: 1; transform: none; }
+    }
+    @media print {
+      .nav, .progress, .copy { display: none !important; }
+      body { background: white; color: black; }
+      .hero, section.block, .closing { break-inside: avoid; }
+      .visual-main, .sheet-frame, .code-panel { box-shadow: none; }
+      a::after { content: " (" attr(href) ")"; font-size: .8em; color: #666; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="nav" aria-label="Case study navigation">
+    <div class="nav-inner">
+      <div class="brand">Voxel Turnaround</div>
+      <div class="nav-links">
+        <a href="#problem">Problem</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#proof">Proof</a>
+        <a href="#integration">Game use</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">AI-assisted game asset pipeline</div>
+          <h1><span>2D Concept</span><span>to 8-Direction</span><span>Game Asset</span></h1>
+          <p class="lead">정면과 측면 2D 컨셉을 visual hull 방식으로 복셀화하고, 게임 제작에 넘길 수 있는 8방향 reference sprite와 검증 manifest를 생성한 실험이다.</p>
+          <p class="meta-line">Role: pipeline design · Python implementation · deterministic verification · portfolio packaging</p>
+          <div class="cta-row">
+            <a class="btn primary" href="../../Tools/VoxelTurnaround/README.md">View tool README</a>
+            <a class="btn secondary" href="assets/voxel-turnaround-sheet.png">Open contact sheet</a>
+          </div>
+        </div>
+        <div class="visual-stack" aria-label="Generated 8 direction voxel turnaround">
+          <div class="visual-main">
+            <img src="assets/voxel-turnaround-sheet.png" alt="Eight direction voxel turnaround contact sheet">
+          </div>
+          <div class="input-strip">
+            <div class="input-card">
+              <img src="assets/voxel-front.png" alt="Front concept silhouette input">
+              <span class="mono">input/front.png</span>
+            </div>
+            <div class="input-card">
+              <img src="assets/voxel-side.png" alt="Side concept silhouette input">
+              <span class="mono">input/side.png</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats" aria-label="Pipeline metrics">
+        <div class="stat win">
+          <div class="num">8</div>
+          <div class="label">direction renders</div>
+          <div class="sub">front, side, diagonals, back</div>
+        </div>
+        <div class="stat">
+          <div class="num">10,007</div>
+          <div class="label">occupied voxels</div>
+          <div class="sub">visual hull demo run</div>
+        </div>
+        <div class="stat">
+          <div class="num">3,117</div>
+          <div class="label">surface voxels</div>
+          <div class="sub">rendered reference shell</div>
+        </div>
+        <div class="stat">
+          <div class="num">PASS</div>
+          <div class="label">verify gate</div>
+          <div class="sub">PNG + SHA + manifest checks</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="block" id="problem">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="snum">01</div>
+          <h2>게임 에셋은 그림만으로 끝나지 않는다</h2>
+        </div>
+        <p class="intro reveal">AI 이미지 생성은 단일 컷을 빠르게 만든다. 문제는 게임 제작이다. 방향별 실루엣이 흔들리거나, 후처리할 기준이 없거나, 엔진이 먹을 manifest 없이 PNG만 남으면 실제 파이프라인에 들어가지 못한다.</p>
+        <div class="grid-3">
+          <article class="card reveal">
+            <div class="lab">Problem</div>
+            <h3>Identity drift</h3>
+            <p>방향별 생성 결과가 같은 오브젝트처럼 보이지 않는 문제가 반복된다. 캐릭터보다 프롭·문·제단 같은 방향성 소품에서 먼저 검증했다.</p>
+          </article>
+          <article class="card reveal">
+            <div class="lab">Decision</div>
+            <h3>Reference prepass</h3>
+            <p>최종 아트를 바로 만들지 않고, front/side 실루엣에서 8방향 reference를 먼저 만든다. 사람이 후처리할 기준을 고정하는 단계다.</p>
+          </article>
+          <article class="card reveal">
+            <div class="lab">Result</div>
+            <h3>Verified output</h3>
+            <p>8방향 PNG, contact sheet, manifest, SHA-256을 생성하고 verify 명령으로 재현 가능성을 확인했다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="pipeline">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="snum">02</div>
+          <h2>Visual hull을 게임 제작용 중간 산출물로 쓴다</h2>
+        </div>
+        <p class="intro reveal">이 도구는 3D 모델러가 아니다. 기존 sprite pipeline 앞에 붙는 선택적 prepass다. 목적은 "보기 좋은 그림"이 아니라 "후처리 가능한 방향별 기준"을 만드는 것이다.</p>
+        <div class="flow reveal" aria-label="Pipeline steps">
+          <div class="flow-step"><strong>01 Input views</strong><span>front.png와 side.png를 받는다. 투명 PNG가 가장 안전하다.</span></div>
+          <div class="flow-step"><strong>02 Silhouette</strong><span>alpha 또는 corner color로 전경 mask를 만든다.</span></div>
+          <div class="flow-step"><strong>03 Voxel carve</strong><span>정면과 측면 실루엣에 동시에 맞는 voxel만 남긴다.</span></div>
+          <div class="flow-step"><strong>04 Render refs</strong><span>surface voxel을 8방향 pixel projection으로 렌더한다.</span></div>
+          <div class="flow-step"><strong>05 Verify</strong><span>manifest, SHA, non-transparent pixel, render count를 확인한다.</span></div>
+        </div>
+        <div class="code-panel reveal">
+          <button class="copy" type="button" data-copy="cd &quot;/Users/godju/Downloads/AI Game/hwigi-tower&quot;&#10;./Tools/VoxelTurnaround/run_demo.sh">Copy</button>
+          <pre><span class="muted">$</span> cd "/Users/godju/Downloads/AI Game/hwigi-tower"
+<span class="muted">$</span> ./Tools/VoxelTurnaround/run_demo.sh
+
+Built demo_obelisk: 10007 occupied voxels, 3117 surface voxels
+PASS voxel-turnaround verification
+- occupied voxels: 10007
+- surface voxels: 3117
+- renders checked: 8</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="proof">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="snum">03</div>
+          <h2>증거는 화면과 manifest 양쪽에 남긴다</h2>
+        </div>
+        <p class="intro reveal">포트폴리오용 주장은 모두 demo run에서 나온 값만 쓴다. 이 페이지는 "AI로 만들었다"가 아니라 "검증 가능한 에셋 생산 단계를 만들었다"는 증거를 보여준다.</p>
+        <div class="proof-list">
+          <div class="proof reveal"><strong>Contact sheet</strong><span>8방향 결과를 한 화면에서 비교한다. 방향별 silhouette drift를 사람이 바로 볼 수 있다.</span></div>
+          <div class="proof reveal"><strong>Manifest</strong><span>input SHA, render SHA, voxel count, non-transparent pixel count를 기록한다.</span></div>
+          <div class="proof reveal"><strong>Verify command</strong><span>나중에 출력물이 깨졌는지 PNG와 manifest를 다시 읽어 검사한다.</span></div>
+          <div class="proof reveal"><strong>Engine boundary</strong><span>Unity runtime 에셋으로 바로 승격하지 않고, reference prepass로 격리했다.</span></div>
+        </div>
+        <div class="sheet-frame reveal">
+          <img src="assets/voxel-turnaround-sheet.png" alt="Generated 8 direction contact sheet">
+        </div>
+        <p class="caption">Generated demo contact sheet. The page embeds the same tracked PNG that the portfolio can reference on GitHub.</p>
+
+        <table class="manifest reveal" aria-label="Manifest excerpt">
+          <tbody>
+            <tr><th>tool</th><td><code>voxel-turnaround</code></td></tr>
+            <tr><th>assetId</th><td><code>demo_obelisk</code></td></tr>
+            <tr><th>occupiedVoxels</th><td><code>10007</code></td></tr>
+            <tr><th>surfaceVoxels</th><td><code>3117</code></td></tr>
+            <tr><th>contactSheet SHA-256</th><td><code>628037bb782ee83bfe90d85db618fd0381df86fa8d0dfb958089627e5c5822d5</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="integration">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="snum">04</div>
+          <h2>게임 제작에는 이렇게 붙인다</h2>
+        </div>
+        <p class="intro reveal">최종 계약은 기존 게임 에셋 파이프라인을 바꾸지 않는다. voxel 결과는 PerfectPixel, sprite-gen, Aseprite 앞단의 reference와 QA 기준으로만 사용한다.</p>
+        <div class="grid-2">
+          <article class="card reveal">
+            <div class="lab">Good fit</div>
+            <h3>Static directional props</h3>
+            <p>탑 조각, 문, 제단, 상자, 보스 장식물처럼 방향성은 필요하지만 rigging은 필요 없는 에셋에 먼저 적용한다.</p>
+          </article>
+          <article class="card reveal">
+            <div class="lab">Boundary</div>
+            <h3>Not a final 3D model</h3>
+            <p>오목한 구조와 topology는 복원하지 못한다. 캐릭터 애니메이션 프레임 생성도 별도 단계로 남긴다.</p>
+          </article>
+        </div>
+        <div class="code-panel reveal">
+          <pre>front/side concept
+  -> voxel turnaround prepass
+  -> 8-direction reference PNGs + manifest.json
+  -> PerfectPixel / sprite-gen / Aseprite refinement
+  -> sprite-sheet.png + runtime manifest
+  -> Unity / libGDX / Godot importer</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="closing">
+    <div class="wrap">
+      <h2>AI asset generation needs gates, not just images.</h2>
+      <p>이 케이스스터디의 핵심은 복셀 자체가 아니라, AI가 만든 시각물을 게임 제작에 들어갈 수 있는 검증 가능한 중간 산출물로 바꾸는 방식이다.</p>
+      <div class="cta-row" style="justify-content:center">
+        <a class="btn primary" href="../../Tools/VoxelTurnaround/voxel_turnaround.py">Read the Python tool</a>
+        <a class="btn secondary" href="../../Tools/VoxelTurnaround/README.md">Run locally</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>Voxel Turnaround Case Study · Lee Ju Hyeong</span>
+      <span class="mono">artifact_stage: interaction_probe / portfolio_case_study</span>
+    </div>
+  </footer>
+
+  <script>
+    document.documentElement.classList.add('js');
+
+    const progress = document.getElementById('progress');
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? window.scrollY / max : 0;
+      progress.style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    const reveal = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          reveal.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach((el) => reveal.observe(el));
+
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(button.getAttribute('data-copy'));
+          const old = button.textContent;
+          button.textContent = 'Copied';
+          setTimeout(() => { button.textContent = old; }, 1000);
+        } catch {
+          button.textContent = 'Copy failed';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
