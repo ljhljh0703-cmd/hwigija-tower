@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 00:38 — portfolio page에 GPT target visual pass 추가
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - 기존 Unity prototype capture가 대외 첫인상으로 조잡해 보이는 리스크를 분리
+  - GPT로 전투, 루트/이벤트, 성장/인벤토리 목표 화면 3장을 생성하고 repo 포트폴리오 assets에 추가
+  - HTML Media 섹션을 `Target visual pass`와 `Implementation proof`로 재구성
+  - 최종 public screenshot은 target visual을 실제 게임 에셋/UI 레이어에 반영한 뒤 런타임에서 재캡처해야 한다는 기준을 명시
+- **Files**: 변경/추가 5개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, target visual assets 3개, progress log)
+- **GDD impact**: 없음 — 포트폴리오 presentation 개선, 게임 런타임 변경 없음
+- **Next**: UI/Asset 세션에서 target visual pass를 실제 Unity 배경/카드/버튼/폰트 레이어로 분해 반영할지 결정
+- **Agent**: Codex
+
 ### 2026-07-02 00:24 — portfolio page에 실제 프로토타입 캡처 증거 추가
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
