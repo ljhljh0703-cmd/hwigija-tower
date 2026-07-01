@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 08:40 — Mataios companion concept와 APK download link 강화
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - 포트폴리오 HTML에 `Mataios, the Companion Concept` 섹션을 추가
+  - ML-Agents 실험을 runtime RL이 아니라 전투 설계 probe로 설명하고, ContextPolicy → deterministic companion brain handoff를 강조
+  - Exp04 핵심 지표와 runtime 금지선(본편 ONNX/RL 미연결)을 함께 표기해 과장 리스크를 낮춤
+  - Build 섹션의 APK 항목과 CTA를 사용자 제공 Google Drive APK download folder로 연결
+- **Files**: 변경 2개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 presentation/copy/link 보정, 게임 런타임 변경 없음
+- **Next**: Google Drive APK 폴더의 실제 최신 APK명/SHA를 별도 배포 세션에서 맞춰주면 Build Facts를 다시 동기화
+- **Agent**: Codex
+
 ### 2026-07-02 08:34 — Source implementation captures 설명 문구 보정
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:

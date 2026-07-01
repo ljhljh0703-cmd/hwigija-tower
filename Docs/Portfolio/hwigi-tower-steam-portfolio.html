@@ -419,6 +419,86 @@
       gap: 10px;
     }
 
+    .companion-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .companion-art {
+      display: grid;
+      align-content: end;
+      min-height: 520px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(9, 11, 13, 0.08), rgba(9, 11, 13, 0.9)),
+        url("../../Assets/_Project/Art/Encounters/enc_combat_gate_03_bg.png") center / cover no-repeat;
+      box-shadow: var(--shadow);
+    }
+
+    .companion-art img {
+      width: min(86%, 360px);
+      margin: 0 auto;
+      filter: drop-shadow(0 28px 28px rgba(0, 0, 0, 0.62));
+    }
+
+    .companion-copy {
+      padding: 18px;
+      border-top: 1px solid var(--line);
+      background: rgba(6, 7, 8, 0.78);
+    }
+
+    .companion-copy h3 {
+      color: var(--gold);
+      font-size: 22px;
+      line-height: 1.2;
+      word-break: keep-all;
+    }
+
+    .companion-copy p {
+      margin-top: 10px;
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .companion-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .metric-card {
+      border: 1px solid rgba(246, 239, 227, 0.12);
+      border-radius: var(--radius);
+      padding: 13px;
+      background: rgba(246, 239, 227, 0.055);
+    }
+
+    .metric-card strong {
+      display: block;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 17px;
+    }
+
+    .metric-card span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+      word-break: keep-all;
+    }
+
     .system-row {
       display: grid;
       grid-template-columns: 170px 1fr 1fr;
@@ -790,6 +870,7 @@
       .section-head,
       .media-grid,
       .capture-head,
+      .companion-grid,
       .split,
       .store-shell {
         grid-template-columns: 1fr;
@@ -801,6 +882,7 @@
       .loop-grid,
       .design-grid,
       .target-grid,
+      .metric-grid,
       .proof-flow,
       .capture-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -844,6 +926,7 @@
       .loop-grid,
       .design-grid,
       .target-grid,
+      .metric-grid,
       .proof-flow,
       .capture-grid {
         grid-template-columns: 1fr;
@@ -874,6 +957,7 @@
         <a href="#store">Store</a>
         <a href="#about">Loop</a>
         <a href="#media">Proof</a>
+        <a href="#mataios">Mataios</a>
         <a href="#features">Systems</a>
         <a href="#pipeline">Portfolio</a>
         <a href="#build">Build</a>
@@ -1155,6 +1239,73 @@
       </div>
     </section>
 
+    <section class="section" id="mataios">
+      <div class="section-head">
+        <h2>Mataios, the Companion Concept</h2>
+        <p class="lead">
+          마타이오스는 "AI 기능"을 전면에 세운 기술 데모가 아니라, 플레이어 옆에서 싸우고 선택을 기억하는 동행자입니다.
+          강화학습 실험은 본편 runtime에 붙인 것이 아니라, 전투 허점을 찾고 동행자 규칙을 더 선명하게 만드는 설계 도구로 사용했습니다.
+        </p>
+      </div>
+      <div class="companion-grid">
+        <article class="companion-art">
+          <img src="../../Assets/_Project/Art/Characters/char_mataios_portrait_01.png" alt="동행자 마타이오스" />
+          <div class="companion-copy">
+            <h3>마타이오스는 캐릭터다. 모델 자랑이 아니다.</h3>
+            <p>
+              전투에서는 보호, 지원, 마무리 판단을 수행하고, 이벤트에서는 플레이어의 선택을 기억합니다.
+              플레이어는 마타이오스가 실제로 옆에서 싸우고 반응한다는 감각을 받아야 합니다.
+            </p>
+          </div>
+        </article>
+        <div class="companion-panel">
+          <article class="build-card">
+            <h3>AI training as combat design probe</h3>
+            <dl>
+              <div>
+                <dt>Problem</dt>
+                <dd>초기 전투는 AttackSpam / SkillSpam 같은 지배 전략이 생기기 쉬웠고, 마타이오스의 존재감도 UI 장식처럼 보였습니다.</dd>
+              </div>
+              <div>
+                <dt>Probe</dt>
+                <dd>ML-Agents 실험은 shipped AI가 아니라 전투 설계 실험장입니다. reward, defend payoff, skill gate를 바꿔 degenerate strategy를 드러냈습니다.</dd>
+              </div>
+              <div>
+                <dt>Finding</dt>
+                <dd>Exp04에서 PPO가 spam baseline을 명확히 넘었지만, ContextPolicy가 더 안정적이었습니다. 그래서 ONNX 연결이 아니라 사람이 읽을 수 있는 deterministic rule로 환원했습니다.</dd>
+              </div>
+              <div>
+                <dt>Runtime</dt>
+                <dd>본편 마타이오스는 runtime RL/ONNX가 아닙니다. `MataiosCombatBrain`은 명시 규칙으로 보호, 지원, 마무리, 안정화 행동을 결정합니다.</dd>
+              </div>
+            </dl>
+          </article>
+          <div class="metric-grid" aria-label="AI training evidence metrics">
+            <div class="metric-card">
+              <strong>+0.318974</strong>
+              <span>Exp04 spam policy gap</span>
+            </div>
+            <div class="metric-card">
+              <strong>0.269650</strong>
+              <span>PPO defend action share</span>
+            </div>
+            <div class="metric-card">
+              <strong>2.101917</strong>
+              <span>deterministic ContextPolicy reward</span>
+            </div>
+          </div>
+          <article class="card">
+            <span class="kicker">Portfolio framing</span>
+            <h3>강화학습을 검은 상자 기능이 아니라 설계 검증 장치로 사용</h3>
+            <p>
+              이 프로젝트의 AI 강점은 학습 모델 과시가 아닙니다.
+              AI 실험으로 전투 규칙의 빈틈을 찾고, 그 결과를 플레이어가 이해할 수 있는 동행자 행동 규칙과 UI 피드백으로 바꾼 점입니다.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="features">
       <div class="section-head">
         <h2>Content &amp; System Design</h2>
@@ -1358,7 +1509,7 @@
             </div>
             <div>
               <dt>APK</dt>
-              <dd>Builds/Android/hwigi-tower-7ac43be-ui-fun-rc-20260701.apk</dd>
+              <dd><a href="https://drive.google.com/drive/folders/1GSTXDCrkHHI-TVfRA-hYQs7hh3PtnTZG?usp=drive_link" target="_blank" rel="noopener noreferrer">Google Drive APK download folder</a></dd>
             </div>
             <div>
               <dt>SHA-256</dt>
@@ -1369,6 +1520,7 @@
               <dd>com.godju.hwigitower / 회귀자는 탑을 오른다 / arm64-v8a / APK Signature Scheme v2 verified</dd>
             </div>
           </dl>
+          <a class="button primary" href="https://drive.google.com/drive/folders/1GSTXDCrkHHI-TVfRA-hYQs7hh3PtnTZG?usp=drive_link" target="_blank" rel="noopener noreferrer">APK 다운로드</a>
         </div>
         <div class="risk-list">
           <article class="card">
