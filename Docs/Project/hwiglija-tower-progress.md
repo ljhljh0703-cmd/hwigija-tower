@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-01 23:58 — Steam-style public portfolio HTML 추가
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - 대외 포트폴리오용 Steam-style single-file HTML 소개 페이지를 `Docs/Portfolio`에 추가
+  - 실제 repo 에셋과 현재 Android playable candidate 정보를 사용해 게임 루프, 동행자 전투, 이벤트 파이프라인, AI-assisted production 강점을 정리
+  - 본편 runtime RL/ONNX 미도입, prototype/not-final-release 상태, Unity baseline test risk를 대외 문구에서 명확히 분리
+  - 참고 HTML의 구조적 장점만 반영하고 ParkDal/외부 visual baseline은 사용하지 않음
+- **Files**: 변경/추가 2개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 산출물 추가, 게임 설계/런타임 변경 없음
+- **Next**: 실제 gameplay GIF/스크린샷 캡처가 확보되면 Media 섹션을 현재 에셋 기반 이미지에서 사용자 검수 완료 스크린샷으로 교체
+- **Agent**: Codex
+
 ### 2026-07-01 23:48 — combat UI readability and action affordance RC pass
 - **Phase**: Post-pause / RC UI-Fun Hardening
 - **Done**:
