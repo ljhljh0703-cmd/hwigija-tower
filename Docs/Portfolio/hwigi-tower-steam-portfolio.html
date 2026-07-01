@@ -235,6 +235,15 @@
       margin-top: 22px;
     }
 
+    .hero-note {
+      max-width: 650px;
+      margin-top: 18px;
+      color: rgba(246, 239, 227, 0.72);
+      font-size: 14px;
+      font-weight: 750;
+      word-break: keep-all;
+    }
+
     .button {
       display: inline-flex;
       align-items: center;
@@ -295,6 +304,132 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
+    }
+
+    .store-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .store-media,
+    .store-panel,
+    .loop-card,
+    .design-card,
+    .system-row {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .store-media {
+      overflow: hidden;
+    }
+
+    .store-media img {
+      width: 100%;
+      height: 100%;
+      min-height: 430px;
+      object-fit: cover;
+    }
+
+    .store-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+      padding: 20px;
+    }
+
+    .store-panel h3 {
+      color: var(--gold);
+      font-size: 19px;
+    }
+
+    .store-panel p,
+    .loop-card p,
+    .design-card p,
+    .system-row p {
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .hook-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hook-list li {
+      padding: 11px 12px;
+      border: 1px solid rgba(246, 239, 227, 0.12);
+      border-radius: var(--radius);
+      background: rgba(246, 239, 227, 0.055);
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 800;
+      word-break: keep-all;
+    }
+
+    .loop-grid,
+    .design-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .loop-grid {
+      margin-bottom: 14px;
+    }
+
+    .design-grid {
+      margin-top: 14px;
+    }
+
+    .loop-card,
+    .design-card {
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .loop-card strong,
+    .design-card strong {
+      display: inline-flex;
+      margin-bottom: 12px;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .loop-card h3,
+    .design-card h3 {
+      font-size: 19px;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+
+    .system-table {
+      display: grid;
+      gap: 10px;
+    }
+
+    .system-row {
+      display: grid;
+      grid-template-columns: 170px 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      box-shadow: none;
+    }
+
+    .system-row b {
+      color: var(--gold);
+      font-size: 14px;
     }
 
     .stat,
@@ -545,13 +680,16 @@
 
       .section-head,
       .media-grid,
-      .split {
+      .split,
+      .store-shell {
         grid-template-columns: 1fr;
       }
 
       .stats,
       .feature-grid,
-      .risk-list {
+      .risk-list,
+      .loop-grid,
+      .design-grid {
         grid-template-columns: repeat(2, 1fr);
       }
 
@@ -589,12 +727,15 @@
 
       .stats,
       .feature-grid,
-      .risk-list {
+      .risk-list,
+      .loop-grid,
+      .design-grid {
         grid-template-columns: 1fr;
       }
 
       .timeline-item,
-      .build-card div {
+      .build-card div,
+      .system-row {
         grid-template-columns: 1fr;
       }
 
@@ -614,10 +755,11 @@
         <span>Hwigi Tower</span>
       </a>
       <div class="nav-links">
-        <a href="#about">About</a>
+        <a href="#store">Store</a>
+        <a href="#about">Loop</a>
         <a href="#media">Media</a>
-        <a href="#features">Features</a>
-        <a href="#pipeline">Pipeline</a>
+        <a href="#features">Systems</a>
+        <a href="#pipeline">Portfolio</a>
         <a href="#build">Build</a>
       </div>
     </div>
@@ -625,15 +767,19 @@
 
   <header class="hero" id="top">
     <div class="hero-inner">
-      <div class="eyebrow">AI-assisted mobile roguelike prototype</div>
+      <div class="eyebrow">Steam-style portfolio case study</div>
       <h1>회귀자는<br />탑을 오른다</h1>
       <p class="subtitle">
-        동행자 마타이오스와 함께 탑을 오르는 세로형 로그라이크.
-        선택형 이벤트, 짧은 전투, 회귀 기억, 그리고 AI 기반 설계 검증을 하나의 제작 파이프라인으로 묶은 프로토타입입니다.
+        죽어도 끝나지 않는 탑. 선택은 즉시 흔적을 남기고,
+        동행자 마타이오스는 전투와 기억 속에서 조금씩 달라집니다.
+      </p>
+      <p class="hero-note">
+        모바일 세로 로그라이크의 5분 런, 동행자 AI, 선택형 이벤트, 전투 설계 검증을 한 화면에서 설명하는 대외 포트폴리오 페이지입니다.
       </p>
       <div class="hero-actions">
-        <a class="button primary" href="../../Builds/Android/hwigi-tower-7ac43be-ui-fun-rc-20260701.apk">Playable APK Candidate</a>
-        <a class="button" href="#pipeline">AI Production Case Study</a>
+        <a class="button primary" href="#build">Android Prototype 정보</a>
+        <a class="button" href="#store">게임 소개 보기</a>
+        <a class="button" href="#pipeline">제작 파이프라인 보기</a>
       </div>
       <div class="tag-row" aria-label="게임 태그">
         <span class="tag">Mobile Portrait</span>
@@ -646,13 +792,64 @@
   </header>
 
   <main>
+    <section class="section" id="store">
+      <div class="section-head">
+        <h2>About This Game</h2>
+        <p class="lead">
+          회귀자는 탑을 오른다는 "짧게 오르고, 선택하고, 잃고, 다시 오른다"는 감각을 전면에 둔 모바일 로그라이크입니다.
+          이 포트폴리오는 아이디어 소개가 아니라, 실제 APK 후보와 구현된 시스템을 바탕으로 게임 기획 역량을 보여주도록 구성했습니다.
+        </p>
+      </div>
+      <div class="store-shell">
+        <article class="store-media">
+          <img src="../../Assets/_Project/Art/Encounters/evt_f01_jar_room_bg.png" alt="항아리 방 이벤트 배경" />
+        </article>
+        <aside class="store-panel" aria-label="게임 핵심 요약">
+          <h3>죽어도 탑은 당신을 기억한다</h3>
+          <p>
+            플레이어는 한 손으로 짧은 런을 반복하며, 전투·휴식·상점·이벤트 사이에서 다음 위험을 고릅니다.
+            선택은 단순 점수가 아니라 HP, 보상, 기억, 동행자의 반응으로 즉시 돌아옵니다.
+          </p>
+          <ul class="hook-list">
+            <li>보이는 미래 노드와 되돌릴 수 없는 길 선택</li>
+            <li>마타이오스가 함께 행동하는 2인 파티 전투</li>
+            <li>33개 이벤트 화면과 138개 선택지 기반 조우 파이프라인</li>
+            <li>AI 훈련을 런타임 기능이 아닌 전투 설계 검증 도구로 활용</li>
+          </ul>
+          <a class="button primary" href="#features">시스템 구현 기획 보기</a>
+        </aside>
+      </div>
+    </section>
+
     <section class="section" id="about">
       <div class="section-head">
-        <h2>짧은 런 안에서 선택, 전투, 동행자의 반응이 계속 이어지는 구조</h2>
+        <h2>5분 안에 가르치고, 시험하고, 비트는 플레이 루프</h2>
         <p class="lead">
-          Hwigi Tower는 하나의 기능을 크게 보여주는 데모가 아니라, 모바일 로그라이크 한 런의 핵심 표면을 빠르게 연결한 작업입니다.
-          지도에서 길을 고르고, 이벤트에서 비용을 감수하고, 전투에서 행동을 선택하고, 그 결과가 마타이오스의 기억과 다음 판단으로 이어집니다.
+          기획 포트폴리오 기준에 맞춰 재미를 "패턴 학습과 흥미로운 선택"으로 설명할 수 있게 재구성했습니다.
+          한 런은 부담 없이 시작하지만, 지도 선택과 전투 판단이 누적되며 다음 피크를 기대하게 만드는 구조를 목표로 합니다.
         </p>
+      </div>
+      <div class="loop-grid">
+        <article class="loop-card">
+          <strong>01 Teach</strong>
+          <h3>보이는 길</h3>
+          <p>미래 노드 타입을 먼저 보여주고, 선택 가능한 길만 밝게 표시해 루트 규칙을 자연스럽게 학습시킵니다.</p>
+        </article>
+        <article class="loop-card">
+          <strong>02 Test</strong>
+          <h3>선택의 비용</h3>
+          <p>이벤트 선택지는 HP, Gold, 보상, 기억 반응으로 즉시 결과를 돌려주며, 추상 점수만 쌓고 끝내지 않습니다.</p>
+        </article>
+        <article class="loop-card">
+          <strong>03 Twist</strong>
+          <h3>전투 판단</h3>
+          <p>공격만 누르는 흐름을 줄이기 위해 중압, 빈틈, 정찰, 방어 cue를 노출하고 행동별 예상값을 보여줍니다.</p>
+        </article>
+        <article class="loop-card">
+          <strong>04 Reward</strong>
+          <h3>회복과 상실</h3>
+          <p>보스 보상, 성장 선택, 마타이오스의 기억 반응이 다음 런의 기대를 만들지만, 회복은 항상 붕괴와 맞물립니다.</p>
+        </article>
       </div>
       <div class="stats">
         <div class="stat">
@@ -717,10 +914,10 @@
 
     <section class="section" id="features">
       <div class="section-head">
-        <h2>About This Game</h2>
+        <h2>Content &amp; System Design</h2>
         <p class="lead">
-          스팀식 소개로 압축하면, 이 프로젝트의 강점은 "모바일 로그라이크 게임 루프"와 "AI를 활용한 제작 검증 프로세스"를 동시에 보여준다는 점입니다.
-          런타임에 AI를 과시하기보다, 플레이어가 실제로 보는 선택과 피드백이 좋아지도록 설계를 좁혀 왔습니다.
+          포트폴리오의 핵심은 "좋아 보이는 아이디어"가 아니라, 제약 안에서 시스템을 구현 가능한 단위로 쪼갠 흔적입니다.
+          아래 항목은 기획 의도, 플레이어 경험, 데이터 구조, UI 피드백이 어떻게 연결되는지 보여줍니다.
         </p>
       </div>
       <div class="feature-grid">
@@ -773,6 +970,60 @@
           </p>
         </article>
       </div>
+      <div class="design-grid">
+        <article class="design-card">
+          <strong>Intent</strong>
+          <h3>왜 이 방향인가</h3>
+          <p>회복, 붕괴, 망각이라는 주제를 플레이 규칙에 묶었습니다. 회복만 주는 보상은 피하고, 선택이 다음 위험과 동행자 반응으로 이어지게 설계했습니다.</p>
+        </article>
+        <article class="design-card">
+          <strong>Target</strong>
+          <h3>5분 런 + 누적 회차</h3>
+          <p>짧은 세션에서는 즉각 보상과 명확한 피드백을 주고, 누적 회차에서는 기억·도덕 선택·동행자 변화로 무게를 쌓는 구조입니다.</p>
+        </article>
+        <article class="design-card">
+          <strong>UX</strong>
+          <h3>모바일 세로 화면 우선</h3>
+          <p>상단 HUD를 줄이고, 전투 판단 정보를 버튼 근처에 배치하고, 이벤트/결과/보상은 중심 영역에서 먼저 읽히게 반복 조정했습니다.</p>
+        </article>
+        <article class="design-card">
+          <strong>Data</strong>
+          <h3>콘텐츠 확장 가능한 조우 구조</h3>
+          <p>이벤트, 선택지, 보상, 기억 반응은 데이터와 resolver를 통해 연결합니다. 누락 ref, raw label, 미지원 효과는 validation 대상으로 관리했습니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="planning">
+      <div class="section-head">
+        <h2>System Planning View</h2>
+        <p class="lead">
+          실제 기획 포트폴리오 관점에서는 "무엇을 만들었다"보다 "어떤 플레이어 문제를 어떤 규칙과 UI로 해결했는가"가 중요합니다.
+          이 페이지는 구현물을 아래처럼 기획서 평가 언어로 다시 번역합니다.
+        </p>
+      </div>
+      <div class="system-table">
+        <article class="system-row">
+          <b>지도/루트</b>
+          <p>플레이어 문제: 선택지가 많아 보이지만 실제 의미가 흐려지는 dense map.</p>
+          <p>기획 해법: 3 sparse lanes, face-up future node, skipped route lock, node tap 즉시 commitment.</p>
+        </article>
+        <article class="system-row">
+          <b>전투</b>
+          <p>플레이어 문제: 공격 버튼만 반복해도 이기는 damage race.</p>
+          <p>기획 해법: 행동 preview, 판단 cue, 정찰 재정의, player/Mataios 피해 분리, 처치 후 2초 피드백.</p>
+        </article>
+        <article class="system-row">
+          <b>이벤트</b>
+          <p>플레이어 문제: 선택 결과가 늦거나 raw label처럼 보여 몰입이 끊기는 상태.</p>
+          <p>기획 해법: 33개 presentation slot, 138개 choice resolution, memory consequence feedback, raw label hide.</p>
+        </article>
+        <article class="system-row">
+          <b>동행자</b>
+          <p>플레이어 문제: NPC가 같이 있는지, 전투에 참여하는지 체감하기 어려운 상태.</p>
+          <p>기획 해법: deterministic companion brain, 보호/지원/마무리 역할, combat log attribution, no runtime RL marketing.</p>
+        </article>
+      </div>
     </section>
 
     <div class="quote-band">
@@ -793,15 +1044,15 @@
       </div>
       <div class="split">
         <div class="build-card">
-          <h3>What was proven</h3>
+          <h3>Portfolio evidence</h3>
           <dl>
             <div>
               <dt>AI QA</dt>
-              <dd>ML-Agents는 shipped runtime이 아니라 전투 설계 실험장으로 사용했습니다. Exp04에서 PPO가 spam baseline을 넘고, ContextPolicy가 더 안정적인 handoff 후보임을 확인했습니다.</dd>
+              <dd>ML-Agents는 shipped runtime이 아니라 전투 설계 실험장으로 사용했습니다. Exp04에서 PPO가 spam baseline을 넘고, deterministic ContextPolicy가 더 안정적인 handoff 후보임을 확인했습니다.</dd>
             </div>
             <div>
               <dt>Runtime</dt>
-              <dd>본편에는 ONNX/RL을 연결하지 않았습니다. 마타이오스는 deterministic rule table 기반 companion brain으로 구현하는 방향을 유지했습니다.</dd>
+              <dd>본편에는 ONNX/RL을 연결하지 않았습니다. 마타이오스는 규칙 기반 companion brain으로 처리해, 캐릭터 경험과 기술 검증을 분리했습니다.</dd>
             </div>
             <div>
               <dt>Release</dt>
@@ -880,7 +1131,7 @@
           <article class="card">
             <span class="kicker">Status</span>
             <h3>Prototype, not final release</h3>
-            <p>현재 목표는 게임 완성판 판매 페이지가 아니라, 대외 포트폴리오에서 playable prototype과 개발 역량을 명확히 보여주는 것입니다.</p>
+            <p>현재 목표는 상용 출시 페이지가 아니라, playable prototype과 기획/구현/검증 역량을 명확히 보여주는 대외 포트폴리오입니다.</p>
           </article>
           <article class="card">
             <span class="kicker">Known Risk</span>
