@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 00:24 — portfolio page에 실제 프로토타입 캡처 증거 추가
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - 소비자 관점의 약점(실제 플레이 화면 증거 부족)과 면접관 관점의 약점(구현된 시스템 증거가 늦게 보임)을 반영
+  - `Docs/Outsource/Juho/W2DemoReadiness/screenshots`의 tracked Unity prototype captures를 Media 섹션에 추가
+  - 전투, 상점, 기억 이벤트, 전투 진입 presentation 화면을 대표 캡처로 구성
+  - 최신 RC 캡처가 아니라는 점을 명시해 대외 포트폴리오 정직성 리스크를 낮춤
+- **Files**: 변경 2개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 presentation 개선, 게임 설계/런타임 변경 없음
+- **Next**: 최신 RC gameplay GIF/스크린샷이 확보되면 representative prototype captures를 검수된 최신 캡처로 교체
+- **Agent**: Codex
+
 ### 2026-07-02 00:11 — Steam-style portfolio page를 marketing + system planning 중심으로 재정리
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
