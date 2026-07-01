@@ -1718,6 +1718,11 @@ namespace HwigiTower.Run
             return GenericSkillOpeningDamageBonus;
         }
 
+        public bool HasGenericHeavyPressureForPreview()
+        {
+            return IsGenericHeavyPressureActive();
+        }
+
         private readonly struct MataiosPolicyResolution
         {
             public MataiosPolicyResolution(MataiosActionPlan plan, int enemyDamage, int playerDamageReduction)

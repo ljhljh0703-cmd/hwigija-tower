@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-01 23:48 — combat UI readability and action affordance RC pass
+- **Phase**: Post-pause / RC UI-Fun Hardening
+- **Done**:
+  - combat log surface를 4줄 중심으로 압축하고 `상세 접힘`/훈련성 filler 문구 노출을 줄임
+  - `판단:` 라인을 추가해 정찰 공격, 중압 방어, 빈틈 스킬, 광폭 연결, 마무리 공격 같은 다음 행동 단서를 표시
+  - Attack/Defend/Skill preview에 정찰 발동/중압 차단 cue를 붙이고 추천 action button 색상을 분리
+  - player/Mataios combat card와 action preview font size를 낮춰 세로 화면에서 텍스트 밀도를 줄임
+- **Files**: 변경 6개 (`PrototypeHud.cs`, `PrototypeEncounterRuntimeResolver.cs`, `PrototypeRunState.cs`, EditMode tests, progress log)
+- **GDD impact**: 없음 — D-037/D-038 범위 내 UI/readability affordance 보강
+- **Blockers**: Unity Test Runner XML은 생성되지 않음. clean baseline에서도 `com.unity.shadergraph` `UnityEngine.GUID` compile error가 재현되어 테스트 미실행으로 분리. Android APK build는 성공
+- **Next**: 새 APK에서 combat HUD 줄수/추천 버튼/정찰·중압·빈틈 cue가 실제 폰 화면에서 읽히는지 사용자 smoke
+- **Agent**: Codex
+
 ### 2026-05-30 22:49 — User smoke hotfix: Rest refresh and boss reward popup
 - **Phase**: W3-2 / Smoke Hotfix
 - **Done**:

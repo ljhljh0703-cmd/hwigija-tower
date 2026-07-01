@@ -1709,6 +1709,8 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("heavy pressure +1", attack.CreateSnapshot().LastCombatRoundResult);
 
             var defend = StartRuntimeCombat("run-heavy-pressure-defend", "COMBAT_HEAVY_PRESSURE_DEFEND", "BOSS_APEX_02", true);
+            var defendPreview = PrototypeEncounterRuntimeResolver.BuildCombatActionPreview(defend, CombatAction.Defend);
+            StringAssert.Contains("중압 차단", defendPreview.PreviewText);
             defend.ResolveCombatRoundInteractive(CombatAction.Defend);
             StringAssert.Contains("heavy pressure blocked", defend.CreateSnapshot().LastCombatRoundResult);
 

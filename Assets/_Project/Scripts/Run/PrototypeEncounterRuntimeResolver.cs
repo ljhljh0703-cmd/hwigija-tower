@@ -91,11 +91,13 @@ namespace HwigiTower.Run
                 return new CombatActionPreview(CombatAction.Attack, label, string.Empty, true);
             }
 
-            return new CombatActionPreview(
-                CombatAction.Attack,
-                label,
-                "예상 피해 " + attack + "-" + (attack + 2),
-                true);
+            var preview = "예상 피해 " + attack + "-" + (attack + 2);
+            if (state.ScoutAttackReady)
+            {
+                preview += " / 정찰 발동";
+            }
+
+            return new CombatActionPreview(CombatAction.Attack, label, preview, true);
         }
 
         private static CombatActionPreview BuildDefendPreview(PrototypeRunState state, string label)
@@ -106,11 +108,13 @@ namespace HwigiTower.Run
                 return new CombatActionPreview(CombatAction.Defend, label, string.Empty, true);
             }
 
-            return new CombatActionPreview(
-                CombatAction.Defend,
-                label,
-                "피해 감소 " + (System.Math.Max(1, enemyAttack / 2) + (state.ScoutDamageReductionReady ? state.ScoutDamageReductionForPreview : 0)),
-                true);
+            var preview = "피해 감소 " + (System.Math.Max(1, enemyAttack / 2) + (state.ScoutDamageReductionReady ? state.ScoutDamageReductionForPreview : 0));
+            if (state.HasGenericHeavyPressureForPreview())
+            {
+                preview += " / 중압 차단";
+            }
+
+            return new CombatActionPreview(CombatAction.Defend, label, preview, true);
         }
 
         private static CombatActionPreview BuildSkillPreview(PrototypeRunState state, string label)
