@@ -537,6 +537,12 @@
       word-break: keep-all;
     }
 
+    .capture-head + .capture-head {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
     .capture-head p,
     .capture-note {
       color: var(--ink-soft);
@@ -548,6 +554,11 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
+    }
+
+    .target-grid {
+      grid-template-columns: repeat(3, 1fr);
+      margin-bottom: 6px;
     }
 
     .capture-card {
@@ -563,6 +574,10 @@
       object-position: center top;
       border-bottom: 1px solid var(--line);
       filter: saturate(0.94) contrast(1.04);
+    }
+
+    .target-grid .capture-card img {
+      aspect-ratio: 9 / 16;
     }
 
     .capture-card .caption {
@@ -755,6 +770,7 @@
       .risk-list,
       .loop-grid,
       .design-grid,
+      .target-grid,
       .capture-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -796,6 +812,7 @@
       .risk-list,
       .loop-grid,
       .design-grid,
+      .target-grid,
       .capture-grid {
         grid-template-columns: 1fr;
       }
@@ -943,7 +960,7 @@
         <h2>Media &amp; Gameplay Proof</h2>
         <p class="lead">
           현재 페이지는 실제 게임 프로젝트에 포함된 에셋만 사용합니다. 스토어 페이지처럼 게임의 장면, 동행자, 적, 이벤트 분위기를 먼저 보여주고,
-          이어서 실제 Unity 프로토타입 캡처로 플레이 화면 증거를 보여줍니다.
+          이어서 GPT visual pass와 실제 Unity 프로토타입 캡처를 분리해 보여줍니다.
         </p>
       </div>
       <div class="media-grid">
@@ -979,10 +996,40 @@
       </div>
       <div class="capture-block" aria-label="실제 프로토타입 플레이 화면">
         <div class="capture-head">
-          <h3>Representative prototype captures</h3>
+          <h3>Target visual pass</h3>
           <p>
-            소비자에게는 "이 게임이 실제로 어떻게 보이는가"가 먼저 필요하고, 면접관에게는 "아이디어가 화면과 시스템으로 연결됐는가"가 필요합니다.
-            아래 캡처는 repo에 보존된 실제 Unity 프로토타입 화면으로, 최신 RC와 일부 UI 문구/수치는 다를 수 있습니다.
+            기존 캡처는 구현 증거로는 의미가 있지만, 소비자용 첫인상으로는 조잡했습니다.
+            아래 3장은 GPT로 1차 가공한 목표 화면입니다. 실제 게임에 반영하려면 이 비주얼을 배경, 캐릭터, UI 프레임, 버튼, 카드 레이어로 나눠 Unity 화면에 물려야 합니다.
+          </p>
+        </div>
+        <div class="capture-grid target-grid">
+          <article class="capture-card">
+            <img src="assets/hwigi_target_combat_visual_01.jpg" alt="전투 목표 비주얼 화면" />
+            <div class="caption">
+              <b>Combat target</b>
+              <span>플레이어 피해와 마타이오스 지원 피해가 분리되고, 세로 화면 하단에 전투 command가 명확히 배치된 목표 화면.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_target_route_visual_01.jpg" alt="지도와 이벤트 목표 비주얼 화면" />
+            <div class="caption">
+              <b>Route target</b>
+              <span>희소한 탑 루트, 선택 가능한 노드 glow, 이벤트 선택 패널을 한 화면에서 읽히게 하는 목표 화면.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_target_growth_visual_01.jpg" alt="성장과 인벤토리 목표 비주얼 화면" />
+            <div class="caption">
+              <b>Growth target</b>
+              <span>아이템, command slot, 단련 선택을 플레이어가 한눈에 이해할 수 있게 묶은 성장/인벤토리 목표 화면.</span>
+            </div>
+          </article>
+        </div>
+        <div class="capture-head">
+          <h3>Implementation proof</h3>
+          <p>
+            아래 캡처는 repo에 보존된 실제 Unity 프로토타입 화면입니다. 최신 RC와 일부 UI 문구/수치는 다를 수 있지만,
+            아이디어가 실제 화면과 조우 파이프라인으로 구현됐다는 증거로 남깁니다.
           </p>
         </div>
         <div class="capture-grid">
@@ -1016,7 +1063,7 @@
           </article>
         </div>
         <p class="capture-note">
-          Note: 최신 공개용 GIF는 별도 캡처 세션에서 교체하는 것이 이상적입니다. 지금 버전은 "실제 프로젝트 화면이 존재한다"는 증거를 먼저 보강하는 목적입니다.
+          Note: 최종적으로는 Target visual pass를 게임 에셋/UI 레이어로 반영한 뒤, 런타임에서 다시 캡처한 화면으로 교체하는 것이 가장 안전합니다.
         </p>
       </div>
     </section>
