@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 00:11 — Steam-style portfolio page를 marketing + system planning 중심으로 재정리
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - Vault archive의 유리링 게임기획 노트에서 포트폴리오 두괄식, 재미 이론, 기획 의도, UI/UX 설계 기준을 좁게 참고
+  - HTML 상단을 Steam 상세 페이지식 hook/store capsule/Android prototype CTA로 재구성
+  - 5분 루프, Content & System Design, System Planning View를 추가해 게임 콘텐츠와 구현 기획 역량이 먼저 보이게 조정
+  - 내부 기술 과시보다 실제 플레이어 문제, 기획 해법, 검증 증거가 연결되도록 문구를 다듬음
+- **Files**: 변경 2개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 presentation 개선, 게임 설계/런타임 변경 없음
+- **Next**: 실제 gameplay capture가 확보되면 hero/media 이미지를 현재 에셋 이미지에서 검수된 전투/지도/이벤트 스크린샷으로 교체
+- **Agent**: Codex
+
 ### 2026-07-01 23:58 — Steam-style public portfolio HTML 추가
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
