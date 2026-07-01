@@ -32,6 +32,16 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 08:34 — Source implementation captures 설명 문구 보정
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - `Source implementation captures` 설명을 원본 캡처의 한계 방어가 아니라 제작 과정 설명으로 보정
+  - 실제 Unity 프로토타입 화면을 기반으로 시스템 완성 → 기능 구현 → UI 디벨롭 순서가 드러나게 카피 수정
+- **Files**: 변경 2개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 copy 보정, 게임 런타임 변경 없음
+- **Next**: UI/Asset 세션에서 remaster 화면을 Unity 레이어로 반영할 때 해당 문구와 실제 산출물을 맞춰 교체
+- **Agent**: Codex
+
 ### 2026-07-02 08:23 — Implementation proof 리마스터와 concept-to-runtime 파이프라인 추가
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
