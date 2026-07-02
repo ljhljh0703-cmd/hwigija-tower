@@ -1,5 +1,0 @@
-policy,episodes,cumulative_reward,episode_length,win_proxy,loss_proxy,timeout_proxy,attack_share,defend_share,skill_share,enemy_damage_per_step,player_damage_per_step,damage_prevented_per_step,failure_mode
-RandomPolicy,1000,1.325538,4.429000,0.933000,0.067000,0.000000,0.335064,0.334161,0.330774,4.443892,3.614586,0.000000,"Random baseline is noisy and not action-efficient."
-AttackSpamPolicy,1000,1.581029,3.149000,1.000000,0.000000,0.000000,1.000000,0.000000,0.000000,6.351223,4.101620,0.000000,"Attack spam is already strong, so PPO must beat speed/reward rather than just win rate."
-SkillSpamPolicy,1000,1.609308,3.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,6.666667,4.007667,0.000000,"Skill spam solves the current short duel quickly, exposing weak Skill cost/context."
-DefendHeavyPolicy,1000,-1.139359,7.870000,0.003000,0.997000,0.000000,0.237230,0.762389,0.000381,1.660102,3.049174,0.000000,"Defend extends survival but lacks payoff under current reward/enemy pressure."

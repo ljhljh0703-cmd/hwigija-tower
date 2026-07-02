@@ -1,6 +1,0 @@
-policy,episodes,cumulative_reward,episode_length,win_proxy,loss_proxy,timeout_proxy,attack_share,defend_share,skill_share,skill_blocked_share,enemy_damage_per_step,player_damage_per_step,damage_prevented_per_step,failure_mode
-RandomPolicy,1000,1.500531,4.563000,0.935000,0.065000,0.000000,0.380890,0.353715,0.265396,0.000000,4.799912,3.578567,1.175323,"Random loses through poor action timing."
-AttackSpamPolicy,1000,1.687249,3.142000,1.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,7.020051,4.075748,0.000000,"Attack remains a strong simple baseline even after Skill gate."
-SkillSpamPolicy,1000,1.703083,3.000000,1.000000,0.000000,0.000000,0.333333,0.000000,0.666667,0.333333,7.682000,3.991333,0.000000,"Cooldown blocks repeated Skill, forcing fallback attacks between Skill turns."
-DefendHeavyPolicy,1000,-0.834880,7.867000,0.004000,0.996000,0.000000,0.236812,0.762680,0.000508,0.000000,1.653998,3.446167,2.533622,"Defend now produces prevention metric but still lacks enough offensive tempo."
-ContextPolicy,1000,1.678110,3.000000,1.000000,0.000000,0.000000,0.666667,0.000000,0.333333,0.000000,7.323333,4.004333,0.000000,"Simple gated heuristic is a useful non-learning target."
