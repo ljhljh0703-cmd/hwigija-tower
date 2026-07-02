@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>소형 LLM으로 게임 NPC 만들기 | Mataios AI NPC Case Study</title>
+  <meta
+    name="description"
+    content="회귀자는 탑을 오른다의 동행자 마타이오스를 위해 EXAONE 3.5 2.4B, QLoRA, FastAPI, Unity를 연결한 AI NPC 대화 모델 포트폴리오 케이스 스터디."
+  />
+  <meta property="og:title" content="소형 LLM으로 게임 NPC 만들기" />
+  <meta
+    property="og:description"
+    content="Qwen2.5 다국어 누출 실패에서 EXAONE 3.5 2.4B 한국어 NPC 모델까지. 게임 NPC를 위한 소형 LLM 파인튜닝 사례."
+  />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#090d10" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090d10;
+      --bg-2: #101719;
+      --ink: #f6f0e6;
+      --ink-soft: rgba(246, 240, 230, 0.78);
+      --muted: rgba(246, 240, 230, 0.58);
+      --panel: rgba(14, 20, 22, 0.86);
+      --panel-strong: #151f22;
+      --line: rgba(246, 240, 230, 0.15);
+      --red: #d66a58;
+      --amber: #d6ad54;
+      --green: #65c38e;
+      --teal: #5dc9c2;
+      --blue: #79a7d8;
+      --maxw: 1160px;
+      --radius: 8px;
+      --shadow: 0 26px 70px rgba(0, 0, 0, 0.46);
+      font-family: "Apple SD Gothic Neo", "Noto Sans KR", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(246, 240, 230, 0.025) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(246, 240, 230, 0.025) 1px, transparent 1px),
+        radial-gradient(circle at 12% -10%, rgba(101, 195, 142, 0.18), transparent 360px),
+        radial-gradient(circle at 82% 4%, rgba(214, 106, 88, 0.13), transparent 420px),
+        var(--bg);
+      background-size: 88px 88px, 88px 88px, auto, auto, auto;
+      line-height: 1.58;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    p,
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+    }
+
+    .nav {
+      position: sticky;
+      z-index: 50;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9, 13, 16, 0.84);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 12px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 920;
+    }
+
+    .brand-mark {
+      width: 15px;
+      height: 22px;
+      border: 2px solid var(--green);
+      border-bottom-width: 5px;
+      background: linear-gradient(180deg, rgba(214, 106, 88, 0.95), rgba(214, 106, 88, 0.2));
+      box-shadow: 5px 5px 0 rgba(121, 167, 216, 0.34);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .nav-links a {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 7px 10px;
+    }
+
+    .nav-links a:hover {
+      border-color: var(--line);
+      background: rgba(246, 240, 230, 0.08);
+      color: var(--ink);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 140px;
+      background: linear-gradient(0deg, var(--bg), transparent);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+      gap: 34px;
+      align-items: center;
+      width: min(var(--maxw), calc(100% - 32px));
+      min-height: 82svh;
+      margin: 0 auto;
+      padding: 78px 0 72px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-top: 16px;
+      font-size: 68px;
+      line-height: 0.98;
+      letter-spacing: 0;
+      word-break: keep-all;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin-top: 24px;
+      color: rgba(246, 240, 230, 0.9);
+      font-size: 22px;
+      font-weight: 760;
+      line-height: 1.56;
+      word-break: keep-all;
+    }
+
+    .hero-copy {
+      margin-top: 18px;
+      max-width: 720px;
+      color: rgba(246, 240, 230, 0.72);
+      font-size: 15px;
+      font-weight: 720;
+      word-break: keep-all;
+    }
+
+    .actions,
+    .tag-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .actions {
+      margin-top: 30px;
+    }
+
+    .tag-row {
+      margin-top: 20px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border: 1px solid rgba(246, 240, 230, 0.18);
+      border-radius: var(--radius);
+      padding: 10px 15px;
+      background: rgba(246, 240, 230, 0.09);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .button.primary {
+      border-color: rgba(101, 195, 142, 0.72);
+      background: linear-gradient(180deg, #77d99d, #2d7856);
+      color: #06100b;
+    }
+
+    .tag {
+      border: 1px solid rgba(246, 240, 230, 0.18);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(9, 13, 16, 0.52);
+      color: rgba(246, 240, 230, 0.82);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .hero-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(12, 18, 20, 0.94), rgba(7, 10, 12, 0.96)),
+        radial-gradient(circle at 70% 20%, rgba(93, 201, 194, 0.16), transparent 220px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .placeholder-shot {
+      display: grid;
+      min-height: 330px;
+      padding: 22px;
+      align-content: end;
+      background:
+        linear-gradient(180deg, rgba(7, 10, 12, 0.1), rgba(7, 10, 12, 0.86)),
+        repeating-linear-gradient(135deg, rgba(246, 240, 230, 0.035) 0 2px, transparent 2px 18px);
+    }
+
+    .dialogue-box {
+      border: 1px solid rgba(246, 240, 230, 0.16);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: rgba(6, 9, 11, 0.84);
+    }
+
+    .dialogue-box b {
+      display: block;
+      color: var(--green);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .dialogue-box p {
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .hero-panel-footer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      border-top: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .hero-panel-footer div {
+      padding: 16px;
+      background: rgba(14, 20, 22, 0.96);
+    }
+
+    .hero-panel-footer strong {
+      display: block;
+      color: var(--green);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 20px;
+    }
+
+    .hero-panel-footer span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+      word-break: keep-all;
+    }
+
+    .section {
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 70px 0;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      font-size: 42px;
+      line-height: 1.12;
+      word-break: keep-all;
+    }
+
+    .lead {
+      color: var(--ink-soft);
+      font-size: 17px;
+      word-break: keep-all;
+    }
+
+    .grid-2,
+    .grid-3,
+    .metric-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3,
+    .metric-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    .timeline-item,
+    .arch-box,
+    .table-card,
+    .truth-note {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .card,
+    .table-card,
+    .truth-note {
+      padding: 20px;
+    }
+
+    .card h3,
+    .table-card h3,
+    .truth-note h3 {
+      color: var(--ink);
+      font-size: 21px;
+      line-height: 1.24;
+      word-break: keep-all;
+    }
+
+    .card p,
+    .table-card p,
+    .truth-note p,
+    .card li {
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .card p,
+    .truth-note p {
+      margin-top: 10px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      margin-bottom: 12px;
+      color: var(--amber);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .contract-list {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .contract-list li {
+      padding: 12px;
+      border: 1px solid rgba(246, 240, 230, 0.12);
+      border-radius: var(--radius);
+      background: rgba(246, 240, 230, 0.052);
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 780;
+    }
+
+    .affinity {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .affinity-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      overflow: hidden;
+      border: 1px solid rgba(246, 240, 230, 0.12);
+      border-radius: var(--radius);
+    }
+
+    .affinity-bar span {
+      padding: 10px 8px;
+      color: #07100c;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .affinity-bar span:nth-child(1) { background: #c95248; }
+    .affinity-bar span:nth-child(2) { background: #c67b4f; }
+    .affinity-bar span:nth-child(3) { background: #c8a75c; }
+    .affinity-bar span:nth-child(4) { background: #83bd7d; }
+    .affinity-bar span:nth-child(5) { background: #63c8a5; }
+
+    .problem {
+      border-top: 3px solid var(--red);
+    }
+
+    .success {
+      border-top: 3px solid var(--green);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+      position: relative;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 18px;
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .timeline-item strong {
+      color: var(--red);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .timeline-item h3 {
+      font-size: 21px;
+      line-height: 1.22;
+      word-break: keep-all;
+    }
+
+    .timeline-item p {
+      margin-top: 8px;
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .code-block {
+      margin-top: 14px;
+      border: 1px solid rgba(246, 240, 230, 0.14);
+      border-radius: var(--radius);
+      padding: 14px;
+      overflow-x: auto;
+      background: rgba(0, 0, 0, 0.32);
+      color: rgba(246, 240, 230, 0.86);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    .metric-card {
+      border: 1px solid rgba(246, 240, 230, 0.14);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: rgba(246, 240, 230, 0.055);
+    }
+
+    .metric-card strong {
+      display: block;
+      color: var(--green);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .metric-card span {
+      display: block;
+      margin-top: 8px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 780;
+      word-break: keep-all;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 56px;
+      gap: 12px;
+      align-items: center;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 820;
+    }
+
+    .bar {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(246, 240, 230, 0.1);
+    }
+
+    .bar i {
+      display: block;
+      width: var(--value);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--red), var(--amber));
+    }
+
+    .bar.success i {
+      background: linear-gradient(90deg, var(--teal), var(--green));
+    }
+
+    .arch {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .arch-box {
+      padding: 20px;
+      box-shadow: none;
+    }
+
+    .arch-box h3 {
+      color: var(--green);
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .arch-box p {
+      margin-top: 10px;
+      color: var(--ink-soft);
+      font-size: 14px;
+      word-break: keep-all;
+    }
+
+    .arch-arrow {
+      display: grid;
+      place-items: center;
+      width: 66px;
+      height: 66px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: rgba(246, 240, 230, 0.06);
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(246, 240, 230, 0.12);
+      border-radius: var(--radius);
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid rgba(246, 240, 230, 0.1);
+      padding: 11px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      background: rgba(246, 240, 230, 0.07);
+      font-weight: 900;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .quote-band {
+      border-block: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(101, 195, 142, 0.16), rgba(214, 173, 84, 0.12)),
+        rgba(246, 240, 230, 0.04);
+    }
+
+    .quote-inner {
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0;
+    }
+
+    blockquote {
+      margin: 0;
+      color: var(--ink);
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.38;
+      word-break: keep-all;
+    }
+
+    .footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 16px 44px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .fade {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+
+    .fade.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .fade {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner,
+      .section-head,
+      .grid-2,
+      .grid-3,
+      .metric-grid,
+      .arch {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      h2 {
+        font-size: 34px;
+      }
+
+      .hero-panel-footer {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .arch-arrow {
+        width: auto;
+        height: auto;
+        border-radius: var(--radius);
+        padding: 10px;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+        gap: 7px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .nav-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero-inner,
+      .section {
+        width: min(100% - 24px, var(--maxw));
+      }
+
+      h1 {
+        font-size: 40px;
+      }
+
+      .subtitle {
+        font-size: 18px;
+      }
+
+      .affinity-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="페이지 섹션">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="AI NPC case study top">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Mataios AI NPC</span>
+      </a>
+      <div class="nav-links">
+        <a href="#context">Context</a>
+        <a href="#failure">Failures</a>
+        <a href="#solution">Solution</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#result">Result</a>
+        <a href="hwigi-tower-steam-portfolio.html#mataios">Main Portfolio</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">Unity x QLoRA x EXAONE 3.5 2.4B</div>
+        <h1>소형 LLM으로<br />게임 NPC 만들기</h1>
+        <p class="subtitle">
+          2.4B 파라미터 한국어 모델로 캐릭터 일관성을 가진 AI NPC를 만든 과정.
+          실패한 모델 선택, 토큰화 버그, 언어 누출 문제를 거쳐 마타이오스 대화 파이프라인을 구성했습니다.
+        </p>
+        <p class="hero-copy">
+          이 페이지는 전투 RL 사례가 아니라 NPC 대화 모델 파인튜닝 사례입니다.
+          본편 전투 동행자 행동은 deterministic rule로 처리하고, 여기서는 캐릭터 대화와 세계관 응답을 위한 소형 LLM 실험을 다룹니다.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="#result">검증 결과 보기</a>
+          <a class="button" href="hwigi-tower-steam-portfolio.html">게임 포트폴리오로 돌아가기</a>
+          <a class="button" href="https://drive.google.com/drive/folders/1GSTXDCrkHHI-TVfRA-hYQs7hh3PtnTZG?usp=drive_link" target="_blank" rel="noopener noreferrer">APK 다운로드 폴더</a>
+        </div>
+        <div class="tag-row" aria-label="기술 태그">
+          <span class="tag">EXAONE 3.5 2.4B</span>
+          <span class="tag">QLoRA r32 alpha64</span>
+          <span class="tag">FastAPI</span>
+          <span class="tag">Unity 6</span>
+          <span class="tag">Korean NPC</span>
+        </div>
+      </div>
+      <aside class="hero-panel" aria-label="NPC dialogue placeholder">
+        <div class="placeholder-shot">
+          <div class="dialogue-box">
+            <b>마타이오스 대화 캡처 placeholder</b>
+            <p>
+              실제 스크린샷은 Unity에서 FastAPI 서버를 붙인 런타임 캡처로 교체합니다.
+              이 페이지에서는 훈련/검증/연동 구조를 먼저 증명합니다.
+            </p>
+          </div>
+        </div>
+        <div class="hero-panel-footer">
+          <div>
+            <strong>3 fail</strong>
+            <span>모델/데이터/토큰화 실패 기록</span>
+          </div>
+          <div>
+            <strong>697</strong>
+            <span>SFT 학습 데이터</span>
+          </div>
+          <div>
+            <strong>100%</strong>
+            <span>최종 한국어 유지율</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section class="section fade" id="context">
+      <div class="section-head">
+        <h2>Project Context</h2>
+        <p class="lead">
+          회귀자는 탑을 오른다는 모바일 세로형 로그라이크 프로토타입입니다.
+          마타이오스는 단순 조력자 UI가 아니라, 전투와 선택, 기억을 통해 플레이어 옆에 있는 감각을 만들어야 하는 핵심 동행자입니다.
+        </p>
+      </div>
+      <div class="grid-2">
+        <article class="card">
+          <span class="kicker">Game</span>
+          <h3>죽어도 다시 오르는 탑</h3>
+          <p>
+            Unity 6 기반 Android 프로토타입입니다. 짧은 런 안에서 지도 선택, 이벤트 선택, 전투 판단,
+            보상과 기억 반응을 반복하며 플레이어가 탑과 동행자를 알아가도록 설계했습니다.
+          </p>
+        </article>
+        <article class="card">
+          <span class="kicker">NPC Contract</span>
+          <h3>마타이오스 행동 계약</h3>
+          <ul class="contract-list">
+            <li>호감도 5단계에 따라 말투가 달라져야 한다.</li>
+            <li>게임 세계관 밖 질문은 차단해야 한다.</li>
+            <li>스토리 단계 S0-S5의 기억 키워드에 반응해야 한다.</li>
+            <li>S3 이후에는 정체성 혼란 패턴이 드러나야 한다.</li>
+            <li>항상 한국어 반말 톤을 유지해야 한다.</li>
+          </ul>
+          <div class="affinity" aria-label="호감도 스펙트럼">
+            <div class="affinity-bar">
+              <span>hostile</span>
+              <span>cold</span>
+              <span>neutral</span>
+              <span>warm</span>
+              <span>open</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section fade" id="problem">
+      <div class="section-head">
+        <h2>Why Small LLM Was Hard</h2>
+        <p class="lead">
+          일반 API를 붙이면 빠르게 데모는 만들 수 있습니다. 하지만 인디 게임의 비용, 오프라인 가능성,
+          대화 레이턴시, 캐릭터 제어를 동시에 고려하면 작은 로컬 모델을 실험할 이유가 있었습니다.
+        </p>
+      </div>
+      <div class="grid-3">
+        <article class="card problem">
+          <span class="kicker">P1</span>
+          <h3>비용과 레이턴시</h3>
+          <p>대형 API는 대화당 비용과 1-3초 레이턴시가 있고, 오프라인 동작도 어렵습니다. 반복 플레이 게임의 동행자 대화에는 부담이 큽니다.</p>
+        </article>
+        <article class="card problem">
+          <span class="kicker">P2</span>
+          <h3>한국어 일관성</h3>
+          <p>Qwen2.5 같은 소형 다국어 모델은 학습 데이터가 부족하면 영어/중국어로 전환되는 문제가 발생했습니다.</p>
+        </article>
+        <article class="card problem">
+          <span class="kicker">P3</span>
+          <h3>캐릭터 제어</h3>
+          <p>호감도, 스토리 단계, BIW 차단, 기억 반응을 동시에 제어해야 했습니다. 단순 챗봇이 아니라 게임 캐릭터여야 했습니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section fade" id="failure">
+      <div class="section-head">
+        <h2>Failure Log</h2>
+        <p class="lead">
+          실패 기록을 숨기지 않았습니다. 모델 호환성, 다국어 prior, 데이터 증강 한계, BPE 토큰화 버그가 실제 병목이었습니다.
+        </p>
+      </div>
+      <div class="timeline">
+        <article class="timeline-item">
+          <strong>Failure 01</strong>
+          <div>
+            <h3>HCX-SEED 0.5B: 한국어 특화 기대, GGUF/응답 제어 실패</h3>
+            <p>
+              한국어 모델이라 기대했지만 GGUF 변환과 아키텍처 호환 문제가 있었고,
+              BIW 질문에 실제 날씨 정보를 생성하는 등 캐릭터/세계관 제어도 실패했습니다.
+            </p>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <strong>Failure 02</strong>
+          <div>
+            <h3>Qwen2.5-1.5B v6.1: 44% 영어/중국어 누출</h3>
+            <p>
+              ChatML과 GGUF 지원은 좋았지만 9건 테스트 중 4건에서 영어 또는 중국어 응답이 나왔습니다.
+              622건 SFT로는 다국어 prior를 덮기 어려웠습니다.
+            </p>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <strong>Failure 03</strong>
+          <div>
+            <h3>Qwen2.5 v6.2: BIW 데이터 증강으로도 개선 없음</h3>
+            <p>
+              BIW 거부 데이터와 한국어 강제 프롬프트를 추가했지만 언어 누출이 유지되었습니다.
+              데이터 추가로 해결되지 않는 구조적 문제라고 판단했습니다.
+            </p>
+          </div>
+        </article>
+        <article class="timeline-item">
+          <strong>Bug</strong>
+          <div>
+            <h3>DataCollator 사일런트 실패: 학습 토큰 0개</h3>
+            <p>
+              response_template 끝 공백이 BPE 문맥 토큰화와 충돌해 응답 경계를 찾지 못했습니다.
+              에러 없이 labels가 모두 -100이 되어 학습이 사실상 비어 있었습니다.
+            </p>
+            <div class="code-block">독립 토큰화: "마타이오스: " -> [..., 25, 220]
+문맥 토큰화: "마타이오스: ...좋진 않아." -> [..., 25, 4593]
+
+결과: 응답 경계 탐지 실패 -> labels all -100 -> learning tokens 0
+해결: trailing space 제거 + token id list 전달 + label validation 셀 추가</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section fade" id="solution">
+      <div class="section-head">
+        <h2>Solution: EXAONE 3.5 2.4B</h2>
+        <p class="lead">
+          해결은 더 큰 모델을 쓰는 것이 아니라, 문제에 맞는 prior를 가진 모델을 고르는 것이었습니다.
+          한국어가 강한 EXAONE 3.5 2.4B로 전환하고 QLoRA 설정과 데이터 구성을 함께 조정했습니다.
+        </p>
+      </div>
+      <div class="grid-3">
+        <article class="card success">
+          <span class="kicker">Model</span>
+          <h3>EXAONE 3.5 2.4B-Instruct</h3>
+          <p>한국어 응답 안정성이 모델 선택의 1순위였습니다. Qwen 계열에서 반복된 다국어 누출 리스크를 줄이기 위해 한국어 prior를 우선했습니다.</p>
+        </article>
+        <article class="card success">
+          <span class="kicker">Training</span>
+          <h3>QLoRA r=32, alpha=64</h3>
+          <p>Colab A100에서 transformers==4.46.3, revision 8e6fc27로 환경을 고정했습니다. 설정은 재현 가능성을 위해 버전 핀과 함께 관리했습니다.</p>
+        </article>
+        <article class="card success">
+          <span class="kicker">Dataset</span>
+          <h3>622건에서 697건으로 증강</h3>
+          <p>BIW 차단, open affinity, fracture 패턴 데이터를 보강했습니다. 양보다 중요한 것은 테스트 실패를 직접 겨냥한 데이터였습니다.</p>
+        </article>
+      </div>
+      <div class="grid-2" style="margin-top: 14px;">
+        <article class="table-card">
+          <h3>Model Selection</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>모델</th>
+                <th>파라미터</th>
+                <th>판정</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>HCX-SEED</td>
+                <td>0.5B</td>
+                <td>호환/제어 실패</td>
+              </tr>
+              <tr>
+                <td>Qwen2.5</td>
+                <td>1.5B</td>
+                <td>다국어 누출 실패</td>
+              </tr>
+              <tr>
+                <td><b>EXAONE 3.5</b></td>
+                <td><b>2.4B</b></td>
+                <td><b>최종 선택</b></td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+        <article class="table-card">
+          <h3>Before / After</h3>
+          <div class="bar-list">
+            <div class="bar-row">
+              <span>Qwen2.5 v6.1</span>
+              <div class="bar"><i style="--value: 56%;"></i></div>
+              <span>56%</span>
+            </div>
+            <div class="bar-row">
+              <span>EXAONE v7</span>
+              <div class="bar success"><i style="--value: 100%;"></i></div>
+              <span>100%</span>
+            </div>
+          </div>
+          <p style="margin-top: 14px;">한국어 유지율 기준입니다. 최종 검증은 5세트 26턴 테스트로 정리했습니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section fade" id="architecture">
+      <div class="section-head">
+        <h2>Architecture</h2>
+        <p class="lead">
+          Ollama/GGUF 변환만으로는 EXAONE 추론을 안정적으로 처리하기 어려웠습니다.
+          그래서 FastAPI + transformers 서버를 두고 Unity가 HTTP로 호출하는 구조를 선택했습니다.
+        </p>
+      </div>
+      <div class="arch" aria-label="Unity FastAPI EXAONE architecture">
+        <article class="arch-box">
+          <h3>Unity Client</h3>
+          <p>MataiosDialogueClient가 Coroutine과 UnityWebRequest로 대화 요청을 보냅니다. 게임 쪽은 ILLMProvider 경계와 deterministic fallback을 유지합니다.</p>
+          <div class="code-block">POST /chat
+POST /raw
+GET  /health</div>
+        </article>
+        <div class="arch-arrow">HTTP</div>
+        <article class="arch-box">
+          <h3>FastAPI Inference Server</h3>
+          <p>transformers가 merged fp16 EXAONE 모델을 로드하고, CUDA/MPS/CPU 디바이스를 감지해 응답을 생성합니다.</p>
+          <div class="code-block">EXAONE 3.5 2.4B
+transformers==4.46.3
+revision=8e6fc27</div>
+        </article>
+      </div>
+      <div class="truth-note" style="margin-top: 14px;">
+        <span class="kicker">Claim Boundary</span>
+        <h3>무엇을 했고, 무엇을 하지 않았나</h3>
+        <p>
+          이 사례는 NPC 대화 모델 파인튜닝과 Unity 연동 파이프라인입니다.
+          모바일 온디바이스 EXAONE 배포나 본편 runtime RL/ONNX 연결을 완료했다고 주장하지 않습니다.
+          전투용 마타이오스 brain은 별도 deterministic rule로 구현되어 있습니다.
+        </p>
+      </div>
+    </section>
+
+    <div class="quote-band">
+      <div class="quote-inner">
+        <blockquote>
+          "AI NPC를 만든다는 것은 모델 하나를 붙이는 일이 아니라, 캐릭터 계약, 실패 테스트, 데이터 보강, 런타임 경계를 함께 설계하는 일이다."
+        </blockquote>
+      </div>
+    </div>
+
+    <section class="section fade" id="result">
+      <div class="section-head">
+        <h2>Validation Result</h2>
+        <p class="lead">
+          최종 페이지에서 가장 중요한 증거는 "모델을 써봤다"가 아니라, 실패 지표가 실제로 개선되었는지입니다.
+          아래 수치는 EXAONE 전환 후 포트폴리오에 공개 가능한 범위로 정리한 검증 결과입니다.
+        </p>
+      </div>
+      <div class="metric-grid">
+        <article class="metric-card">
+          <strong>100%</strong>
+          <span>한국어 유지율, 26/26</span>
+        </article>
+        <article class="metric-card">
+          <strong>100%</strong>
+          <span>BIW 질문 차단</span>
+        </article>
+        <article class="metric-card">
+          <strong>85%+</strong>
+          <span>호감도 어조 분리 목표 달성</span>
+        </article>
+        <article class="metric-card">
+          <strong>100%</strong>
+          <span>기억 키워드 반응</span>
+        </article>
+        <article class="metric-card">
+          <strong>697</strong>
+          <span>SFT JSONL 데이터</span>
+        </article>
+        <article class="metric-card">
+          <strong>2.4B</strong>
+          <span>최종 모델 크기</span>
+        </article>
+      </div>
+      <div class="grid-2" style="margin-top: 14px;">
+        <article class="card">
+          <span class="kicker">Portfolio Value</span>
+          <h3>게임 기획과 ML 엔지니어링을 연결한 사례</h3>
+          <p>
+            마타이오스의 말투, 기억, 세계관 차단은 게임 기획 요구사항입니다.
+            이 요구사항을 테스트셋, 데이터 증강, 모델 선택, Unity 연동 구조로 바꾼 것이 이 케이스의 핵심입니다.
+          </p>
+        </article>
+        <article class="card">
+          <span class="kicker">Next Work</span>
+          <h3>런타임 캡처와 모바일 추론 검토</h3>
+          <p>
+            다음 단계는 같은 네트워크 FastAPI 서버를 붙인 실제 Unity 캡처를 확보하고,
+            MLC-LLM 또는 다른 모바일 추론 경로에서 EXAONE 계열 지원 가능성을 다시 검토하는 것입니다.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Hwigi Tower portfolio case study. AI NPC dialogue training proof, not a final commercial release claim.</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(".fade").forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>
