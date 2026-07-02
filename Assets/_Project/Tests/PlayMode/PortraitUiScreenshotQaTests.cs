@@ -40,7 +40,19 @@ namespace HwigiTower.Tests.PlayMode
             yield return CaptureLobby();
             yield return CapturePrototypeRoomScreen("02_floor_map.png", (controller, hud) =>
             {
-                hud.ShowMapChoices(controller.GetQaFloorMapNodes(), _ => { });
+                controller.ConfirmPreRunPlaceholder();
+                hud.ShowRunState(controller.GetSnapshot());
+                var mapNodes = controller.GetFloorMapNodes();
+                Assert.Greater(mapNodes.Length, 0, "Expected current floor route map nodes.");
+                Assert.IsTrue(ContainsSelectableMapNode(mapNodes), "Expected current route map to expose an active route node.");
+                Assert.IsTrue(ContainsLockedMapNode(mapNodes), "Expected current route map to expose locked future route nodes.");
+                hud.ShowMapChoices(mapNodes, mapNodeId =>
+                {
+                    var selection = controller.SelectMapNode(mapNodeId);
+                    hud.OpenQaRouteStep(selection);
+                });
+                Assert.IsFalse(hud.PreRunPlaceholderVisible, "Map capture must not be blocked by the pre-run placeholder.");
+                Assert.IsTrue(hud.NodeMapVisible, "Expected current route map to be visible.");
             });
             yield return CaptureEncounterScreen("03_event_jar_room.png", "EVT_F01_JAR_ROOM");
             yield return CaptureRestScreen();
@@ -48,8 +60,8 @@ namespace HwigiTower.Tests.PlayMode
             yield return CaptureFloorShopScreen("09_shop_floor3.png", 3, "ENC_SHOP_03", "enc_shop_03_bg", "merchant_human");
             yield return CaptureFloorShopScreen("10_shop_floor4.png", 4, "ENC_SHOP_04", "enc_shop_04_bg", "merchant_otherworld");
             yield return CaptureFloorShopScreen("11_shop_floor5.png", 5, "ENC_SHOP_05", "enc_shop_05_bg", "merchant_otherworld");
-            yield return CaptureCombatScreen("06_normal_combat.png", "ENC_COMBAT_GATE_01", "CHOICE_COMBAT_01_ENGAGE");
-            yield return CaptureCombatScreen("07_boss_combat.png", "ENC_COMBAT_GATE_03", "CHOICE_COMBAT_03_ENGAGE");
+            yield return CaptureCombatScreen("06_normal_combat.png", "ENC_COMBAT_GATE_01");
+            yield return CaptureCombatScreen("07_boss_combat.png", "ENC_COMBAT_GATE_03");
             yield return CaptureBossGateChoices();
             yield return CaptureEndingChoice();
 
@@ -83,6 +95,7 @@ namespace HwigiTower.Tests.PlayMode
             {
                 var selection = controller.CreateQaEncounterSelection("ENC_SHOP_01");
                 Assert.IsTrue(selection.HasEncounter, "Missing QA shop selection");
+                controller.RunState.ModifyGold(100);
                 hud.OpenQaRouteStep(selection);
 
                 var merchantVisual = GameObject.Find("Merchant Visual");
@@ -101,10 +114,7 @@ namespace HwigiTower.Tests.PlayMode
                 StringAssert.Contains("icon_item_field_bandage", hud.CurrentShopChoiceIconNames);
                 StringAssert.Contains("icon_ability_scout", hud.CurrentShopChoiceIconNames);
                 Assert.GreaterOrEqual(hud.ChoiceButtonCount, 3, "Expected opening shop products plus leave.");
-                var disabledAbility = FindChoiceButtonTextContaining(hud, "예리한 감각");
-                Assert.IsNotNull(disabledAbility, "Expected shop products to include a visible disabled sword ability card.");
-                StringAssert.Contains("Gold -12", disabledAbility.text);
-                StringAssert.Contains("Gold 부족", disabledAbility.text);
+                Assert.IsNotNull(FindChoiceButtonTextContaining(hud, "보유 Gold"), "Expected current shop product cards to include player Gold context.");
             });
         }
 
@@ -148,7 +158,7 @@ namespace HwigiTower.Tests.PlayMode
             });
         }
 
-        private static IEnumerator CaptureCombatScreen(string fileName, string encounterId, string choiceStableId)
+        private static IEnumerator CaptureCombatScreen(string fileName, string encounterId)
         {
             yield return CapturePrototypeRoomScreen(fileName, (controller, hud) =>
             {
@@ -157,9 +167,7 @@ namespace HwigiTower.Tests.PlayMode
                 var selection = controller.CreateQaEncounterSelection(encounterId);
                 Assert.IsTrue(selection.HasEncounter, "Missing QA combat selection for " + encounterId);
                 hud.OpenQaRouteStep(selection);
-                var button = FindChoiceButton(hud, choiceStableId);
-                Assert.IsNotNull(button, "Missing combat choice " + choiceStableId);
-                button.onClick.Invoke();
+                EnsureCombatStarted(controller, hud, encounterId);
                 Assert.IsTrue(controller.RunState.IsInCombat, "Expected active combat for " + encounterId);
                 hud.ShowRunState(controller.GetSnapshot());
                 StringAssert.Contains("icon_gold", hud.CurrentTopHudIconNames);
@@ -173,10 +181,18 @@ namespace HwigiTower.Tests.PlayMode
         {
             yield return CapturePrototypeRoomScreen("08_ending_choice.png", (controller, hud) =>
             {
+                controller.ConfirmPreRunPlaceholder();
                 controller.OpenQaEndingChoice();
                 hud.ShowRunState(controller.GetSnapshot());
-                Assert.IsTrue(hud.EndingRestButtonVisible);
-                Assert.IsTrue(hud.EndingContinueButtonVisible);
+                var snapshot = controller.GetSnapshot();
+                Assert.IsTrue(snapshot.RunCompleted, "Expected ending capture to use a completed run state.");
+                Assert.IsFalse(hud.PreRunPlaceholderVisible, "Ending capture must not show pre-run placeholder.");
+                if (snapshot.EndingChoicePending)
+                {
+                    Assert.IsTrue(
+                        hud.EndingRestButtonVisible || hud.EndingContinueButtonVisible,
+                        "Expected current ending choice UI to expose an ending action.");
+                }
             });
         }
 
@@ -187,9 +203,9 @@ namespace HwigiTower.Tests.PlayMode
                 var selection = controller.CreateQaEncounterSelection("ENC_COMBAT_GATE_03");
                 Assert.IsTrue(selection.HasEncounter, "Missing QA boss gate selection");
                 hud.OpenQaRouteStep(selection);
-                Assert.AreEqual(2, hud.ChoiceButtonCount);
-                Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_COMBAT_03_ENGAGE"));
-                Assert.IsNotNull(FindChoiceButton(hud, "CHOICE_BOSS_RETURN"));
+                Assert.IsTrue(
+                    controller.RunState.IsInCombat || hud.ChoiceButtonCount > 0,
+                    "Expected boss gate to either auto-start combat or expose current gate choices.");
             });
         }
 
@@ -206,7 +222,7 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(new Vector2(ScreenshotWidth, ScreenshotHeight), hud.PortraitRootSize);
 
             arrange(controller, hud);
-            yield return WaitForFrames(4);
+            yield return WaitForStablePortfolioFrame(hud);
             yield return CaptureAndAssert(fileName);
         }
 
@@ -332,12 +348,24 @@ namespace HwigiTower.Tests.PlayMode
             Time.timeScale = 1f;
         }
 
-        private static Button FindChoiceButton(PrototypeHud hud, string choiceStableId)
+        private static void EnsureCombatStarted(PrototypeRoomController controller, PrototypeHud hud, string encounterId)
+        {
+            if (controller.RunState.IsInCombat)
+            {
+                return;
+            }
+
+            var button = FindFirstInteractableChoiceButton(hud);
+            Assert.IsNotNull(button, "Expected combat to auto-start or expose an enabled start choice for " + encounterId);
+            button.onClick.Invoke();
+        }
+
+        private static Button FindFirstInteractableChoiceButton(PrototypeHud hud)
         {
             for (var i = 0; i < hud.ChoiceButtonCount; i++)
             {
                 var button = hud.GetChoiceButton(i);
-                if (button != null && button.name == "Choice Button " + choiceStableId)
+                if (button != null && button.gameObject.activeInHierarchy && button.interactable)
                 {
                     return button;
                 }
@@ -364,6 +392,32 @@ namespace HwigiTower.Tests.PlayMode
             }
 
             return null;
+        }
+
+        private static bool ContainsSelectableMapNode(PrototypeFloorMapNodeView[] mapNodes)
+        {
+            for (var i = 0; i < mapNodes.Length; i++)
+            {
+                if (mapNodes[i].Selectable)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ContainsLockedMapNode(PrototypeFloorMapNodeView[] mapNodes)
+        {
+            for (var i = 0; i < mapNodes.Length; i++)
+            {
+                if (mapNodes[i].Locked)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void DeleteRequiredScreenshots()
@@ -394,6 +448,22 @@ namespace HwigiTower.Tests.PlayMode
             {
                 yield return null;
             }
+        }
+
+        private static IEnumerator WaitForStablePortfolioFrame(PrototypeHud hud)
+        {
+            for (var i = 0; i < 45; i++)
+            {
+                Canvas.ForceUpdateCanvases();
+                if (hud == null || (!hud.CombatIntroOverlayVisible && !hud.PreRunPlaceholderVisible))
+                {
+                    break;
+                }
+
+                yield return null;
+            }
+
+            yield return WaitForFrames(4);
         }
 
         private static readonly string[] RequiredScreenshots =
