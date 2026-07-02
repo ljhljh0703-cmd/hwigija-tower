@@ -32,6 +32,14 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 11:52 — 포폴 카피·가독성 폴리시 반영
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**: 메인/AI NPC 포트폴리오 HTML에 불필요 영문 한글화, 과잉솔직 리프레임, 수치 정리, 정직 경계 유지 중심의 카피·가독성 폴리시를 반영
+- **Files**: 변경 3개 (`Docs/Portfolio/hwigi-tower-steam-portfolio.html`, `Docs/Portfolio/portfolio_ai_npc.html`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 copy/readability 보정, 게임 런타임 변경 없음
+- **Next**: 요청 시 public repo `hwigi-tower-portfolio`에 두 HTML과 assets를 재배포하고 HTTP 200 확인
+- **Agent**: Claude/Codex
+
 ### 2026-07-02 11:46 — Claude front polish handoff 작성
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
