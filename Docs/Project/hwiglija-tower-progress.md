@@ -32,6 +32,17 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 20:45 — Portfolio Capture Polish orchestration harness 추가
+- **Phase**: Post-pause / Portfolio Capture Prep
+- **Done**:
+  - 포트폴리오 데모 영상용 UI polish를 총괄하기 위한 ProjectOps harness를 추가
+  - Command Center / UI-Asset / Game Dev / Deploy / Portfolio 세션 역할, 게이트, 금지선, acceptance 용어를 정리
+  - 각 세션에 바로 전달할 수 있는 RC1 dispatch 문서를 추가
+- **Files**: 변경/추가 3개 (`Docs/ProjectOps/portfolio-capture-polish-harness.md`, dispatch, progress log)
+- **GDD impact**: 없음 — 운영/지휘 harness 추가, 게임 런타임 변경 없음
+- **Next**: UI/Asset 세션에 RC1 triage dispatch를 보내 Combat/Map/Event/Reward P0 목록부터 확정
+- **Agent**: Codex
+
 ### 2026-07-02 11:52 — 포폴 카피·가독성 폴리시 반영
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**: 메인/AI NPC 포트폴리오 HTML에 불필요 영문 한글화, 과잉솔직 리프레임, 수치 정리, 정직 경계 유지 중심의 카피·가독성 폴리시를 반영
