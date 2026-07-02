@@ -32,6 +32,17 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 11:46 — Claude front polish handoff 작성
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - Claude가 포트폴리오 HTML의 front design, 가독성, 윤문을 이어갈 수 있도록 handoff 문서를 추가
+  - 편집 가능 파일, 금지 파일, AI/ML claim boundary, Korean copy rule, validation command를 명시
+  - public Pages repo와 private source repo 분리 사유 및 재배포 주의사항을 기록
+- **Files**: 변경/추가 2개 (`Docs/Portfolio/HANDOFF_claude_portfolio_front_polish.md`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 작업 지시서 추가, 게임 런타임 변경 없음
+- **Next**: Claude 세션은 handoff를 읽고 두 HTML 페이지를 front/readability/copy 중심으로 수정 후 검증 결과를 보고
+- **Agent**: Codex
+
 ### 2026-07-02 11:31 — GitHub Pages public portfolio deploy 완료
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
