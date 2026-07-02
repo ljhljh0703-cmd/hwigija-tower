@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 11:31 — GitHub Pages public portfolio deploy 완료
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - 원본 private repo는 현재 플랜에서 GitHub Pages를 지원하지 않아, 소스 전체 공개 대신 별도 public repo `hwigi-tower-portfolio`를 생성
+  - Steam-style 포트폴리오와 AI NPC case study HTML, 표시용 이미지 에셋만 포함한 static package를 `main` branch root로 배포
+  - GitHub Pages URL `https://ljhljh0703-cmd.github.io/hwigi-tower-portfolio/`의 index/main/AI page/대표 이미지 asset HTTP 200 응답을 확인
+  - 배포 패키지에서 raw ML evidence CSV/JSON, checkpoint, ONNX, event log, secret token류는 제외하고 검사
+- **Files**: 원본 repo 변경 1개 (`Docs/Project/hwiglija-tower-progress.md`), 별도 public deploy repo 생성
+- **GDD impact**: 없음 — 포트폴리오 공개 배포 기록, 게임 런타임 변경 없음
+- **Next**: 공개 URL에서 모바일/데스크톱 육안 확인 후, 실제 Unity + FastAPI 대화 캡처가 준비되면 AI NPC placeholder를 교체
+- **Agent**: Codex
+
 ### 2026-07-02 11:02 — AI NPC training portfolio case study 추가
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
