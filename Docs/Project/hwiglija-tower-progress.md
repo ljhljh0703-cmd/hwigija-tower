@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-03 01:23 — Vertical Slice Case Study closure harness 추가
+- **Phase**: Post-pause / Portfolio Closure
+- **Done**:
+  - Hwigi Tower의 최종 목표를 상용 완성이 아닌 `Portfolio Vertical Slice Case Study v1`로 고정하는 ProjectOps harness를 추가
+  - Accepted / Candidate / Not Applied evidence와 AI/ML claim boundary를 분리
+  - Portfolio, UI/Asset, AI, Release/Ops, WIKI 세션에 보낼 closure dispatch를 정리
+  - Steam-style case study outline을 작성해 APK, 구현 화면, 마타이오스, ML-Agents, concept-to-UI, 제작 파이프라인을 하나의 흐름으로 묶음
+- **Files**: 변경/추가 4개 (`Docs/ProjectOps/vertical-slice-case-study-harness.md`, `Docs/ProjectOps/vertical-slice-session-dispatches.md`, `Docs/Portfolio/vertical-slice-case-study-outline.md`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 closure 운영 문서, 게임 런타임 변경 없음
+- **Next**: Portfolio/HTML 세션은 source HTML을 case study outline에 맞춰 정리하고, Release/Ops는 APK와 screenshot artifact manifest를 고정
+- **Agent**: Codex
+
 ### 2026-07-02 23:45 — Portfolio screenshot fixture 상태 보정
 - **Phase**: Post-pause / Portfolio Capture Prep
 - **Done**:
