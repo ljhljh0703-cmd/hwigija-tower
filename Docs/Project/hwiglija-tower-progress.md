@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 20:46 — Portfolio Capture Polish Gate 1 triage 실행
+- **Phase**: Post-pause / Portfolio Capture Prep
+- **Done**:
+  - RC1 harness 기준으로 UI/Asset triage와 runtime anchor 탐색을 병렬 수행
+  - Combat / Map / Event / Reward-Growth / Shop의 P0 capture risk를 분리하고 Game Dev 구현 범위를 확정
+  - stale dispatch base를 Gate 1 입력 baseline `origin/Proto@9f59b51`로 보정
+  - Gate 2 Game Dev가 읽을 status 문서와 P0 implementation dispatch를 추가
+- **Files**: 변경/추가 3개 (`Docs/ProjectOps/portfolio-capture-polish-dispatch.md`, status, progress log)
+- **GDD impact**: 없음 — 운영/화면 polish harness 진행, 게임 런타임 변경 없음
+- **Next**: Game Dev 세션은 clean latest `origin/Proto`에서 CodeGraph preflight 후 `PrototypeHud.cs` 중심 RC1 P0 구현
+- **Agent**: Codex
+
 ### 2026-07-02 20:45 — Portfolio Capture Polish orchestration harness 추가
 - **Phase**: Post-pause / Portfolio Capture Prep
 - **Done**:
