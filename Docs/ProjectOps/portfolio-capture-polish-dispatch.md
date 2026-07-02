@@ -4,7 +4,7 @@
 
 ## 공통 기준
 
-- Base: `origin/Proto@55c873695857d5a13fb2e3d0a89e1a39c3d0ac59`
+- Base: latest `origin/Proto` after harness status update. Current command-center baseline: `origin/Proto@9f59b51b430f022a17eb6c599a79bccbc675f813`
 - Clean worktree 필수.
 - Main dirty worktree 사용 금지.
 - 목표: 포트폴리오/데모 영상에 찍힐 화면 품질 개선.
@@ -70,32 +70,37 @@
 # Game Dev 지시 — Portfolio Capture Polish RC1 P0 Implementation
 
 ## 기준
-- Base: latest origin/Proto after UI/Asset triage
+- Base: latest origin/Proto after command-center Gate 1 status
 - clean worktree 필수
 - C# runtime 변경 전 CodeGraph fresh preflight
 - main dirty worktree 사용 금지
+- 먼저 `Docs/ProjectOps/portfolio-capture-polish-harness.md`와 `Docs/ProjectOps/portfolio-capture-polish-status.md`를 읽을 것
 
 ## 구현 범위
-UI/Asset 세션이 준 P0만 구현.
+Gate 1에서 확정된 P0만 구현. 이번 pass는 `PrototypeHud.cs` 중심 presentation polish가 원칙이다.
 
-예상 P0:
+P0:
 1. Combat HUD
-   - 로그 2~3줄 핵심화
-   - 플레이어 피해 / 마타이오스 지원 / 적 반응 순서 명확화
-   - 버튼 preview 과밀 완화
-   - 피해 숫자, 흔들림, 처치 피드백 유지/강화
+   - enemy stage + bottom player/Mataios party dock 구조로 정리
+   - enemy HP / player HP / Mataios HP / 최근 combat log 2~3줄 중심
+   - `플레이어: N 피해`, `마타이오스: N 지원 피해/보호/마무리` 분리
+   - Attack/Defend/Skill 버튼은 크게 유지하고 disabled Skill은 이유를 표시
+   - 피해 숫자, shake/pulse, 처치 feedback은 유지하거나 표시 계층만 강화
 
 2. Map/Event
-   - 선택지 카드와 결과 패널 정렬
-   - CTA 버튼 명확화
-   - raw/internal label 제거
+   - route/debug/internal label 숨김: `[current]`, `[locked]`, `MoralChoice`, `CHOICE_`, `ENC_` 등 노출 금지
+   - 기존 node/map/button sprite를 써서 sparse route, current glow, future dark, locked state를 플레이어용 label로 표시
+   - event choice는 Korean label + 즉시 효과 preview + 선택 후 compact result strip으로 정리
 
-3. Reward/Growth
+3. Reward/Growth/Shop
    - 보상/성장 팝업 중앙성, 수치, 아이콘, CTA 정리
+   - plain result text 대신 중앙 popup과 단일 CTA 사용
+   - shop을 데모 루트에 넣을 경우 2~3개 item card, name/effect/price/current Gold/disabled reason/leave CTA가 보여야 함
 
 ## 금지
 - 새 시스템 추가 금지
 - 전투/경제 밸런스 임의 확장 금지
+- `CombatController`, `PrototypeRunState`, `PrototypeFloorMapBuilder`, `MataiosCombatBrain` 변경 금지. 단, UI 수정만으로 불가능한 실제 버그가 테스트로 증명되면 보고 후 최소 변경
 - runtime RL/ONNX 금지
 - ITEM_07 / OQ-025 full deck 금지
 - raw ML output commit 금지
@@ -104,7 +109,7 @@ UI/Asset 세션이 준 P0만 구현.
 - CodeGraph preflight 보고
 - git diff --check
 - forbidden diff search
-- targeted EditMode 가능하면 실행
+- targeted EditMode: `PresentationLayerTests` 우선. 가능하면 combat/map/event/reward/shop 표시 test 추가 또는 갱신
 - Android APK build
 
 ## 보고
