@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 22:39 — Portfolio Capture final APK 후보 고정
+- **Phase**: Post-pause / Portfolio Capture Prep
+- **Done**:
+  - `origin/Proto@185f794` clean worktree에서 Gate 2/3 release verification을 재수행
+  - CodeGraph index를 fresh 생성하고 Android APK를 새로 빌드
+  - repo-local `Builds/Android` 아래 촬영용 APK 후보를 고정하고 SHA/package/label/ABI/signature를 확인
+  - Unity batch test runner는 XML을 생성하지 않아 targeted EditMode PASS가 아니라 N/A로 분리 기록
+- **Files**: 변경/추가 2개 (`Docs/ProjectOps/portfolio-capture-final-apk-report.md`, progress log)
+- **GDD impact**: 없음 — 배포/촬영 후보 기록, 게임 런타임 변경 없음
+- **Blockers**: 실제 Android device visual smoke는 사용자 확인 필요. Unity CLI test result XML 미생성
+- **Next**: 사용자는 `hwigi-tower-185f794-portfolio-capture-final-20260702.apk`로 전투/이벤트/보상/상점 화면을 육안 확인하고 촬영 가능 여부를 판단
+- **Agent**: Codex
+
 ### 2026-07-02 20:46 — Portfolio Capture Polish Gate 1 triage 실행
 - **Phase**: Post-pause / Portfolio Capture Prep
 - **Done**:
