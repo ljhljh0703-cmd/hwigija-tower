@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 11:02 — AI NPC training portfolio case study 추가
+- **Phase**: Post-pause / Portfolio Packaging
+- **Done**:
+  - 마타이오스 대화 모델 훈련 사례를 `portfolio_ai_npc.html` 독립 페이지로 추가
+  - HCX/Qwen 실패, BPE 사일런트 실패, EXAONE 3.5 2.4B + QLoRA 전환, FastAPI + Unity 연동 구조를 포트폴리오용으로 정리
+  - 기존 Steam-style 포트폴리오에 AI NPC 케이스 링크와 CTA를 추가
+  - 사용자 제공 handoff 원문을 `Docs/Portfolio/HANDOFF_portfolio_ai_npc.md`로 보존
+- **Files**: 변경/추가 4개 (`Docs/Portfolio/portfolio_ai_npc.html`, Steam-style HTML, AI NPC handoff, progress log)
+- **GDD impact**: 없음 — 포트폴리오 presentation/증거 정리, 게임 런타임 변경 없음
+- **Next**: Unity + FastAPI 실제 대화 캡처를 확보하면 placeholder 영역을 런타임 스크린샷/GIF로 교체
+- **Agent**: Codex
+
 ### 2026-07-02 08:40 — Mataios companion concept와 APK download link 강화
 - **Phase**: Post-pause / Portfolio Packaging
 - **Done**:
