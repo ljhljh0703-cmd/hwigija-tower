@@ -770,12 +770,12 @@
         <span>Mataios AI NPC</span>
       </a>
       <div class="nav-links">
-        <a href="#context">Context</a>
-        <a href="#failure">Failures</a>
-        <a href="#solution">Solution</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#result">Result</a>
-        <a href="hwigi-tower-steam-portfolio.html#mataios">Main Portfolio</a>
+        <a href="#context">배경</a>
+        <a href="#failure">실패 기록</a>
+        <a href="#solution">해법</a>
+        <a href="#architecture">아키텍처</a>
+        <a href="#result">검증</a>
+        <a href="hwigi-tower-steam-portfolio.html#mataios">게임 포트폴리오</a>
       </div>
     </div>
   </nav>
@@ -809,10 +809,10 @@
       <aside class="hero-panel" aria-label="NPC dialogue placeholder">
         <div class="placeholder-shot">
           <div class="dialogue-box">
-            <b>마타이오스 대화 캡처 placeholder</b>
+            <b>마타이오스는 호감도에 따라 말투가 달라진다</b>
             <p>
-              실제 스크린샷은 Unity에서 FastAPI 서버를 붙인 런타임 캡처로 교체합니다.
-              이 페이지에서는 훈련/검증/연동 구조를 먼저 증명합니다.
+              같은 질문에도 호감도 단계(hostile→open)와 스토리 진행에 따라 반말 톤과 태도가 달라지도록 설계했습니다.
+              이 페이지는 그 대화를 만든 훈련·검증·연동 과정을 담습니다.
             </p>
           </div>
         </div>
@@ -837,7 +837,7 @@
   <main>
     <section class="section fade" id="context">
       <div class="section-head">
-        <h2>Project Context</h2>
+        <h2>프로젝트 배경</h2>
         <p class="lead">
           회귀자는 탑을 오른다는 모바일 세로형 로그라이크 프로토타입입니다.
           마타이오스는 단순 조력자 UI가 아니라, 전투와 선택, 기억을 통해 플레이어 옆에 있는 감각을 만들어야 하는 핵심 동행자입니다.
@@ -845,7 +845,7 @@
       </div>
       <div class="grid-2">
         <article class="card">
-          <span class="kicker">Game</span>
+          <span class="kicker">게임</span>
           <h3>죽어도 다시 오르는 탑</h3>
           <p>
             Unity 6 기반 Android 프로토타입입니다. 짧은 런 안에서 지도 선택, 이벤트 선택, 전투 판단,
@@ -853,7 +853,7 @@
           </p>
         </article>
         <article class="card">
-          <span class="kicker">NPC Contract</span>
+          <span class="kicker">NPC 계약</span>
           <h3>마타이오스 행동 계약</h3>
           <ul class="contract-list">
             <li>호감도 5단계에 따라 말투가 달라져야 한다.</li>
@@ -877,7 +877,7 @@
 
     <section class="section fade" id="problem">
       <div class="section-head">
-        <h2>Why Small LLM Was Hard</h2>
+        <h2>소형 LLM이 어려웠던 이유</h2>
         <p class="lead">
           일반 API를 붙이면 빠르게 데모는 만들 수 있습니다. 하지만 인디 게임의 비용, 오프라인 가능성,
           대화 레이턴시, 캐릭터 제어를 동시에 고려하면 작은 로컬 모델을 실험할 이유가 있었습니다.
@@ -904,14 +904,14 @@
 
     <section class="section fade" id="failure">
       <div class="section-head">
-        <h2>Failure Log</h2>
+        <h2>실패 기록</h2>
         <p class="lead">
           실패 기록을 숨기지 않았습니다. 모델 호환성, 다국어 prior, 데이터 증강 한계, BPE 토큰화 버그가 실제 병목이었습니다.
         </p>
       </div>
       <div class="timeline">
         <article class="timeline-item">
-          <strong>Failure 01</strong>
+          <strong>실패 01</strong>
           <div>
             <h3>HCX-SEED 0.5B: 한국어 특화 기대, GGUF/응답 제어 실패</h3>
             <p>
@@ -921,7 +921,7 @@
           </div>
         </article>
         <article class="timeline-item">
-          <strong>Failure 02</strong>
+          <strong>실패 02</strong>
           <div>
             <h3>Qwen2.5-1.5B v6.1: 44% 영어/중국어 누출</h3>
             <p>
@@ -931,7 +931,7 @@
           </div>
         </article>
         <article class="timeline-item">
-          <strong>Failure 03</strong>
+          <strong>실패 03</strong>
           <div>
             <h3>Qwen2.5 v6.2: BIW 데이터 증강으로도 개선 없음</h3>
             <p>
@@ -941,7 +941,7 @@
           </div>
         </article>
         <article class="timeline-item">
-          <strong>Bug</strong>
+          <strong>버그</strong>
           <div>
             <h3>DataCollator 사일런트 실패: 학습 토큰 0개</h3>
             <p>
@@ -960,7 +960,7 @@
 
     <section class="section fade" id="solution">
       <div class="section-head">
-        <h2>Solution: EXAONE 3.5 2.4B</h2>
+        <h2>해법: EXAONE 3.5 2.4B</h2>
         <p class="lead">
           해결은 더 큰 모델을 쓰는 것이 아니라, 문제에 맞는 prior를 가진 모델을 고르는 것이었습니다.
           한국어가 강한 EXAONE 3.5 2.4B로 전환하고 QLoRA 설정과 데이터 구성을 함께 조정했습니다.
@@ -968,24 +968,24 @@
       </div>
       <div class="grid-3">
         <article class="card success">
-          <span class="kicker">Model</span>
+          <span class="kicker">모델</span>
           <h3>EXAONE 3.5 2.4B-Instruct</h3>
           <p>한국어 응답 안정성이 모델 선택의 1순위였습니다. Qwen 계열에서 반복된 다국어 누출 리스크를 줄이기 위해 한국어 prior를 우선했습니다.</p>
         </article>
         <article class="card success">
-          <span class="kicker">Training</span>
+          <span class="kicker">학습</span>
           <h3>QLoRA r=32, alpha=64</h3>
           <p>Colab A100에서 transformers==4.46.3, revision 8e6fc27로 환경을 고정했습니다. 설정은 재현 가능성을 위해 버전 핀과 함께 관리했습니다.</p>
         </article>
         <article class="card success">
-          <span class="kicker">Dataset</span>
+          <span class="kicker">데이터셋</span>
           <h3>622건에서 697건으로 증강</h3>
           <p>BIW 차단, open affinity, fracture 패턴 데이터를 보강했습니다. 양보다 중요한 것은 테스트 실패를 직접 겨냥한 데이터였습니다.</p>
         </article>
       </div>
       <div class="grid-2" style="margin-top: 14px;">
         <article class="table-card">
-          <h3>Model Selection</h3>
+          <h3>모델 선택</h3>
           <table>
             <thead>
               <tr>
@@ -1014,7 +1014,7 @@
           </table>
         </article>
         <article class="table-card">
-          <h3>Before / After</h3>
+          <h3>개선 전후 · 한국어 유지율</h3>
           <div class="bar-list">
             <div class="bar-row">
               <span>Qwen2.5 v6.1</span>
@@ -1034,7 +1034,7 @@
 
     <section class="section fade" id="architecture">
       <div class="section-head">
-        <h2>Architecture</h2>
+        <h2>아키텍처</h2>
         <p class="lead">
           Ollama/GGUF 변환만으로는 EXAONE 추론을 안정적으로 처리하기 어려웠습니다.
           그래서 FastAPI + transformers 서버를 두고 Unity가 HTTP로 호출하는 구조를 선택했습니다.
@@ -1058,7 +1058,7 @@ revision=8e6fc27</div>
         </article>
       </div>
       <div class="truth-note" style="margin-top: 14px;">
-        <span class="kicker">Claim Boundary</span>
+        <span class="kicker">주장 경계</span>
         <h3>무엇을 했고, 무엇을 하지 않았나</h3>
         <p>
           이 사례는 NPC 대화 모델 파인튜닝과 Unity 연동 파이프라인입니다.
@@ -1078,7 +1078,7 @@ revision=8e6fc27</div>
 
     <section class="section fade" id="result">
       <div class="section-head">
-        <h2>Validation Result</h2>
+        <h2>검증 결과</h2>
         <p class="lead">
           최종 페이지에서 가장 중요한 증거는 "모델을 써봤다"가 아니라, 실패 지표가 실제로 개선되었는지입니다.
           아래 수치는 EXAONE 전환 후 포트폴리오에 공개 가능한 범위로 정리한 검증 결과입니다.
@@ -1112,7 +1112,7 @@ revision=8e6fc27</div>
       </div>
       <div class="grid-2" style="margin-top: 14px;">
         <article class="card">
-          <span class="kicker">Portfolio Value</span>
+          <span class="kicker">포트폴리오 가치</span>
           <h3>게임 기획과 ML 엔지니어링을 연결한 사례</h3>
           <p>
             마타이오스의 말투, 기억, 세계관 차단은 게임 기획 요구사항입니다.
@@ -1120,7 +1120,7 @@ revision=8e6fc27</div>
           </p>
         </article>
         <article class="card">
-          <span class="kicker">Next Work</span>
+          <span class="kicker">다음 작업</span>
           <h3>런타임 캡처와 모바일 추론 검토</h3>
           <p>
             다음 단계는 같은 네트워크 FastAPI 서버를 붙인 실제 Unity 캡처를 확보하고,
@@ -1132,7 +1132,7 @@ revision=8e6fc27</div>
   </main>
 
   <footer class="footer">
-    <p>Hwigi Tower portfolio case study. AI NPC dialogue training proof, not a final commercial release claim.</p>
+    <p>회귀자는 탑을 오른다 포트폴리오 · AI NPC 대화 모델 파인튜닝 사례이며, 정식 출시를 주장하지 않습니다.</p>
   </footer>
 
   <script>
