@@ -32,6 +32,19 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-02 23:45 — Portfolio screenshot fixture 상태 보정
+- **Phase**: Post-pause / Portfolio Capture Prep
+- **Done**:
+  - 포트폴리오용 12장 세로 UI 캡처 fixture가 pre-run placeholder를 잘못 찍던 map/ending 상태를 보정
+  - combat auto-start 이후 intro overlay가 남은 프레임을 피하도록 stable-frame wait를 추가
+  - shop capture는 현재 보유 Gold 맥락이 보이는 상태로 갱신하고, stale disabled 상품 문구 의존을 제거
+  - Unity TestRunner CLI가 실행 없이 종료되는 문제는 임시 Editor runner로 우회 검증했으며 runner는 커밋 범위에서 제거
+- **Files**: 변경 2개 (`Assets/_Project/Tests/PlayMode/PortraitUiScreenshotQaTests.cs`, progress log)
+- **GDD impact**: 없음 — 촬영/검증 fixture 변경, 게임 런타임 변경 없음
+- **Blockers**: 캡처 경로상 legacy UI Text는 실제 이미지에서 약간 흐리게 보임. 포폴 최종 이미지는 별도 UI/Asset 리마스터 또는 후처리 후보
+- **Next**: stable `Builds/PortfolioScreenshots` 산출물을 포트폴리오 HTML/영상 제작에 사용하고, 텍스트 선명도는 UI 리마스터 작업으로 분리
+- **Agent**: Codex
+
 ### 2026-07-02 22:39 — Portfolio Capture final APK 후보 고정
 - **Phase**: Post-pause / Portfolio Capture Prep
 - **Done**:
