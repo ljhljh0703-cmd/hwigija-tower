@@ -297,14 +297,72 @@ namespace HwigiTower.Tests.EditMode
             var views = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, encounter);
             var hud = CreateHud(out _);
 
+            hud.ShowRunState(new PrototypeRunSnapshot("run-ui-shop-disabled", 20, 24, 5, 0, 5, 0, 0, 0, 0, 0, false));
             hud.ShowChoices(encounter, views, _ => { });
 
             var disabledLabel = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
             Assert.IsNotNull(disabledLabel);
             StringAssert.Contains("정찰", disabledLabel.text);
             StringAssert.Contains("Gold -20", disabledLabel.text);
+            StringAssert.Contains("보유 Gold 5", disabledLabel.text);
             StringAssert.Contains("Gold 부족", disabledLabel.text);
             StringAssert.DoesNotContain("ABILITY_SCOUT", disabledLabel.text);
+        }
+
+        [Test]
+        public void Gate2P0_PublicSanitizerRemovesInternalLabels()
+        {
+            var method = typeof(PrototypeHud).GetMethod("NormalizePublicHint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method);
+
+            var label = (string)method.Invoke(null, new object[] { "[current] MoralChoice CHOICE_EVT_TEST ENC_COMBAT_GATE_01 MEM_FRAGMENT_03 Unavailable" });
+
+            StringAssert.Contains("현재", label);
+            StringAssert.Contains("선택", label);
+            StringAssert.Contains("전투", label);
+            StringAssert.Contains("기억의 잔향", label);
+            StringAssert.Contains("선택 불가", label);
+            AssertPublicSurface(label, "gate2 sanitizer");
+        }
+
+        [Test]
+        public void Gate2P0_CombatLogStaysDenseAndSkillShowsDisabledReason()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-gate2-combat",
+                14,
+                24,
+                6,
+                0,
+                9,
+                0,
+                1,
+                0,
+                0,
+                1,
+                false,
+                isInCombat: true,
+                lastCombatId: "COMBAT_GATE2",
+                lastCombatEnemyId: "ENEMY_EMPTY_ARMOR",
+                enemyHp: 9,
+                enemyMaxHp: 18,
+                enemyAttack: 4,
+                combatRound: 2,
+                lastCombatRoundResult: "round 2 | action Attack | playerDamage 7 | enemyDamage 3 | enemyHp 18->9 | playerHp 17->14 | mataios support 2 | heavy pressure blocked",
+                lastMataiosCombatDamage: 2,
+                equippedCommandIds: new[] { PrototypeRunState.CommandAttackId, PrototypeRunState.CommandDefendId, PrototypeRunState.CommandScoutId });
+
+            hud.ShowRunState(snapshot);
+
+            Assert.LessOrEqual(hud.CombatMessage.Split('\n').Length, 3);
+            StringAssert.Contains("리빙 아머", hud.CombatMessage);
+            StringAssert.Contains("적 HP 9/18", hud.CombatMessage);
+            StringAssert.Contains("플레이어: 7 피해", hud.CombatMessage);
+            StringAssert.Contains("마타이오스: 2 지원 피해", hud.CombatMessage);
+            StringAssert.Contains("판단:", hud.CombatMessage);
+            StringAssert.Contains("스킬", hud.CombatActionButtonLabels);
+            StringAssert.Contains("조건 부족", hud.CombatActionButtonLabels);
         }
 
         [Test]
@@ -1622,6 +1680,10 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.DoesNotContain("MEM_FRAGMENT_", text, context);
             StringAssert.DoesNotContain("TriggerGameOver", text, context);
             StringAssert.DoesNotContain("PLACEHOLDER_EVT_", text, context);
+            StringAssert.DoesNotContain("CHOICE_", text, context);
+            StringAssert.DoesNotContain("ENC_", text, context);
+            StringAssert.DoesNotContain("[current]", text, context);
+            StringAssert.DoesNotContain("[locked]", text, context);
         }
 
         private static void AssertPublicLabel(DemoPresentationData data, string stableId, string expected)

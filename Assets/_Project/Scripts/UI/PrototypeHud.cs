@@ -1127,7 +1127,7 @@ namespace HwigiTower.UI
 
             resultText.text = string.IsNullOrEmpty(message)
                 ? "결과\n-"
-                : BuildResultSummary(message);
+                : showRawDebugText ? BuildResultSummary(message) : SanitizePublicText(BuildResultSummary(message));
             RefreshResultSummaryIcons(_lastResultMessage);
         }
 
@@ -1590,6 +1590,7 @@ namespace HwigiTower.UI
             label.color = view.Enabled
                 ? new Color(0.95f, 0.97f, 0.94f, 1f)
                 : new Color(0.78f, 0.82f, 0.82f, 0.96f);
+            label.text = BuildShopCardLabel(view, label.text);
 
             var iconSprite = ResolvePurchaseChoiceIcon(view);
             if (iconSprite == null)
@@ -1610,6 +1611,23 @@ namespace HwigiTower.UI
             icon.raycastTarget = false;
             icon.color = view.Enabled ? Color.white : new Color(0.72f, 0.76f, 0.78f, 0.88f);
             _shopChoiceIconImages.Add(icon);
+        }
+
+        private string BuildShopCardLabel(PrototypeEncounterChoiceView view, string currentLabel)
+        {
+            var gold = _roomController == null ? _lastSnapshot.Gold : _roomController.GetSnapshot().Gold;
+            var label = SanitizePublicText(currentLabel);
+            if (!label.Contains("보유 Gold", StringComparison.Ordinal))
+            {
+                label += "\n보유 Gold " + gold;
+            }
+
+            if (!view.Enabled && !label.Contains("Gold 부족", StringComparison.Ordinal))
+            {
+                label += "\nGold 부족";
+            }
+
+            return SanitizePublicText(label);
         }
 
         private Button CreateMapNodeButton(PrototypeFloorMapNodeView node, Action<string> onNodeSelected)
@@ -5073,7 +5091,9 @@ namespace HwigiTower.UI
             var recommendedAction = ResolveRecommendedCombatAction(snapshot);
             if (attackButton != null)
             {
-                var preview = _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Attack);
+                var preview = _roomController == null
+                    ? new CombatActionPreview(CombatAction.Attack, "공격", string.Empty, false)
+                    : _roomController.BuildCombatActionPreview(CombatAction.Attack);
                 attackButton.gameObject.SetActive(snapshot.IsInCombat && snapshot.IsCommandEquipped(PrototypeRunState.CommandAttackId));
                 attackButton.interactable = canAct && attackButton.gameObject.activeSelf;
                 SetCombatActionButtonPreview(attackButton, preview);
@@ -5082,7 +5102,9 @@ namespace HwigiTower.UI
 
             if (defendButton != null)
             {
-                var preview = _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Defend);
+                var preview = _roomController == null
+                    ? new CombatActionPreview(CombatAction.Defend, "방어", string.Empty, false)
+                    : _roomController.BuildCombatActionPreview(CombatAction.Defend);
                 defendButton.gameObject.SetActive(snapshot.IsInCombat && snapshot.IsCommandEquipped(PrototypeRunState.CommandDefendId));
                 defendButton.interactable = canAct && defendButton.gameObject.activeSelf;
                 SetCombatActionButtonPreview(defendButton, preview);
@@ -5091,7 +5113,9 @@ namespace HwigiTower.UI
 
             if (skillButton != null)
             {
-                var preview = _roomController == null ? default : _roomController.BuildCombatActionPreview(CombatAction.Skill);
+                var preview = _roomController == null
+                    ? new CombatActionPreview(CombatAction.Skill, "스킬", "조건 부족", false)
+                    : _roomController.BuildCombatActionPreview(CombatAction.Skill);
                 var skillEquipped = snapshot.IsCommandEquipped(PrototypeRunState.CommandScoutId) || snapshot.IsCommandEquipped(PrototypeRunState.CommandArts03Id);
                 skillButton.gameObject.SetActive(snapshot.IsInCombat && skillEquipped);
                 skillButton.interactable = canAct && skillButton.gameObject.activeSelf && preview.Usable;
@@ -5137,12 +5161,22 @@ namespace HwigiTower.UI
                 return;
             }
 
-            label.text = string.IsNullOrEmpty(preview.Label)
+            var actionLabel = string.IsNullOrEmpty(preview.Label)
+                ? PublicCombatActionName(preview.Action.ToString())
+                : preview.Label;
+            var previewText = preview.PreviewText;
+            if (preview.Action == CombatAction.Skill && !preview.Usable && string.IsNullOrEmpty(previewText))
+            {
+                previewText = "조건 부족";
+            }
+
+            label.text = string.IsNullOrEmpty(actionLabel)
                 ? string.Empty
-                : preview.HasPreview ? preview.Label + "\n" + preview.PreviewText : preview.Label;
-            label.fontSize = preview.HasPreview ? 19 : 28;
-            label.resizeTextMinSize = preview.HasPreview ? 13 : 22;
-            label.resizeTextMaxSize = preview.HasPreview ? 19 : 28;
+                : string.IsNullOrEmpty(previewText) ? actionLabel : actionLabel + "\n" + previewText;
+            var hasPreviewText = !string.IsNullOrEmpty(previewText);
+            label.fontSize = hasPreviewText ? 19 : 28;
+            label.resizeTextMinSize = hasPreviewText ? 13 : 22;
+            label.resizeTextMaxSize = hasPreviewText ? 19 : 28;
             label.lineSpacing = 0.92f;
         }
 
@@ -6049,7 +6083,7 @@ namespace HwigiTower.UI
                 label += "\n" + NormalizePublicHint(view.HintText);
             }
 
-            return label;
+            return showRawDebugText ? label : SanitizePublicText(label);
         }
 
         private static bool IsPurchaseChoice(string choiceStableId)
@@ -6903,27 +6937,21 @@ namespace HwigiTower.UI
 
         private string BuildCombatPresentation(PrototypeRunSnapshot snapshot)
         {
+            var feedback = BuildCombatFeedback(snapshot.LastCombatRoundResult);
+            var detail = BuildCombatLogDetailLine(snapshot);
+            var build = BuildCombatBuildSummaryLine(snapshot);
+            var resultLine = string.IsNullOrEmpty(detail)
+                ? feedback
+                : feedback + " | " + detail;
+            var decisionLine = string.IsNullOrEmpty(build)
+                ? BuildCombatDecisionLine(snapshot)
+                : BuildCombatDecisionLine(snapshot) + " | " + build;
             var lines = new List<string>
             {
                 PublicEnemyName(snapshot.LastCombatEnemyId) + " | 적 HP " + snapshot.EnemyHp + "/" + snapshot.EnemyMaxHp + " | 내 HP " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp,
-                ShortenPublicLine(BuildCombatFeedback(snapshot.LastCombatRoundResult), 48),
-                ShortenPublicLine(BuildCombatDecisionLine(snapshot), 50)
+                ShortenPublicLine(resultLine, 78),
+                ShortenPublicLine(decisionLine, 78)
             };
-
-            var detail = BuildCombatLogDetailLine(snapshot);
-            var build = BuildCombatBuildSummaryLine(snapshot);
-            if (!string.IsNullOrEmpty(detail) && !string.IsNullOrEmpty(build))
-            {
-                lines.Add(ShortenPublicLine(detail + " | " + build, 62));
-            }
-            else if (!string.IsNullOrEmpty(detail))
-            {
-                lines.Add(ShortenPublicLine(detail, 62));
-            }
-            else if (!string.IsNullOrEmpty(build))
-            {
-                lines.Add(ShortenPublicLine(build, 62));
-            }
 
             return string.Join("\n", lines);
         }
@@ -8037,7 +8065,7 @@ namespace HwigiTower.UI
         {
             if (!string.IsNullOrEmpty(configuredLabel) && !LooksLikeInternalLabel(configuredLabel))
             {
-                return configuredLabel;
+                return SanitizePublicText(configuredLabel);
             }
 
             if (encounter == null)
@@ -8118,7 +8146,7 @@ namespace HwigiTower.UI
                 .Replace("Glitch -1", "불안 감소", StringComparison.Ordinal)
                 .Replace("Glitch +1", "불안 증가", StringComparison.Ordinal);
 
-            return ReplacePublicRefs(normalized);
+            return SanitizePublicText(ReplacePublicRefs(normalized));
         }
 
         private static string ReplacePublicRefs(string value)
@@ -8128,7 +8156,7 @@ namespace HwigiTower.UI
                 return string.Empty;
             }
 
-            return value
+            var replaced = value
                 .Replace("TriggerGameOver", "실패", StringComparison.Ordinal)
                 .Replace("MoralChoice", "선택", StringComparison.Ordinal)
                 .Replace("도덕 선택", "선택", StringComparison.Ordinal)
@@ -8162,6 +8190,78 @@ namespace HwigiTower.UI
                 .Replace("ABILITY_GUARD_01", PublicRefName("ABILITY_GUARD_01"), StringComparison.Ordinal)
                 .Replace("REWARD_CACHE_SMALL", PublicRefName("REWARD_CACHE_SMALL"), StringComparison.Ordinal)
                 .Replace("REWARD_CACHE_MEMORY", PublicRefName("REWARD_CACHE_MEMORY"), StringComparison.Ordinal);
+            return StripInternalReferenceTokens(replaced);
+        }
+
+        private static string SanitizePublicText(string value)
+        {
+            return StripInternalReferenceTokens(value);
+        }
+
+        private static string StripInternalReferenceTokens(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            var text = value
+                .Replace("[current]", "현재", StringComparison.Ordinal)
+                .Replace("[locked]", "잠김", StringComparison.Ordinal)
+                .Replace("[complete]", "완료", StringComparison.Ordinal)
+                .Replace("[cleared]", "완료", StringComparison.Ordinal)
+                .Replace("MoralChoice", "선택", StringComparison.Ordinal)
+                .Replace("MemoryFragment", "기억의 잔향", StringComparison.Ordinal)
+                .Replace("TriggerGameOver", "실패", StringComparison.Ordinal)
+                .Replace("도덕 선택", "선택", StringComparison.Ordinal)
+                .Replace("Unavailable", "선택 불가", StringComparison.Ordinal)
+                .Replace("PLACEHOLDER_", string.Empty, StringComparison.Ordinal);
+
+            text = ReplaceInternalTokenPrefix(text, "CHOICE_", "선택");
+            text = ReplaceInternalTokenPrefix(text, "ENC_COMBAT_GATE_", "전투");
+            text = ReplaceInternalTokenPrefix(text, "ENC_SHOP_", "상점");
+            text = ReplaceInternalTokenPrefix(text, "ENC_REST_", "휴식");
+            text = ReplaceInternalTokenPrefix(text, "ENC_MORAL_", "선택");
+            text = ReplaceInternalTokenPrefix(text, "ENC_MEMORY_", "기억의 잔향");
+            text = ReplaceInternalTokenPrefix(text, "ENC_", "조우");
+            text = ReplaceInternalTokenPrefix(text, "EVT_", "이벤트");
+            text = ReplaceInternalTokenPrefix(text, "MEM_FRAGMENT_", "기억의 잔향");
+            while (text.Contains("  ", StringComparison.Ordinal))
+            {
+                text = text.Replace("  ", " ", StringComparison.Ordinal);
+            }
+
+            return text.Trim();
+        }
+
+        private static string ReplaceInternalTokenPrefix(string value, string prefix, string replacement)
+        {
+            var result = value;
+            var searchStart = 0;
+            while (searchStart < result.Length)
+            {
+                var start = result.IndexOf(prefix, searchStart, StringComparison.Ordinal);
+                if (start < 0)
+                {
+                    break;
+                }
+
+                var end = start + prefix.Length;
+                while (end < result.Length && IsInternalTokenCharacter(result[end]))
+                {
+                    end++;
+                }
+
+                result = result.Substring(0, start) + replacement + result.Substring(end);
+                searchStart = start + replacement.Length;
+            }
+
+            return result;
+        }
+
+        private static bool IsInternalTokenCharacter(char value)
+        {
+            return char.IsLetterOrDigit(value) || value == '_' || value == '-' || value == '.';
         }
 
         private static string PublicRefName(string reference)
