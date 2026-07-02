@@ -1,0 +1,1589 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>회귀자는 탑을 오른다 | Hwigi Tower Portfolio</title>
+  <meta
+    name="description"
+    content="모바일 세로 로그라이크 회귀자는 탑을 오른다의 대외 포트폴리오 쇼케이스. 동행자 AI, 선택형 이벤트, 전투 설계 검증, Android 프로토타입 배포 파이프라인을 소개합니다."
+  />
+  <meta property="og:title" content="회귀자는 탑을 오른다 | Hwigi Tower" />
+  <meta
+    property="og:description"
+    content="동행자 마타이오스와 탑을 오르는 모바일 로그라이크. AI를 런타임 과시가 아닌 전투 설계 검증 도구로 사용한 프로토타입 포트폴리오."
+  />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#090b0d" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b0d;
+      --bg-2: #111514;
+      --ink: #f6efe3;
+      --ink-soft: rgba(246, 239, 227, 0.78);
+      --muted: rgba(246, 239, 227, 0.58);
+      --panel: rgba(13, 17, 17, 0.88);
+      --panel-strong: #151917;
+      --line: rgba(246, 239, 227, 0.15);
+      --gold: #c99b46;
+      --red: #a83d32;
+      --green: #67a36d;
+      --blue: #6a9ac9;
+      --maxw: 1180px;
+      --radius: 8px;
+      --shadow: 0 24px 68px rgba(0, 0, 0, 0.45);
+      font-family: "Apple SD Gothic Neo", "Noto Sans KR", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(246, 239, 227, 0.025) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(246, 239, 227, 0.025) 1px, transparent 1px),
+        radial-gradient(circle at 50% -20%, rgba(201, 155, 70, 0.18), transparent 360px),
+        var(--bg);
+      background-size: 92px 92px, 92px 92px, auto, auto;
+      line-height: 1.58;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      z-index: 100;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(246, 239, 227, 0.08);
+    }
+
+    .scroll-progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--gold), var(--green));
+    }
+
+    .nav {
+      position: sticky;
+      z-index: 80;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9, 11, 13, 0.82);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 12px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 900;
+    }
+
+    .brand-mark {
+      width: 15px;
+      height: 22px;
+      border: 2px solid var(--gold);
+      border-bottom-width: 5px;
+      background: linear-gradient(180deg, var(--red), rgba(168, 61, 50, 0.2));
+      box-shadow: 5px 5px 0 rgba(103, 163, 109, 0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .nav-links a {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 7px 10px;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      border-color: var(--line);
+      background: rgba(246, 239, 227, 0.08);
+      color: var(--ink);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 86svh;
+      overflow: hidden;
+      display: grid;
+      align-items: end;
+      background:
+        linear-gradient(90deg, rgba(9, 11, 13, 0.94), rgba(9, 11, 13, 0.72) 44%, rgba(9, 11, 13, 0.24)),
+        linear-gradient(180deg, rgba(9, 11, 13, 0.14), rgba(9, 11, 13, 0.96)),
+        url("../../Assets/_Project/Art/Encounters/enc_combat_gate_03_bg.png") center / cover no-repeat;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 130px;
+      background: linear-gradient(0deg, var(--bg), transparent);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 96px 0 76px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #e8c06d;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 42px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      max-width: 920px;
+      margin-top: 18px;
+      font-size: 76px;
+      line-height: 0.96;
+      letter-spacing: 0;
+      word-break: keep-all;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin-top: 24px;
+      color: rgba(246, 239, 227, 0.9);
+      font-size: 22px;
+      font-weight: 760;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .hero-actions,
+    .tag-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-actions {
+      margin-top: 30px;
+    }
+
+    .tag-row {
+      margin-top: 22px;
+    }
+
+    .hero-note {
+      max-width: 650px;
+      margin-top: 18px;
+      color: rgba(246, 239, 227, 0.72);
+      font-size: 14px;
+      font-weight: 750;
+      word-break: keep-all;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border: 1px solid rgba(246, 239, 227, 0.18);
+      border-radius: var(--radius);
+      padding: 10px 15px;
+      background: rgba(246, 239, 227, 0.09);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .button.primary {
+      border-color: rgba(201, 155, 70, 0.72);
+      background: linear-gradient(180deg, #d8aa58, #8f622a);
+      color: #170f08;
+    }
+
+    .tag {
+      border: 1px solid rgba(246, 239, 227, 0.18);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(9, 11, 13, 0.52);
+      color: rgba(246, 239, 227, 0.82);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .section {
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 70px 0;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      font-size: 42px;
+      line-height: 1.12;
+      word-break: keep-all;
+    }
+
+    .lead {
+      color: var(--ink-soft);
+      font-size: 17px;
+      word-break: keep-all;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .store-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .store-media,
+    .store-panel,
+    .loop-card,
+    .design-card,
+    .system-row {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .store-media {
+      overflow: hidden;
+    }
+
+    .store-media img {
+      width: 100%;
+      height: 100%;
+      min-height: 430px;
+      object-fit: cover;
+    }
+
+    .store-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+      padding: 20px;
+    }
+
+    .store-panel h3 {
+      color: var(--gold);
+      font-size: 19px;
+    }
+
+    .store-panel p,
+    .loop-card p,
+    .design-card p,
+    .system-row p {
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .hook-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hook-list li {
+      padding: 11px 12px;
+      border: 1px solid rgba(246, 239, 227, 0.12);
+      border-radius: var(--radius);
+      background: rgba(246, 239, 227, 0.055);
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 800;
+      word-break: keep-all;
+    }
+
+    .loop-grid,
+    .design-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .loop-grid {
+      margin-bottom: 14px;
+    }
+
+    .design-grid {
+      margin-top: 14px;
+    }
+
+    .loop-card,
+    .design-card {
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .loop-card strong,
+    .design-card strong {
+      display: inline-flex;
+      margin-bottom: 12px;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .loop-card h3,
+    .design-card h3 {
+      font-size: 19px;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+
+    .system-table {
+      display: grid;
+      gap: 10px;
+    }
+
+    .companion-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .companion-art {
+      display: grid;
+      align-content: end;
+      min-height: 520px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(9, 11, 13, 0.08), rgba(9, 11, 13, 0.9)),
+        url("../../Assets/_Project/Art/Encounters/enc_combat_gate_03_bg.png") center / cover no-repeat;
+      box-shadow: var(--shadow);
+    }
+
+    .companion-art img {
+      width: min(86%, 360px);
+      margin: 0 auto;
+      filter: drop-shadow(0 28px 28px rgba(0, 0, 0, 0.62));
+    }
+
+    .companion-copy {
+      padding: 18px;
+      border-top: 1px solid var(--line);
+      background: rgba(6, 7, 8, 0.78);
+    }
+
+    .companion-copy h3 {
+      color: var(--gold);
+      font-size: 22px;
+      line-height: 1.2;
+      word-break: keep-all;
+    }
+
+    .companion-copy p {
+      margin-top: 10px;
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .companion-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .metric-card {
+      border: 1px solid rgba(246, 239, 227, 0.12);
+      border-radius: var(--radius);
+      padding: 13px;
+      background: rgba(246, 239, 227, 0.055);
+    }
+
+    .metric-card strong {
+      display: block;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 17px;
+    }
+
+    .metric-card span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+      word-break: keep-all;
+    }
+
+    .system-row {
+      display: grid;
+      grid-template-columns: 170px 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      box-shadow: none;
+    }
+
+    .system-row b {
+      color: var(--gold);
+      font-size: 14px;
+    }
+
+    .stat,
+    .card,
+    .media-card,
+    .capture-card,
+    .build-card,
+    .timeline-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .stat {
+      padding: 18px;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 25px;
+      line-height: 1.1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 16px;
+    }
+
+    .media-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .media-card {
+      overflow: hidden;
+    }
+
+    .media-card figure {
+      margin: 0;
+    }
+
+    .media-card img {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      filter: saturate(0.94) contrast(1.04);
+    }
+
+    .media-card.tall img {
+      min-height: 536px;
+    }
+
+    .caption {
+      display: grid;
+      gap: 6px;
+      padding: 14px 15px 16px;
+      border-top: 1px solid var(--line);
+      background: rgba(9, 11, 13, 0.9);
+    }
+
+    .caption b {
+      font-size: 15px;
+    }
+
+    .caption span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .capture-block {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(246, 239, 227, 0.055), rgba(246, 239, 227, 0.018)),
+        rgba(9, 11, 13, 0.72);
+    }
+
+    .capture-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .capture-head h3 {
+      color: var(--gold);
+      font-size: 24px;
+      line-height: 1.18;
+      word-break: keep-all;
+    }
+
+    .capture-head + .capture-head {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .capture-head p,
+    .capture-note {
+      color: var(--ink-soft);
+      font-size: 14px;
+      word-break: keep-all;
+    }
+
+    .capture-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .target-grid {
+      grid-template-columns: repeat(3, 1fr);
+      margin-bottom: 6px;
+    }
+
+    .proof-flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0 8px;
+    }
+
+    .proof-step {
+      border: 1px solid rgba(246, 239, 227, 0.12);
+      border-radius: var(--radius);
+      padding: 13px;
+      background: rgba(6, 7, 8, 0.58);
+    }
+
+    .proof-step strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .proof-step span {
+      color: var(--ink-soft);
+      font-size: 13px;
+      word-break: keep-all;
+    }
+
+    .capture-card {
+      overflow: hidden;
+      background: rgba(6, 7, 8, 0.86);
+      box-shadow: none;
+    }
+
+    .capture-card img {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      object-position: center top;
+      border-bottom: 1px solid var(--line);
+      filter: saturate(0.94) contrast(1.04);
+    }
+
+    .target-grid .capture-card img {
+      aspect-ratio: 9 / 16;
+    }
+
+    .capture-card .caption {
+      min-height: 128px;
+      border-top: 0;
+    }
+
+    .capture-note {
+      margin-top: 13px;
+      color: var(--muted);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      padding: 20px;
+    }
+
+    .card .kicker {
+      display: inline-flex;
+      margin-bottom: 16px;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .card h3 {
+      font-size: 21px;
+      line-height: 1.24;
+      word-break: keep-all;
+    }
+
+    .card p {
+      margin-top: 12px;
+      color: var(--ink-soft);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .build-card {
+      padding: 22px;
+    }
+
+    .build-card h3 {
+      color: var(--gold);
+      font-size: 19px;
+    }
+
+    .build-card dl {
+      display: grid;
+      gap: 13px;
+      margin: 18px 0 0;
+    }
+
+    .build-card div {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      padding-top: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    .build-card dt {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .build-card dd {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 136px 1fr;
+      gap: 18px;
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .timeline-item strong {
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .timeline-item h3 {
+      font-size: 18px;
+    }
+
+    .timeline-item p {
+      margin-top: 6px;
+      color: var(--ink-soft);
+      font-size: 14px;
+      word-break: keep-all;
+    }
+
+    .quote-band {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(168, 61, 50, 0.18), transparent 42%),
+        linear-gradient(180deg, rgba(246, 239, 227, 0.05), rgba(246, 239, 227, 0));
+    }
+
+    .quote-inner {
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+
+    blockquote {
+      max-width: 930px;
+      margin: 0;
+      color: var(--ink);
+      font-size: 27px;
+      font-weight: 900;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .risk-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .risk-list .card {
+      background: rgba(21, 25, 23, 0.82);
+      box-shadow: none;
+    }
+
+    .footer {
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: #060708;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      h1 {
+        font-size: 52px;
+      }
+
+      .subtitle {
+        font-size: 18px;
+      }
+
+      .section-head,
+      .media-grid,
+      .capture-head,
+      .companion-grid,
+      .split,
+      .store-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .stats,
+      .feature-grid,
+      .risk-list,
+      .loop-grid,
+      .design-grid,
+      .target-grid,
+      .metric-grid,
+      .proof-flow,
+      .capture-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .media-card.tall img {
+        min-height: 360px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .nav-inner,
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        min-height: 78svh;
+      }
+
+      .hero-inner {
+        padding: 78px 0 58px;
+      }
+
+      h1 {
+        font-size: 39px;
+      }
+
+      h2 {
+        font-size: 31px;
+      }
+
+      .stats,
+      .feature-grid,
+      .risk-list,
+      .loop-grid,
+      .design-grid,
+      .target-grid,
+      .metric-grid,
+      .proof-flow,
+      .capture-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-item,
+      .build-card div,
+      .system-row {
+        grid-template-columns: 1fr;
+      }
+
+      blockquote {
+        font-size: 21px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <nav class="nav" aria-label="페이지 섹션">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="Hwigi Tower top">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Hwigi Tower</span>
+      </a>
+      <div class="nav-links">
+        <a href="#store">Store</a>
+        <a href="#about">Loop</a>
+        <a href="#media">Proof</a>
+        <a href="#mataios">Mataios</a>
+        <a href="portfolio_ai_npc.html">AI NPC</a>
+        <a href="#features">Systems</a>
+        <a href="#pipeline">Portfolio</a>
+        <a href="#build">Build</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-inner">
+      <div class="eyebrow">Steam-style portfolio case study</div>
+      <h1>회귀자는<br />탑을 오른다</h1>
+      <p class="subtitle">
+        죽어도 끝나지 않는 탑. 선택은 즉시 흔적을 남기고,
+        동행자 마타이오스는 전투와 기억 속에서 조금씩 달라집니다.
+      </p>
+      <p class="hero-note">
+        모바일 세로 로그라이크의 5분 런, 동행자 AI, 선택형 이벤트, 전투 설계 검증을 한 화면에서 설명하는 대외 포트폴리오 페이지입니다.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="#build">Android Prototype 정보</a>
+        <a class="button" href="#store">게임 소개 보기</a>
+        <a class="button" href="#pipeline">제작 파이프라인 보기</a>
+        <a class="button" href="portfolio_ai_npc.html">AI NPC 훈련 케이스</a>
+      </div>
+      <div class="tag-row" aria-label="게임 태그">
+        <span class="tag">Mobile Portrait</span>
+        <span class="tag">Roguelike Route</span>
+        <span class="tag">Companion AI</span>
+        <span class="tag">Choice Events</span>
+        <span class="tag">Combat Design Lab</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="store">
+      <div class="section-head">
+        <h2>About This Game</h2>
+        <p class="lead">
+          회귀자는 탑을 오른다는 "짧게 오르고, 선택하고, 잃고, 다시 오른다"는 감각을 전면에 둔 모바일 로그라이크입니다.
+          이 포트폴리오는 아이디어 소개가 아니라, 실제 APK 후보와 구현된 시스템을 바탕으로 게임 기획 역량을 보여주도록 구성했습니다.
+        </p>
+      </div>
+      <div class="store-shell">
+        <article class="store-media">
+          <img src="../../Assets/_Project/Art/Encounters/evt_f01_jar_room_bg.png" alt="항아리 방 이벤트 배경" />
+        </article>
+        <aside class="store-panel" aria-label="게임 핵심 요약">
+          <h3>죽어도 탑은 당신을 기억한다</h3>
+          <p>
+            플레이어는 한 손으로 짧은 런을 반복하며, 전투·휴식·상점·이벤트 사이에서 다음 위험을 고릅니다.
+            선택은 단순 점수가 아니라 HP, 보상, 기억, 동행자의 반응으로 즉시 돌아옵니다.
+          </p>
+          <ul class="hook-list">
+            <li>보이는 미래 노드와 되돌릴 수 없는 길 선택</li>
+            <li>마타이오스가 함께 행동하는 2인 파티 전투</li>
+            <li>33개 이벤트 화면과 138개 선택지 기반 조우 파이프라인</li>
+            <li>AI 훈련을 런타임 기능이 아닌 전투 설계 검증 도구로 활용</li>
+          </ul>
+          <a class="button primary" href="#features">시스템 구현 기획 보기</a>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="section-head">
+        <h2>5분 안에 가르치고, 시험하고, 비트는 플레이 루프</h2>
+        <p class="lead">
+          기획 포트폴리오 기준에 맞춰 재미를 "패턴 학습과 흥미로운 선택"으로 설명할 수 있게 재구성했습니다.
+          한 런은 부담 없이 시작하지만, 지도 선택과 전투 판단이 누적되며 다음 피크를 기대하게 만드는 구조를 목표로 합니다.
+        </p>
+      </div>
+      <div class="loop-grid">
+        <article class="loop-card">
+          <strong>01 Teach</strong>
+          <h3>보이는 길</h3>
+          <p>미래 노드 타입을 먼저 보여주고, 선택 가능한 길만 밝게 표시해 루트 규칙을 자연스럽게 학습시킵니다.</p>
+        </article>
+        <article class="loop-card">
+          <strong>02 Test</strong>
+          <h3>선택의 비용</h3>
+          <p>이벤트 선택지는 HP, Gold, 보상, 기억 반응으로 즉시 결과를 돌려주며, 추상 점수만 쌓고 끝내지 않습니다.</p>
+        </article>
+        <article class="loop-card">
+          <strong>03 Twist</strong>
+          <h3>전투 판단</h3>
+          <p>공격만 누르는 흐름을 줄이기 위해 중압, 빈틈, 정찰, 방어 cue를 노출하고 행동별 예상값을 보여줍니다.</p>
+        </article>
+        <article class="loop-card">
+          <strong>04 Reward</strong>
+          <h3>회복과 상실</h3>
+          <p>보스 보상, 성장 선택, 마타이오스의 기억 반응이 다음 런의 기대를 만들지만, 회복은 항상 붕괴와 맞물립니다.</p>
+        </article>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <strong>33</strong>
+          <span>event presentation slots integrated</span>
+        </div>
+        <div class="stat">
+          <strong>138</strong>
+          <span>choice rows validated in event pipeline</span>
+        </div>
+        <div class="stat">
+          <strong>112 MB</strong>
+          <span>recent Android APK candidate size</span>
+        </div>
+        <div class="stat">
+          <strong>0</strong>
+          <span>runtime ONNX/RL integration in shipped prototype</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="media">
+      <div class="section-head">
+        <h2>Media &amp; Gameplay Proof</h2>
+        <p class="lead">
+          현재 페이지는 실제 게임 프로젝트에 포함된 에셋만 사용합니다. 스토어 페이지처럼 게임의 장면, 동행자, 적, 이벤트 분위기를 먼저 보여주고,
+          이어서 GPT visual pass와 실제 Unity 프로토타입 캡처를 분리해 보여줍니다.
+        </p>
+      </div>
+      <div class="media-grid">
+        <article class="media-card tall">
+          <figure>
+            <img src="../../Assets/_Project/Art/Encounters/evt_f05_cradle_of_outer_gods_bg.png" alt="탑의 후반 이벤트 배경" />
+            <figcaption class="caption">
+              <b>이벤트 중심의 탑 탐험</b>
+              <span>층별 조우는 전투만 반복하지 않고, 위험한 선택과 기억 단서를 섞어 런의 리듬을 만듭니다.</span>
+            </figcaption>
+          </figure>
+        </article>
+        <div class="media-stack">
+          <article class="media-card">
+            <figure>
+              <img src="../../Assets/_Project/Art/Characters/char_mataios_portrait_01.png" alt="동행자 마타이오스 초상" />
+              <figcaption class="caption">
+                <b>마타이오스는 UI 장식이 아니라 전투 actor</b>
+                <span>플레이어 행동 뒤에 보호, 지원, 마무리 판단을 수행하는 deterministic companion brain으로 설계했습니다.</span>
+              </figcaption>
+            </figure>
+          </article>
+          <article class="media-card">
+            <figure>
+              <img src="../../Assets/_Project/Art/Enemies/enemy_boss_apex_02.png" alt="보스 적 이미지" />
+              <figcaption class="caption">
+                <b>보스전은 긴장감과 피드백 중심으로 조정</b>
+                <span>체력, 처치 지연, 보상 팝업, 피해 분리 표시를 반복 수정하며 전투 결과의 체감을 올렸습니다.</span>
+              </figcaption>
+            </figure>
+          </article>
+        </div>
+      </div>
+      <div class="capture-block" aria-label="실제 프로토타입 플레이 화면">
+        <div class="capture-head">
+          <h3>Target visual pass</h3>
+          <p>
+            기존 캡처는 구현 증거로는 의미가 있지만, 소비자용 첫인상으로는 조잡했습니다.
+            아래 3장은 GPT로 1차 가공한 목표 화면입니다. 실제 게임에 반영하려면 이 비주얼을 배경, 캐릭터, UI 프레임, 버튼, 카드 레이어로 나눠 Unity 화면에 물려야 합니다.
+          </p>
+        </div>
+        <div class="capture-grid target-grid">
+          <article class="capture-card">
+            <img src="assets/hwigi_target_combat_visual_01.jpg" alt="전투 목표 비주얼 화면" />
+            <div class="caption">
+              <b>Combat target</b>
+              <span>플레이어 피해와 마타이오스 지원 피해가 분리되고, 세로 화면 하단에 전투 command가 명확히 배치된 목표 화면.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_target_route_visual_01.jpg" alt="지도와 이벤트 목표 비주얼 화면" />
+            <div class="caption">
+              <b>Route target</b>
+              <span>희소한 탑 루트, 선택 가능한 노드 glow, 이벤트 선택 패널을 한 화면에서 읽히게 하는 목표 화면.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_target_growth_visual_01.jpg" alt="성장과 인벤토리 목표 비주얼 화면" />
+            <div class="caption">
+              <b>Growth target</b>
+              <span>아이템, command slot, 단련 선택을 플레이어가 한눈에 이해할 수 있게 묶은 성장/인벤토리 목표 화면.</span>
+            </div>
+          </article>
+        </div>
+        <div class="capture-head">
+          <h3>Implementation remaster pass</h3>
+          <p>
+            원본 Unity 캡처의 기능 증거는 유지하되, 대외 포트폴리오용 화면 품질은 GPT 리마스터로 먼저 끌어올립니다.
+            여기서 끝내지 않고, UI/Asset 세션이 이 컨셉을 실제 Unity 레이어로 분해해 런타임 캡처로 바꾸는 제작 기술을 도입합니다.
+          </p>
+        </div>
+        <div class="capture-grid">
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_combat_01.jpg" alt="전투 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Combat remaster</b>
+              <span>전투 로그, 피해 분리, 마타이오스 지원, command button hierarchy를 포트폴리오용 화면 품질로 재정리한 목표입니다.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_shop_01.jpg" alt="상점 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Shop remaster</b>
+              <span>상점은 자원 선택과 아이템 효과를 한 번에 읽히게 하고, 동행자 반응을 하단 패널에 붙이는 방향입니다.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_memory_01.jpg" alt="기억 이벤트 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Memory remaster</b>
+              <span>기억 이벤트는 raw ref가 아니라 consequence feedback과 보상 row가 중심이 되도록 화면 언어를 정리합니다.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="assets/hwigi_impl_remaster_encounter_01.jpg" alt="전투 조우 구현 리마스터 목표 화면" />
+            <div class="caption">
+              <b>Encounter remaster</b>
+              <span>전투 진입 전 위협, 보상, 마타이오스 지원 가능 여부를 먼저 읽게 하는 조우 presentation 목표입니다.</span>
+            </div>
+          </article>
+        </div>
+        <div class="proof-flow" aria-label="컨셉 이미지를 런타임 캡처로 바꾸는 작업 흐름">
+          <div class="proof-step">
+            <strong>01 Source capture</strong>
+            <span>조잡하지만 실제 동작한 Unity prototype capture를 문제 증거로 보존합니다.</span>
+          </div>
+          <div class="proof-step">
+            <strong>02 GPT remaster</strong>
+            <span>GPT visual pass로 소비자용 화면 품질과 정보 계층의 목표를 빠르게 만듭니다.</span>
+          </div>
+          <div class="proof-step">
+            <strong>03 Layer split</strong>
+            <span>UI/Asset 세션이 배경, 카드, 버튼, 아이콘, 폰트, 데미지 숫자를 Unity 레이어로 분해합니다.</span>
+          </div>
+          <div class="proof-step">
+            <strong>04 Runtime capture</strong>
+            <span>게임 안에 반영한 뒤 Android/Editor 런타임에서 다시 캡처해 최종 proof로 교체합니다.</span>
+          </div>
+        </div>
+        <div class="capture-head">
+          <h3>Source implementation captures</h3>
+          <p>
+            아래는 repo에 보존된 실제 Unity 프로토타입 화면입니다.
+            현재 보유한 에셋을 토대로 시스템을 완성하고, 기능을 구현한 후 UI를 디벨롭합니다.
+          </p>
+        </div>
+        <div class="capture-grid">
+          <article class="capture-card">
+            <img src="../Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_19_active_combat_polish.png" alt="프로토타입 전투 화면 캡처" />
+            <div class="caption">
+              <b>Combat proof</b>
+              <span>적, HP bar, 플레이어/마타이오스 카드, action buttons가 한 화면에 들어오는 모바일 세로 전투 구조.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="../Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_16_shop_polish.png" alt="프로토타입 상점 화면 캡처" />
+            <div class="caption">
+              <b>Shop proof</b>
+              <span>짧은 런 중간에 자원 선택을 끼워 넣는 상점/보급 화면. 전투만 반복하지 않는 리듬 설계 증거.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="../Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_17_memory_cutscene_polish.png" alt="프로토타입 기억 이벤트 화면 캡처" />
+            <div class="caption">
+              <b>Memory proof</b>
+              <span>메모리/이벤트는 단순 텍스트 로그가 아니라 배경, 컷신 레이어, 결과 피드백으로 분리해 보여줍니다.</span>
+            </div>
+          </article>
+          <article class="capture-card">
+            <img src="../Outsource/Juho/W2DemoReadiness/screenshots/prototype_room_1080x1920_18_combatgate_cutscene_polish.png" alt="프로토타입 전투 진입 화면 캡처" />
+            <div class="caption">
+              <b>Encounter proof</b>
+              <span>전투 진입 전 presentation layer와 실제 전투 UI를 연결하는 화면. 조우 파이프라인이 화면으로 드러납니다.</span>
+            </div>
+          </article>
+        </div>
+        <p class="capture-note">
+          Note: 최종적으로는 Target visual pass를 게임 에셋/UI 레이어로 반영한 뒤, 런타임에서 다시 캡처한 화면으로 교체하는 것이 가장 안전합니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="mataios">
+      <div class="section-head">
+        <h2>Mataios, the Companion Concept</h2>
+        <p class="lead">
+          마타이오스는 "AI 기능"을 전면에 세운 기술 데모가 아니라, 플레이어 옆에서 싸우고 선택을 기억하는 동행자입니다.
+          강화학습 실험은 본편 runtime에 붙인 것이 아니라, 전투 허점을 찾고 동행자 규칙을 더 선명하게 만드는 설계 도구로 사용했습니다.
+        </p>
+      </div>
+      <div class="companion-grid">
+        <article class="companion-art">
+          <img src="../../Assets/_Project/Art/Characters/char_mataios_portrait_01.png" alt="동행자 마타이오스" />
+          <div class="companion-copy">
+            <h3>마타이오스는 캐릭터다. 모델 자랑이 아니다.</h3>
+            <p>
+              전투에서는 보호, 지원, 마무리 판단을 수행하고, 이벤트에서는 플레이어의 선택을 기억합니다.
+              플레이어는 마타이오스가 실제로 옆에서 싸우고 반응한다는 감각을 받아야 합니다.
+            </p>
+          </div>
+        </article>
+        <div class="companion-panel">
+          <article class="build-card">
+            <h3>AI training as combat design probe</h3>
+            <dl>
+              <div>
+                <dt>Problem</dt>
+                <dd>초기 전투는 AttackSpam / SkillSpam 같은 지배 전략이 생기기 쉬웠고, 마타이오스의 존재감도 UI 장식처럼 보였습니다.</dd>
+              </div>
+              <div>
+                <dt>Probe</dt>
+                <dd>ML-Agents 실험은 shipped AI가 아니라 전투 설계 실험장입니다. reward, defend payoff, skill gate를 바꿔 degenerate strategy를 드러냈습니다.</dd>
+              </div>
+              <div>
+                <dt>Finding</dt>
+                <dd>Exp04에서 PPO가 spam baseline을 명확히 넘었지만, ContextPolicy가 더 안정적이었습니다. 그래서 ONNX 연결이 아니라 사람이 읽을 수 있는 deterministic rule로 환원했습니다.</dd>
+              </div>
+              <div>
+                <dt>Runtime</dt>
+                <dd>본편 마타이오스는 runtime RL/ONNX가 아닙니다. `MataiosCombatBrain`은 명시 규칙으로 보호, 지원, 마무리, 안정화 행동을 결정합니다.</dd>
+              </div>
+            </dl>
+          </article>
+          <div class="metric-grid" aria-label="AI training evidence metrics">
+            <div class="metric-card">
+              <strong>+0.318974</strong>
+              <span>Exp04 spam policy gap</span>
+            </div>
+            <div class="metric-card">
+              <strong>0.269650</strong>
+              <span>PPO defend action share</span>
+            </div>
+            <div class="metric-card">
+              <strong>2.101917</strong>
+              <span>deterministic ContextPolicy reward</span>
+            </div>
+          </div>
+          <article class="card">
+            <span class="kicker">Portfolio framing</span>
+            <h3>강화학습을 검은 상자 기능이 아니라 설계 검증 장치로 사용</h3>
+            <p>
+              이 프로젝트의 AI 강점은 학습 모델 과시가 아닙니다.
+              AI 실험으로 전투 규칙의 빈틈을 찾고, 그 결과를 플레이어가 이해할 수 있는 동행자 행동 규칙과 UI 피드백으로 바꾼 점입니다.
+            </p>
+            <p>
+              별도 케이스 스터디에서는 마타이오스 대화를 위해 EXAONE 3.5 2.4B, QLoRA, FastAPI, Unity를 연결한 AI NPC 훈련 과정을 정리했습니다.
+              전투 RL과 대화 모델 파인튜닝을 섞어 과장하지 않고, 각각의 목적과 검증 지표를 분리해 보여줍니다.
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="portfolio_ai_npc.html">AI NPC 훈련 케이스 보기</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="section-head">
+        <h2>Content &amp; System Design</h2>
+        <p class="lead">
+          포트폴리오의 핵심은 "좋아 보이는 아이디어"가 아니라, 제약 안에서 시스템을 구현 가능한 단위로 쪼갠 흔적입니다.
+          아래 항목은 기획 의도, 플레이어 경험, 데이터 구조, UI 피드백이 어떻게 연결되는지 보여줍니다.
+        </p>
+      </div>
+      <div class="feature-grid">
+        <article class="card">
+          <span class="kicker">Route</span>
+          <h3>희소한 3-lane 지도와 되돌릴 수 없는 노드 선택</h3>
+          <p>
+            매 층은 전투, 이벤트, 휴식, 상점, 보스까지 이어지는 짧은 루트로 구성됩니다.
+            미래 노드는 타입을 보여주되 비활성화해, 플레이어가 위험과 보상을 미리 보고 고르게 만듭니다.
+          </p>
+        </article>
+        <article class="card">
+          <span class="kicker">Combat</span>
+          <h3>버튼 연타가 아니라 판단 cue가 있는 전투</h3>
+          <p>
+            공격, 방어, 스킬은 예상 피해와 방어 가치, 쿨타임을 보여줍니다.
+            최근 작업에서는 중압 방어, 빈틈 스킬, 정찰 공격 같은 판단 라인을 추가해 다음 행동을 읽기 쉽게 만들었습니다.
+          </p>
+        </article>
+        <article class="card">
+          <span class="kicker">Companion</span>
+          <h3>동행자가 전투에 참여하는 감각</h3>
+          <p>
+            마타이오스의 피해와 플레이어 피해를 합치지 않고 분리 표시합니다.
+            플레이어가 싸우는 동안 동행자가 보호하거나 지원하는지 로그와 UI에서 확인할 수 있게 했습니다.
+          </p>
+        </article>
+        <article class="card">
+          <span class="kicker">Events</span>
+          <h3>33개 이벤트 화면과 138개 선택지 파이프라인</h3>
+          <p>
+            이벤트는 배경, 선택지, 결과, 보상, 기억 반응을 데이터로 연결합니다.
+            raw label 노출, 누락 배경, 미지원 효과 같은 문제를 정적 검증과 핫픽스로 반복 제거했습니다.
+          </p>
+        </article>
+        <article class="card">
+          <span class="kicker">Growth</span>
+          <h3>레벨업 보상, 스킬 정리, 5 command slots</h3>
+          <p>
+            정찰은 즉시 큰 피해가 아니라 다음 공격 강화와 1회 피해 감소로 조정했습니다.
+            공격/방어 기본 장착, 액티브 스킬 교체, 단련 보상으로 성장 표면을 만들었습니다.
+          </p>
+        </article>
+        <article class="card">
+          <span class="kicker">Feedback</span>
+          <h3>피해 숫자, 흔들림, 처치 지연, 보스 보상 팝업</h3>
+          <p>
+            유저 피드백을 받아 전투 시작 버튼을 제거하고, 전투 진입 암전, 피격 흔들림, 격파 표시,
+            보스 보상 팝업을 추가했습니다. 결과는 즉시 사라지지 않고 약 2초간 처치 피드백을 먼저 보여줍니다.
+          </p>
+        </article>
+      </div>
+      <div class="design-grid">
+        <article class="design-card">
+          <strong>Intent</strong>
+          <h3>왜 이 방향인가</h3>
+          <p>회복, 붕괴, 망각이라는 주제를 플레이 규칙에 묶었습니다. 회복만 주는 보상은 피하고, 선택이 다음 위험과 동행자 반응으로 이어지게 설계했습니다.</p>
+        </article>
+        <article class="design-card">
+          <strong>Target</strong>
+          <h3>5분 런 + 누적 회차</h3>
+          <p>짧은 세션에서는 즉각 보상과 명확한 피드백을 주고, 누적 회차에서는 기억·도덕 선택·동행자 변화로 무게를 쌓는 구조입니다.</p>
+        </article>
+        <article class="design-card">
+          <strong>UX</strong>
+          <h3>모바일 세로 화면 우선</h3>
+          <p>상단 HUD를 줄이고, 전투 판단 정보를 버튼 근처에 배치하고, 이벤트/결과/보상은 중심 영역에서 먼저 읽히게 반복 조정했습니다.</p>
+        </article>
+        <article class="design-card">
+          <strong>Data</strong>
+          <h3>콘텐츠 확장 가능한 조우 구조</h3>
+          <p>이벤트, 선택지, 보상, 기억 반응은 데이터와 resolver를 통해 연결합니다. 누락 ref, raw label, 미지원 효과는 validation 대상으로 관리했습니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="planning">
+      <div class="section-head">
+        <h2>System Planning View</h2>
+        <p class="lead">
+          실제 기획 포트폴리오 관점에서는 "무엇을 만들었다"보다 "어떤 플레이어 문제를 어떤 규칙과 UI로 해결했는가"가 중요합니다.
+          이 페이지는 구현물을 아래처럼 기획서 평가 언어로 다시 번역합니다.
+        </p>
+      </div>
+      <div class="system-table">
+        <article class="system-row">
+          <b>지도/루트</b>
+          <p>플레이어 문제: 선택지가 많아 보이지만 실제 의미가 흐려지는 dense map.</p>
+          <p>기획 해법: 3 sparse lanes, face-up future node, skipped route lock, node tap 즉시 commitment.</p>
+        </article>
+        <article class="system-row">
+          <b>전투</b>
+          <p>플레이어 문제: 공격 버튼만 반복해도 이기는 damage race.</p>
+          <p>기획 해법: 행동 preview, 판단 cue, 정찰 재정의, player/Mataios 피해 분리, 처치 후 2초 피드백.</p>
+        </article>
+        <article class="system-row">
+          <b>이벤트</b>
+          <p>플레이어 문제: 선택 결과가 늦거나 raw label처럼 보여 몰입이 끊기는 상태.</p>
+          <p>기획 해법: 33개 presentation slot, 138개 choice resolution, memory consequence feedback, raw label hide.</p>
+        </article>
+        <article class="system-row">
+          <b>동행자</b>
+          <p>플레이어 문제: NPC가 같이 있는지, 전투에 참여하는지 체감하기 어려운 상태.</p>
+          <p>기획 해법: deterministic companion brain, 보호/지원/마무리 역할, combat log attribution, no runtime RL marketing.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="quote-band">
+      <div class="quote-inner">
+        <blockquote>
+          "AI를 검은 상자 기능으로 붙인 것이 아니라, 반복 플레이의 허점을 찾고 전투 규칙을 고치는 설계 디버거로 사용했다."
+        </blockquote>
+      </div>
+    </div>
+
+    <section class="section" id="pipeline">
+      <div class="section-head">
+        <h2>AI-Assisted Production Strengths</h2>
+        <p class="lead">
+          이 포트폴리오에서 가장 강한 지점은 결과물 자체와 함께, 그 결과물이 만들어진 방식입니다.
+          세션 분리, clean worktree, CodeGraph preflight, evidence freeze, APK artifact gate를 사용해 "바이브코딩"을 검증 가능한 개발 파이프라인으로 바꾸려 했습니다.
+        </p>
+      </div>
+      <div class="split">
+        <div class="build-card">
+          <h3>Portfolio evidence</h3>
+          <dl>
+            <div>
+              <dt>AI QA</dt>
+              <dd>ML-Agents는 shipped runtime이 아니라 전투 설계 실험장으로 사용했습니다. Exp04에서 PPO가 spam baseline을 넘고, deterministic ContextPolicy가 더 안정적인 handoff 후보임을 확인했습니다.</dd>
+            </div>
+            <div>
+              <dt>Runtime</dt>
+              <dd>본편에는 ONNX/RL을 연결하지 않았습니다. 마타이오스는 규칙 기반 companion brain으로 처리해, 캐릭터 경험과 기술 검증을 분리했습니다.</dd>
+            </div>
+            <div>
+              <dt>Release</dt>
+              <dd>Android APK는 package, label, arm64 ABI, v2 signature, SHA-256을 함께 보고하는 방식으로 관리했습니다.</dd>
+            </div>
+            <div>
+              <dt>Risk</dt>
+              <dd>Unity Test Runner baseline issue, device smoke N/A, authored route regression 등은 통과로 포장하지 않고 별도 risk bucket으로 분리했습니다.</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="timeline">
+          <article class="timeline-item">
+            <strong>Design</strong>
+            <div>
+              <h3>지도, 전투, 동행자 역할을 결정 문서로 먼저 잠금</h3>
+              <p>D-034 route commitment, D-035 companion brain, D-036 combat preview, D-038 command cleanup처럼 구현 전 계약을 분리했습니다.</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <strong>Build</strong>
+            <div>
+              <h3>작은 배치로 구현하고 APK까지 반복 배포</h3>
+              <p>UI batch, combat fun rebuild, event integration, route/content hotfix를 작은 단위로 나누어 push와 APK artifact를 만들었습니다.</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <strong>Verify</strong>
+            <div>
+              <h3>Targeted tests와 사용자 smoke를 분리</h3>
+              <p>자동 테스트로 막을 수 있는 regressions와 실제 폰에서만 보이는 readability 문제를 구분해, 각각 다른 gate로 처리했습니다.</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <strong>Improve</strong>
+            <div>
+              <h3>피드백을 기능이 아니라 플레이 감각으로 번역</h3>
+              <p>"전투가 재미없다"는 피드백을 피해 분리, 처치 피드백, 보스 체력, 스킬 의미, 성장 UI, command slot으로 나눠 고쳤습니다.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="build">
+      <div class="section-head">
+        <h2>Current Build Facts</h2>
+        <p class="lead">
+          아래 정보는 현재 포트폴리오 페이지 작성 시점의 확인 가능한 빌드/문서 상태입니다.
+          "완성 출시"가 아니라, Android playable candidate와 개발 사례를 보여주는 포트폴리오 기준입니다.
+        </p>
+      </div>
+      <div class="split">
+        <div class="build-card">
+          <h3>Playable candidate</h3>
+          <dl>
+            <div>
+              <dt>Commit</dt>
+              <dd>7ac43be5ae9aab8f73832430aaf78ea68e0177d0</dd>
+            </div>
+            <div>
+              <dt>APK</dt>
+              <dd><a href="https://drive.google.com/drive/folders/1GSTXDCrkHHI-TVfRA-hYQs7hh3PtnTZG?usp=drive_link" target="_blank" rel="noopener noreferrer">Google Drive APK download folder</a></dd>
+            </div>
+            <div>
+              <dt>SHA-256</dt>
+              <dd>08ca2014c2f08bfeb06dcf8d28c46f97ece806be151efc735586fa195e95c932</dd>
+            </div>
+            <div>
+              <dt>Android</dt>
+              <dd>com.godju.hwigitower / 회귀자는 탑을 오른다 / arm64-v8a / APK Signature Scheme v2 verified</dd>
+            </div>
+          </dl>
+          <a class="button primary" href="https://drive.google.com/drive/folders/1GSTXDCrkHHI-TVfRA-hYQs7hh3PtnTZG?usp=drive_link" target="_blank" rel="noopener noreferrer">APK 다운로드</a>
+        </div>
+        <div class="risk-list">
+          <article class="card">
+            <span class="kicker">Status</span>
+            <h3>Prototype, not final release</h3>
+            <p>현재 목표는 상용 출시 페이지가 아니라, playable prototype과 기획/구현/검증 역량을 명확히 보여주는 대외 포트폴리오입니다.</p>
+          </article>
+          <article class="card">
+            <span class="kicker">Known Risk</span>
+            <h3>Unity baseline test issue</h3>
+            <p>일부 Unity Test Runner는 baseline package compile issue로 XML 결과를 만들지 못했습니다. Android build와 targeted 검증은 별도로 보고되었습니다.</p>
+          </article>
+          <article class="card">
+            <span class="kicker">Next</span>
+            <h3>Public capture pass</h3>
+            <p>스토어형 페이지에 붙일 실제 gameplay GIF/스크린샷은 별도 캡처 세션에서 전투, 이벤트, 지도, 성장 UI를 선별해야 합니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>회귀자는 탑을 오른다 / Hwigi Tower</span>
+      <span>Portfolio HTML generated from repo-local evidence and current prototype assets.</span>
+    </div>
+  </footer>
+
+  <script>
+    const progressBar = document.getElementById("progress-bar");
+    const navLinks = Array.from(document.querySelectorAll(".nav-links a"));
+    const sections = navLinks
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+
+    function updateProgress() {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const pct = Math.min(100, Math.max(0, (window.scrollY / maxScroll) * 100));
+      progressBar.style.width = `${pct}%`;
+
+      let activeId = "";
+      sections.forEach((section) => {
+        const top = section.getBoundingClientRect().top;
+        if (top <= 120) activeId = section.id;
+      });
+      navLinks.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${activeId}`);
+      });
+    }
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+  </script>
+</body>
+</html>
