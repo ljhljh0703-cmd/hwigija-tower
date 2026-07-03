@@ -32,6 +32,17 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-03 17:29 — AI NPC 포트폴리오 이미지 evidence 배치
+- **Phase**: Post-pause / Portfolio Closure
+- **Done**:
+  - `portfolio_ai_npc.html`에 마타이오스 character visual과 AI NPC 훈련 evidence 이미지를 배치
+  - 실패 기록, 해법, 아키텍처, 검증 결과 섹션에 모델 선택표/BPE bug/loss curve/평가표/BIW 차단 캡처를 연결
+  - `Docs/Portfolio/assets/ai-npc/` 아래 공개용 이미지 asset을 추가하고 local browser screenshot으로 hero/mobile/full-page 렌더를 확인
+- **Files**: 변경/추가 13개 (`Docs/Portfolio/portfolio_ai_npc.html`, `Docs/Portfolio/assets/ai-npc/*`, progress log)
+- **GDD impact**: 없음 — 포트폴리오 visual evidence 배치, 게임 런타임 변경 없음
+- **Next**: 타이포/카피 polish 전, public repo 재배포 후 실제 URL에서 이미지 로딩과 페이지 무게를 확인
+- **Agent**: Codex
+
 ### 2026-07-03 01:23 — Vertical Slice Case Study closure harness 추가
 - **Phase**: Post-pause / Portfolio Closure
 - **Done**:
