@@ -264,6 +264,8 @@
 
     .placeholder-shot {
       display: grid;
+      position: relative;
+      overflow: hidden;
       min-height: 330px;
       padding: 22px;
       align-content: end;
@@ -272,7 +274,19 @@
         repeating-linear-gradient(135deg, rgba(246, 240, 230, 0.035) 0 2px, transparent 2px 18px);
     }
 
+    .hero-character {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.72;
+      filter: saturate(0.92) contrast(1.05);
+    }
+
     .dialogue-box {
+      position: relative;
+      z-index: 1;
       border: 1px solid rgba(246, 240, 230, 0.16);
       border-radius: var(--radius);
       padding: 16px;
@@ -363,7 +377,19 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .evidence-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .card,
+    .evidence-card,
     .timeline-item,
     .arch-box,
     .table-card,
@@ -372,6 +398,55 @@
       border-radius: var(--radius);
       background: var(--panel);
       box-shadow: var(--shadow);
+    }
+
+    .evidence-card {
+      overflow: hidden;
+      background: rgba(9, 13, 16, 0.88);
+    }
+
+    .evidence-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      background: rgba(0, 0, 0, 0.28);
+    }
+
+    .evidence-card.contain img {
+      object-fit: contain;
+      padding: 12px;
+    }
+
+    .evidence-card.portrait img {
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .evidence-card.tall img {
+      aspect-ratio: 3 / 4;
+    }
+
+    .evidence-caption {
+      display: grid;
+      gap: 5px;
+      padding: 13px 14px 15px;
+      border-top: 1px solid rgba(246, 240, 230, 0.1);
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 760;
+      word-break: keep-all;
+    }
+
+    .evidence-caption strong {
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 920;
+    }
+
+    .evidence-caption span {
+      color: var(--muted);
     }
 
     .card,
@@ -699,6 +774,8 @@
       .section-head,
       .grid-2,
       .grid-3,
+      .evidence-grid,
+      .evidence-grid.three,
       .metric-grid,
       .arch {
         grid-template-columns: 1fr;
@@ -806,8 +883,14 @@
           <span class="tag">Korean NPC</span>
         </div>
       </div>
-      <aside class="hero-panel" aria-label="NPC dialogue placeholder">
+      <aside class="hero-panel" aria-label="마타이오스 AI NPC visual">
         <div class="placeholder-shot">
+          <img
+            class="hero-character"
+            src="assets/ai-npc/game_mataios_bust_s3_s4.png"
+            alt="마타이오스 후기 스토리 톤 버스트 이미지"
+            loading="eager"
+          />
           <div class="dialogue-box">
             <b>마타이오스는 호감도에 따라 말투가 달라진다</b>
             <p>
@@ -873,6 +956,22 @@
           </div>
         </article>
       </div>
+      <div class="evidence-grid">
+        <figure class="evidence-card portrait">
+          <img src="assets/ai-npc/game_mataios_fullbody.png" alt="마타이오스 전신 캐릭터 이미지" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>캐릭터 기준 이미지</strong>
+            <span>AI NPC case study가 다루는 대상은 추상 챗봇이 아니라, 게임 안 동행자 마타이오스입니다.</span>
+          </figcaption>
+        </figure>
+        <figure class="evidence-card contain tall">
+          <img src="assets/ai-npc/selected_contact_sheet.png" alt="AI NPC 훈련 증거 contact sheet" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>실험 증거 contact sheet</strong>
+            <span>모델 선택, 학습 파라미터, loss, 언어 유지율, 평가표를 한 번에 확인할 수 있게 묶었습니다.</span>
+          </figcaption>
+        </figure>
+      </div>
     </section>
 
     <section class="section fade" id="problem">
@@ -899,6 +998,22 @@
           <h3>캐릭터 제어</h3>
           <p>호감도, 스토리 단계, BIW 차단, 기억 반응을 동시에 제어해야 했습니다. 단순 챗봇이 아니라 게임 캐릭터여야 했습니다.</p>
         </article>
+      </div>
+      <div class="evidence-grid">
+        <figure class="evidence-card contain">
+          <img src="assets/ai-npc/selected_08_model_selection_table.png" alt="모델 선택 비교표" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>모델 선택 실패 기록</strong>
+            <span>HCX-SEED, Qwen2.5, EXAONE을 비교하며 실패 원인을 모델/언어 prior 기준으로 좁혔습니다.</span>
+          </figcaption>
+        </figure>
+        <figure class="evidence-card contain">
+          <img src="assets/ai-npc/selected_07_bpe_bug_result.png" alt="BPE 사일런트 실패 분석 캡처" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>BPE 사일런트 실패</strong>
+            <span>loss가 정상처럼 보여도 학습 토큰이 0개가 될 수 있음을 검증 셀로 확인한 증거입니다.</span>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
@@ -1030,6 +1145,22 @@
           <p style="margin-top: 14px;">한국어 유지율 기준입니다. 최종 검증은 5세트 26턴 테스트로 정리했습니다.</p>
         </article>
       </div>
+      <div class="evidence-grid">
+        <figure class="evidence-card contain">
+          <img src="assets/ai-npc/selected_03_loss_curve.png" alt="EXAONE QLoRA 학습 loss curve" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>훈련 진행 증거</strong>
+            <span>EXAONE 전환 후 QLoRA 학습이 실제로 수렴했는지 확인하기 위한 loss curve입니다.</span>
+          </figcaption>
+        </figure>
+        <figure class="evidence-card contain">
+          <img src="assets/ai-npc/selected_05_before_after_result.png" alt="Qwen과 EXAONE 전후 응답 비교" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>Before / After 응답 비교</strong>
+            <span>다국어 누출과 BIW 실패가 모델 전환 후 어떻게 줄었는지 보여주는 대표 비교입니다.</span>
+          </figcaption>
+        </figure>
+      </div>
     </section>
 
     <section class="section fade" id="architecture">
@@ -1066,6 +1197,13 @@ revision=8e6fc27</div>
           전투용 마타이오스 brain은 별도 deterministic rule로 구현되어 있습니다.
         </p>
       </div>
+      <figure class="evidence-card contain" style="margin-top: 14px;">
+        <img src="assets/ai-npc/selected_09_latency_result_card.png" alt="FastAPI 연동과 응답 지연 검토 카드" loading="lazy" />
+        <figcaption class="evidence-caption">
+          <strong>연동/지연 검토</strong>
+          <span>Unity가 HTTP 경계로 대화 요청을 보내는 구조에서 실험적으로 확인한 latency evidence입니다.</span>
+        </figcaption>
+      </figure>
     </section>
 
     <div class="quote-band">
@@ -1109,6 +1247,29 @@ revision=8e6fc27</div>
           <strong>2.4B</strong>
           <span>최종 모델 크기</span>
         </article>
+      </div>
+      <div class="evidence-grid three">
+        <figure class="evidence-card contain">
+          <img src="assets/ai-npc/selected_04_korean_retention_table.png" alt="한국어 유지율 검증표" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>한국어 유지율 검증</strong>
+            <span>최종 모델이 26턴 검증에서 한국어를 유지했는지 확인한 공개용 표입니다.</span>
+          </figcaption>
+        </figure>
+        <figure class="evidence-card contain">
+          <img src="assets/ai-npc/selected_06_eval20_table.png" alt="20문항 평가 결과표" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>평가셋 결과</strong>
+            <span>호감도, 세계관 차단, 기억 반응을 단일 지표가 아니라 테스트셋으로 확인했습니다.</span>
+          </figcaption>
+        </figure>
+        <figure class="evidence-card contain">
+          <img src="assets/ai-npc/selected_10_biw_blocking_result.png" alt="BIW 차단 테스트 결과" loading="lazy" />
+          <figcaption class="evidence-caption">
+            <strong>BIW 차단 증거</strong>
+            <span>게임 세계 밖 질문을 캐릭터 계약에 맞게 거부하는지 확인한 대표 결과입니다.</span>
+          </figcaption>
+        </figure>
       </div>
       <div class="grid-2" style="margin-top: 14px;">
         <article class="card">
