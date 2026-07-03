@@ -32,6 +32,18 @@ project: 회귀자는 탑을 오른다
 
 ## 진행 로그
 
+### 2026-07-03 17:36 — 게임 HTML 이력서 흡수용 Claude/Vault 공통 브리프 추가
+- **Phase**: Post-pause / Portfolio Closure
+- **Done**:
+  - Hwigi Tower 메인/AI NPC public HTML을 이력서에 붙이기 위한 공통 handoff 문서를 추가
+  - Claude 이력서 세션이 사용할 project card, resume bullet, claim boundary, public link registry를 정리
+  - Vault Claude가 Gate 후보로 흡수할 지식 범위와 흡수 금지 범위를 분리
+  - public main/AI NPC page HTTP 200과 AI NPC evidence caption 반영 상태를 확인
+- **Files**: 변경/추가 2개 (`Docs/Portfolio/HANDOFF_claude_vault_game_html_resume.md`, progress log)
+- **GDD impact**: 없음 — 이력서/포트폴리오 공유 브리프, 게임 런타임 변경 없음
+- **Next**: Claude 이력서 세션은 이 문서를 읽고 Hwigi Tower를 resume project card + JD별 bullet로 변환
+- **Agent**: Codex
+
 ### 2026-07-03 17:29 — AI NPC 포트폴리오 이미지 evidence 배치
 - **Phase**: Post-pause / Portfolio Closure
 - **Done**:
