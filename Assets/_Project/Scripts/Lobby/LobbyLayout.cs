@@ -18,34 +18,34 @@ namespace HwigiTower.Lobby
 
     public static class LobbyUiTokens
     {
-        public const string VoidBgHex = LobbyUiTokenContract.VoidBgHex;
-        public const string PanelBgHex = LobbyUiTokenContract.PanelBgHex;
-        public const string PanelBgAltHex = LobbyUiTokenContract.PanelBgAltHex;
-        public const string FrameHex = LobbyUiTokenContract.FrameHex;
-        public const string FrameHiHex = LobbyUiTokenContract.FrameHiHex;
-        public const string GoldHex = LobbyUiTokenContract.GoldHex;
-        public const string GoldDimHex = LobbyUiTokenContract.GoldDimHex;
-        public const string InkHex = LobbyUiTokenContract.InkHex;
-        public const string InkDimHex = LobbyUiTokenContract.InkDimHex;
-        public const string InkMuteHex = LobbyUiTokenContract.InkMuteHex;
+        public const string VoidBgHex = UiTokenContract.VoidBgHex;
+        public const string PanelBgHex = UiTokenContract.PanelBgHex;
+        public const string PanelBgAltHex = UiTokenContract.PanelBgAltHex;
+        public const string FrameHex = UiTokenContract.FrameHex;
+        public const string FrameHiHex = UiTokenContract.FrameHiHex;
+        public const string GoldHex = UiTokenContract.GoldHex;
+        public const string GoldDimHex = UiTokenContract.GoldDimHex;
+        public const string InkHex = UiTokenContract.InkHex;
+        public const string InkDimHex = UiTokenContract.InkDimHex;
+        public const string InkMuteHex = UiTokenContract.InkMuteHex;
 
-        public const int TitleFontSize = LobbyUiTokenContract.TitleFontSize;
-        public const int PrimaryFontSize = LobbyUiTokenContract.PrimaryFontSize;
-        public const int BodyFontSize = LobbyUiTokenContract.BodyFontSize;
-        public const int LabelFontSize = LobbyUiTokenContract.LabelFontSize;
-        public const int MicroFontSize = LobbyUiTokenContract.MicroFontSize;
-        public const float TitleLineHeight = LobbyUiTokenContract.TitleLineHeight;
-        public const float PrimaryLineHeight = LobbyUiTokenContract.PrimaryLineHeight;
-        public const float BodyLineHeight = LobbyUiTokenContract.BodyLineHeight;
-        public const float LabelLineHeight = LobbyUiTokenContract.LabelLineHeight;
-        public const float DisplayLetterSpacing = LobbyUiTokenContract.DisplayLetterSpacing;
-        public const float LabelLetterSpacing = LobbyUiTokenContract.LabelLetterSpacing;
-        public const int SpacingUnit = LobbyUiTokenContract.SpacingUnit;
-        public const int Gutter = LobbyUiTokenContract.Gutter;
-        public const int FrameBorderWidth = LobbyUiTokenContract.FrameBorderWidth;
-        public const int CornerSize = LobbyUiTokenContract.CornerSize;
-        public const int TapTargetMinPx = LobbyUiTokenContract.TapTargetMinPx;
-        public const float VignetteStrength = LobbyUiTokenContract.VignetteStrength;
+        public const int TitleFontSize = UiTokenContract.TitleFontSize;
+        public const int PrimaryFontSize = UiTokenContract.PrimaryFontSize;
+        public const int BodyFontSize = UiTokenContract.BodyFontSize;
+        public const int LabelFontSize = UiTokenContract.LabelFontSize;
+        public const int MicroFontSize = UiTokenContract.MicroFontSize;
+        public const float TitleLineHeight = UiTokenContract.TitleLineHeight;
+        public const float PrimaryLineHeight = UiTokenContract.PrimaryLineHeight;
+        public const float BodyLineHeight = UiTokenContract.BodyLineHeight;
+        public const float LabelLineHeight = UiTokenContract.LabelLineHeight;
+        public const float DisplayLetterSpacing = UiTokenContract.DisplayLetterSpacing;
+        public const float LabelLetterSpacing = UiTokenContract.LabelLetterSpacing;
+        public const int SpacingUnit = UiTokenContract.SpacingUnit;
+        public const int Gutter = UiTokenContract.Gutter;
+        public const int FrameBorderWidth = UiTokenContract.FrameBorderWidth;
+        public const int CornerSize = UiTokenContract.CornerSize;
+        public const int TapTargetMinPx = UiTokenContract.TapTargetMinPx;
+        public const float VignetteStrength = UiTokenContract.VignetteStrength;
 
         public static readonly Color VoidBg = Parse(VoidBgHex);
         public static readonly Color PanelBg = Parse(PanelBgHex);

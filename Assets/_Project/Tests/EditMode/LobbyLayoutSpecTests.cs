@@ -63,30 +63,30 @@ namespace HwigiTower.Tests.EditMode
         {
             var tokens = LoadTokenSpec();
 
-            Assert.AreEqual(tokens.color.voidBg, LobbyUiTokens.VoidBgHex);
-            Assert.AreEqual(tokens.color.panelBg, LobbyUiTokens.PanelBgHex);
-            Assert.AreEqual(tokens.color.panelBgAlt, LobbyUiTokens.PanelBgAltHex);
-            Assert.AreEqual(tokens.color.frame, LobbyUiTokens.FrameHex);
-            Assert.AreEqual(tokens.color.frameHi, LobbyUiTokens.FrameHiHex);
-            Assert.AreEqual(tokens.color.gold, LobbyUiTokens.GoldHex);
-            Assert.AreEqual(tokens.color.goldDim, LobbyUiTokens.GoldDimHex);
-            Assert.AreEqual(tokens.color.ink, LobbyUiTokens.InkHex);
-            Assert.AreEqual(tokens.color.inkDim, LobbyUiTokens.InkDimHex);
-            Assert.AreEqual(tokens.color.inkMute, LobbyUiTokens.InkMuteHex);
-            Assert.AreEqual(tokens.typeScale.title.size, LobbyUiTokens.TitleFontSize);
-            Assert.AreEqual(tokens.typeScale.primary.size, LobbyUiTokens.PrimaryFontSize);
-            Assert.AreEqual(tokens.typeScale.body.size, LobbyUiTokens.BodyFontSize);
-            Assert.AreEqual(tokens.typeScale.label.size, LobbyUiTokens.LabelFontSize);
-            Assert.AreEqual(tokens.typeScale.micro.size, LobbyUiTokens.MicroFontSize);
-            Assert.AreEqual(tokens.typeScale.title.lineHeight, LobbyUiTokens.TitleLineHeight, 0.0001f);
-            Assert.AreEqual(tokens.typeScale.primary.lineHeight, LobbyUiTokens.PrimaryLineHeight, 0.0001f);
-            Assert.AreEqual(tokens.typeScale.body.lineHeight, LobbyUiTokens.BodyLineHeight, 0.0001f);
-            Assert.AreEqual(tokens.typeScale.label.lineHeight, LobbyUiTokens.LabelLineHeight, 0.0001f);
-            Assert.AreEqual(tokens.spacing.unit, LobbyUiTokens.SpacingUnit);
-            Assert.AreEqual(tokens.spacing.gutter, LobbyUiTokens.Gutter);
-            Assert.AreEqual(tokens.frameStyle.border.widthPx, LobbyUiTokens.FrameBorderWidth);
-            Assert.AreEqual(tokens.frameStyle.corner.sizePx, LobbyUiTokens.CornerSize);
-            Assert.AreEqual(tokens.interaction.tapTargetMinPx, LobbyUiTokens.TapTargetMinPx);
+            Assert.AreEqual(tokens.color.voidBg, UiTokenContract.VoidBgHex);
+            Assert.AreEqual(tokens.color.panelBg, UiTokenContract.PanelBgHex);
+            Assert.AreEqual(tokens.color.panelBgAlt, UiTokenContract.PanelBgAltHex);
+            Assert.AreEqual(tokens.color.frame, UiTokenContract.FrameHex);
+            Assert.AreEqual(tokens.color.frameHi, UiTokenContract.FrameHiHex);
+            Assert.AreEqual(tokens.color.gold, UiTokenContract.GoldHex);
+            Assert.AreEqual(tokens.color.goldDim, UiTokenContract.GoldDimHex);
+            Assert.AreEqual(tokens.color.ink, UiTokenContract.InkHex);
+            Assert.AreEqual(tokens.color.inkDim, UiTokenContract.InkDimHex);
+            Assert.AreEqual(tokens.color.inkMute, UiTokenContract.InkMuteHex);
+            Assert.AreEqual(tokens.typeScale.title.size, UiTokenContract.TitleFontSize);
+            Assert.AreEqual(tokens.typeScale.primary.size, UiTokenContract.PrimaryFontSize);
+            Assert.AreEqual(tokens.typeScale.body.size, UiTokenContract.BodyFontSize);
+            Assert.AreEqual(tokens.typeScale.label.size, UiTokenContract.LabelFontSize);
+            Assert.AreEqual(tokens.typeScale.micro.size, UiTokenContract.MicroFontSize);
+            Assert.AreEqual(tokens.typeScale.title.lineHeight, UiTokenContract.TitleLineHeight, 0.0001f);
+            Assert.AreEqual(tokens.typeScale.primary.lineHeight, UiTokenContract.PrimaryLineHeight, 0.0001f);
+            Assert.AreEqual(tokens.typeScale.body.lineHeight, UiTokenContract.BodyLineHeight, 0.0001f);
+            Assert.AreEqual(tokens.typeScale.label.lineHeight, UiTokenContract.LabelLineHeight, 0.0001f);
+            Assert.AreEqual(tokens.spacing.unit, UiTokenContract.SpacingUnit);
+            Assert.AreEqual(tokens.spacing.gutter, UiTokenContract.Gutter);
+            Assert.AreEqual(tokens.frameStyle.border.widthPx, UiTokenContract.FrameBorderWidth);
+            Assert.AreEqual(tokens.frameStyle.corner.sizePx, UiTokenContract.CornerSize);
+            Assert.AreEqual(tokens.interaction.tapTargetMinPx, UiTokenContract.TapTargetMinPx);
         }
 
         [Test]
@@ -104,8 +104,10 @@ namespace HwigiTower.Tests.EditMode
         {
             var contract = File.ReadAllText("Assets/_Project/Scripts/Lobby/LobbyLayoutContract.cs");
             var adapter = File.ReadAllText("Assets/_Project/Scripts/Lobby/LobbyLayout.cs");
+            var combatContract = File.ReadAllText("Assets/_Project/Scripts/UI/CombatLayoutContract.cs");
 
             StringAssert.DoesNotContain("UnityEngine", contract);
+            StringAssert.DoesNotContain("UnityEngine", combatContract);
             StringAssert.Contains("Vector2", adapter);
             StringAssert.Contains("Color", adapter);
         }

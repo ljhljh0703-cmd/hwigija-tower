@@ -1,5 +1,6 @@
 using System.Text.Json;
 using HwigiTower.Lobby;
+using HwigiTower.UI;
 
 var outputPath = ReadArgument(args, "--output");
 if (string.IsNullOrWhiteSpace(outputPath))
@@ -8,14 +9,14 @@ if (string.IsNullOrWhiteSpace(outputPath))
     return 2;
 }
 
+var screen = ReadArgument(args, "--screen") ?? "lobby";
 var capturedAt = ReadArgument(args, "--captured-at") ??
     "origin/Proto@" + LobbyBuildInfo.SourceRevision + " static-contract (Unity 미실행)";
-var document = new LayoutDocument
+var document = screen switch
 {
-    Screen = "lobby",
-    CapturedAt = capturedAt,
-    Source = "LobbyLayoutContract.cs",
-    Slots = LobbyLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualSlot)
+    "lobby" => BuildLobbyDocument(capturedAt),
+    "combat" => BuildCombatDocument(capturedAt),
+    _ => throw new ArgumentException("Unsupported screen: " + screen)
 };
 
 var fullOutputPath = Path.GetFullPath(outputPath);
@@ -47,7 +48,29 @@ static string? ReadArgument(string[] commandLine, string name)
     return null;
 }
 
-static ActualSlot ToActualSlot(LobbySlot slot)
+static LayoutDocument BuildLobbyDocument(string capturedAt)
+{
+    return new LayoutDocument
+    {
+        Screen = "lobby",
+        CapturedAt = capturedAt,
+        Source = "LobbyLayoutContract.cs",
+        Slots = LobbyLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualLobbySlot)
+    };
+}
+
+static LayoutDocument BuildCombatDocument(string capturedAt)
+{
+    return new LayoutDocument
+    {
+        Screen = "combat",
+        CapturedAt = capturedAt,
+        Source = "CombatLayoutContract.cs",
+        Slots = CombatLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualCombatSlot)
+    };
+}
+
+static ActualSlot ToActualLobbySlot(LobbySlot slot)
 {
     return new ActualSlot
     {
@@ -61,17 +84,36 @@ static ActualSlot ToActualSlot(LobbySlot slot)
     };
 }
 
+static ActualSlot ToActualCombatSlot(CombatSlot slot)
+{
+    return new ActualSlot
+    {
+        X = slot.X,
+        Y = slot.Y,
+        W = slot.Width,
+        H = slot.Height,
+        FontSize = slot.FontSize,
+        Visible = true,
+        Layer = slot.Layer,
+        Type = slot.Type,
+        Label = slot.Label,
+        Color = slot.ColorToken,
+        Interactive = slot.Interactive,
+        FrameStyle = slot.HasFrame
+    };
+}
+
 static int ResolveFontSize(LobbySlot slot)
 {
     return slot.Key switch
     {
-        "titleMark" => LobbyUiTokenContract.TitleFontSize,
-        "primaryAction" => LobbyUiTokenContract.PrimaryFontSize,
-        "secondaryAction" => LobbyUiTokenContract.BodyFontSize,
-        "utilityRow" => LobbyUiTokenContract.MicroFontSize,
-        "buildStamp" => LobbyUiTokenContract.MicroFontSize,
+        "titleMark" => UiTokenContract.TitleFontSize,
+        "primaryAction" => UiTokenContract.PrimaryFontSize,
+        "secondaryAction" => UiTokenContract.BodyFontSize,
+        "utilityRow" => UiTokenContract.MicroFontSize,
+        "buildStamp" => UiTokenContract.MicroFontSize,
         "towerArt" => 0,
-        _ => LobbyUiTokenContract.LabelFontSize
+        _ => UiTokenContract.LabelFontSize
     };
 }
 
@@ -92,4 +134,9 @@ internal sealed class ActualSlot
     public int FontSize { get; init; }
     public bool Visible { get; init; }
     public string Layer { get; init; } = string.Empty;
+    public string Type { get; init; } = string.Empty;
+    public string Label { get; init; } = string.Empty;
+    public string Color { get; init; } = string.Empty;
+    public bool Interactive { get; init; }
+    public bool FrameStyle { get; init; }
 }

@@ -111,7 +111,7 @@ namespace HwigiTower.Lobby
         }
     }
 
-    public static class LobbyUiTokenContract
+    public static class UiTokenContract
     {
         public const string VoidBgHex = "#0B0907";
         public const string PanelBgHex = "#17120D";
