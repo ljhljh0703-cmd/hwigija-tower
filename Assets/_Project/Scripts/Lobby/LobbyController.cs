@@ -12,6 +12,15 @@ namespace HwigiTower.Lobby
     [DefaultExecutionOrder(-10000)]
     public sealed class LobbyController : MonoBehaviour
     {
+        private enum LobbyTextStyle
+        {
+            Title,
+            Primary,
+            Body,
+            Label,
+            Micro
+        }
+
         [SerializeField] private string newGameSceneName = "PrototypeRoom";
         [SerializeField] private AudioCueCatalog audioCueCatalog;
         [SerializeField] private LobbyPresentationData presentationData;
@@ -20,10 +29,13 @@ namespace HwigiTower.Lobby
         private const string LobbyTitleName = "Lobby Title";
         private const string LobbyNewGameButtonName = "Lobby New Game Button";
         private const string LobbyContinueButtonName = "Lobby Continue Button";
+        private const string LobbyRecordButtonName = "Lobby Record Button";
         private const string LobbySettingsButtonName = "Lobby Settings Button";
+        private const string LobbyQuitButtonName = "Lobby Quit Button";
+        private const string LobbyLayoutRevisionName = "Lobby Layout Revision v1.1";
 
         private GameObject _settingsPanel;
-        private GameObject _profilePanel;
+        private GameObject _recordPanel;
         private Text _statusText;
         private Button _continueButton;
         private RectTransform _safeAreaRoot;
@@ -32,7 +44,8 @@ namespace HwigiTower.Lobby
 
         public string NewGameSceneName => string.IsNullOrEmpty(newGameSceneName) ? "PrototypeRoom" : newGameSceneName;
         public bool SettingsPanelVisible => _settingsPanel != null && _settingsPanel.activeSelf;
-        public bool ProfilePanelVisible => _profilePanel != null && _profilePanel.activeSelf;
+        public bool RecordPanelVisible => _recordPanel != null && _recordPanel.activeSelf;
+        public bool ProfilePanelVisible => RecordPanelVisible;
         public string ContinueDisabledReason => "저장된 진행 없음";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -103,7 +116,7 @@ namespace HwigiTower.Lobby
             _uiBuilt = false;
             _safeAreaRoot = null;
             _settingsPanel = null;
-            _profilePanel = null;
+            _recordPanel = null;
             _statusText = null;
             _continueButton = null;
             _audioStarted = false;
@@ -132,11 +145,14 @@ namespace HwigiTower.Lobby
 
         private bool IsRuntimeUiPresent()
         {
-            return transform.Find(LobbyCanvasName) != null
-                && GameObject.Find(LobbyTitleName) != null
-                && GameObject.Find(LobbyNewGameButtonName) != null
-                && GameObject.Find(LobbyContinueButtonName) != null
-                && GameObject.Find(LobbySettingsButtonName) != null;
+            return transform.Find(LobbyCanvasName) != null &&
+                GameObject.Find(LobbyTitleName) != null &&
+                GameObject.Find(LobbyNewGameButtonName) != null &&
+                GameObject.Find(LobbyContinueButtonName) != null &&
+                GameObject.Find(LobbyRecordButtonName) != null &&
+                GameObject.Find(LobbySettingsButtonName) != null &&
+                GameObject.Find(LobbyQuitButtonName) != null &&
+                FindChildTransform(transform, LobbyLayoutRevisionName) != null;
         }
 
         private void HidePartialRuntimeUi()
@@ -145,11 +161,12 @@ namespace HwigiTower.Lobby
             if (existing != null)
             {
                 existing.gameObject.SetActive(false);
+                existing.name = "Lobby Obsolete Runtime UI";
             }
 
             _safeAreaRoot = null;
             _settingsPanel = null;
-            _profilePanel = null;
+            _recordPanel = null;
             _statusText = null;
             _continueButton = null;
             _uiBuilt = false;
@@ -178,28 +195,35 @@ namespace HwigiTower.Lobby
         public void ShowContinuePlaceholder()
         {
             PlayUiSfx(PrototypeAudioContext.UiDisabled);
-            if (_statusText != null)
+            ConfigureContinueButton();
+        }
+
+        public void OpenRecord()
+        {
+            PlayUiSfx(PrototypeAudioContext.UiTap);
+            if (_recordPanel != null)
             {
-                _statusText.text = ContinueDisabledReason;
+                _recordPanel.SetActive(true);
+            }
+        }
+
+        public void CloseRecord()
+        {
+            PlayUiSfx(PrototypeAudioContext.UiTap);
+            if (_recordPanel != null)
+            {
+                _recordPanel.SetActive(false);
             }
         }
 
         public void OpenProfile()
         {
-            PlayUiSfx(PrototypeAudioContext.UiTap);
-            if (_profilePanel != null)
-            {
-                _profilePanel.SetActive(true);
-            }
+            OpenRecord();
         }
 
         public void CloseProfile()
         {
-            PlayUiSfx(PrototypeAudioContext.UiTap);
-            if (_profilePanel != null)
-            {
-                _profilePanel.SetActive(false);
-            }
+            CloseRecord();
         }
 
         public void OpenSettings()
@@ -267,16 +291,20 @@ namespace HwigiTower.Lobby
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = canvasObject.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1080f, 1920f);
+            scaler.referenceResolution = new Vector2(LobbyLayout.ReferenceWidth, LobbyLayout.ReferenceHeight);
             scaler.matchWidthOrHeight = 1f;
             canvasObject.AddComponent<GraphicRaycaster>();
 
+            var revision = new GameObject(LobbyLayoutRevisionName);
+            revision.transform.SetParent(canvasObject.transform, false);
+
             CreateSafeAreaRoot(canvasObject.transform);
             BuildBackground(canvasObject.transform, _safeAreaRoot.transform);
-            BuildProfileChip(_safeAreaRoot.transform);
+            BuildRunStatus(_safeAreaRoot.transform);
             BuildHero(_safeAreaRoot.transform);
-            BuildMenuColumn(_safeAreaRoot.transform);
-            BuildProfilePanel(_safeAreaRoot.transform);
+            BuildActionLayer(_safeAreaRoot.transform);
+            BuildBuildStamp(_safeAreaRoot.transform);
+            BuildRecordPanel(_safeAreaRoot.transform);
             BuildSettingsPanel(_safeAreaRoot.transform);
             BindRuntimeUi();
         }
@@ -290,24 +318,81 @@ namespace HwigiTower.Lobby
             _safeAreaRoot.anchorMin = new Vector2(0.5f, 0.5f);
             _safeAreaRoot.anchorMax = new Vector2(0.5f, 0.5f);
             _safeAreaRoot.pivot = new Vector2(0.5f, 0.5f);
-            _safeAreaRoot.sizeDelta = new Vector2(1080f, 1920f);
+            _safeAreaRoot.sizeDelta = new Vector2(LobbyLayout.ReferenceWidth, LobbyLayout.ReferenceHeight);
             _safeAreaRoot.anchoredPosition = Vector2.zero;
         }
 
-        private void BuildMenuColumn(Transform parent)
+        private void BuildBackground(Transform canvasParent, Transform portraitParent)
         {
-            _statusText = CreateText(parent, "Lobby Status", string.Empty, 28, new Vector2(0.14f, 0.52f), new Vector2(0.86f, 0.57f));
-            _statusText.alignment = TextAnchor.MiddleCenter;
+            var gutterObject = new GameObject("Lobby Landscape Gutter");
+            gutterObject.transform.SetParent(canvasParent, false);
+            StretchToParent(gutterObject.AddComponent<RectTransform>());
+            var gutter = gutterObject.AddComponent<Image>();
+            gutter.color = LobbyUiTokens.VoidBg;
+            gutter.raycastTarget = false;
+            gutterObject.transform.SetAsFirstSibling();
 
-            CreateButton(parent, "Lobby New Game Button", "새 게임", new Vector2(0.14f, 0.43f), new Vector2(0.86f, 0.50f), StartNewGame);
-            _continueButton = CreateButton(parent, "Lobby Continue Button", "이어 하기", new Vector2(0.14f, 0.34f), new Vector2(0.86f, 0.42f), ContinueSavedRun);
-            ConfigureContinueButton();
-            CreateButton(parent, "Lobby Profile Button", "프로필", new Vector2(0.14f, 0.26f), new Vector2(0.86f, 0.33f), OpenProfile);
-            CreateButton(parent, "Lobby Settings Button", "설정", new Vector2(0.14f, 0.18f), new Vector2(0.86f, 0.25f), OpenSettings);
-            if (ShouldShowQuitButton())
+            var backgroundObject = new GameObject("Lobby Background");
+            backgroundObject.transform.SetParent(portraitParent, false);
+            var backgroundRect = backgroundObject.AddComponent<RectTransform>();
+            ApplySlot(backgroundRect, LobbyLayout.TowerArt);
+            var background = backgroundObject.AddComponent<Image>();
+            background.raycastTarget = false;
+            if (presentationData != null && presentationData.BackgroundSprite != null)
             {
-                CreateButton(parent, "Lobby Quit Button", "종료", new Vector2(0.14f, 0.10f), new Vector2(0.86f, 0.17f), QuitOrShowPlaceholder);
+                background.sprite = presentationData.BackgroundSprite;
+                background.preserveAspect = false;
             }
+            else
+            {
+                background.color = LobbyUiTokens.VoidBg;
+            }
+
+            backgroundObject.transform.SetAsFirstSibling();
+
+            var overlayObject = new GameObject("Lobby Background Readability Overlay");
+            overlayObject.transform.SetParent(portraitParent, false);
+            var overlayRect = overlayObject.AddComponent<RectTransform>();
+            ApplySlot(overlayRect, LobbyLayout.TowerArt);
+            var overlay = overlayObject.AddComponent<Image>();
+            overlay.color = LobbyUiTokens.WithAlpha(LobbyUiTokens.VoidBg, LobbyUiTokens.VignetteStrength);
+            overlay.raycastTarget = false;
+            overlayObject.transform.SetSiblingIndex(1);
+        }
+
+        private void BuildRunStatus(Transform parent)
+        {
+            _statusText = CreateSlotText(parent, "Lobby Run Status", LobbyLayout.RunStatus, LobbyTextStyle.Label, LobbyUiTokens.InkDim);
+            _statusText.alignment = TextAnchor.MiddleCenter;
+        }
+
+        private void BuildHero(Transform parent)
+        {
+            var title = CreateSlotText(parent, LobbyTitleName, LobbyLayout.TitleMark, LobbyTextStyle.Title, LobbyUiTokens.Ink);
+            title.fontStyle = FontStyle.Bold;
+            AddTextShadow(title, LobbyUiTokens.WithAlpha(LobbyUiTokens.VoidBg, LobbyUiTokens.VignetteStrength));
+
+            var tagline = CreateSlotText(parent, "Lobby Tagline", LobbyLayout.Tagline, LobbyTextStyle.Label, LobbyUiTokens.InkDim);
+            AddTextShadow(tagline, LobbyUiTokens.WithAlpha(LobbyUiTokens.VoidBg, LobbyUiTokens.VignetteStrength));
+        }
+
+        private void BuildActionLayer(Transform parent)
+        {
+            CreateFramedButton(parent, LobbyNewGameButtonName, LobbyLayout.PrimaryAction, true, StartNewGame);
+            _continueButton = CreateFramedButton(parent, LobbyContinueButtonName, LobbyLayout.SecondaryAction, false, ContinueSavedRun);
+
+            var utilityRow = new GameObject("Lobby Utility Row");
+            utilityRow.transform.SetParent(parent, false);
+            ApplySlot(utilityRow.AddComponent<RectTransform>(), LobbyLayout.UtilityRow);
+            CreateUtilityButton(utilityRow.transform, LobbyRecordButtonName, "기록", 0, OpenRecord);
+            CreateUtilityButton(utilityRow.transform, LobbySettingsButtonName, "설정", 1, OpenSettings);
+            CreateUtilityButton(utilityRow.transform, LobbyQuitButtonName, "종료", 2, QuitOrShowPlaceholder);
+        }
+
+        private void BuildBuildStamp(Transform parent)
+        {
+            var stamp = CreateSlotText(parent, "Lobby Build Stamp", LobbyLayout.BuildStamp, LobbyTextStyle.Micro, LobbyUiTokens.InkMute);
+            stamp.text = Application.version + " · " + LobbyBuildInfo.SourceRevision;
         }
 
         private void ConfigureContinueButton()
@@ -319,223 +404,182 @@ namespace HwigiTower.Lobby
 
             if (PrototypeRunSaveStore.TryLoadSummary(out var summary))
             {
-                _continueButton.interactable = true;
-                SetButtonText(_continueButton, "이어 하기\n" + summary.DisplayText, 24);
+                SetButtonState(_continueButton, true, false);
+                SetButtonText(_continueButton, LobbyLayout.SecondaryAction.Content, LobbyTextStyle.Body);
                 if (_statusText != null)
                 {
-                    _statusText.text = summary.DisplayText;
+                    _statusText.text = "저장됨 · 최고 도달 층 " + summary.CurrentFloor + " · 기억 조각 " + summary.MemoryFragmentCount;
                 }
+
                 return;
             }
 
-            _continueButton.interactable = false;
-            SetButtonText(_continueButton, "이어 하기\n" + ContinueDisabledReason, 24);
-        }
-
-        private void BuildBackground(Transform canvasParent, Transform portraitParent)
-        {
-            var gutterObject = new GameObject("Lobby Landscape Gutter");
-            gutterObject.transform.SetParent(canvasParent, false);
-            var gutterRect = gutterObject.AddComponent<RectTransform>();
-            gutterRect.anchorMin = Vector2.zero;
-            gutterRect.anchorMax = Vector2.one;
-            gutterRect.offsetMin = Vector2.zero;
-            gutterRect.offsetMax = Vector2.zero;
-            var gutter = gutterObject.AddComponent<Image>();
-            gutter.color = new Color(0.012f, 0.016f, 0.022f, 1f);
-            gutter.raycastTarget = false;
-            gutterObject.transform.SetAsFirstSibling();
-
-            var backgroundObject = new GameObject("Lobby Background");
-            backgroundObject.transform.SetParent(portraitParent, false);
-            var rect = backgroundObject.AddComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            var image = backgroundObject.AddComponent<Image>();
-            if (presentationData != null && presentationData.BackgroundSprite != null)
+            SetButtonState(_continueButton, false, false);
+            SetButtonText(_continueButton, "이어서 오른다 · " + ContinueDisabledReason, LobbyTextStyle.Label);
+            if (_statusText != null)
             {
-                image.sprite = presentationData.BackgroundSprite;
-                image.preserveAspect = false;
-                image.color = Color.white;
+                _statusText.text = "저장 없음 · 최고 도달 층 - · 기억 조각 0";
             }
-            else
-            {
-                image.color = new Color(0.025f, 0.032f, 0.042f, 1f);
-            }
-            backgroundObject.transform.SetAsFirstSibling();
-
-            var overlayObject = new GameObject("Lobby Background Readability Overlay");
-            overlayObject.transform.SetParent(portraitParent, false);
-            var overlayRect = overlayObject.AddComponent<RectTransform>();
-            overlayRect.anchorMin = Vector2.zero;
-            overlayRect.anchorMax = Vector2.one;
-            overlayRect.offsetMin = Vector2.zero;
-            overlayRect.offsetMax = Vector2.zero;
-            var overlay = overlayObject.AddComponent<Image>();
-            overlay.color = new Color(0.0f, 0.0f, 0.0f, presentationData != null && presentationData.BackgroundSprite != null ? 0.36f : 0.0f);
-            overlay.raycastTarget = false;
-            overlayObject.transform.SetSiblingIndex(1);
-        }
-
-        private void BuildProfileChip(Transform parent)
-        {
-            var card = CreatePanel(parent, "Lobby Profile Chip", new Vector2(0.06f, 0.91f), new Vector2(0.42f, 0.965f), new Color(0.04f, 0.055f, 0.07f, 0.70f));
-            var icon = CreatePanel(card.transform, "Lobby Profile Icon Placeholder", new Vector2(0.05f, 0.18f), new Vector2(0.18f, 0.82f), new Color(0.17f, 0.20f, 0.22f, 1f));
-            CreateText(icon.transform, "Lobby Profile Icon Text", "P", 24, Vector2.zero, Vector2.one);
-            var name = presentationData != null ? presentationData.DefaultProfileName : "Player";
-            var profileName = CreateText(card.transform, "Lobby Profile Name", name, 22, new Vector2(0.22f, 0.14f), new Vector2(0.96f, 0.86f));
-            profileName.alignment = TextAnchor.MiddleLeft;
-        }
-
-        private void BuildHero(Transform parent)
-        {
-            var hasLogo = presentationData != null && presentationData.LogoSprite != null;
-            if (hasLogo)
-            {
-                var logoObject = new GameObject("Lobby Logo");
-                logoObject.transform.SetParent(parent, false);
-                var logoRect = logoObject.AddComponent<RectTransform>();
-                logoRect.anchorMin = new Vector2(0.20f, 0.69f);
-                logoRect.anchorMax = new Vector2(0.80f, 0.82f);
-                logoRect.offsetMin = Vector2.zero;
-                logoRect.offsetMax = Vector2.zero;
-                var logo = logoObject.AddComponent<Image>();
-                logo.sprite = presentationData.LogoSprite;
-                logo.preserveAspect = true;
-                logo.raycastTarget = false;
-            }
-
-            var titleValue = presentationData != null ? presentationData.TitleText : "회귀자는 탑을 오른다";
-            var title = CreateText(parent, LobbyTitleName, titleValue, hasLogo ? 42 : 66, hasLogo ? new Vector2(0.10f, 0.615f) : new Vector2(0.08f, 0.66f), hasLogo ? new Vector2(0.90f, 0.675f) : new Vector2(0.92f, 0.76f));
-            title.color = new Color(0.94f, 0.97f, 0.92f, 1f);
-            var subtitleValue = presentationData != null ? presentationData.SubtitleText : "Prototype";
-            var subtitle = CreateText(parent, "Lobby Subtitle", subtitleValue, 28, hasLogo ? new Vector2(0.14f, 0.57f) : new Vector2(0.14f, 0.61f), hasLogo ? new Vector2(0.86f, 0.605f) : new Vector2(0.86f, 0.65f));
-            subtitle.color = new Color(0.74f, 0.82f, 0.84f, 1f);
         }
 
         private void BuildSettingsPanel(Transform parent)
         {
-            _settingsPanel = new GameObject("Lobby Settings Panel");
-            _settingsPanel.transform.SetParent(parent, false);
-            var rect = _settingsPanel.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.10f, 0.30f);
-            rect.anchorMax = new Vector2(0.90f, 0.70f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            var image = _settingsPanel.AddComponent<Image>();
-            image.color = new Color(0.035f, 0.045f, 0.055f, 0.96f);
-
-            CreateText(_settingsPanel.transform, "Lobby Settings Title", "설정", 42, new Vector2(0.08f, 0.78f), new Vector2(0.92f, 0.92f));
-            CreateSlider(_settingsPanel.transform, "Lobby BGM Volume Slider", "BGM", 0.70f, new Vector2(0.12f, 0.60f), new Vector2(0.88f, 0.70f), value => PrototypeAudioService.GetOrCreate().SetBgmVolume(value));
-            CreateSlider(_settingsPanel.transform, "Lobby SFX Volume Slider", "SFX", 0.85f, new Vector2(0.12f, 0.44f), new Vector2(0.88f, 0.54f), value => PrototypeAudioService.GetOrCreate().SetSfxVolume(value));
-            CreateSlider(_settingsPanel.transform, "Lobby Text Speed Slider", "Text Speed", 0.60f, new Vector2(0.12f, 0.28f), new Vector2(0.88f, 0.38f), _ => { });
-            CreateButton(_settingsPanel.transform, "Lobby Settings Close Button", "닫기", new Vector2(0.30f, 0.08f), new Vector2(0.70f, 0.18f), CloseSettings);
+            _settingsPanel = CreateModalPanel(parent, "Lobby Settings Panel", 0.10f, 0.30f, 0.90f, 0.70f);
+            CreateLocalText(_settingsPanel.transform, "Lobby Settings Title", "설정", LobbyTextStyle.Primary, LobbyUiTokens.Ink, 0.08f, 0.78f, 0.92f, 0.92f);
+            CreateSlider(_settingsPanel.transform, "Lobby BGM Volume Slider", "BGM", 0.70f, 0.12f, 0.60f, 0.88f, 0.70f, value => PrototypeAudioService.GetOrCreate().SetBgmVolume(value));
+            CreateSlider(_settingsPanel.transform, "Lobby SFX Volume Slider", "SFX", 0.85f, 0.12f, 0.44f, 0.88f, 0.54f, value => PrototypeAudioService.GetOrCreate().SetSfxVolume(value));
+            CreateSlider(_settingsPanel.transform, "Lobby Text Speed Slider", "Text Speed", 0.60f, 0.12f, 0.28f, 0.88f, 0.38f, _ => { });
+            CreatePanelButton(_settingsPanel.transform, "Lobby Settings Close Button", "닫기", 0.30f, 0.08f, 0.70f, 0.18f, CloseSettings);
             _settingsPanel.SetActive(false);
         }
 
-        private void BuildProfilePanel(Transform parent)
+        private void BuildRecordPanel(Transform parent)
         {
-            _profilePanel = new GameObject("Lobby Profile Panel");
-            _profilePanel.transform.SetParent(parent, false);
-            var rect = _profilePanel.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.10f, 0.30f);
-            rect.anchorMax = new Vector2(0.90f, 0.68f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            var image = _profilePanel.AddComponent<Image>();
-            image.color = new Color(0.035f, 0.045f, 0.055f, 0.96f);
-
+            _recordPanel = CreateModalPanel(parent, "Lobby Record Panel", 0.10f, 0.30f, 0.90f, 0.68f);
             var name = presentationData != null ? presentationData.DefaultProfileName : "Player";
-            CreateText(_profilePanel.transform, "Lobby Profile Panel Title", "프로필", 42, new Vector2(0.08f, 0.78f), new Vector2(0.92f, 0.92f));
-            CreateText(_profilePanel.transform, "Lobby Profile Panel Name", name, 32, new Vector2(0.10f, 0.58f), new Vector2(0.90f, 0.70f));
-            CreateText(_profilePanel.transform, "Lobby Profile Runs Cleared", "클리어: 준비 중", 28, new Vector2(0.10f, 0.42f), new Vector2(0.90f, 0.54f));
-            CreateText(_profilePanel.transform, "Lobby Profile Memories", "기억: 준비 중", 28, new Vector2(0.10f, 0.28f), new Vector2(0.90f, 0.40f));
-            CreateButton(_profilePanel.transform, "Lobby Profile Close Button", "닫기", new Vector2(0.30f, 0.08f), new Vector2(0.70f, 0.20f), CloseProfile);
-            _profilePanel.SetActive(false);
+            CreateLocalText(_recordPanel.transform, "Lobby Record Panel Title", "기록", LobbyTextStyle.Primary, LobbyUiTokens.Ink, 0.08f, 0.78f, 0.92f, 0.92f);
+            CreateLocalText(_recordPanel.transform, "Lobby Record Player", name, LobbyTextStyle.Body, LobbyUiTokens.Ink, 0.10f, 0.58f, 0.90f, 0.70f);
+            CreateLocalText(_recordPanel.transform, "Lobby Record Runs Cleared", "클리어 기록: 준비 중", LobbyTextStyle.Label, LobbyUiTokens.InkDim, 0.10f, 0.42f, 0.90f, 0.54f);
+            CreateLocalText(_recordPanel.transform, "Lobby Record Memories", "기억 기록: 준비 중", LobbyTextStyle.Label, LobbyUiTokens.InkDim, 0.10f, 0.28f, 0.90f, 0.40f);
+            CreatePanelButton(_recordPanel.transform, "Lobby Record Close Button", "닫기", 0.30f, 0.08f, 0.70f, 0.20f, CloseRecord);
+            _recordPanel.SetActive(false);
         }
 
-        private static GameObject CreatePanel(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Color color)
+        private static GameObject CreateModalPanel(Transform parent, string name, float left, float bottom, float right, float top)
         {
             var panelObject = new GameObject(name);
             panelObject.transform.SetParent(parent, false);
             var rect = panelObject.AddComponent<RectTransform>();
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
+            ApplyAnchors(rect, left, bottom, right, top);
             var image = panelObject.AddComponent<Image>();
-            image.color = color;
+            image.color = LobbyUiTokens.PanelBg;
+            var outline = panelObject.AddComponent<Outline>();
+            outline.effectColor = LobbyUiTokens.FrameHi;
+            outline.effectDistance = new Vector2(LobbyUiTokens.FrameBorderWidth, -LobbyUiTokens.FrameBorderWidth);
             return panelObject;
         }
 
-        private static Text CreateText(Transform parent, string name, string value, int fontSize, Vector2 anchorMin, Vector2 anchorMax)
+        private static Text CreateSlotText(Transform parent, string name, LobbySlot slot, LobbyTextStyle style, Color color)
         {
             var textObject = new GameObject(name);
             textObject.transform.SetParent(parent, false);
             var rect = textObject.AddComponent<RectTransform>();
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            var text = textObject.AddComponent<Text>();
-            text.font = ResolveFont();
-            text.fontSize = fontSize;
-            text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = Mathf.Max(18, fontSize - 10);
-            text.resizeTextMaxSize = fontSize;
+            ApplySlot(rect, slot);
+            return ConfigureText(textObject.AddComponent<Text>(), slot.Content, style, color);
+        }
+
+        private static Text CreateLocalText(Transform parent, string name, string value, LobbyTextStyle style, Color color, float left, float bottom, float right, float top)
+        {
+            var textObject = new GameObject(name);
+            textObject.transform.SetParent(parent, false);
+            var rect = textObject.AddComponent<RectTransform>();
+            ApplyAnchors(rect, left, bottom, right, top);
+            return ConfigureText(textObject.AddComponent<Text>(), value, style, color);
+        }
+
+        private static Text ConfigureText(Text text, string value, LobbyTextStyle style, Color color)
+        {
+            text.font = LobbyUiTokens.ResolveRuntimeFont();
+            text.fontSize = ResolveFontSize(style);
+            text.lineSpacing = ResolveLineSpacing(style);
             text.alignment = TextAnchor.MiddleCenter;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Truncate;
-            text.color = new Color(0.88f, 0.93f, 0.95f, 1f);
+            text.color = color;
             text.text = value;
             return text;
         }
 
-        private static Button CreateButton(Transform parent, string name, string label, Vector2 anchorMin, Vector2 anchorMax, UnityEngine.Events.UnityAction action)
+        private static Button CreateFramedButton(Transform parent, string name, LobbySlot slot, bool primary, UnityEngine.Events.UnityAction action)
         {
             var buttonObject = new GameObject(name);
             buttonObject.transform.SetParent(parent, false);
             var rect = buttonObject.AddComponent<RectTransform>();
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
+            ApplySlot(rect, slot);
             var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.12f, 0.16f, 0.19f, 0.98f);
+            image.color = primary ? LobbyUiTokens.PanelBgAlt : LobbyUiTokens.PanelBg;
+            var outline = buttonObject.AddComponent<Outline>();
+            outline.effectColor = primary ? LobbyUiTokens.Gold : LobbyUiTokens.FrameHi;
+            outline.effectDistance = new Vector2(LobbyUiTokens.FrameBorderWidth, -LobbyUiTokens.FrameBorderWidth);
+
             var button = buttonObject.AddComponent<Button>();
             button.targetGraphic = image;
+            button.transition = Selectable.Transition.None;
             button.onClick.AddListener(action);
-            var text = CreateText(buttonObject.transform, name + " Text", label, 34, Vector2.zero, Vector2.one);
+
+            CreateFrameCorner(buttonObject.transform, "Top Left", new Vector2(0f, 1f), new Vector2(0f, 1f), primary ? LobbyUiTokens.Gold : LobbyUiTokens.FrameHi);
+            CreateFrameCorner(buttonObject.transform, "Top Right", new Vector2(1f, 1f), new Vector2(1f, 1f), primary ? LobbyUiTokens.Gold : LobbyUiTokens.FrameHi);
+            CreateFrameCorner(buttonObject.transform, "Bottom Left", new Vector2(0f, 0f), new Vector2(0f, 0f), primary ? LobbyUiTokens.Gold : LobbyUiTokens.FrameHi);
+            CreateFrameCorner(buttonObject.transform, "Bottom Right", new Vector2(1f, 0f), new Vector2(1f, 0f), primary ? LobbyUiTokens.Gold : LobbyUiTokens.FrameHi);
+
+            var text = CreateLocalText(buttonObject.transform, name + " Text", slot.Content, primary ? LobbyTextStyle.Primary : LobbyTextStyle.Body, LobbyUiTokens.Ink, 0f, 0f, 1f, 1f);
             text.raycastTarget = false;
             return button;
         }
 
-        private static void SetButtonText(Button button, string value, int fontSize)
+        private static void CreateFrameCorner(Transform parent, string name, Vector2 anchor, Vector2 pivot, Color color)
         {
-            var label = button.GetComponentInChildren<Text>();
-            if (label != null)
-            {
-                label.text = value;
-                label.fontSize = fontSize;
-                label.resizeTextMinSize = 18;
-                label.resizeTextMaxSize = fontSize;
-            }
+            var cornerObject = new GameObject("Lobby Frame Corner " + name);
+            cornerObject.transform.SetParent(parent, false);
+            var rect = cornerObject.AddComponent<RectTransform>();
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = pivot;
+            rect.sizeDelta = new Vector2(LobbyUiTokens.CornerSize, LobbyUiTokens.CornerSize);
+            var image = cornerObject.AddComponent<Image>();
+            image.color = color;
+            image.raycastTarget = false;
         }
 
-        private static void CreateSlider(Transform parent, string name, string label, float value, Vector2 anchorMin, Vector2 anchorMax, UnityEngine.Events.UnityAction<float> onChanged)
+        private static void CreateUtilityButton(Transform parent, string name, string label, int index, UnityEngine.Events.UnityAction action)
         {
-            CreateText(parent, name + " Label", label, 24, new Vector2(anchorMin.x, anchorMax.y), new Vector2(anchorMax.x, anchorMax.y + 0.06f));
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            var width = 1f / 3f;
+            rect.anchorMin = new Vector2(index * width, 0f);
+            rect.anchorMax = new Vector2((index + 1) * width, 1f);
+            rect.offsetMin = new Vector2(index == 0 ? 0f : LobbyUiTokens.SpacingUnit * 0.5f, 0f);
+            rect.offsetMax = new Vector2(index == 2 ? 0f : -LobbyUiTokens.SpacingUnit * 0.5f, 0f);
+            var image = buttonObject.AddComponent<Image>();
+            image.color = LobbyUiTokens.PanelBg;
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.None;
+            button.onClick.AddListener(action);
+            var text = CreateLocalText(buttonObject.transform, name + " Text", label, LobbyTextStyle.Micro, LobbyUiTokens.InkDim, 0f, 0f, 1f, 1f);
+            text.raycastTarget = false;
+        }
+
+        private static Button CreatePanelButton(Transform parent, string name, string label, float left, float bottom, float right, float top, UnityEngine.Events.UnityAction action)
+        {
+            var buttonObject = new GameObject(name);
+            buttonObject.transform.SetParent(parent, false);
+            var rect = buttonObject.AddComponent<RectTransform>();
+            ApplyAnchors(rect, left, bottom, right, top);
+            var image = buttonObject.AddComponent<Image>();
+            image.color = LobbyUiTokens.PanelBgAlt;
+            var outline = buttonObject.AddComponent<Outline>();
+            outline.effectColor = LobbyUiTokens.Frame;
+            outline.effectDistance = new Vector2(LobbyUiTokens.FrameBorderWidth, -LobbyUiTokens.FrameBorderWidth);
+            var button = buttonObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.None;
+            button.onClick.AddListener(action);
+            var text = CreateLocalText(buttonObject.transform, name + " Text", label, LobbyTextStyle.Label, LobbyUiTokens.Ink, 0f, 0f, 1f, 1f);
+            text.raycastTarget = false;
+            return button;
+        }
+
+        private static void CreateSlider(Transform parent, string name, string label, float value, float left, float bottom, float right, float top, UnityEngine.Events.UnityAction<float> onChanged)
+        {
+            CreateLocalText(parent, name + " Label", label, LobbyTextStyle.Micro, LobbyUiTokens.InkDim, left, top, right, top + 0.06f);
             var sliderObject = new GameObject(name);
             sliderObject.transform.SetParent(parent, false);
             var rect = sliderObject.AddComponent<RectTransform>();
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
+            ApplyAnchors(rect, left, bottom, right, top);
             var background = sliderObject.AddComponent<Image>();
-            background.color = new Color(0.08f, 0.10f, 0.12f, 0.96f);
+            background.color = LobbyUiTokens.PanelBgAlt;
             var slider = sliderObject.AddComponent<Slider>();
             slider.minValue = 0f;
             slider.maxValue = 1f;
@@ -543,9 +587,102 @@ namespace HwigiTower.Lobby
             slider.onValueChanged.AddListener(onChanged);
         }
 
-        private static Font ResolveFont()
+        private static void SetButtonText(Button button, string value, LobbyTextStyle style)
         {
-            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+            var label = button.GetComponentInChildren<Text>();
+            if (label == null)
+            {
+                return;
+            }
+
+            label.text = value;
+            label.fontSize = ResolveFontSize(style);
+            label.lineSpacing = ResolveLineSpacing(style);
+        }
+
+        private static void SetButtonState(Button button, bool enabled, bool primary)
+        {
+            button.interactable = enabled;
+            var image = button.GetComponent<Image>();
+            if (image != null)
+            {
+                image.color = enabled ? (primary ? LobbyUiTokens.PanelBgAlt : LobbyUiTokens.PanelBg) : LobbyUiTokens.PanelBg;
+            }
+
+            var label = button.GetComponentInChildren<Text>();
+            if (label != null)
+            {
+                label.color = enabled ? LobbyUiTokens.Ink : LobbyUiTokens.InkMute;
+            }
+
+            var outline = button.GetComponent<Outline>();
+            if (outline != null)
+            {
+                outline.effectColor = enabled ? (primary ? LobbyUiTokens.Gold : LobbyUiTokens.FrameHi) : LobbyUiTokens.Frame;
+            }
+        }
+
+        private static void AddTextShadow(Graphic graphic, Color color)
+        {
+            var shadow = graphic.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = color;
+            shadow.effectDistance = new Vector2(LobbyUiTokens.FrameBorderWidth, -LobbyUiTokens.FrameBorderWidth);
+        }
+
+        private static int ResolveFontSize(LobbyTextStyle style)
+        {
+            switch (style)
+            {
+                case LobbyTextStyle.Title:
+                    return LobbyUiTokens.TitleFontSize;
+                case LobbyTextStyle.Primary:
+                    return LobbyUiTokens.PrimaryFontSize;
+                case LobbyTextStyle.Body:
+                    return LobbyUiTokens.BodyFontSize;
+                case LobbyTextStyle.Micro:
+                    return LobbyUiTokens.MicroFontSize;
+                default:
+                    return LobbyUiTokens.LabelFontSize;
+            }
+        }
+
+        private static float ResolveLineSpacing(LobbyTextStyle style)
+        {
+            switch (style)
+            {
+                case LobbyTextStyle.Title:
+                    return LobbyUiTokens.TitleLineHeight;
+                case LobbyTextStyle.Primary:
+                    return LobbyUiTokens.PrimaryLineHeight;
+                case LobbyTextStyle.Body:
+                    return LobbyUiTokens.BodyLineHeight;
+                default:
+                    return LobbyUiTokens.LabelLineHeight;
+            }
+        }
+
+        private static void ApplySlot(RectTransform rect, LobbySlot slot)
+        {
+            rect.anchorMin = LobbyLayoutRuntime.AnchorMin(slot);
+            rect.anchorMax = LobbyLayoutRuntime.AnchorMax(slot);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
+        private static void ApplyAnchors(RectTransform rect, float left, float bottom, float right, float top)
+        {
+            rect.anchorMin = new Vector2(left, bottom);
+            rect.anchorMax = new Vector2(right, top);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
+        private static void StretchToParent(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
         }
 
         private void NormalizeRuntimeUi()
@@ -577,7 +714,7 @@ namespace HwigiTower.Lobby
             if (scaler != null)
             {
                 scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                scaler.referenceResolution = new Vector2(1080f, 1920f);
+                scaler.referenceResolution = new Vector2(LobbyLayout.ReferenceWidth, LobbyLayout.ReferenceHeight);
                 scaler.matchWidthOrHeight = 1f;
             }
 
@@ -591,16 +728,16 @@ namespace HwigiTower.Lobby
         {
             _safeAreaRoot = FindChildComponent<RectTransform>("Lobby Portrait Safe Area");
             _settingsPanel = FindChildGameObject("Lobby Settings Panel");
-            _profilePanel = FindChildGameObject("Lobby Profile Panel");
-            _statusText = FindChildComponent<Text>("Lobby Status");
+            _recordPanel = FindChildGameObject("Lobby Record Panel");
+            _statusText = FindChildComponent<Text>("Lobby Run Status");
             _continueButton = FindChildComponent<Button>(LobbyContinueButtonName);
 
             BindButton(LobbyNewGameButtonName, StartNewGame);
             BindButton(LobbyContinueButtonName, ContinueSavedRun);
-            BindButton("Lobby Profile Button", OpenProfile);
-            BindButton("Lobby Settings Button", OpenSettings);
-            BindButton("Lobby Quit Button", QuitOrShowPlaceholder);
-            BindButton("Lobby Profile Close Button", CloseProfile);
+            BindButton(LobbyRecordButtonName, OpenRecord);
+            BindButton(LobbySettingsButtonName, OpenSettings);
+            BindButton(LobbyQuitButtonName, QuitOrShowPlaceholder);
+            BindButton("Lobby Record Close Button", CloseRecord);
             BindButton("Lobby Settings Close Button", CloseSettings);
 
             if (_settingsPanel != null)
@@ -608,9 +745,9 @@ namespace HwigiTower.Lobby
                 _settingsPanel.SetActive(false);
             }
 
-            if (_profilePanel != null)
+            if (_recordPanel != null)
             {
-                _profilePanel.SetActive(false);
+                _recordPanel.SetActive(false);
             }
 
             ConfigureContinueButton();
@@ -672,16 +809,6 @@ namespace HwigiTower.Lobby
             {
                 eventSystem.gameObject.AddComponent<InputSystemUIInputModule>();
             }
-        }
-
-        private bool ShouldShowQuitButton()
-        {
-            if (presentationData == null || !presentationData.ShowQuitButtonOnDesktopOnly)
-            {
-                return true;
-            }
-
-            return Application.isEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer;
         }
     }
 }

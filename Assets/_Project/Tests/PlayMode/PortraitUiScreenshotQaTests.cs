@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using HwigiTower.Lobby;
 using HwigiTower.Run;
 using HwigiTower.UI;
 using NUnit.Framework;
@@ -37,7 +38,9 @@ namespace HwigiTower.Tests.PlayMode
             Screen.SetResolution(ScreenshotWidth, ScreenshotHeight, false);
             yield return WaitForFrames(8);
 
-            yield return CaptureLobby();
+            yield return CaptureLobbyNoSave();
+            yield return CaptureLobbyWithSave();
+            ResetRunStateIsolation();
             yield return CapturePrototypeRoomScreen("02_floor_map.png", (controller, hud) =>
             {
                 controller.ConfirmPreRunPlaceholder();
@@ -68,7 +71,27 @@ namespace HwigiTower.Tests.PlayMode
             AssertRequiredScreenshots();
         }
 
-        private static IEnumerator CaptureLobby()
+        private static IEnumerator CaptureLobbyNoSave()
+        {
+            PrototypeRunSaveStore.Delete();
+            PrototypeRunSaveRequest.RequestNewGame();
+            yield return CaptureLobby("01_lobby_no_save.png", false);
+        }
+
+        private static IEnumerator CaptureLobbyWithSave()
+        {
+            PrototypeRunSaveStore.Save(new PrototypeRunSaveData
+            {
+                runId = "run-portrait-lobby-save",
+                currentFloor = 4,
+                playerHp = 19,
+                playerMaxHp = 24,
+                memoryFragmentRefs = new[] { "MEM_FRAGMENT_01", "MEM_FRAGMENT_03" }
+            });
+            yield return CaptureLobby("01_lobby_with_save.png", true);
+        }
+
+        private static IEnumerator CaptureLobby(string fileName, bool expectsSave)
         {
             yield return SceneManager.LoadSceneAsync("Lobby", LoadSceneMode.Single);
             yield return WaitForFrames(10);
@@ -76,7 +99,21 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsNotNull(GameObject.Find("Lobby Canvas"));
             Assert.IsNotNull(GameObject.Find("Lobby Title"));
             Assert.IsNotNull(GameObject.Find("Lobby New Game Button"));
-            yield return CaptureAndAssert("01_lobby.png");
+            Assert.IsNotNull(GameObject.Find("Lobby Utility Row"));
+            var continueButton = GameObject.Find("Lobby Continue Button").GetComponent<Button>();
+            Assert.AreEqual(expectsSave, continueButton.interactable);
+            if (expectsSave)
+            {
+                StringAssert.Contains("최고 도달 층 4", GameObject.Find("Lobby Run Status").GetComponent<Text>().text);
+            }
+            else
+            {
+                StringAssert.Contains("저장된 진행 없음", continueButton.GetComponentInChildren<Text>().text);
+            }
+
+            var controller = Object.FindFirstObjectByType<LobbyController>();
+            Assert.IsNotNull(controller);
+            yield return CaptureAndAssert(fileName);
         }
 
         private static IEnumerator CaptureEncounterScreen(string fileName, string encounterId)
@@ -468,7 +505,8 @@ namespace HwigiTower.Tests.PlayMode
 
         private static readonly string[] RequiredScreenshots =
         {
-            "01_lobby.png",
+            "01_lobby_no_save.png",
+            "01_lobby_with_save.png",
             "02_floor_map.png",
             "03_event_jar_room.png",
             "04_rest_mataios.png",

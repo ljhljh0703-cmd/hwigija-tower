@@ -94,7 +94,7 @@ namespace HwigiTower.EditorTools
             serialized.FindProperty("backgroundSprite").objectReferenceValue = background;
             serialized.FindProperty("logoSprite").objectReferenceValue = null;
             serialized.FindProperty("titleText").stringValue = "회귀자는 탑을 오른다";
-            serialized.FindProperty("subtitleText").stringValue = "Prototype";
+            serialized.FindProperty("subtitleText").stringValue = "되찾는 것은 잃기 위해서다";
             serialized.FindProperty("defaultProfileName").stringValue = "Player";
             serialized.FindProperty("showQuitButtonOnDesktopOnly").boolValue = true;
             serialized.ApplyModifiedPropertiesWithoutUndo();
