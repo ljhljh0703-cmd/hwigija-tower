@@ -8,6 +8,25 @@
   },
   "sourceCapture": "Builds/PortfolioScreenshots/hwigi-tower-0739f53-20260702/01_lobby.png",
   "layoutIntent": "처음 켰을 때 5초 안에 「새 게임」을 누르게 한다. 배경 탑을 가리지 않으면서 버튼 위계를 하나로 좁힌다.",
+  "dataBinding": {
+    "_note": "2026-09-02 소급 작성. `LobbyController.cs` 가 실제로 읽는 경로를 역으로 확인해 채웠다",
+    "runStatus": {
+      "source": "PrototypeRunSaveStore.TryLoadSummary → PrototypeRunSaveSummary",
+      "fields": "RunId · CurrentFloor · PlayerHp · PlayerMaxHp · MemoryFragmentCount · RunStatus · IsValid · DisplayText",
+      "present": true,
+      "note": "로비는 스냅샷이 아니라 저장 요약을 읽는다. 런이 시작되기 전이라 RunState 가 없다"
+    },
+    "secondaryAction": {
+      "source": "PrototypeRunSaveStore.HasSave",
+      "type": "bool",
+      "present": true,
+      "note": "false 면 이어하기 비활성. 이 단언이 R2 런타임 실패의 자리였다(legacy Canvas 바인딩)"
+    },
+    "_absent": {
+      "runCount": "회차 누적 필드 없음(2026-09-01 R2 확인). 저장 유무·최고 도달 층·기억 조각으로 대체",
+      "towerDeepArt": "`tower_deep` 아트 미입고 — assetFallbacks 참조"
+    }
+  },
   "constraints": [
     {
       "id": "L-01",
@@ -308,7 +327,8 @@
   },
   "revisions": [
     "v1.1 2026-09-01 · L-03 범위를 불투명 패널·interactive 로 한정, L-08 신설. 사유 = Codex STOP 보고(사양 자체 모순)",
-    "v1.2 2026-09-01 · assetFallbacks 신설(명조 TMP·tower_deep 부재 명시) · deepRun status=blocked · runStatus content 를 save 스키마 현실에 맞춤(1단 오류 정정)"
+    "v1.2 2026-09-01 · assetFallbacks 신설(명조 TMP·tower_deep 부재 명시) · deepRun status=blocked · runStatus content 를 save 스키마 현실에 맞춤(1단 오류 정정)",
+    "v1.3 2026-09-02 · `dataBinding` 소급 작성(B-01). `LobbyController.cs` 실참조 대조 기반"
   ],
   "checker": "Tools/check_layout.py",
   "assetFallbacks": {

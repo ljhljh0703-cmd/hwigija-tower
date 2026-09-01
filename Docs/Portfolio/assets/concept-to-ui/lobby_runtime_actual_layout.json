@@ -1,6 +1,6 @@
 {
   "screen": "lobby",
-  "capturedAt": "2026-09-01T22:01:55.1377550Z runtime RectTransform capture",
+  "capturedAt": "2026-09-01T23:16:29.3888200Z runtime RectTransform capture",
   "source": "runtime",
   "slots": {
     "runStatus": {"x": 0.06, "y": 0.022, "w": 0.88, "h": 0.036, "fontSize": 26, "visible": true},

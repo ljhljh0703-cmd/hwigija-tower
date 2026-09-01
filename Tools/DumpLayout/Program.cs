@@ -18,6 +18,7 @@ var document = screen switch
     "combat" => BuildCombatDocument(capturedAt),
     "floormap" => BuildFloorMapDocument(capturedAt),
     "rest" => BuildRestDocument(capturedAt),
+    "shop" => BuildShopDocument(capturedAt),
     _ => throw new ArgumentException("Unsupported screen: " + screen)
 };
 
@@ -94,6 +95,17 @@ static LayoutDocument BuildFloorMapDocument(string capturedAt)
     };
 }
 
+static LayoutDocument BuildShopDocument(string capturedAt)
+{
+    return new LayoutDocument
+    {
+        Screen = "shop",
+        CapturedAt = capturedAt,
+        Source = "contract",
+        Slots = ShopLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualShopSlot)
+    };
+}
+
 static ActualSlot ToActualLobbySlot(LobbySlot slot)
 {
     return new ActualSlot
@@ -147,6 +159,25 @@ static ActualSlot ToActualRestSlot(RestSlot slot)
 }
 
 static ActualSlot ToActualFloorMapSlot(FloorMapSlot slot)
+{
+    return new ActualSlot
+    {
+        X = slot.X,
+        Y = slot.Y,
+        W = slot.Width,
+        H = slot.Height,
+        FontSize = slot.FontSize,
+        Visible = true,
+        Layer = slot.Layer,
+        Type = slot.Type,
+        Label = slot.Label,
+        Color = slot.ColorToken,
+        Interactive = slot.Interactive,
+        FrameStyle = slot.HasFrame
+    };
+}
+
+static ActualSlot ToActualShopSlot(ShopSlot slot)
 {
     return new ActualSlot
     {

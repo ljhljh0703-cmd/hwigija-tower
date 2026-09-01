@@ -875,7 +875,7 @@ namespace HwigiTower.Tests.PlayMode
             for (var i = 0; i < hud.ChoiceButtonCount; i++)
             {
                 var button = hud.GetChoiceButton(i);
-                if (button != null && button.name.StartsWith("Choice Button "))
+                if (button != null && (button.name.StartsWith("Choice Button ") || IsShopChoiceButton(hud, button)))
                 {
                     return true;
                 }
@@ -889,6 +889,11 @@ namespace HwigiTower.Tests.PlayMode
             if (expectedEncounterId != null && expectedEncounterId.StartsWith("ENC_REST_", System.StringComparison.Ordinal))
             {
                 return hud.RestInteractionPanelVisible;
+            }
+
+            if (expectedEncounterId != null && expectedEncounterId.Contains("SHOP", System.StringComparison.Ordinal))
+            {
+                return hud.ShopUiVisible;
             }
 
             var expectedPrefix = ExpectedChoicePrefix(expectedEncounterId);
@@ -1337,7 +1342,7 @@ namespace HwigiTower.Tests.PlayMode
             for (var i = 0; i < hud.ChoiceButtonCount; i++)
             {
                 var button = hud.GetChoiceButton(i);
-                if (button != null && button.interactable && button.name.StartsWith("Choice Button "))
+                if (button != null && button.interactable && (button.name.StartsWith("Choice Button ") || IsShopChoiceButton(hud, button)))
                 {
                     return button;
                 }
@@ -1351,13 +1356,23 @@ namespace HwigiTower.Tests.PlayMode
             for (var i = 0; i < hud.ChoiceButtonCount; i++)
             {
                 var button = hud.GetChoiceButton(i);
-                if (button != null && button.interactable && button.name.StartsWith("Choice Button ") && !button.name.Contains("COMBAT"))
+                if (button != null && button.interactable &&
+                    ((button.name.StartsWith("Choice Button ") && !button.name.Contains("COMBAT")) || IsShopChoiceButton(hud, button)))
                 {
                     return button;
                 }
             }
 
             return null;
+        }
+
+        private static bool IsShopChoiceButton(PrototypeHud hud, Button button)
+        {
+            return hud != null &&
+                hud.ShopUiVisible &&
+                button != null &&
+                (button.name.StartsWith("Shop Offer Row ", System.StringComparison.Ordinal) ||
+                 button.name == "Shop Leave Button");
         }
 
         private static string ResolvePreferredChoiceId(PrototypeRunState state, PrototypeDemoRunStep step)

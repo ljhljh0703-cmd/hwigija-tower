@@ -150,24 +150,13 @@ namespace HwigiTower.Tests.PlayMode
                 controller.RunState.ModifyGold(100);
                 hud.OpenQaRouteStep(selection);
 
-                var merchantVisual = GameObject.Find("Merchant Visual");
-                Assert.IsNotNull(merchantVisual, "Missing merchant spotlight visual");
-                Assert.IsTrue(merchantVisual.activeInHierarchy, "Merchant spotlight should be visible for shop");
-                var image = merchantVisual.GetComponent<Image>();
-                Assert.IsNotNull(image);
-                Assert.IsNotNull(image.sprite);
-                Assert.AreEqual("merchant_human", image.sprite.name);
-                Assert.IsTrue(hud.NpcSpotlightVisible);
-                Assert.AreEqual("상점", hud.CurrentNpcSpotlightModeLabel);
-                StringAssert.Contains("상인", hud.NpcSpotlightMessage);
-                StringAssert.Contains("ui_spotlight_gradient", hud.CurrentNpcSupportSpriteNames);
-                StringAssert.Contains("ui_npc_dialogue_plate", hud.CurrentNpcSupportSpriteNames);
-                StringAssert.Contains("ui_shop_product_card", hud.CurrentShopChoiceCardSpriteNames);
-                StringAssert.Contains("icon_item_field_bandage", hud.CurrentShopChoiceIconNames);
-                StringAssert.Contains("icon_ability_scout", hud.CurrentShopChoiceIconNames);
-                Assert.GreaterOrEqual(hud.ChoiceButtonCount, 3, "Expected opening shop products plus leave.");
-                Assert.IsNotNull(FindChoiceButtonTextContaining(hud, "보유 Gold"), "Expected current shop product cards to include player Gold context.");
-            });
+                Assert.IsTrue(hud.ShopUiVisible);
+                Assert.IsFalse(hud.NpcSpotlightVisible);
+                Assert.AreEqual("enc_shop_01_bg", hud.ShopSceneSpriteName);
+                Assert.AreEqual(6, hud.ChoiceButtonCount, "Expected five offer rows plus leave.");
+                StringAssert.Contains("붕대", hud.ShopOfferText);
+                Assert.IsEmpty(hud.CurrentShopChoiceIconNames);
+            }, "shop");
         }
 
         private static IEnumerator CaptureFloorShopScreen(string fileName, int floor, string encounterId, string expectedBackground, string expectedMerchant)
@@ -180,17 +169,11 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.IsTrue(selection.HasEncounter, "Missing QA shop selection " + encounterId);
                 hud.OpenQaRouteStep(selection);
 
-                var merchantVisual = GameObject.Find("Merchant Visual");
-                Assert.IsNotNull(merchantVisual, "Missing merchant spotlight visual for floor " + floor);
-                var image = merchantVisual.GetComponent<Image>();
-                Assert.IsNotNull(image);
-                Assert.IsNotNull(image.sprite);
-                Assert.AreEqual(expectedMerchant, image.sprite.name);
                 Assert.AreEqual(expectedBackground, hud.CurrentBackgroundSpriteName);
-                Assert.IsTrue(hud.NpcSpotlightVisible);
-                Assert.AreEqual("상점", hud.CurrentNpcSpotlightModeLabel);
-                StringAssert.Contains("ui_spotlight_gradient", hud.CurrentNpcSupportSpriteNames);
-                StringAssert.Contains("ui_shop_product_card", hud.CurrentShopChoiceCardSpriteNames);
+                Assert.IsTrue(hud.ShopUiVisible);
+                Assert.IsFalse(hud.NpcSpotlightVisible);
+                Assert.AreEqual(expectedBackground, hud.ShopSceneSpriteName);
+                Assert.AreEqual(6, hud.ChoiceButtonCount);
             });
         }
 
@@ -366,6 +349,27 @@ namespace HwigiTower.Tests.PlayMode
                     new RuntimeSlotRequest("selectedNodeCard", "FloorMap Selected Card"),
                     new RuntimeSlotRequest("departButton", "FloorMap Depart Button"),
                     new RuntimeSlotRequest("backButton", "FloorMap Back Button")
+                });
+                return;
+            }
+
+            if (screen == "shop")
+            {
+                WriteRuntimeActual(screen, root, new[]
+                {
+                    new RuntimeSlotRequest("floorChip", "Shop floorChip"),
+                    new RuntimeSlotRequest("sanityChip", "Shop sanityChip"),
+                    new RuntimeSlotRequest("hpChip", "Shop hpChip"),
+                    new RuntimeSlotRequest("goldChip", "Shop goldChip"),
+                    new RuntimeSlotRequest("screenTitle", "Shop Screen Title"),
+                    new RuntimeSlotRequest("shopScene", "Shop Scene"),
+                    new RuntimeSlotRequest("ownedStrip", "Shop Owned Strip"),
+                    new RuntimeSlotRequest("offerRow1", "Shop Offer Row 1"),
+                    new RuntimeSlotRequest("offerRow2", "Shop Offer Row 2"),
+                    new RuntimeSlotRequest("offerRow3", "Shop Offer Row 3"),
+                    new RuntimeSlotRequest("offerRow4", "Shop Offer Row 4"),
+                    new RuntimeSlotRequest("offerRow5", "Shop Offer Row 5"),
+                    new RuntimeSlotRequest("leaveButton", "Shop Leave Button")
                 });
                 return;
             }

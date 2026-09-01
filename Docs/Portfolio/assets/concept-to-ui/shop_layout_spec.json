@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 2,
+  "specVersion": "1.2",
+  "screen": "shop",
+  "sharedBy": [
+    "큐 5 상점",
+    "큐 6 상점 3층",
+    "큐 7 상점 4층",
+    "큐 8 상점 5층"
+  ],
+  "tokens": "ui_tokens.json",
+  "checker": "Tools/check_layout.py",
+  "wiringChecker": "Tools/check_wiring.py",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "layoutIntent": "살 수 있는 것과 못 사는 것을 한눈에 가르고, 못 사는 이유를 그 자리에 적는다. 판단 대상은 「무엇을 포기하는가」이고 골드가 그 조건이다.",
+  "_why_one_spec": "층별로 파는 물건만 다르고 화면 구조는 같다(ENC_SHOP_01~05 전부 구매 5 + 나가기 1). 5~8번을 한 장으로 쓴다. 층 차이는 슬롯이 아니라 데이터다 — 사양을 4장 쓰면 4번 고쳐야 한다.",
+  "changeFromCapture": [
+    "선택지를 5행 목록으로 편다 — 구매 선택지가 5개이고 전부 DisabledVisible 이라 숨길 수 없다",
+    "못 사는 항목을 숨기지 않고 각 행 안에 이유를 붙인다",
+    "상단 텍스트 한 줄을 자원 칩 4개로 분해 — 골드가 이 화면의 판단 조건이다",
+    "나가기 경로를 명시 — 안 사고 나갈 수 있다는 것이 보여야 한다"
+  ],
+  "dataBinding": {
+    "_note": "2026-09-01 승격 판정. 출처 없는 슬롯은 위탁 전에 여기서 걸린다",
+    "floorChip": {
+      "source": "PrototypeRunSnapshot.CurrentFloor",
+      "type": "int",
+      "present": true
+    },
+    "sanityChip": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "normalize": "(Mental + 100) / 200",
+      "present": true,
+      "note": "0~1 이 아니다"
+    },
+    "hpChip": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "goldChip": {
+      "source": "PrototypeRunSnapshot.Gold",
+      "type": "int",
+      "present": true,
+      "note": "이 화면의 판단 조건. 강조 대상"
+    },
+    "ownedCount": {
+      "source": "PrototypeRunSnapshot.ItemCount",
+      "type": "int",
+      "present": true,
+      "note": "🩸 v1.1 은 `OwnedItemCount` 로 썼다 — 그런 멤버는 없다. `PrototypeRunState.CountOwnedItems()` 라는 *메서드* 이름을 보고 스냅샷 속성 이름을 유추했다. 2026-09-02 Unity 컴파일 CS1061 로 검출"
+    },
+    "_absent": {
+      "itemPrice": "가격 전용 필드가 없다. 값은 TextKey·HintText 안 문자열이다 — 화면이 숫자를 파싱하지 않는다",
+      "itemIcon": "선택지별 아이콘 참조가 데이터에 없다. 종류 아이콘은 아트 입고 후 별건",
+      "shopkeeperArt": "상인 아트는 있으나 선택지와 연결하는 필드가 없다. 배경으로만 쓴다"
+    },
+    "offerRow": {
+      "source": "PrototypeEncounterChoiceView[] (PrototypeRoomController.BuildEncounterChoiceViews)",
+      "fields": "ChoiceStableId · TextKey · Visible · Enabled · ReasonTextKey · HintText",
+      "present": true,
+      "count": "구매 5 + 나가기 1 = 6. 실측: ENC_SHOP_01·03·04·05 전부 BUY_ITEM·BUY_OIL·BUY_CHARM·BUY_ABILITY·BUY_RECALL + LEAVE",
+      "unavailablePolicyMode": "DisabledVisible — **숨길 수 없다.** 비활성으로 남는다"
+    }
+  },
+  "constraints": [
+    {
+      "id": "S-01",
+      "text": "누를 수 있는 요소는 y >= 0.52",
+      "check": "interactive 슬롯 전부",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.52,
+        "applyTo": {
+          "interactive": true
+        }
+      },
+      "rationale": "행이 5개라 action 층을 넓혔다. 그래도 조작은 하단 절반 안"
+    },
+    {
+      "id": "S-02",
+      "text": "터치 타깃 최소 96px",
+      "check": "h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "S-03",
+      "text": "구매 행은 정확히 5개",
+      "check": "role=offer 슬롯 수 == 5",
+      "machineCheck": {
+        "type": "count",
+        "applyTo": {
+          "role": [
+            "offer"
+          ]
+        },
+        "eq": 5
+      },
+      "rationale": "🩸 v1.0 은 3으로 썼다. 실물을 안 열고 휴식(3선택지)에서 유추했다. ENC_SHOP_01·03·04·05 실측 = 구매 5(ITEM·OIL·CHARM·ABILITY·RECALL). 2026-09-02 코덱스가 착수 전 검출"
+    },
+    {
+      "id": "S-04",
+      "text": "같은 문구가 두 슬롯에 중복되지 않는다",
+      "check": "content 중복 0건",
+      "machineCheck": {
+        "type": "noDuplicateContent"
+      }
+    },
+    {
+      "id": "S-05",
+      "text": "골드 칩은 자원 스트립 뒤쪽 끝",
+      "check": "goldChip.x > 0.7",
+      "machineCheck": {
+        "type": "fieldBound",
+        "slot": "goldChip",
+        "field": "x",
+        "gt": 0.7
+      },
+      "rationale": "이 화면의 판단 조건이라 눈이 마지막에 닿는 자리에 고정한다"
+    },
+    {
+      "id": "S-06",
+      "text": "층 순서는 resource → judgement → subject → action",
+      "check": "bands 순서",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "resource",
+          "judgement",
+          "subject",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "S-07",
+      "text": "나가기 버튼은 구매 행보다 아래",
+      "check": "offerRow1.y < leaveButton.y",
+      "machineCheck": {
+        "type": "relative",
+        "a": "offerRow1",
+        "b": "leaveButton",
+        "field": "y",
+        "op": "lt"
+      }
+    },
+    {
+      "id": "S-08",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 없다",
+      "check": "slots[*].content 에 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2"
+    },
+    {
+      "id": "S-09",
+      "text": "구매 행이 상단 정보 영역을 침범하지 않는다",
+      "check": "interactive 슬롯 ⟂ y<0.52 영역",
+      "machineCheck": {
+        "type": "noOverlap",
+        "region": {
+          "x0": 0.0,
+          "y0": 0.0,
+          "x1": 1.0,
+          "y1": 0.52
+        },
+        "applyTo": {
+          "interactive": true
+        }
+      },
+      "rationale": "행이 5개로 늘어 아래가 꽉 찬다. 넘치면 자원 칩·상인 씬을 덮는다"
+    }
+  ],
+  "bands": {
+    "resource": {
+      "y": 0.0,
+      "h": 0.1
+    },
+    "judgement": {
+      "y": 0.1,
+      "h": 0.06
+    },
+    "subject": {
+      "y": 0.16,
+      "h": 0.36
+    },
+    "action": {
+      "y": 0.52,
+      "h": 0.48
+    }
+  },
+  "slots": {
+    "floorChip": {
+      "band": "resource",
+      "x": 0.04,
+      "y": 0.03,
+      "w": 0.18,
+      "h": 0.044,
+      "order": 1,
+      "layer": "hud",
+      "type": "chip",
+      "style": "numeric",
+      "label": "층"
+    },
+    "sanityChip": {
+      "band": "resource",
+      "x": 0.24,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 2,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "이성",
+      "color": "sanity"
+    },
+    "hpChip": {
+      "band": "resource",
+      "x": 0.5,
+      "y": 0.03,
+      "w": 0.2,
+      "h": 0.044,
+      "order": 3,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "체력",
+      "color": "hp"
+    },
+    "goldChip": {
+      "band": "resource",
+      "x": 0.72,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 4,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "골드",
+      "color": "gold_coin",
+      "notes": "S-05 로 뒤쪽 고정. 다른 화면보다 폭을 넓게 — 이 화면의 판단 조건"
+    },
+    "screenTitle": {
+      "band": "judgement",
+      "x": 0.1,
+      "y": 0.106,
+      "w": 0.8,
+      "h": 0.048,
+      "order": 10,
+      "layer": "title",
+      "type": "text",
+      "style": "screen",
+      "notes": "장소 이름. 「상점」이라 쓰면 아래 카드와 겹칠 소지 — S-04 확인"
+    },
+    "shopScene": {
+      "band": "subject",
+      "x": 0.0,
+      "y": 0.16,
+      "w": 1.0,
+      "h": 0.26,
+      "order": 20,
+      "layer": "background",
+      "type": "image",
+      "notes": "상인 배경 아트 재사용. 선택지와 연결하는 데이터는 없다"
+    },
+    "ownedStrip": {
+      "band": "subject",
+      "x": 0.04,
+      "y": 0.442,
+      "w": 0.92,
+      "h": 0.038,
+      "order": 21,
+      "layer": "hud",
+      "type": "text",
+      "style": "label",
+      "notes": "보유 수. OwnedItemCount 하나뿐 — 목록이 아니다"
+    },
+    "offerRow1": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.53,
+      "w": 0.92,
+      "h": 0.062,
+      "order": 30,
+      "layer": "actions",
+      "type": "row",
+      "role": "offer",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "구매 선택지 1. 높이 119px. **Enabled=false 면 비활성 + ReasonTextKey 를 행 안에 붙인다.** DisabledVisible 이라 숨길 수 없다"
+    },
+    "offerRow2": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.598,
+      "w": 0.92,
+      "h": 0.062,
+      "order": 31,
+      "layer": "actions",
+      "type": "row",
+      "role": "offer",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "구매 선택지 2"
+    },
+    "offerRow3": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.666,
+      "w": 0.92,
+      "h": 0.062,
+      "order": 32,
+      "layer": "actions",
+      "type": "row",
+      "role": "offer",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "구매 선택지 3"
+    },
+    "offerRow4": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.734,
+      "w": 0.92,
+      "h": 0.062,
+      "order": 33,
+      "layer": "actions",
+      "type": "row",
+      "role": "offer",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "구매 선택지 4"
+    },
+    "offerRow5": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.802,
+      "w": 0.92,
+      "h": 0.062,
+      "order": 34,
+      "layer": "actions",
+      "type": "row",
+      "role": "offer",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "구매 선택지 5"
+    },
+    "leaveButton": {
+      "band": "action",
+      "x": 0.3,
+      "y": 0.9,
+      "w": 0.4,
+      "h": 0.056,
+      "order": 50,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "content": "나간다",
+      "notes": "높이 107px (S-02). 어떤 상태에서도 누를 수 있다"
+    }
+  },
+  "variants": {
+    "_note": "상점에 붕괴 variants 를 두지 않는다. 붕괴 연출 무대는 휴식·전투다"
+  },
+  "invariantUnderVariants": [
+    "못 사는 선택지는 숨기지 않는다. 비활성 + 이유로 남는다 (DisabledVisible)",
+    "이유는 행 안에 붙는다. 공용 이유 슬롯을 두지 않는다 — 행이 5개라 어느 행 것인지 안 갈린다",
+    "「붕괴도」 수치와 용어를 노출하지 않는다",
+    "나가기 버튼은 어떤 상태에서도 누를 수 있다"
+  ],
+  "floorOverrides": {
+    "_note": "층 차이는 슬롯이 아니라 데이터다. 좌표를 층별로 바꾸지 않는다",
+    "ENC_SHOP_01·03·04·05": "같은 슬롯·같은 좌표. TextKey·HintText·Enabled 만 다르다",
+    "ENC_F02_SHOP_001": "2층 상점은 id 체계가 다르다(CHOICE_F02_SHOP_*). 같은 구조인지 착수 시 확인하고, 다르면 멈추고 보고한다"
+  },
+  "assetFallbacks": {
+    "shop_item_icons": {
+      "present": false,
+      "fallback": null,
+      "status": "미구현",
+      "note": "선택지별 아이콘 참조가 데이터에 없다. 아이콘 없이 문구만으로 성립하게 그린다. 임의 대체 금지"
+    }
+  },
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "goldChip",
+      "offerRow1",
+      "offerRow2",
+      "offerRow3",
+      "offerRow4",
+      "offerRow5",
+      "leaveButton"
+    ]
+  },
+  "revisions": [
+    "v1.0 2026-09-02 · 최초. 큐 5~8 공유 1장. dataBinding 은 PrototypeEncounterChoiceView 6필드 실재. 가격·아이콘·상인 연결 필드는 데이터에 없어 사양에서 뺐다",
+    "v1.1 2026-09-02 · 🩸 **내 사양 오류 정정** — 구매 행 3 → **5**. v1.0 은 실물 인카운터를 안 열고 휴식(3선택지)에서 유추했다. 코덱스가 착수 전 검출(코드 변경 0). 3카드 가로배치 → 5행 세로목록, action 층 0.58→0.52, 공용 이유 슬롯 제거(행 안으로), S-09(상단 침범 금지) 신설",
+    "v1.2 2026-09-02 · 🩸 두 번째 내 오류 정정 — `ownedCount.source` `OwnedItemCount` → **`ItemCount`**. `Tools/check_databinding.py` 신설로 기계 검출 전환"
+  ]
+}

@@ -12,5 +12,6 @@
     <Compile Include="../../Assets/_Project/Scripts/UI/CombatLayoutContract.cs" Link="CombatLayoutContract.cs" />
     <Compile Include="../../Assets/_Project/Scripts/UI/FloorMapLayoutContract.cs" Link="FloorMapLayoutContract.cs" />
     <Compile Include="../../Assets/_Project/Scripts/UI/RestLayoutContract.cs" Link="RestLayoutContract.cs" />
+    <Compile Include="../../Assets/_Project/Scripts/UI/ShopLayoutContract.cs" Link="ShopLayoutContract.cs" />
   </ItemGroup>
 </Project>

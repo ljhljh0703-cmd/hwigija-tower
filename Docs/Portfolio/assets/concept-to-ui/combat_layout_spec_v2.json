@@ -480,6 +480,76 @@
     "brokenFrom": "undecided"
   },
   "revisions": [
-    "v2.1 2026-09-01 · D-029 충돌 제거(broken.reward 전투 강화 절 삭제) · mataiosSanityBar → mataiosStateLabel(비수치) · C-09 신설 · 임계값 미정 → variants blocked. 구현된 적 없는 절이라 되돌릴 코드 없음"
-  ]
+    "v2.1 2026-09-01 · D-029 충돌 제거(broken.reward 전투 강화 절 삭제) · mataiosSanityBar → mataiosStateLabel(비수치) · C-09 신설 · 임계값 미정 → variants blocked. 구현된 적 없는 절이라 되돌릴 코드 없음",
+    "v2.2 2026-09-02 · `dataBinding` 소급 작성(B-01). `CombatUiController.cs` 실참조 대조 기반"
+  ],
+  "dataBinding": {
+    "_note": "2026-09-02 소급 작성. 이 사양은 dataBinding 규칙(2026-09-01 승격) 이전에 쓰였다. `CombatUiController.cs` 가 실제로 읽는 멤버를 역으로 확인해 채웠다 — 추론이 아니라 코드 대조다",
+    "floorChip": {
+      "source": "PrototypeRunSnapshot.CurrentFloor",
+      "type": "int",
+      "present": true
+    },
+    "sanityChip": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "normalize": "(Mental + 100) / 200",
+      "present": true,
+      "note": "0~1 이 아니다"
+    },
+    "hpChip": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "goldChip": {
+      "source": "PrototypeRunSnapshot.Gold",
+      "type": "int",
+      "present": true
+    },
+    "playerHpBar": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "playerSanityBar": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "present": true
+    },
+    "enemyHpBar": {
+      "source": "PrototypeRunSnapshot.EnemyHp / EnemyMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "threatReadout": {
+      "source": "PrototypeRunSnapshot.EnemyAttack",
+      "type": "int",
+      "present": true,
+      "note": "예상 피해의 근거. 버틸 턴은 PlayerHp ÷ EnemyAttack 파생 — 화면에서 계산한다"
+    },
+    "mataiosStateLabel": {
+      "source": "PrototypeRunSnapshot.GlitchLevel",
+      "type": "int",
+      "range": [
+        0,
+        100
+      ],
+      "present": true,
+      "display": "non_numeric",
+      "note": "숫자·게이지·「붕괴도」 용어 금지(C-09·D-012 P2)"
+    },
+    "_absent": {
+      "mataiosSanity": "없음. 마타이오스 전용 이성 값은 코드에 없다(2026-09-01 확인)",
+      "enemyIntent": "적의 다음 행동 종류를 담는 필드가 없다. threatReadout 은 EnemyAttack 수치 기반"
+    }
+  }
 }

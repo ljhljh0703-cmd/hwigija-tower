@@ -300,13 +300,12 @@ namespace HwigiTower.Tests.EditMode
             hud.ShowRunState(new PrototypeRunSnapshot("run-ui-shop-disabled", 20, 24, 5, 0, 5, 0, 0, 0, 0, 0, false));
             hud.ShowChoices(encounter, views, _ => { });
 
-            var disabledLabel = hud.GetChoiceButton(1).GetComponentInChildren<Text>();
-            Assert.IsNotNull(disabledLabel);
-            StringAssert.Contains("정찰", disabledLabel.text);
-            StringAssert.Contains("Gold -20", disabledLabel.text);
-            StringAssert.Contains("보유 Gold 5", disabledLabel.text);
-            StringAssert.Contains("Gold 부족", disabledLabel.text);
-            StringAssert.DoesNotContain("ABILITY_SCOUT", disabledLabel.text);
+            Assert.IsTrue(hud.ShopUiVisible);
+            StringAssert.Contains("정찰", hud.ShopOfferText);
+            StringAssert.Contains("Gold -20", hud.ShopOfferDetailText);
+            StringAssert.Contains("골드 5", hud.ShopGoldText);
+            StringAssert.Contains("Gold 부족", hud.ShopUnavailableReasonText);
+            StringAssert.DoesNotContain("ABILITY_SCOUT", hud.ShopOfferDetailText);
         }
 
         [Test]

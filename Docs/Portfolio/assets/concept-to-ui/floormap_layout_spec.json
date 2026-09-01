@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "specVersion": "1.0",
+  "specVersion": "1.1",
   "screen": "floormap",
   "tokens": "ui_tokens.json",
   "checker": "Tools/check_layout.py",
@@ -48,7 +48,8 @@
       "source": "PrototypeRunSnapshot.FloorMapNodes (PrototypeFloorMapNodeView[])",
       "fields": "MapNodeId · Type · Floor · Layer · Index · Selectable · Completed · Locked · NormalizedX · NormalizedY · Current · NextMapNodeIds · PreviousMapNodeIds",
       "present": true,
-      "note": "노드 좌표는 NormalizedX/Y 를 그대로 쓴다. 화면이 좌표를 새로 계산하지 않는다"
+      "note": "노드 좌표는 NormalizedX/Y 를 그대로 쓴다. 화면이 좌표를 새로 계산하지 않는다",
+      "count": "가변. 층당 레이어 3(`PrototypeFloorMap` layers 배열 3칸)이고 레이어별 노드 수는 런 경로에 따라 다르다. 고정 개수를 가정하지 않는다"
     },
     "selectedNodeId": {
       "source": "PrototypeRunSnapshot.SelectedMapNodeId / HasSelectedMapNode",
@@ -332,6 +333,7 @@
     ]
   },
   "revisions": [
-    "v1.0 2026-09-01 · 최초. dataBinding 을 실 데이터(PrototypeFloorMapNodeView 13필드)로 채우고 발행. 층 이름·노드 난이도는 데이터에 없어 사양에서 뺐다"
+    "v1.0 2026-09-01 · 최초. dataBinding 을 실 데이터(PrototypeFloorMapNodeView 13필드)로 채우고 발행. 층 이름·노드 난이도는 데이터에 없어 사양에서 뺐다",
+    "v1.1 2026-09-02 · `dataBinding.nodeGraph.count` 보충(B-03). 가변임을 명시 — 고정 개수 가정 금지"
   ]
 }

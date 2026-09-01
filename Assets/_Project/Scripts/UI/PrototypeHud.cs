@@ -85,6 +85,7 @@ namespace HwigiTower.UI
         [SerializeField] private CombatUiController combatUiController;
         [SerializeField] private RestUiController restUiController;
         [SerializeField] private FloorMapUiController floorMapUiController;
+        [SerializeField] private ShopUiController shopUiController;
         [SerializeField] private RectTransform restInteractionPanel;
         [SerializeField] private Text restResponseText;
         [SerializeField] private InputField restInputField;
@@ -341,6 +342,12 @@ namespace HwigiTower.UI
         public Vector2 RestInteractionAnchorMin => restInteractionPanel == null ? Vector2.zero : restInteractionPanel.anchorMin;
         public string CurrentShopChoiceCardSpriteNames => JoinImageSpriteNames(_shopChoiceCardImages);
         public string CurrentShopChoiceIconNames => JoinImageSpriteNames(_shopChoiceIconImages);
+        public bool ShopUiVisible => shopUiController != null && shopUiController.Visible;
+        public string ShopSceneSpriteName => shopUiController == null ? string.Empty : shopUiController.SceneSpriteName;
+        public string ShopGoldText => shopUiController == null ? string.Empty : shopUiController.GoldText;
+        public string ShopOfferText => shopUiController == null ? string.Empty : shopUiController.OfferText;
+        public string ShopOfferDetailText => shopUiController == null ? string.Empty : shopUiController.OfferDetailText;
+        public string ShopUnavailableReasonText => shopUiController == null ? string.Empty : shopUiController.UnavailableReasonText;
         public string CurrentResultSummaryIconNames => JoinImageSpriteNames(_resultSummaryIconImages);
         public string CurrentResultSummaryLabels => string.Join("|", _activeResultSummaryLabels);
         public string CurrentResultSummaryValues => string.Join("|", _activeResultSummaryValues);
@@ -729,6 +736,12 @@ namespace HwigiTower.UI
 
         public void ShowChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
         {
+            if (!showRawDebugText && encounter != null && encounter.Type == EncounterType.Shop)
+            {
+                ShowShopChoices(encounter, choiceViews, onChoiceSelected);
+                return;
+            }
+
             ClearChoices();
             HideRestInteractionPanel();
             EnsureScreenLayers();
@@ -825,11 +838,110 @@ namespace HwigiTower.UI
             }
         }
 
+        private void ShowShopChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
+        {
+            ClearChoices();
+            HideRestInteractionPanel();
+            EnsureScreenLayers();
+            HideEventCutsceneLayout();
+            HideUtilityPanel();
+            SetLayerVisible(actionLayer, false);
+            SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(objectiveLayer, false);
+            SetLayerVisible(visualLayer, false);
+            SetLayerVisible(npcReactionLayer, false);
+            SetLayerVisible(resultLayer, false);
+            SetResultVisible(false);
+            EnsureEventSystem();
+            ApplyPresentationSlot(encounter.Id);
+            var sceneSprite = encounterBackgroundImage == null ? null : encounterBackgroundImage.sprite;
+            HideMerchantPresentation();
+            _eventPresentationActive = false;
+            _shopPresentationActive = true;
+            EnsureShopUi(onChoiceSelected);
+            if (shopUiController == null)
+            {
+                return;
+            }
+
+            var offers = new List<ShopOfferPresentation>();
+            var leaveChoiceStableId = string.Empty;
+            var source = choiceViews ?? Array.Empty<PrototypeEncounterChoiceView>();
+            for (var i = 0; i < source.Length; i++)
+            {
+                var view = source[i];
+                if (IsPurchaseChoice(view.ChoiceStableId))
+                {
+                    offers.Add(BuildShopOfferPresentation(view));
+                }
+                else if (view.ChoiceStableId.Contains("_LEAVE", StringComparison.Ordinal))
+                {
+                    leaveChoiceStableId = view.ChoiceStableId;
+                }
+            }
+
+            var snapshot = _roomController == null ? _lastSnapshot : _roomController.GetSnapshot();
+            shopUiController.Show(snapshot, ResolvePresentationDisplayName(encounter), sceneSprite, offers.ToArray(), leaveChoiceStableId);
+            for (var i = 0; i < shopUiController.OfferButtons.Count; i++)
+            {
+                _choiceButtons.Add(shopUiController.OfferButtons[i]);
+            }
+            _choiceButtons.Add(shopUiController.LeaveButton);
+
+            if (interactionText != null)
+            {
+                interactionText.text = string.Empty;
+                interactionText.gameObject.SetActive(false);
+            }
+
+            ShowResultMessage(string.Empty);
+        }
+
+        private void EnsureShopUi(Action<string> onChoiceSelected)
+        {
+            if (shopUiController == null)
+            {
+                var moduleObject = new GameObject("Shop UI Module", typeof(RectTransform));
+                moduleObject.transform.SetParent(HudParent, false);
+                shopUiController = moduleObject.AddComponent<ShopUiController>();
+            }
+
+            shopUiController.Initialize(HudParent, choiceStableId =>
+            {
+                ClearChoices();
+                HideEventCutsceneLayout();
+                onChoiceSelected?.Invoke(choiceStableId);
+            });
+        }
+
+        private void HideShopUi()
+        {
+            if (shopUiController != null)
+            {
+                shopUiController.Hide();
+            }
+        }
+
+        private static ShopOfferPresentation BuildShopOfferPresentation(PrototypeEncounterChoiceView view)
+        {
+            var title = ResolvePurchaseChoiceTitle(view.HintText);
+            var detail = FirstPublicLine(NormalizePublicHint(view.HintText));
+            var unavailableReason = view.Enabled ? string.Empty : NormalizeShopDisabledHint(view.HintText);
+            return new ShopOfferPresentation(view.ChoiceStableId, title, detail, unavailableReason, view.Enabled);
+        }
+
+        private static string FirstPublicLine(string value)
+        {
+            var lineBreak = value.IndexOf('\n');
+            return lineBreak < 0 ? value : value.Substring(0, lineBreak);
+        }
+
         public void ClearChoices()
         {
+            HideShopUi();
             for (var i = 0; i < _choiceButtons.Count; i++)
             {
-                if (_choiceButtons[i] != null)
+                if (_choiceButtons[i] != null && (shopUiController == null || !shopUiController.Owns(_choiceButtons[i])))
                 {
                     DestroyHudObject(_choiceButtons[i].gameObject);
                 }
@@ -7394,7 +7506,7 @@ namespace HwigiTower.UI
                 HideLegacyEncounterVisuals(hideBackground: false);
             }
 
-            if (!snapshot.IsInCombat && _shopPresentationActive)
+            if (!snapshot.IsInCombat && _shopPresentationActive && (shopUiController == null || !shopUiController.Visible))
             {
                 ApplyMerchantPresentation(snapshot.CurrentFloor);
             }

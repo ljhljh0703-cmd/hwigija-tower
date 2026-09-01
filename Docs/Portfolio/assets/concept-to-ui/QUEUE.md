@@ -25,14 +25,14 @@
 | 2 | 전투 (일반) | `combat_layout_spec_v2.json` v2.1 | ✅ **통과(런타임)** | 3 | 반려 해소. **런타임 27/27** · 배선 22/22 · 구 빌더 경로 안전 제거(−149줄) |
 | 3 | 휴식 (마타이오스) | `rest_layout_spec.json` v1.1 | ✅ **통과(런타임)** | 1 | 사양 9/9 · 정적 20/20 · **런타임 20/20** · 캡처 생성됨. variants 는 아트 4종 + 임계값 미정으로 blocked |
 | 4 | 층 지도 | `floormap_layout_spec.json` v1.0 | ✅ **통과(런타임)** | 1 | 사양 8/8 · **런타임 14/14** · 배선 10/10 |
-| 5 | 상점 | `shop_layout_spec.json` **v1.0** | **대기** | 0 | 자체 채점 **8/8**. 🔑 **5~8 공유 1장** — 층 차이는 슬롯이 아니라 데이터(`ENC_SHOP_01~05` 동일 구조) |
-| 6 | 상점 3층 | `shop_layout_spec.json` (공유) | 대기 | 0 | 5번과 같은 사양. 좌표를 층별로 바꾸지 않는다 |
-| 7 | 상점 4층 | `shop_layout_spec.json` (공유) | 대기 | 0 | 5번과 같은 사양. 좌표를 층별로 바꾸지 않는다 |
-| 8 | 상점 5층 | `shop_layout_spec.json` (공유) | 대기 | 0 | 5번과 같은 사양. 좌표를 층별로 바꾸지 않는다 |
-| 9 | 이벤트 (항아리 방) | 미작성 | 대기 | 0 | |
-| 10 | 보스 전투 | 미작성 | 대기 | 0 | 2번 사양 파생 |
-| 11 | 보스 관문 선택 | 미작성 | 대기 | 0 | |
-| 12 | 엔딩 선택 | 미작성 | 대기 | 0 | P1 3악장 종착 |
+| 5 | 상점 | `shop_layout_spec.json` v1.2 (공유) | ✅ **통과(런타임)** | 1 | 5행+나가기 · 배선 13/13 · 런타임 PASS |
+| 6 | 상점 3층 | `shop_layout_spec.json` v1.2 (공유) | ✅ **통과(런타임)** | 1 | 5행+나가기 · 배선 13/13 · 런타임 PASS |
+| 7 | 상점 4층 | `shop_layout_spec.json` v1.2 (공유) | ✅ **통과(런타임)** | 1 | 5행+나가기 · 배선 13/13 · 런타임 PASS |
+| 8 | 상점 5층 | `shop_layout_spec.json` v1.2 (공유) | ✅ **통과(런타임)** | 1 | 5행+나가기 · 배선 13/13 · 런타임 PASS |
+| 9 | 이벤트 (항아리 방) | `event_layout_spec.json` **v1.0** | **대기** | 0 | 좌표 8/8 · 데이터바인딩 PASS. 🔴 **선택지 2~14 가변**(41종 실측) → 고정 행 폐기, 스크롤 목록 + 고정 조작부 |
+| 10 | 보스 전투 | `combat_layout_spec_v2.json` 파생 | 대기 | 0 | 전투와 같은 슬롯. 보스 전용 UI 요소가 데이터에 없다 — 확인 후 파생 여부 확정 |
+| 11 | 보스 관문 선택 | 미작성 | 대기 | 0 | `ENC_COMBAT_GATE_01~03` 선택지 **1개**(ENGAGE). 저비용 |
+| 12 | 엔딩 선택 | 미작성 | 대기 | 0 | `EndingChoicePending`·`EndingRest`·`EndingContinue`·`EndingChoiceId` 실재. P1 3악장 종착 |
 
 ## 런타임 레인 (2026-09-01 개통)
 
@@ -45,8 +45,9 @@ R2 기준선 실측: `e9d5454`와 R1의 실패 이름 집합은 EditMode **30/30
 | 전투 | `source: runtime`, 22 슬롯 | **27/27 PASS** | R3 재배선 runtime 검증됨 |
 | 휴식 | `source: runtime`, 14 슬롯 | **20/20 PASS** | R3 재캡처 runtime 검증됨 |
 | 층 지도 | `source: runtime`, 10 슬롯 | **14/14 PASS** | R3 신규 runtime 검증됨 |
+| 상점 (5~8 공유) | `source: runtime`, 13 슬롯 | **20/20 PASS** | R4 1·3·4·5층 캡처 runtime 검증됨 |
 
-R3 전량 검증은 EditMode **204/212**(잔여 8), PlayMode **14/21**(잔여 맵 진행 6 + explicit 1 SKIP)로 기준선 실패 이름 집합을 유지했다. 명시적 QA **1/1 pass**; PNG는 `Docs/Portfolio/assets/concept-to-ui/runtime-captures/`, runtime actual은 같은 상위 디렉터리에 있다.
+R4 전량 검증은 EditMode **204/212**(잔여 8), PlayMode **14/21**(잔여 맵 진행 6 + explicit 1 SKIP)로 기준선 실패 이름 집합을 유지했다. 명시적 QA **1/1 pass**; PNG는 `Docs/Portfolio/assets/concept-to-ui/runtime-captures/`, runtime actual은 같은 상위 디렉터리에 있다.
 ⚠️ C-08은 아트 4종 미입고 + `thresholds.*: undecided` variants blocked라 여전히 SKIP. 기본 상태로 대체 측정하지 않았다.
 
 ## 상태 값
@@ -59,7 +60,7 @@ R3 전량 검증은 EditMode **204/212**(잔여 8), PlayMode **14/21**(잔여 �
 ## 사양 미작성 화면
 
 서식은 휴식 v1.1 에서 확정됐다(`dataBinding` 포함). 이제 파생해서 쓴다.
-5~8 상점 4종은 **사양 1장 공유 후보**다. 층 지도(4번)가 런타임까지 통과하면 그 구조를 파생시킨다.
+5~8 상점 4종은 **사양 1장 공유**로 R4에서 완료했다. 다음은 사양 미작성 9 이벤트다.
 
 ## 표준 배선 패턴 (휴식이 기준 사례)
 
