@@ -1,7 +1,7 @@
 {
   "screen": "combat",
   "capturedAt": "origin/Proto@5adc2e1 static-contract (Unity \uBBF8\uC2E4\uD589)",
-  "source": "CombatLayoutContract.cs",
+  "source": "contract",
   "slots": {
     "floorChip": {
       "x": 0.04,

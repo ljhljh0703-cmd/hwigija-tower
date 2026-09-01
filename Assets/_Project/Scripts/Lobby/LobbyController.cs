@@ -66,18 +66,34 @@ namespace HwigiTower.Lobby
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void EnsureLobbySceneRuntimeUi()
         {
-            if (SceneManager.GetActiveScene().name != "Lobby")
+            var activeScene = SceneManager.GetActiveScene();
+            if (activeScene.name != "Lobby")
             {
                 return;
             }
 
-            var controller = FindFirstObjectByType<LobbyController>();
+            var controller = FindLobbyControllerInScene(activeScene);
             if (controller == null)
             {
                 controller = new GameObject("Lobby Runtime").AddComponent<LobbyController>();
             }
 
             controller.EnsureRuntimeUi();
+        }
+
+        private static LobbyController FindLobbyControllerInScene(Scene scene)
+        {
+            var controllers = FindObjectsByType<LobbyController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (var i = 0; i < controllers.Length; i++)
+            {
+                var controller = controllers[i];
+                if (controller != null && controller.gameObject.scene == scene)
+                {
+                    return controller;
+                }
+            }
+
+            return null;
         }
 
         private void Awake()
@@ -145,23 +161,29 @@ namespace HwigiTower.Lobby
 
         private bool IsRuntimeUiPresent()
         {
-            return transform.Find(LobbyCanvasName) != null &&
-                GameObject.Find(LobbyTitleName) != null &&
-                GameObject.Find(LobbyNewGameButtonName) != null &&
-                GameObject.Find(LobbyContinueButtonName) != null &&
-                GameObject.Find(LobbyRecordButtonName) != null &&
-                GameObject.Find(LobbySettingsButtonName) != null &&
-                GameObject.Find(LobbyQuitButtonName) != null &&
-                FindChildTransform(transform, LobbyLayoutRevisionName) != null;
+            var runtimeUiRoot = FindRuntimeUiRoot();
+            return runtimeUiRoot != null &&
+                FindChildTransform(runtimeUiRoot, LobbyTitleName) != null &&
+                FindChildTransform(runtimeUiRoot, LobbyNewGameButtonName) != null &&
+                FindChildTransform(runtimeUiRoot, LobbyContinueButtonName) != null &&
+                FindChildTransform(runtimeUiRoot, LobbyRecordButtonName) != null &&
+                FindChildTransform(runtimeUiRoot, LobbySettingsButtonName) != null &&
+                FindChildTransform(runtimeUiRoot, LobbyQuitButtonName) != null &&
+                FindChildTransform(runtimeUiRoot, LobbyLayoutRevisionName) != null;
         }
 
         private void HidePartialRuntimeUi()
         {
-            var existing = transform.Find(LobbyCanvasName);
-            if (existing != null)
+            for (var i = transform.childCount - 1; i >= 0; i--)
             {
-                existing.gameObject.SetActive(false);
-                existing.name = "Lobby Obsolete Runtime UI";
+                var child = transform.GetChild(i);
+                if (child.name != LobbyCanvasName)
+                {
+                    continue;
+                }
+
+                child.gameObject.SetActive(false);
+                child.name = "Lobby Obsolete Runtime UI";
             }
 
             _safeAreaRoot = null;
@@ -687,7 +709,7 @@ namespace HwigiTower.Lobby
 
         private void NormalizeRuntimeUi()
         {
-            var canvasTransform = transform.Find(LobbyCanvasName);
+            var canvasTransform = FindRuntimeUiRoot();
             if (canvasTransform == null)
             {
                 return;
@@ -726,19 +748,25 @@ namespace HwigiTower.Lobby
 
         private void BindRuntimeUi()
         {
-            _safeAreaRoot = FindChildComponent<RectTransform>("Lobby Portrait Safe Area");
-            _settingsPanel = FindChildGameObject("Lobby Settings Panel");
-            _recordPanel = FindChildGameObject("Lobby Record Panel");
-            _statusText = FindChildComponent<Text>("Lobby Run Status");
-            _continueButton = FindChildComponent<Button>(LobbyContinueButtonName);
+            var runtimeUiRoot = FindRuntimeUiRoot();
+            if (runtimeUiRoot == null)
+            {
+                return;
+            }
 
-            BindButton(LobbyNewGameButtonName, StartNewGame);
-            BindButton(LobbyContinueButtonName, ContinueSavedRun);
-            BindButton(LobbyRecordButtonName, OpenRecord);
-            BindButton(LobbySettingsButtonName, OpenSettings);
-            BindButton(LobbyQuitButtonName, QuitOrShowPlaceholder);
-            BindButton("Lobby Record Close Button", CloseRecord);
-            BindButton("Lobby Settings Close Button", CloseSettings);
+            _safeAreaRoot = FindChildComponent<RectTransform>(runtimeUiRoot, "Lobby Portrait Safe Area");
+            _settingsPanel = FindChildGameObject(runtimeUiRoot, "Lobby Settings Panel");
+            _recordPanel = FindChildGameObject(runtimeUiRoot, "Lobby Record Panel");
+            _statusText = FindChildComponent<Text>(runtimeUiRoot, "Lobby Run Status");
+            _continueButton = FindChildComponent<Button>(runtimeUiRoot, LobbyContinueButtonName);
+
+            BindButton(runtimeUiRoot, LobbyNewGameButtonName, StartNewGame);
+            BindButton(runtimeUiRoot, LobbyContinueButtonName, ContinueSavedRun);
+            BindButton(runtimeUiRoot, LobbyRecordButtonName, OpenRecord);
+            BindButton(runtimeUiRoot, LobbySettingsButtonName, OpenSettings);
+            BindButton(runtimeUiRoot, LobbyQuitButtonName, QuitOrShowPlaceholder);
+            BindButton(runtimeUiRoot, "Lobby Record Close Button", CloseRecord);
+            BindButton(runtimeUiRoot, "Lobby Settings Close Button", CloseSettings);
 
             if (_settingsPanel != null)
             {
@@ -753,9 +781,9 @@ namespace HwigiTower.Lobby
             ConfigureContinueButton();
         }
 
-        private void BindButton(string name, UnityEngine.Events.UnityAction action)
+        private void BindButton(Transform runtimeUiRoot, string name, UnityEngine.Events.UnityAction action)
         {
-            var button = FindChildComponent<Button>(name);
+            var button = FindChildComponent<Button>(runtimeUiRoot, name);
             if (button == null)
             {
                 return;
@@ -765,15 +793,29 @@ namespace HwigiTower.Lobby
             button.onClick.AddListener(action);
         }
 
-        private GameObject FindChildGameObject(string targetName)
+        private Transform FindRuntimeUiRoot()
         {
-            var child = FindChildTransform(transform, targetName);
+            for (var i = 0; i < transform.childCount; i++)
+            {
+                var child = transform.GetChild(i);
+                if (child.name == LobbyCanvasName && child.gameObject.activeInHierarchy)
+                {
+                    return child;
+                }
+            }
+
+            return null;
+        }
+
+        private static GameObject FindChildGameObject(Transform root, string targetName)
+        {
+            var child = FindChildTransform(root, targetName);
             return child != null ? child.gameObject : null;
         }
 
-        private T FindChildComponent<T>(string targetName) where T : Component
+        private static T FindChildComponent<T>(Transform root, string targetName) where T : Component
         {
-            var child = FindChildTransform(transform, targetName);
+            var child = FindChildTransform(root, targetName);
             return child != null ? child.GetComponent<T>() : null;
         }
 

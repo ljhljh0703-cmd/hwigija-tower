@@ -15,9 +15,9 @@
 
 | # | 화면 | 사양 | 상태 | 라운드 | 비고 |
 |---|---|---|---|---|---|
-| 1 | 로비 | `lobby_layout_spec.json` v1.2 | **통과(정적)** | 2 | 8/8 + actual 12/12 · `120f37c` · 🆕 **런타임 검증 = 휴식 라운드에 묶음**(09-01 라이선스 활성) |
-| 2 | 전투 (일반) | `combat_layout_spec_v2.json` **v2.1** | **통과(정적)** | 2 | 사양 8 PASS·C-08 SKIP·C-09 PASS. actual **27/27** — `mataiosSanityBar` → `mataiosStateLabel` 반영. 런타임 캡처는 3화면 QA의 기존 no-save 격리 실패로 미생성 |
-| 3 | 휴식 (마타이오스) | `rest_layout_spec.json` **v1.1** | **통과(정적)** | 1 | 사양 **9/9** + actual **20/20**. variants 는 아트 4종 미입고 + 임계값 미정으로 blocked — **기본 상태만 구현**. 런타임 캡처는 3화면 QA의 기존 no-save 격리 실패로 미생성 |
+| 1 | 로비 | `lobby_layout_spec.json` v1.2 | **통과(정적)** | 2 | 정적 8/8 + 12/12. R2 runtime actual **12/12 PASS** |
+| 2 | 전투 (일반) | `combat_layout_spec_v2.json` **v2.1** | **통과(정적)** | 2 | 정적 8 PASS·C-08 SKIP·C-09 PASS + 27/27. R2 runtime actual **2 PASS · 25 FAIL** — 좌표/누락 차이는 `_rejections.md` 기록, 수정 대기 |
+| 3 | 휴식 (마타이오스) | `rest_layout_spec.json` **v1.1** | **통과(정적)** | 1 | 정적 9/9 + 20/20. R2 runtime actual **20/20 PASS**. variants 는 아트 4종 미입고 + 임계값 미정으로 blocked |
 | 4 | 층 지도 | 미작성 | 대기 | 0 | |
 | 5 | 상점 | 미작성 | 대기 | 0 | 6·7과 사양 1장 공유 후보 |
 | 6 | 상점 3층 | 미작성 | 대기 | 0 | |
@@ -31,8 +31,16 @@
 ## 런타임 레인 (2026-09-01 개통)
 
 Unity 라이선스 활성 확인(`Tools/unity_license_probe.sh` · 배치 `exit=0`). `exit 198` 해소.
-지금까지의 「통과」는 **전부 정적 층**이다. 로비·전투·휴식 런타임 검증은 `DISPATCH-rest.md` §C 한 라운드로 묶었다.
-⚠️ 마지막 테스트 결과가 **2026-05-10** 이다 — 넉 달치 변경이 미검증이다. 첫 라운드 실패는 이번 작업 탓이 아닐 수 있다.
+R2 기준선 실측: `e9d5454`와 R1의 실패 이름 집합은 EditMode **30/30**, PlayMode **8/8** 동일(새 실패 0·고쳐진 것 0)이었다.
+
+| 화면 | runtime actual | 정적 contract 대조 | 상태 |
+|---|---|---|---|
+| 로비 | `source: runtime`, 8 슬롯 | **12/12 PASS** | runtime 검증됨 |
+| 전투 | `source: runtime`, 15/22 슬롯 보고 | **2 PASS · 25 FAIL** | 반려 — 좌표/누락 차이를 `_rejections.md`에 기록, 수정 대기 |
+| 휴식 | `source: runtime`, 14 슬롯 | **20/20 PASS** | runtime 검증됨 |
+
+EditMode는 좁은 ML-Agents immutable-meta Error 기대 후 **203/211**(잔여 8), PlayMode는 no-save UI 바인딩 격리 수리 후 **14/21**(잔여 맵 진행 6)이다. 명시적 QA는 통과했고 PNG·runtime actual은 `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 있다.
+⚠️ C-08은 아트 4종 미입고 + `thresholds.*: undecided` variants blocked라 여전히 SKIP. 기본 상태로 대체 측정하지 않았다.
 
 ## 상태 값
 

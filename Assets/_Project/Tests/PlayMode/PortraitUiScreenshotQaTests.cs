@@ -98,6 +98,17 @@ namespace HwigiTower.Tests.PlayMode
             yield return SceneManager.LoadSceneAsync("Lobby", LoadSceneMode.Single);
             yield return WaitForFrames(10);
 
+            var controller = Object.FindFirstObjectByType<LobbyController>();
+            Assert.IsNotNull(controller);
+            if (!expectsSave)
+            {
+                PrototypeRunSaveStore.Delete();
+                PrototypeRunSaveRequest.RequestNewGame();
+                Assert.IsFalse(PrototypeRunSaveStore.HasSave(), "No-save screenshot fixture observed a persisted run at " + PrototypeRunSaveStore.DefaultPath);
+                controller.ShowContinuePlaceholder();
+                yield return null;
+            }
+
             Assert.IsNotNull(GameObject.Find("Lobby Canvas"));
             Assert.IsNotNull(GameObject.Find("Lobby Title"));
             Assert.IsNotNull(GameObject.Find("Lobby New Game Button"));
@@ -113,8 +124,6 @@ namespace HwigiTower.Tests.PlayMode
                 StringAssert.Contains("저장된 진행 없음", continueButton.GetComponentInChildren<Text>().text);
             }
 
-            var controller = Object.FindFirstObjectByType<LobbyController>();
-            Assert.IsNotNull(controller);
             WriteLobbyRuntimeActual();
             yield return CaptureAndAssert(fileName);
         }
@@ -350,13 +359,13 @@ namespace HwigiTower.Tests.PlayMode
             builder.Append("{\n");
             builder.Append("  \"screen\": \"").Append(JsonEscape(screen)).Append("\",\n");
             builder.Append("  \"capturedAt\": \"").Append(System.DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)).Append(" runtime RectTransform capture\",\n");
-            builder.Append("  \"source\": \"PortraitUiScreenshotQaTests\",\n");
+            builder.Append("  \"source\": \"runtime\",\n");
             builder.Append("  \"slots\": {");
             var wroteSlot = false;
             for (var i = 0; i < requests.Length; i++)
             {
                 var request = requests[i];
-                var rect = FindRuntimeRectTransform(request.ObjectName);
+                var rect = FindRuntimeRectTransform(request.ObjectName, reference);
                 if (rect == null)
                 {
                     continue;
@@ -406,19 +415,27 @@ namespace HwigiTower.Tests.PlayMode
             return rect;
         }
 
-        private static RectTransform FindRuntimeRectTransform(string objectName)
+        private static RectTransform FindRuntimeRectTransform(string objectName, RectTransform reference)
         {
             var transforms = Object.FindObjectsByType<RectTransform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            RectTransform inactiveMatch = null;
             for (var i = 0; i < transforms.Length; i++)
             {
                 var rect = transforms[i];
-                if (rect != null && rect.name == objectName)
+                if (rect == null || rect.name != objectName || !rect.IsChildOf(reference))
+                {
+                    continue;
+                }
+
+                if (rect.gameObject.activeInHierarchy)
                 {
                     return rect;
                 }
+
+                inactiveMatch ??= rect;
             }
 
-            return null;
+            return inactiveMatch;
         }
 
         private static string FormatFloat(float value)

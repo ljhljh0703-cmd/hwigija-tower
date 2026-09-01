@@ -55,7 +55,7 @@ static LayoutDocument BuildLobbyDocument(string capturedAt)
     {
         Screen = "lobby",
         CapturedAt = capturedAt,
-        Source = "LobbyLayoutContract.cs",
+        Source = "contract",
         Slots = LobbyLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualLobbySlot)
     };
 }
@@ -66,7 +66,7 @@ static LayoutDocument BuildCombatDocument(string capturedAt)
     {
         Screen = "combat",
         CapturedAt = capturedAt,
-        Source = "CombatLayoutContract.cs",
+        Source = "contract",
         Slots = CombatLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualCombatSlot)
     };
 }
@@ -77,7 +77,7 @@ static LayoutDocument BuildRestDocument(string capturedAt)
     {
         Screen = "rest",
         CapturedAt = capturedAt,
-        Source = "RestLayoutContract.cs",
+        Source = "contract",
         Slots = RestLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualRestSlot)
     };
 }

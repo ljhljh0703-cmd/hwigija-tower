@@ -3,6 +3,8 @@ using System.Linq;
 using HwigiTower.Encounters;
 using NUnit.Framework;
 using UnityEditor;
+using EncounterPipelineV02Baker = HwigiTower.Tests.EditMode.EditModeEncounterBakerLogGuard;
+using EncounterRuntimeCatalogBuilder = HwigiTower.Tests.EditMode.EditModeCatalogRefreshLogGuard;
 
 namespace HwigiTower.Tests.EditMode
 {

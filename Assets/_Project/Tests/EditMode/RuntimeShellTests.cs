@@ -14,6 +14,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using EncounterRuntimeCatalogBuilder = HwigiTower.Tests.EditMode.EditModeCatalogRefreshLogGuard;
 
 namespace HwigiTower.Tests.EditMode
 {

@@ -52,6 +52,23 @@ namespace HwigiTower.Tests.PlayMode
             AssertSlot("Lobby Build Stamp", LobbyLayout.BuildStamp);
 
             var continueButton = GameObject.Find("Lobby Continue Button").GetComponent<Button>();
+            var controllers = Object.FindObjectsByType<LobbyController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Assert.AreEqual(1, controllers.Length, "Lobby scene must have one controller that owns the runtime UI.");
+            var allButtons = Object.FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var continueButtonCount = 0;
+            for (var i = 0; i < allButtons.Length; i++)
+            {
+                if (allButtons[i] != null && allButtons[i].gameObject.activeInHierarchy && allButtons[i].name == "Lobby Continue Button")
+                {
+                    continueButtonCount++;
+                }
+            }
+            Assert.AreEqual(1, continueButtonCount, "Lobby scene must expose one Continue button.");
+            var controllerButton = typeof(LobbyController)
+                .GetField("_continueButton", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(controller) as Button;
+            Assert.IsNotNull(controllerButton, "LobbyController did not bind its Continue button.");
+            Assert.AreSame(controllerButton, continueButton, "The visible Continue button must be the button refreshed by LobbyController.");
             Assert.IsFalse(continueButton.interactable);
             Assert.AreEqual("이어서 오른다 · " + controller.ContinueDisabledReason, continueButton.GetComponentInChildren<Text>().text);
             var noSaveStatus = GameObject.Find("Lobby Run Status").GetComponent<Text>().text;
@@ -160,7 +177,7 @@ namespace HwigiTower.Tests.PlayMode
                 memoryFragmentRefs = new[] { "MEM_FRAGMENT_01" }
             });
 
-            yield return LoadLobby();
+            yield return LoadLobby(true);
 
             var continueButton = GameObject.Find("Lobby Continue Button").GetComponent<Button>();
             Assert.IsTrue(continueButton.interactable);
@@ -182,11 +199,24 @@ namespace HwigiTower.Tests.PlayMode
             Assert.AreEqual(2, room.RunState.CurrentFloor);
         }
 
-        private static IEnumerator LoadLobby()
+        private static IEnumerator LoadLobby(bool expectsSave = false)
         {
             yield return SceneManager.LoadSceneAsync("Lobby", LoadSceneMode.Single);
             yield return null;
             yield return null;
+            var controller = Object.FindFirstObjectByType<LobbyController>();
+            Assert.IsNotNull(controller);
+            if (!expectsSave)
+            {
+                // The test runner can initialize the Lobby before this fixture deletes a prior run.
+                // Reapply the no-save fixture after the target scene has completed its UI bootstrap.
+                PrototypeRunSaveStore.Delete();
+                PrototypeRunSaveRequest.RequestNewGame();
+                Assert.IsFalse(
+                    PrototypeRunSaveStore.HasSave(),
+                    "No-save lobby fixture observed a persisted run at " + PrototypeRunSaveStore.DefaultPath);
+                controller.ShowContinuePlaceholder();
+            }
             Canvas.ForceUpdateCanvases();
         }
 

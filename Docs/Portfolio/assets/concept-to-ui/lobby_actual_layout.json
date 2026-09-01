@@ -1,7 +1,7 @@
 {
   "screen": "lobby",
   "capturedAt": "origin/Proto@5adc2e1 static-contract (Unity \uBBF8\uC2E4\uD589)",
-  "source": "LobbyLayoutContract.cs",
+  "source": "contract",
   "slots": {
     "runStatus": {
       "x": 0.06,
