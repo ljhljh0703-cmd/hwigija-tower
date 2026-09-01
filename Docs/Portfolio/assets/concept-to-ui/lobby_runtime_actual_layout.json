@@ -1,0 +1,15 @@
+{
+  "screen": "lobby",
+  "capturedAt": "2026-09-01T22:01:55.1377550Z runtime RectTransform capture",
+  "source": "runtime",
+  "slots": {
+    "runStatus": {"x": 0.06, "y": 0.022, "w": 0.88, "h": 0.036, "fontSize": 26, "visible": true},
+    "towerArt": {"x": 0, "y": 0, "w": 1, "h": 0.7, "visible": true},
+    "titleMark": {"x": 0.1, "y": 0.46, "w": 0.8, "h": 0.12, "fontSize": 96, "visible": true},
+    "tagline": {"x": 0.15, "y": 0.585, "w": 0.7, "h": 0.035, "fontSize": 26, "visible": true},
+    "primaryAction": {"x": 0.1, "y": 0.69, "w": 0.8, "h": 0.078, "fontSize": 42, "visible": true},
+    "secondaryAction": {"x": 0.14, "y": 0.784, "w": 0.72, "h": 0.062, "fontSize": 34, "visible": true},
+    "utilityRow": {"x": 0.2, "y": 0.878, "w": 0.6, "h": 0.052, "fontSize": 22, "visible": true},
+    "buildStamp": {"x": 0.35, "y": 0.955, "w": 0.3, "h": 0.022, "fontSize": 22, "visible": true}
+  }
+}

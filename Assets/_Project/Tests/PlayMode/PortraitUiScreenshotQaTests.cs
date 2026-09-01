@@ -17,7 +17,9 @@ namespace HwigiTower.Tests.PlayMode
     {
         private const int ScreenshotWidth = 1080;
         private const int ScreenshotHeight = 1920;
-        private const string ScreenshotDirectory = "/private/tmp/hwigi-portrait-ui-v3-screenshots";
+        private static string ProjectRoot => Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+        private static string ScreenshotDirectory => Path.Combine(ProjectRoot, "Docs", "Portfolio", "assets", "concept-to-ui", "runtime-captures");
+        private static string RuntimeActualDirectory => Path.Combine(ProjectRoot, "Docs", "Portfolio", "assets", "concept-to-ui");
 
         [SetUp]
         public void SetUp()
@@ -36,6 +38,7 @@ namespace HwigiTower.Tests.PlayMode
         public IEnumerator PortraitUiV3_CapturesRequiredQaScreens()
         {
             Directory.CreateDirectory(ScreenshotDirectory);
+            Directory.CreateDirectory(RuntimeActualDirectory);
             DeleteRequiredScreenshots();
             Screen.SetResolution(ScreenshotWidth, ScreenshotHeight, false);
             yield return WaitForFrames(8);
@@ -58,7 +61,7 @@ namespace HwigiTower.Tests.PlayMode
                 });
                 Assert.IsFalse(hud.PreRunPlaceholderVisible, "Map capture must not be blocked by the pre-run placeholder.");
                 Assert.IsTrue(hud.NodeMapVisible, "Expected current route map to be visible.");
-            });
+            }, "floormap");
             yield return CaptureEncounterScreen("03_event_jar_room.png", "EVT_F01_JAR_ROOM");
             yield return CaptureRestScreen();
             yield return CaptureShopScreen();
@@ -323,6 +326,11 @@ namespace HwigiTower.Tests.PlayMode
             {
                 WriteRuntimeActual(screen, root, new[]
                 {
+                    new RuntimeSlotRequest("floorChip", "Combat floorChip"),
+                    new RuntimeSlotRequest("sanityChip", "Combat sanityChip"),
+                    new RuntimeSlotRequest("hpChip", "Combat hpChip"),
+                    new RuntimeSlotRequest("goldChip", "Combat goldChip"),
+                    new RuntimeSlotRequest("threatReadout", "Combat Threat Readout"),
                     new RuntimeSlotRequest("enemyPanel", "Combat Enemy Stage"),
                     new RuntimeSlotRequest("enemyTitle", "Combat Enemy Title"),
                     new RuntimeSlotRequest("enemyHpBar", "Enemy HP Bar Frame"),
@@ -331,13 +339,33 @@ namespace HwigiTower.Tests.PlayMode
                     new RuntimeSlotRequest("damageEffectOverlay", "Combat Enemy Damage Number"),
                     new RuntimeSlotRequest("playerCard", "Combat Player Card"),
                     new RuntimeSlotRequest("playerHpBar", "Player HP Bar Frame"),
+                    new RuntimeSlotRequest("playerSanityBar", "Player Sanity Bar Frame"),
                     new RuntimeSlotRequest("mataiosCard", "Combat Mataios Card"),
                     new RuntimeSlotRequest("mataiosHpBar", "Mataios HP Bar Frame"),
+                    new RuntimeSlotRequest("mataiosStateLabel", "Combat Mataios State Label"),
                     new RuntimeSlotRequest("attackButton", "Combat Button Attack"),
                     new RuntimeSlotRequest("defendButton", "Combat Button Defend"),
                     new RuntimeSlotRequest("skillButton", "Combat Button Skill"),
                     new RuntimeSlotRequest("combatLog", "Combat Log Panel"),
                     new RuntimeSlotRequest("itemInspectButton", "Combat Item Inspect Button")
+                });
+                return;
+            }
+
+            if (screen == "floormap")
+            {
+                WriteRuntimeActual(screen, root, new[]
+                {
+                    new RuntimeSlotRequest("floorChip", "FloorMap floorChip"),
+                    new RuntimeSlotRequest("sanityChip", "FloorMap sanityChip"),
+                    new RuntimeSlotRequest("hpChip", "FloorMap hpChip"),
+                    new RuntimeSlotRequest("goldChip", "FloorMap goldChip"),
+                    new RuntimeSlotRequest("screenTitle", "FloorMap Screen Title"),
+                    new RuntimeSlotRequest("nodeGraph", "FloorMap Node Graph"),
+                    new RuntimeSlotRequest("nodeLegend", "FloorMap Node Legend"),
+                    new RuntimeSlotRequest("selectedNodeCard", "FloorMap Selected Card"),
+                    new RuntimeSlotRequest("departButton", "FloorMap Depart Button"),
+                    new RuntimeSlotRequest("backButton", "FloorMap Back Button")
                 });
                 return;
             }
@@ -403,7 +431,7 @@ namespace HwigiTower.Tests.PlayMode
                 builder.Append('\n');
             }
             builder.Append("  }\n}");
-            File.WriteAllText(Path.Combine(ScreenshotDirectory, screen + "_actual_layout.json"), builder.ToString());
+            File.WriteAllText(Path.Combine(RuntimeActualDirectory, screen + "_runtime_actual_layout.json"), builder.ToString());
         }
 
         private static RectTransform RequireRectTransform(string objectName)

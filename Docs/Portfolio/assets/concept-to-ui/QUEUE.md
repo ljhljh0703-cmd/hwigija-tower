@@ -1,8 +1,14 @@
 # 화면 큐 — 회귀탑 UI 개편
 
+> ▶ **진입점은 `NEXT.md` 다.** 지시를 받았으면 거기부터 읽는다. 사람이 지시문을 옮기지 않는다.
+
 > 코덱스는 **「대기」 맨 위 항목을 스스로 집는다.** 사람이 매번 다음 지시를 주지 않는다.
 > 통과하면 상태를 「통과」로 바꾸고 다음 항목으로 간다. 막히면 「보류」로 두고 사유를 적는다.
-> 채점 = `python3 Tools/check_layout.py --spec <spec> --actual <actual> --rejections Docs/Portfolio/assets/concept-to-ui/_rejections.md`
+> 채점 = **두 개다. 둘 다 돌린다.**
+>   ① 좌표 `python3 Tools/check_layout.py --spec <spec> --actual <actual> --rejections Docs/Portfolio/assets/concept-to-ui/_rejections.md`
+>   ② **배선 `python3 Tools/check_wiring.py`** — 계약이 화면에 연결됐는지. 🔒 2026-09-01 신설, 전투 반려가 낳았다.
+>   ⚠️ ①만 통과하고 ②가 FAIL 이면 **사양대로 그려지지 않는다.** 「27/27 통과」가 그렇게 나왔다.
+>   ⛔ 완료 조건은 **런타임 actual 대조**다. 정적(contract) 대조는 완료 조건이 아니다.
 
 ## 전역 (화면보다 먼저)
 
@@ -15,14 +21,14 @@
 
 | # | 화면 | 사양 | 상태 | 라운드 | 비고 |
 |---|---|---|---|---|---|
-| 1 | 로비 | `lobby_layout_spec.json` v1.2 | **통과(정적)** | 2 | 정적 8/8 + 12/12. R2 runtime actual **12/12 PASS** |
-| 2 | 전투 (일반) | `combat_layout_spec_v2.json` **v2.1** | **통과(정적)** | 2 | 정적 8 PASS·C-08 SKIP·C-09 PASS + 27/27. R2 runtime actual **2 PASS · 25 FAIL** — 좌표/누락 차이는 `_rejections.md` 기록, 수정 대기 |
-| 3 | 휴식 (마타이오스) | `rest_layout_spec.json` **v1.1** | **통과(정적)** | 1 | 정적 9/9 + 20/20. R2 runtime actual **20/20 PASS**. variants 는 아트 4종 미입고 + 임계값 미정으로 blocked |
-| 4 | 층 지도 | 미작성 | 대기 | 0 | |
-| 5 | 상점 | 미작성 | 대기 | 0 | 6·7과 사양 1장 공유 후보 |
-| 6 | 상점 3층 | 미작성 | 대기 | 0 | |
-| 7 | 상점 4층 | 미작성 | 대기 | 0 | |
-| 8 | 상점 5층 | 미작성 | 대기 | 0 | |
+| 1 | 로비 | `lobby_layout_spec.json` v1.2 | ✅ **통과(런타임)** | 3 | 정적 12/12 · **런타임 12/12** · 최초 5 FAIL 은 writer 계측 오류로 판명(정정 보존) |
+| 2 | 전투 (일반) | `combat_layout_spec_v2.json` v2.1 | ✅ **통과(런타임)** | 3 | 반려 해소. **런타임 27/27** · 배선 22/22 · 구 빌더 경로 안전 제거(−149줄) |
+| 3 | 휴식 (마타이오스) | `rest_layout_spec.json` v1.1 | ✅ **통과(런타임)** | 1 | 사양 9/9 · 정적 20/20 · **런타임 20/20** · 캡처 생성됨. variants 는 아트 4종 + 임계값 미정으로 blocked |
+| 4 | 층 지도 | `floormap_layout_spec.json` v1.0 | ✅ **통과(런타임)** | 1 | 사양 8/8 · **런타임 14/14** · 배선 10/10 |
+| 5 | 상점 | `shop_layout_spec.json` **v1.0** | **대기** | 0 | 자체 채점 **8/8**. 🔑 **5~8 공유 1장** — 층 차이는 슬롯이 아니라 데이터(`ENC_SHOP_01~05` 동일 구조) |
+| 6 | 상점 3층 | `shop_layout_spec.json` (공유) | 대기 | 0 | 5번과 같은 사양. 좌표를 층별로 바꾸지 않는다 |
+| 7 | 상점 4층 | `shop_layout_spec.json` (공유) | 대기 | 0 | 5번과 같은 사양. 좌표를 층별로 바꾸지 않는다 |
+| 8 | 상점 5층 | `shop_layout_spec.json` (공유) | 대기 | 0 | 5번과 같은 사양. 좌표를 층별로 바꾸지 않는다 |
 | 9 | 이벤트 (항아리 방) | 미작성 | 대기 | 0 | |
 | 10 | 보스 전투 | 미작성 | 대기 | 0 | 2번 사양 파생 |
 | 11 | 보스 관문 선택 | 미작성 | 대기 | 0 | |
@@ -35,11 +41,12 @@ R2 기준선 실측: `e9d5454`와 R1의 실패 이름 집합은 EditMode **30/30
 
 | 화면 | runtime actual | 정적 contract 대조 | 상태 |
 |---|---|---|---|
-| 로비 | `source: runtime`, 8 슬롯 | **12/12 PASS** | runtime 검증됨 |
-| 전투 | `source: runtime`, 15/22 슬롯 보고 | **2 PASS · 25 FAIL** | 반려 — 좌표/누락 차이를 `_rejections.md`에 기록, 수정 대기 |
-| 휴식 | `source: runtime`, 14 슬롯 | **20/20 PASS** | runtime 검증됨 |
+| 로비 | `source: runtime`, 8 슬롯 | **12/12 PASS** | R3 재캡처 runtime 검증됨 |
+| 전투 | `source: runtime`, 22 슬롯 | **27/27 PASS** | R3 재배선 runtime 검증됨 |
+| 휴식 | `source: runtime`, 14 슬롯 | **20/20 PASS** | R3 재캡처 runtime 검증됨 |
+| 층 지도 | `source: runtime`, 10 슬롯 | **14/14 PASS** | R3 신규 runtime 검증됨 |
 
-EditMode는 좁은 ML-Agents immutable-meta Error 기대 후 **203/211**(잔여 8), PlayMode는 no-save UI 바인딩 격리 수리 후 **14/21**(잔여 맵 진행 6)이다. 명시적 QA는 통과했고 PNG·runtime actual은 `/private/tmp/hwigi-portrait-ui-v3-screenshots/`에 있다.
+R3 전량 검증은 EditMode **204/212**(잔여 8), PlayMode **14/21**(잔여 맵 진행 6 + explicit 1 SKIP)로 기준선 실패 이름 집합을 유지했다. 명시적 QA **1/1 pass**; PNG는 `Docs/Portfolio/assets/concept-to-ui/runtime-captures/`, runtime actual은 같은 상위 디렉터리에 있다.
 ⚠️ C-08은 아트 4종 미입고 + `thresholds.*: undecided` variants blocked라 여전히 SKIP. 기본 상태로 대체 측정하지 않았다.
 
 ## 상태 값
@@ -51,4 +58,10 @@ EditMode는 좁은 ML-Agents immutable-meta Error 기대 후 **203/211**(잔여 
 
 ## 사양 미작성 화면
 
-3~12번은 **로비 파일럿이 통과한 뒤** 서식을 고쳐서 쓴다. 지금 미리 쓰면 서식이 바뀔 때 10장을 다시 고쳐야 한다.
+서식은 휴식 v1.1 에서 확정됐다(`dataBinding` 포함). 이제 파생해서 쓴다.
+5~8 상점 4종은 **사양 1장 공유 후보**다. 층 지도(4번)가 런타임까지 통과하면 그 구조를 파생시킨다.
+
+## 표준 배선 패턴 (휴식이 기준 사례)
+
+`<S>LayoutContract.cs`(순수 C#) → `<S>Layout.cs`(Unity 어댑터) → `<S>UiController.cs`(모듈) → `PrototypeHud` 에서 `AddComponent`.
+**새 구조를 발명하지 않는다.** 전투가 이 모양의 두 번째 사례이고, 층 지도가 세 번째다.

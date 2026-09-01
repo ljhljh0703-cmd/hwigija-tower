@@ -16,6 +16,7 @@ var document = screen switch
 {
     "lobby" => BuildLobbyDocument(capturedAt),
     "combat" => BuildCombatDocument(capturedAt),
+    "floormap" => BuildFloorMapDocument(capturedAt),
     "rest" => BuildRestDocument(capturedAt),
     _ => throw new ArgumentException("Unsupported screen: " + screen)
 };
@@ -82,6 +83,17 @@ static LayoutDocument BuildRestDocument(string capturedAt)
     };
 }
 
+static LayoutDocument BuildFloorMapDocument(string capturedAt)
+{
+    return new LayoutDocument
+    {
+        Screen = "floormap",
+        CapturedAt = capturedAt,
+        Source = "contract",
+        Slots = FloorMapLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualFloorMapSlot)
+    };
+}
+
 static ActualSlot ToActualLobbySlot(LobbySlot slot)
 {
     return new ActualSlot
@@ -116,6 +128,25 @@ static ActualSlot ToActualCombatSlot(CombatSlot slot)
 }
 
 static ActualSlot ToActualRestSlot(RestSlot slot)
+{
+    return new ActualSlot
+    {
+        X = slot.X,
+        Y = slot.Y,
+        W = slot.Width,
+        H = slot.Height,
+        FontSize = slot.FontSize,
+        Visible = true,
+        Layer = slot.Layer,
+        Type = slot.Type,
+        Label = slot.Label,
+        Color = slot.ColorToken,
+        Interactive = slot.Interactive,
+        FrameStyle = slot.HasFrame
+    };
+}
+
+static ActualSlot ToActualFloorMapSlot(FloorMapSlot slot)
 {
     return new ActualSlot
     {

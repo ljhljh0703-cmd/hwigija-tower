@@ -1,0 +1,21 @@
+{
+  "screen": "rest",
+  "capturedAt": "2026-09-01T22:01:56.7823120Z runtime RectTransform capture",
+  "source": "runtime",
+  "slots": {
+    "floorChip": {"x": 0.04, "y": 0.03, "w": 0.18, "h": 0.044, "fontSize": 26, "visible": true},
+    "sanityChip": {"x": 0.24, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "hpChip": {"x": 0.5, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "goldChip": {"x": 0.76, "y": 0.03, "w": 0.2, "h": 0.044, "fontSize": 26, "visible": true},
+    "screenTitle": {"x": 0.1, "y": 0.106, "w": 0.8, "h": 0.048, "fontSize": 54, "visible": true},
+    "restScene": {"x": 0, "y": 0.16, "w": 1, "h": 0.44, "visible": true},
+    "mataiosState": {"x": 0.52, "y": 0.61, "w": 0.44, "h": 0.118, "visible": true},
+    "mataiosStateLabel": {"x": 0.54, "y": 0.698, "w": 0.4, "h": 0.024, "fontSize": 26, "visible": true},
+    "playerState": {"x": 0.04, "y": 0.61, "w": 0.44, "h": 0.118, "fontSize": 34, "visible": true},
+    "playerHpBar": {"x": 0.06, "y": 0.7, "w": 0.4, "h": 0.016, "visible": true},
+    "choiceTalk": {"x": 0.04, "y": 0.756, "w": 0.28, "h": 0.17, "fontSize": 34, "visible": true},
+    "choiceTrain": {"x": 0.36, "y": 0.756, "w": 0.28, "h": 0.17, "fontSize": 34, "visible": true},
+    "choiceSleep": {"x": 0.68, "y": 0.756, "w": 0.28, "h": 0.17, "fontSize": 34, "visible": true},
+    "departButton": {"x": 0.3, "y": 0.938, "w": 0.4, "h": 0.052, "fontSize": 26, "visible": false}
+  }
+}

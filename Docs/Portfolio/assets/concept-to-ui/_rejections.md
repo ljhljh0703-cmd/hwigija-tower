@@ -256,3 +256,63 @@
 - 조치: `PortraitUiScreenshotQaTests` writer가 캡처 기준 root의 자식만 찾고, 활성 노드를 우선하며 inactive 노드는 같은 root 안에서만 fallback으로 고르도록 수정했다.
 - 재캡처: `01_lobby_no_save.png` 재생성, `lobby_actual_layout.json` top-level `source: runtime`, runtime 대조 **12/12 PASS**. 앞선 lobby 자동 반려는 audit으로 남기되 layout 판정에는 사용하지 않는다.
 - 승격 후보: no
+
+### 2026-09-01 · 런타임 R2 · ③Gate — **전투 반려** · 로비·휴식 통과
+**🔴 이 하네스가 만들어진 이유가 여기서 처음 드러났다.**
+
+- 위반: **`combat_layout_spec_v2.json` 이 화면에 구현된 적이 없다.** 계약 파일만 있고 런타임 배선이 없다
+- 실제(내 독립 확인, 반증 시도 포함):
+  - `CombatLayoutContract` 의 22 슬롯 중 **18개의 이름이 `PrototypeHud.cs` 에 단 한 번도 안 나온다**
+  - 반증 시도 — 상수로 참조할 가능성: `PrototypeHud.cs` 에 `CombatLayoutContract` 참조 **0건**
+  - `CombatLayoutContract` 를 참조하는 파일은 **전 리포에서 1개, 그것도 테스트**(`LobbyLayoutSpecTests.cs`)
+  - 대조군 — 휴식은 배선돼 있다: `PrototypeHud.cs:85` `[SerializeField] RestUiController`, `:2643` `AddComponent<RestUiController>()`
+  - 전투 UI 모듈이 없다. `RestLayout.cs`·`RestUiController.cs` 는 있는데 `Combat*Controller.cs` 는 없다
+- 기대: 사양 v2 대로 배치된 전투 화면
+- 🔴 **왜 정적 게이트가 못 잡았나**: `27/27 PASS` 는 **사양 ⟂ 계약 상수** 대조였고 **둘 다 같은 라운드에서 같은 손이 썼다.** 서로를 베낀 두 문서가 일치하는 것을 「구현됐다」로 읽었다. 화면은 한 번도 안 봤다
+- 런타임 실측이 그것을 드러냈다 — 전투 runtime 대조 **2 PASS · 25 FAIL**, v2 신설 슬롯 7종(`floorChip`·`sanityChip`·`hpChip`·`goldChip`·`threatReadout`·`playerSanityBar`·`mataiosStateLabel`)이 **런타임 보고에 아예 없다**(존재하지 않으니까). `combatLog` Δy **−0.357** = 구 레이아웃 그대로
+- 처리: **`QUEUE.md` 2번 전투를 「통과(정적)」에서 반려로 내린다.** 3단 재위탁
+- 승격 후보: **yes (확정)** — **「정적 actual 이 런타임 배선을 증명하지 않는다. 계약 파일이 화면에 연결됐는지를 2단·4단 완료 판정에 넣는다」**
+  기계 검사 가능: *계약 타입을 참조하는 비-테스트 파일이 1개 이상 존재하는가.* 이번 경우 0이었다. `check_layout.py` 가 아니라 별도 검사가 필요하다
+
+**코덱스 R2 검증 — 자기보고와 차이 0건 (4라운드 연속)**
+
+| 항목 | 보고 | 내 확인 |
+|---|---|---|
+| 전역 `LogAssert.ignoreFailingMessages` 미사용 | 미사용 | `Assets/` 전수 **0건** ✅ |
+| 무시 패턴 범위 | 메시지 1종 | `^Asset Packages/com\.unity\.ml-agents/Samples...$` **앵커된 정규식 1개** ✅ |
+| 단언 약화 여부 | 유지 | `Assert.IsFalse(continueButton.interactable)` **line 72 보존** · `Ignore`/`Explicit` **0건** ✅ |
+| 기준선 = R1 실패 집합 동일 | EditMode 30/30 · PlayMode 8/8 | XML 리포 내 보존, 해시 병기 |
+| 캡처·런타임 actual | 생성됨 | RETURN 에 해시 병기 (파일은 `/private/tmp` — **내 마운트 밖이라 미재현**) |
+
+**잘한 것 셋**
+1. **내 가설을 반증하고 그렇게 적었다.** 「저장 상태 누수」는 **틀렸고**, 진짜 원인은 `LobbyController` 가 비활성 legacy Canvas 의 동명 버튼을 바인딩한 것이었다. 가설에 코드를 맞추지 않았다
+2. **측정 도구를 고친 것을 숨기지 않았다.** 최초 로비 5 FAIL 은 writer 가 비활성 legacy RectTransform 을 집은 계측 오류였고, 자동 반려 기록을 **삭제하지 않고 정정 append** 했다. 도구 수정 자체는 정당하나 — **결과를 본 뒤 계측기를 고친 것**이므로 이 절에 명시해 둔다
+3. **전투 25 FAIL 을 고치지 않고 수치로 보존했다.** 고쳤으면 위 발견이 묻혔다
+
+**⚠️ 내 검증 한계**: 런타임 actual JSON 과 PNG 는 `/private/tmp` 에 있어 연결 폴더 밖이다. **슬롯별 Δ 수치는 재현하지 못했고 RETURN 표를 인용한 것이다.** 다만 위 「전투 미배선」 판정은 Δ 표가 아니라 **리포 안 소스 코드**로 독립 확인했다. 다음 라운드부터 런타임 산출을 리포 안으로 낼 것
+
+### 2026-09-02 · R3 · ③Gate — **전 화면 런타임 통과.** 이 레인 첫 완전 통과
+**독립 재현 — 자기보고와 차이 0건 (5라운드 연속)**
+
+| 화면 | 사양 자체 | **런타임 actual 대조** |
+|---|---|---|
+| 로비 | 8/8 | **12/12 PASS** |
+| 휴식 | 9/9 | **20/20 PASS** |
+| 전투 | 8 PASS · C-08 SKIP | **27/27 PASS** ← 반려 해소 |
+| 층 지도 | 8/8 | **14/14 PASS** |
+
+**배선 검사 4계약 전부 100%** — `CombatUiController` · `FloorMapUiController` · `LobbyController` · `RestUiController`.
+R2 에서 `CombatLayout` 참조가 0개였던 것이 이번에 22/22 가 됐다. **신설한 검사기가 반려를 내고 그 반려를 닫는 것까지 한 사이클 돌았다.**
+
+`source` 표기가 파일명까지 갈렸다 — `<screen>_actual_layout.json`(contract) ⟂ `<screen>_runtime_actual_layout.json`(runtime) 4쌍 8파일. 덮어쓰기 사고 경로가 닫혔다.
+
+**죽은 경로 삭제 검증 (삭제는 추가보다 위험하므로 별도로 봤다)**
+- `PrototypeHud.cs` 8,358 → **8,209줄**(−149). 기준선 `e9d5454` 는 8,450 — 3라운드 누적 −241
+- 구 전투 private 심볼 29종 전수 확인: **참조 0 된 것 없음**(전량 살아 있거나 정당하게 이동)
+- 잔존 4건 전부 정당 — `combatEnemyStage` 는 L3447 에서 `combatUiController.EnemyPanel` 로 **새 모듈에 연결**된 살아 있는 다리이고, `CreateCombatPanelRect` 는 `eventCutscenePanel`(다른 화면)이 쓴다
+- 판정: **안전한 삭제.** 도달 불가 코드만 걷혔다
+
+⚠️ **구조 관측(반려 아님)** — 모듈 3종 신설로 1,842줄이 생겼는데 모놀리스는 241줄만 줄었다. 화면 추출이 모놀리스를 갚고 있지 않다.
+남은 8화면도 같은 비율이면 `PrototypeHud.cs` 는 8천 줄대로 남는다. **이번 라운드의 결함은 아니다** — 다음 레버 후보로만 적어 둔다.
+
+**승격 후보: yes** — 「신설 검사기는 첫 반려를 낸 뒤 그 반려가 닫히는 것까지 봐야 유효하다」. `check_wiring.py` 는 R2 에서 FAIL, R3 에서 PASS 로 한 사이클을 돌았다. 반려를 낸 적 없는 검사기는 아직 검사기가 아니다

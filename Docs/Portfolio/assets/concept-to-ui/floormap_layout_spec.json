@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 2,
+  "specVersion": "1.0",
+  "screen": "floormap",
+  "tokens": "ui_tokens.json",
+  "checker": "Tools/check_layout.py",
+  "wiringChecker": "Tools/check_wiring.py",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "layoutIntent": "이번 층의 남은 길을 한 화면에 보이고, 지금 고를 수 있는 것만 누르게 한다. 판단 대상은 '앞으로 뭘 밟을지'이고, 자원은 그 판단의 조건이다.",
+  "changeFromCapture": [
+    "노드를 세로 버튼 목록(높이 124px·간격 132px)으로 쌓던 것을 층 그래프로 바꾼다 — 갈림길이 목록이면 길로 안 읽힌다",
+    "노드 좌표를 코드 상수가 아니라 데이터의 NormalizedX/Y 로 배치한다",
+    "상단 텍스트 한 줄을 자원 칩 4개로 분해 (전투·휴식과 동일 규격)",
+    "선택 가능/완료/잠김을 색이 아니라 형태와 테두리로도 구분한다 — 색만으로는 96px 에서 안 갈린다"
+  ],
+  "dataBinding": {
+    "_note": "2026-09-01 승격 판정. 출처 없는 슬롯은 위탁 전에 여기서 걸린다",
+    "floorChip": {
+      "source": "PrototypeRunSnapshot.CurrentFloor",
+      "type": "int",
+      "present": true
+    },
+    "sanityChip": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "normalize": "(Mental + 100) / 200",
+      "present": true,
+      "note": "0~1 이 아니다"
+    },
+    "hpChip": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "goldChip": {
+      "source": "PrototypeRunSnapshot.Gold",
+      "type": "int",
+      "present": true
+    },
+    "nodeGraph": {
+      "source": "PrototypeRunSnapshot.FloorMapNodes (PrototypeFloorMapNodeView[])",
+      "fields": "MapNodeId · Type · Floor · Layer · Index · Selectable · Completed · Locked · NormalizedX · NormalizedY · Current · NextMapNodeIds · PreviousMapNodeIds",
+      "present": true,
+      "note": "노드 좌표는 NormalizedX/Y 를 그대로 쓴다. 화면이 좌표를 새로 계산하지 않는다"
+    },
+    "selectedNodeId": {
+      "source": "PrototypeRunSnapshot.SelectedMapNodeId / HasSelectedMapNode",
+      "type": "string",
+      "present": true
+    },
+    "_absent": {
+      "floorName": "층 이름 문자열은 데이터에 없다. 번호로만 표시한다",
+      "nodeDifficulty": "노드별 난이도 값 없음. 종류(Type)만 있다"
+    }
+  },
+  "nodeTypes": {
+    "_source": "PrototypeFloorMapNodeType",
+    "values": [
+      "Combat",
+      "Event",
+      "Rest",
+      "Shop",
+      "Boss"
+    ],
+    "note": "5종. 아이콘은 A 금색 원형 계열을 따른다(아트 진단 기준군). 신규 6종 재생성 대기"
+  },
+  "constraints": [
+    {
+      "id": "M-01",
+      "text": "누를 수 있는 요소는 y >= 0.62",
+      "check": "interactive 슬롯 전부",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.62,
+        "applyTo": {
+          "interactive": true
+        }
+      },
+      "rationale": "지도는 subject 층이 크지만 조작은 여전히 엄지 범위 안이다"
+    },
+    {
+      "id": "M-02",
+      "text": "터치 타깃 최소 96px",
+      "check": "h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "M-03",
+      "text": "노드 그래프가 화면의 40% 이상",
+      "check": "nodeGraph 면적 >= 0.40",
+      "machineCheck": {
+        "type": "minArea",
+        "slot": "nodeGraph",
+        "value": 0.4
+      },
+      "rationale": "이 화면의 판단 대상이다. 캡처에서는 세로 목록이라 길이 안 보였다"
+    },
+    {
+      "id": "M-04",
+      "text": "같은 문구가 두 슬롯에 중복되지 않는다",
+      "check": "content 중복 0건",
+      "machineCheck": {
+        "type": "noDuplicateContent"
+      }
+    },
+    {
+      "id": "M-05",
+      "text": "이성 칩은 자원 스트립 앞쪽",
+      "check": "sanityChip.x < 0.5",
+      "machineCheck": {
+        "type": "fieldBound",
+        "slot": "sanityChip",
+        "field": "x",
+        "lt": 0.5
+      }
+    },
+    {
+      "id": "M-06",
+      "text": "층 순서는 resource → judgement → subject → action",
+      "check": "bands 순서",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "resource",
+          "judgement",
+          "subject",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "M-07",
+      "text": "진행 버튼은 노드 그래프보다 아래",
+      "check": "departButton.y > nodeGraph.y",
+      "machineCheck": {
+        "type": "relative",
+        "a": "nodeGraph",
+        "b": "departButton",
+        "field": "y",
+        "op": "lt"
+      }
+    },
+    {
+      "id": "M-08",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 없다",
+      "check": "slots[*].content 에 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2. 휴식 R-09·전투 C-09 와 같은 규칙"
+    }
+  ],
+  "bands": {
+    "resource": {
+      "y": 0.0,
+      "h": 0.1
+    },
+    "judgement": {
+      "y": 0.1,
+      "h": 0.06
+    },
+    "subject": {
+      "y": 0.16,
+      "h": 0.46
+    },
+    "action": {
+      "y": 0.62,
+      "h": 0.38
+    }
+  },
+  "slots": {
+    "floorChip": {
+      "band": "resource",
+      "x": 0.04,
+      "y": 0.03,
+      "w": 0.18,
+      "h": 0.044,
+      "order": 1,
+      "layer": "hud",
+      "type": "chip",
+      "style": "numeric",
+      "label": "층"
+    },
+    "sanityChip": {
+      "band": "resource",
+      "x": 0.24,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 2,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "이성",
+      "color": "sanity"
+    },
+    "hpChip": {
+      "band": "resource",
+      "x": 0.5,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 3,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "체력",
+      "color": "hp"
+    },
+    "goldChip": {
+      "band": "resource",
+      "x": 0.76,
+      "y": 0.03,
+      "w": 0.2,
+      "h": 0.044,
+      "order": 4,
+      "layer": "hud",
+      "type": "chip",
+      "label": "골드",
+      "color": "gold_coin"
+    },
+    "screenTitle": {
+      "band": "judgement",
+      "x": 0.1,
+      "y": 0.106,
+      "w": 0.8,
+      "h": 0.048,
+      "order": 10,
+      "layer": "title",
+      "type": "text",
+      "style": "screen",
+      "notes": "「N층」. 층 이름 문자열은 데이터에 없다(dataBinding._absent) — 번호로만 쓴다"
+    },
+    "nodeGraph": {
+      "band": "subject",
+      "x": 0.02,
+      "y": 0.16,
+      "w": 0.96,
+      "h": 0.46,
+      "order": 20,
+      "layer": "map",
+      "type": "graph",
+      "notes": "노드 배치는 NormalizedX/Y 그대로. 화면이 좌표를 새로 계산하지 않는다. 간선은 NextMapNodeIds 로 그린다"
+    },
+    "nodeLegend": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.632,
+      "w": 0.92,
+      "h": 0.04,
+      "order": 30,
+      "layer": "hud",
+      "type": "text",
+      "style": "label",
+      "notes": "5종 표기. 색만으로 구분하지 않는다(M-04 중복 회피 위해 노드 라벨과 문구를 겹치지 않게)"
+    },
+    "selectedNodeCard": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.688,
+      "w": 0.92,
+      "h": 0.15,
+      "order": 40,
+      "layer": "actions",
+      "type": "card",
+      "frameStyle": true,
+      "notes": "SelectedMapNodeId 가 있을 때만 내용이 찬다. 없으면 「길을 고르십시오」 상태"
+    },
+    "departButton": {
+      "band": "action",
+      "x": 0.3,
+      "y": 0.868,
+      "w": 0.4,
+      "h": 0.056,
+      "order": 50,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "content": "들어간다",
+      "notes": "선택한 노드로 진입. 높이 0.056 = 107px (M-02 96px 이상)"
+    },
+    "backButton": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.868,
+      "w": 0.22,
+      "h": 0.056,
+      "order": 51,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "content": "지도 접기"
+    }
+  },
+  "variants": {
+    "_note": "층 지도에는 붕괴 variants 를 두지 않는다. 붕괴 연출의 무대는 휴식·전투다(사양 분산 방지)"
+  },
+  "invariantUnderVariants": [
+    "선택 가능·완료·잠김 세 상태가 색 말고 형태·테두리로도 갈린다",
+    "「붕괴도」 수치와 용어를 노출하지 않는다",
+    "현재 노드(Current)는 어떤 상태에서도 화면 안에 보인다"
+  ],
+  "assetFallbacks": {
+    "node_icons_v2": {
+      "present": false,
+      "fallback": "기존 A 금색 원형 계열 재사용",
+      "status": "아트 6종 재생성 대기",
+      "note": "B 회색 선형·C 배너 계열을 쓰지 않는다. 임의 대체 금지"
+    }
+  },
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "floorChip",
+      "hpChip",
+      "nodeGraph",
+      "departButton"
+    ]
+  },
+  "revisions": [
+    "v1.0 2026-09-01 · 최초. dataBinding 을 실 데이터(PrototypeFloorMapNodeView 13필드)로 채우고 발행. 층 이름·노드 난이도는 데이터에 없어 사양에서 뺐다"
+  ]
+}

@@ -220,7 +220,8 @@ namespace HwigiTower.Tests.PlayMode
             Assert.IsTrue(hud.CombatItemInspectButtonVisible);
             Assert.AreEqual("char_player_portrait_01", hud.CurrentCombatPlayerPortraitSpriteName);
             Assert.AreEqual("char_mataios_portrait_01", hud.CurrentCombatMataiosPortraitSpriteName);
-            StringAssert.Contains("적 HP", hud.CombatMessage);
+            StringAssert.Contains("HP", hud.CombatEnemyTitleMessage);
+            StringAssert.Contains(">", hud.CombatThreatReadoutMessage);
             StringAssert.Contains("예상 피해", hud.CombatActionButtonLabels);
             StringAssert.Contains("피해 감소", hud.CombatActionButtonLabels);
             StringAssert.Contains("스킬", hud.CombatActionButtonLabels);

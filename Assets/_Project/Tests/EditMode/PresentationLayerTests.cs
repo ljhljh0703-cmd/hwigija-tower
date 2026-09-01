@@ -355,12 +355,13 @@ namespace HwigiTower.Tests.EditMode
 
             hud.ShowRunState(snapshot);
 
-            Assert.LessOrEqual(hud.CombatMessage.Split('\n').Length, 3);
-            StringAssert.Contains("리빙 아머", hud.CombatMessage);
-            StringAssert.Contains("적 HP 9/18", hud.CombatMessage);
+            Assert.AreEqual(1, hud.CombatMessage.Split('\n').Length);
+            StringAssert.Contains("리빙 아머", hud.CombatEnemyTitleMessage);
+            StringAssert.Contains("HP 9/18", hud.CombatEnemyTitleMessage);
+            StringAssert.Contains("> 4", hud.CombatThreatReadoutMessage);
             StringAssert.Contains("플레이어: 7 피해", hud.CombatMessage);
             StringAssert.Contains("마타이오스: 2 지원 피해", hud.CombatMessage);
-            StringAssert.Contains("판단:", hud.CombatMessage);
+            StringAssert.DoesNotContain("판단:", hud.CombatMessage);
             StringAssert.Contains("스킬", hud.CombatActionButtonLabels);
             StringAssert.Contains("조건 부족", hud.CombatActionButtonLabels);
         }
@@ -767,7 +768,8 @@ namespace HwigiTower.Tests.EditMode
 
                 Assert.IsTrue(hud.CombatPanelVisible);
                 Assert.IsTrue(hud.CombatEnemyVisible);
-                StringAssert.Contains("적 HP", hud.CombatMessage);
+                StringAssert.Contains("HP", hud.CombatEnemyTitleMessage);
+                StringAssert.Contains(">", hud.CombatThreatReadoutMessage);
                 StringAssert.Contains("공격", hud.CombatActionButtonLabels);
                 StringAssert.Contains("방어", hud.CombatActionButtonLabels);
                 StringAssert.Contains("스킬", hud.CombatActionButtonLabels);
@@ -874,11 +876,13 @@ namespace HwigiTower.Tests.EditMode
             StringAssert.Contains("icon_action_defend", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("icon_action_skill_scout", hud.CurrentCombatActionIconNames);
             StringAssert.Contains("ATK 7", hud.CombatEnemyStatusMessage);
-            StringAssert.Contains("최종 보스", hud.CombatMessage);
-            StringAssert.Contains("적 HP 22/34", hud.CombatMessage);
+            StringAssert.Contains("최종 보스", hud.CombatEnemyTitleMessage);
+            StringAssert.Contains("HP 22/34", hud.CombatEnemyTitleMessage);
+            StringAssert.Contains("> 7", hud.CombatThreatReadoutMessage);
+            StringAssert.Contains("22/34", hud.CombatThreatReadoutMessage);
             StringAssert.Contains("선택 방어 | 받은 피해", hud.CombatMessage);
             StringAssert.Contains("절반 감소", hud.CombatMessage);
-            StringAssert.Contains("판단: 중압", hud.CombatMessage);
+            StringAssert.DoesNotContain("판단:", hud.CombatMessage);
             StringAssert.Contains("플레이어", hud.CombatPartyMessage);
             StringAssert.Contains("마타이오스", hud.CombatPartyMessage);
             StringAssert.DoesNotContain("BOSS_APEX_02", hud.CombatMessage);
@@ -922,7 +926,8 @@ namespace HwigiTower.Tests.EditMode
             hud.ShowRunState(snapshot);
 
             StringAssert.Contains("마타이오스 보호", hud.CombatMessage);
-            StringAssert.Contains("판단:", hud.CombatMessage);
+            StringAssert.Contains("> 3", hud.CombatThreatReadoutMessage);
+            StringAssert.DoesNotContain("판단:", hud.CombatMessage);
             StringAssert.DoesNotContain("상세 접힘", hud.CombatMessage);
             StringAssert.DoesNotContain("Skill CD -1", hud.CombatMessage);
             StringAssert.Contains("성장 ATK +1", hud.CombatPartyMessage);
@@ -1294,7 +1299,8 @@ namespace HwigiTower.Tests.EditMode
             Assert.IsEmpty(hud.RouteMessage);
             StringAssert.Contains("선택 공격 | 적 피해 6", hud.CombatMessage);
             StringAssert.Contains("받은 피해 3", hud.CombatMessage);
-            StringAssert.Contains("판단:", hud.CombatMessage);
+            StringAssert.Contains(">", hud.CombatThreatReadoutMessage);
+            StringAssert.DoesNotContain("판단:", hud.CombatMessage);
             StringAssert.DoesNotContain("ENC_COMBAT_GATE_03", hud.RouteMessage);
         }
 
