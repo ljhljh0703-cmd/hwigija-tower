@@ -678,12 +678,9 @@ namespace HwigiTower.Tests.PlayMode
             StringAssert.Contains("icon_rest_talk", hud.CurrentRestActionIconNames);
             StringAssert.Contains("icon_rest_train", hud.CurrentRestActionIconNames);
             StringAssert.Contains("icon_rest_recover", hud.CurrentRestActionIconNames);
-            StringAssert.Contains("대화", hud.CurrentRestActionCardLabels);
             StringAssert.Contains("마타이오스와 대화", hud.CurrentRestActionCardLabels);
-            StringAssert.Contains("훈련", hud.CurrentRestActionCardLabels);
-            StringAssert.Contains("다음 전투 피해 +1", hud.CurrentRestActionCardLabels);
-            StringAssert.Contains("휴식", hud.CurrentRestActionCardLabels);
-            StringAssert.Contains("HP 회복", hud.CurrentRestActionCardLabels);
+            StringAssert.Contains("단련 · 다음 전투 보너스", hud.CurrentRestActionCardLabels);
+            StringAssert.Contains("휴식 · 체력 회복", hud.CurrentRestActionCardLabels);
             StringAssert.DoesNotContain("Glitch", hud.CurrentRestActionCardLabels);
             var actionButton = hud.GetRestActionButton(actionId);
             Assert.IsNotNull(actionButton);

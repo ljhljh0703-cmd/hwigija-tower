@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using HwigiTower.Lobby;
 using HwigiTower.Run;
 using HwigiTower.UI;
@@ -113,6 +115,7 @@ namespace HwigiTower.Tests.PlayMode
 
             var controller = Object.FindFirstObjectByType<LobbyController>();
             Assert.IsNotNull(controller);
+            WriteLobbyRuntimeActual();
             yield return CaptureAndAssert(fileName);
         }
 
@@ -192,7 +195,7 @@ namespace HwigiTower.Tests.PlayMode
                 StringAssert.Contains("icon_rest_talk", hud.CurrentRestActionIconNames);
                 StringAssert.Contains("icon_rest_train", hud.CurrentRestActionIconNames);
                 StringAssert.Contains("icon_rest_recover", hud.CurrentRestActionIconNames);
-            });
+            }, "rest");
         }
 
         private static IEnumerator CaptureCombatScreen(string fileName, string encounterId)
@@ -211,7 +214,7 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.AreEqual("char_player_portrait_01", hud.CurrentCombatPlayerPortraitSpriteName);
                 Assert.AreEqual("char_mataios_portrait_01", hud.CurrentCombatMataiosPortraitSpriteName);
                 Assert.IsFalse(hud.CombatPortraitFrameVisible);
-            });
+            }, encounterId == "ENC_COMBAT_GATE_01" ? "combat" : null);
         }
 
         private static IEnumerator CaptureEndingChoice()
@@ -246,7 +249,7 @@ namespace HwigiTower.Tests.PlayMode
             });
         }
 
-        private static IEnumerator CapturePrototypeRoomScreen(string fileName, System.Action<PrototypeRoomController, PrototypeHud> arrange)
+        private static IEnumerator CapturePrototypeRoomScreen(string fileName, System.Action<PrototypeRoomController, PrototypeHud> arrange, string runtimeLayoutScreen = null)
         {
             yield return SceneManager.LoadSceneAsync("PrototypeRoom", LoadSceneMode.Single);
             yield return WaitForFrames(8);
@@ -260,7 +263,184 @@ namespace HwigiTower.Tests.PlayMode
 
             arrange(controller, hud);
             yield return WaitForStablePortfolioFrame(hud);
+            if (!string.IsNullOrEmpty(runtimeLayoutScreen))
+            {
+                WritePrototypeRuntimeActual(runtimeLayoutScreen);
+            }
             yield return CaptureAndAssert(fileName);
+        }
+
+        private static void WriteLobbyRuntimeActual()
+        {
+            WriteRuntimeActual("lobby", RequireRectTransform("Lobby Portrait Safe Area"), new[]
+            {
+                new RuntimeSlotRequest("runStatus", "Lobby Run Status"),
+                new RuntimeSlotRequest("towerArt", "Lobby Background"),
+                new RuntimeSlotRequest("titleMark", "Lobby Title"),
+                new RuntimeSlotRequest("tagline", "Lobby Tagline"),
+                new RuntimeSlotRequest("primaryAction", "Lobby New Game Button"),
+                new RuntimeSlotRequest("secondaryAction", "Lobby Continue Button"),
+                new RuntimeSlotRequest("utilityRow", "Lobby Utility Row"),
+                new RuntimeSlotRequest("buildStamp", "Lobby Build Stamp")
+            });
+        }
+
+        private static void WritePrototypeRuntimeActual(string screen)
+        {
+            var root = RequireRectTransform("PortraitRoot");
+            if (screen == "rest")
+            {
+                WriteRuntimeActual(screen, root, new[]
+                {
+                    new RuntimeSlotRequest("floorChip", "Rest floorChip"),
+                    new RuntimeSlotRequest("sanityChip", "Rest sanityChip"),
+                    new RuntimeSlotRequest("hpChip", "Rest hpChip"),
+                    new RuntimeSlotRequest("goldChip", "Rest goldChip"),
+                    new RuntimeSlotRequest("screenTitle", "Rest Screen Title"),
+                    new RuntimeSlotRequest("restScene", "Rest Scene"),
+                    new RuntimeSlotRequest("mataiosState", "Rest Mataios State"),
+                    new RuntimeSlotRequest("mataiosStateLabel", "Rest Mataios State Label"),
+                    new RuntimeSlotRequest("playerState", "Rest Player State"),
+                    new RuntimeSlotRequest("playerHpBar", "Rest Player HP Bar"),
+                    new RuntimeSlotRequest("choiceTalk", "Rest Choice Talk"),
+                    new RuntimeSlotRequest("choiceTrain", "Rest Choice Train"),
+                    new RuntimeSlotRequest("choiceSleep", "Rest Choice Sleep"),
+                    new RuntimeSlotRequest("departButton", "Rest Depart Button")
+                });
+                return;
+            }
+
+            if (screen == "combat")
+            {
+                WriteRuntimeActual(screen, root, new[]
+                {
+                    new RuntimeSlotRequest("enemyPanel", "Combat Enemy Stage"),
+                    new RuntimeSlotRequest("enemyTitle", "Combat Enemy Title"),
+                    new RuntimeSlotRequest("enemyHpBar", "Enemy HP Bar Frame"),
+                    new RuntimeSlotRequest("enemyStatusChips", "Combat Enemy Status Chips"),
+                    new RuntimeSlotRequest("enemyImage", "Combat Enemy Image"),
+                    new RuntimeSlotRequest("damageEffectOverlay", "Combat Enemy Damage Number"),
+                    new RuntimeSlotRequest("playerCard", "Combat Player Card"),
+                    new RuntimeSlotRequest("playerHpBar", "Player HP Bar Frame"),
+                    new RuntimeSlotRequest("mataiosCard", "Combat Mataios Card"),
+                    new RuntimeSlotRequest("mataiosHpBar", "Mataios HP Bar Frame"),
+                    new RuntimeSlotRequest("attackButton", "Combat Button Attack"),
+                    new RuntimeSlotRequest("defendButton", "Combat Button Defend"),
+                    new RuntimeSlotRequest("skillButton", "Combat Button Skill"),
+                    new RuntimeSlotRequest("combatLog", "Combat Log Panel"),
+                    new RuntimeSlotRequest("itemInspectButton", "Combat Item Inspect Button")
+                });
+                return;
+            }
+
+            Assert.Fail("Unsupported runtime layout screen: " + screen);
+        }
+
+        private static void WriteRuntimeActual(string screen, RectTransform reference, RuntimeSlotRequest[] requests)
+        {
+            Canvas.ForceUpdateCanvases();
+            var referenceCorners = new Vector3[4];
+            reference.GetWorldCorners(referenceCorners);
+            var referenceWidth = referenceCorners[2].x - referenceCorners[0].x;
+            var referenceHeight = referenceCorners[1].y - referenceCorners[0].y;
+            Assert.Greater(referenceWidth, 0f, "Runtime layout reference has no width: " + reference.name);
+            Assert.Greater(referenceHeight, 0f, "Runtime layout reference has no height: " + reference.name);
+
+            var builder = new StringBuilder();
+            builder.Append("{\n");
+            builder.Append("  \"screen\": \"").Append(JsonEscape(screen)).Append("\",\n");
+            builder.Append("  \"capturedAt\": \"").Append(System.DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)).Append(" runtime RectTransform capture\",\n");
+            builder.Append("  \"source\": \"PortraitUiScreenshotQaTests\",\n");
+            builder.Append("  \"slots\": {");
+            var wroteSlot = false;
+            for (var i = 0; i < requests.Length; i++)
+            {
+                var request = requests[i];
+                var rect = FindRuntimeRectTransform(request.ObjectName);
+                if (rect == null)
+                {
+                    continue;
+                }
+
+                var corners = new Vector3[4];
+                rect.GetWorldCorners(corners);
+                var x = (corners[0].x - referenceCorners[0].x) / referenceWidth;
+                var y = (referenceCorners[1].y - corners[1].y) / referenceHeight;
+                var w = (corners[2].x - corners[0].x) / referenceWidth;
+                var h = (corners[1].y - corners[0].y) / referenceHeight;
+                var text = rect.GetComponent<Text>() ?? rect.GetComponentInChildren<Text>(true);
+
+                if (wroteSlot)
+                {
+                    builder.Append(',');
+                }
+
+                builder.Append("\n    \"").Append(JsonEscape(request.Key)).Append("\": {");
+                builder.Append("\"x\": ").Append(FormatFloat(x));
+                builder.Append(", \"y\": ").Append(FormatFloat(y));
+                builder.Append(", \"w\": ").Append(FormatFloat(w));
+                builder.Append(", \"h\": ").Append(FormatFloat(h));
+                if (text != null)
+                {
+                    builder.Append(", \"fontSize\": ").Append(text.fontSize.ToString(CultureInfo.InvariantCulture));
+                }
+                builder.Append(", \"visible\": ").Append(rect.gameObject.activeInHierarchy ? "true" : "false");
+                builder.Append('}');
+                wroteSlot = true;
+            }
+
+            if (wroteSlot)
+            {
+                builder.Append('\n');
+            }
+            builder.Append("  }\n}");
+            File.WriteAllText(Path.Combine(ScreenshotDirectory, screen + "_actual_layout.json"), builder.ToString());
+        }
+
+        private static RectTransform RequireRectTransform(string objectName)
+        {
+            var target = GameObject.Find(objectName);
+            Assert.IsNotNull(target, "Missing runtime layout target: " + objectName);
+            var rect = target.GetComponent<RectTransform>();
+            Assert.IsNotNull(rect, "Runtime layout target has no RectTransform: " + objectName);
+            return rect;
+        }
+
+        private static RectTransform FindRuntimeRectTransform(string objectName)
+        {
+            var transforms = Object.FindObjectsByType<RectTransform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (var i = 0; i < transforms.Length; i++)
+            {
+                var rect = transforms[i];
+                if (rect != null && rect.name == objectName)
+                {
+                    return rect;
+                }
+            }
+
+            return null;
+        }
+
+        private static string FormatFloat(float value)
+        {
+            return value.ToString("0.######", CultureInfo.InvariantCulture);
+        }
+
+        private static string JsonEscape(string value)
+        {
+            return value.Replace("\\", "\\\\").Replace("\"", "\\\"");
+        }
+
+        private sealed class RuntimeSlotRequest
+        {
+            public RuntimeSlotRequest(string key, string objectName)
+            {
+                Key = key;
+                ObjectName = objectName;
+            }
+
+            public string Key { get; }
+            public string ObjectName { get; }
         }
 
         private static IEnumerator CaptureAndAssert(string fileName)

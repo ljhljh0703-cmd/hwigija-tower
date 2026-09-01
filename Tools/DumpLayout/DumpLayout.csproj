@@ -10,5 +10,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="../../Assets/_Project/Scripts/Lobby/LobbyLayoutContract.cs" Link="LobbyLayoutContract.cs" />
     <Compile Include="../../Assets/_Project/Scripts/UI/CombatLayoutContract.cs" Link="CombatLayoutContract.cs" />
+    <Compile Include="../../Assets/_Project/Scripts/UI/RestLayoutContract.cs" Link="RestLayoutContract.cs" />
   </ItemGroup>
 </Project>

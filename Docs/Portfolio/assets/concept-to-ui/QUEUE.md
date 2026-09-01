@@ -16,8 +16,8 @@
 | # | 화면 | 사양 | 상태 | 라운드 | 비고 |
 |---|---|---|---|---|---|
 | 1 | 로비 | `lobby_layout_spec.json` v1.2 | **통과(정적)** | 2 | 8/8 + actual 12/12 · `120f37c` · 🆕 **런타임 검증 = 휴식 라운드에 묶음**(09-01 라이선스 활성) |
-| 2 | 전투 (일반) | `combat_layout_spec_v2.json` **v2.1** | **재작업 1건** | 1 | 사양 8 PASS·C-08 SKIP. actual **26/27** — `mataiosStateLabel` 미보고. D-029·D-012 반영 rename 이라 `CombatLayoutContract.cs` 슬롯 1개 + DumpLayout 재실행 필요 |
-| 3 | 휴식 (마타이오스) | `rest_layout_spec.json` **v1.1** | **대기** | 0 | 자체 채점 **9/9**. `DISPATCH-rest.md` 발행. variants 는 아트 4종 미입고 + 임계값 미정으로 blocked — **기본 상태만 구현** |
+| 2 | 전투 (일반) | `combat_layout_spec_v2.json` **v2.1** | **통과(정적)** | 2 | 사양 8 PASS·C-08 SKIP·C-09 PASS. actual **27/27** — `mataiosSanityBar` → `mataiosStateLabel` 반영. 런타임 캡처는 3화면 QA의 기존 no-save 격리 실패로 미생성 |
+| 3 | 휴식 (마타이오스) | `rest_layout_spec.json` **v1.1** | **통과(정적)** | 1 | 사양 **9/9** + actual **20/20**. variants 는 아트 4종 미입고 + 임계값 미정으로 blocked — **기본 상태만 구현**. 런타임 캡처는 3화면 QA의 기존 no-save 격리 실패로 미생성 |
 | 4 | 층 지도 | 미작성 | 대기 | 0 | |
 | 5 | 상점 | 미작성 | 대기 | 0 | 6·7과 사양 1장 공유 후보 |
 | 6 | 상점 3층 | 미작성 | 대기 | 0 | |

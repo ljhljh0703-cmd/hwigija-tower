@@ -75,7 +75,7 @@ namespace HwigiTower.UI
         public static readonly CombatSlot PlayerSanityBar = Slot("playerSanityBar", 0.075f, 0.70f, 0.38f, 0.016f, "party", "gauge", string.Empty, false, false, string.Empty, "이성", "sanity", UiTokenContract.LabelFontSize);
         public static readonly CombatSlot MataiosCard = Slot("mataiosCard", 0.525f, 0.572f, 0.42f, 0.152f, "party", "card", string.Empty, false, true, string.Empty, string.Empty, string.Empty, 0);
         public static readonly CombatSlot MataiosHpBar = Slot("mataiosHpBar", 0.545f, 0.678f, 0.38f, 0.016f, "party", "gauge", string.Empty, false, false, string.Empty, "체력", "hp", UiTokenContract.LabelFontSize);
-        public static readonly CombatSlot MataiosSanityBar = Slot("mataiosSanityBar", 0.545f, 0.70f, 0.38f, 0.016f, "party", "gauge", string.Empty, false, false, string.Empty, "이성", "sanity", UiTokenContract.LabelFontSize);
+        public static readonly CombatSlot MataiosStateLabel = Slot("mataiosStateLabel", 0.545f, 0.70f, 0.38f, 0.016f, "party", "text", string.Empty, false, false, string.Empty, "상태", string.Empty, UiTokenContract.LabelFontSize);
         public static readonly CombatSlot AttackButton = Slot("attackButton", 0.06f, 0.76f, 0.27f, 0.11f, "actions", "button", string.Empty, true, true, "공격", string.Empty, string.Empty, UiTokenContract.PrimaryFontSize);
         public static readonly CombatSlot DefendButton = Slot("defendButton", 0.365f, 0.76f, 0.27f, 0.11f, "actions", "button", string.Empty, true, true, "방어", string.Empty, string.Empty, UiTokenContract.PrimaryFontSize);
         public static readonly CombatSlot SkillButton = Slot("skillButton", 0.67f, 0.76f, 0.27f, 0.11f, "actions", "button", string.Empty, true, true, "정찰", string.Empty, string.Empty, UiTokenContract.PrimaryFontSize);
@@ -100,7 +100,7 @@ namespace HwigiTower.UI
             PlayerSanityBar,
             MataiosCard,
             MataiosHpBar,
-            MataiosSanityBar,
+            MataiosStateLabel,
             AttackButton,
             DefendButton,
             SkillButton,

@@ -241,11 +241,11 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void Hud_RestActionCardLabelsStayPublicAndHideGlitch()
+        public void RestLayout_ChoiceCardLabelsStayPublicAndHideGlitch()
         {
-            AssertRestActionCardLabel("rest.ask_mood", "대화", "마타이오스와 대화");
-            AssertRestActionCardLabel("rest.train", "단련", "다음 전투 보너스");
-            AssertRestActionCardLabel("rest.recover", "휴식", "HP 회복");
+            AssertRestActionCardLabel(RestLayout.ChoiceTalk, "마타이오스와 대화");
+            AssertRestActionCardLabel(RestLayout.ChoiceTrain, "단련 · 다음 전투 보너스");
+            AssertRestActionCardLabel(RestLayout.ChoiceSleep, "휴식 · 체력 회복");
         }
 
         [Test]
@@ -1197,7 +1197,7 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void Hud_RestInteractionKeepsBackgroundAndMovesChoiceUiUp()
+        public void Hud_RestInteractionUsesThePortraitRestLayoutContract()
         {
             var hud = CreateHud(out _);
             var data = AssetDatabase.LoadAssetAtPath<DemoPresentationData>("Assets/_Project/Data/Presentation/SO_DemoPresentationData.asset");
@@ -1212,7 +1212,14 @@ namespace HwigiTower.Tests.EditMode
 
             Assert.IsTrue(hud.RestInteractionPanelVisible);
             Assert.AreEqual("enc_rest_01_bg", hud.CurrentBackgroundSpriteName);
-            Assert.GreaterOrEqual(hud.RestInteractionAnchorMin.y, 0.45f);
+            Assert.AreEqual(Vector2.zero, hud.RestInteractionAnchorMin);
+            StringAssert.Contains("마타이오스와 대화", hud.CurrentRestActionCardLabels);
+            StringAssert.Contains("단련 · 다음 전투 보너스", hud.CurrentRestActionCardLabels);
+            StringAssert.Contains("휴식 · 체력 회복", hud.CurrentRestActionCardLabels);
+            StringAssert.DoesNotContain("붕괴도", hud.CurrentRestActionCardLabels);
+            var title = GameObject.Find("Rest Screen Title");
+            Assert.IsNotNull(title);
+            Assert.AreEqual("모닥불", title.GetComponent<Text>().text);
         }
 
         [Test]
@@ -1661,14 +1668,11 @@ namespace HwigiTower.Tests.EditMode
             Assert.AreEqual(spriteName, icon.name);
         }
 
-        private static void AssertRestActionCardLabel(string actionId, string title, string preview)
+        private static void AssertRestActionCardLabel(RestSlot slot, string expectedContent)
         {
-            var method = typeof(PrototypeHud).GetMethod("BuildRestActionCardLabel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            Assert.IsNotNull(method);
-            var label = (string)method.Invoke(null, new object[] { actionId });
-            StringAssert.Contains(title, label);
-            StringAssert.Contains(preview, label);
-            StringAssert.DoesNotContain("Glitch", label);
+            Assert.AreEqual(expectedContent, slot.Content);
+            StringAssert.DoesNotContain("Glitch", slot.Content);
+            StringAssert.DoesNotContain("붕괴도", slot.Content);
         }
 
         private static void AssertPublicSurface(string text, string context)

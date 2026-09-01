@@ -82,6 +82,7 @@ namespace HwigiTower.UI
         [SerializeField] private Button restartButton;
         [SerializeField] private Button endingRestButton;
         [SerializeField] private Button endingContinueButton;
+        [SerializeField] private RestUiController restUiController;
         [SerializeField] private RectTransform restInteractionPanel;
         [SerializeField] private Text restResponseText;
         [SerializeField] private InputField restInputField;
@@ -229,11 +230,6 @@ namespace HwigiTower.UI
         private const float CombatActionButtonSize = 118f;
         private const int ChoiceFontSize = ButtonFontSize;
         private const int MapNodeFontSize = 29;
-        private const int RestBodyFontSize = 30;
-        private const int RestInputFontSize = 34;
-        private const float RestActionCardWidth = 286f;
-        private const float RestActionCardHeight = 190f;
-        private const int RestActionCardFontSize = 24;
         private const int ResultLineLimit = 3;
         private const int ResultIconChipCount = 6;
         private const float DenseLineSpacing = 0.92f;
@@ -2575,6 +2571,7 @@ namespace HwigiTower.UI
             SetLayerVisible(resultLayer, false);
             ApplyRestPresentationSlot(selection.EncounterId);
             HideNpcSpotlight();
+            RefreshRestUi();
             _pendingRestSelection = selection;
             _pendingRestActionId = string.Empty;
             SetRestActionCardsVisible(true);
@@ -2611,104 +2608,53 @@ namespace HwigiTower.UI
             SetResultVisible(false);
         }
 
+        private void RefreshRestUi()
+        {
+            if (restUiController == null)
+            {
+                return;
+            }
+
+            var snapshot = _roomController == null ? default : _roomController.GetSnapshot();
+            var restScene = encounterBackgroundImage == null ? null : encounterBackgroundImage.sprite;
+            var restMataios = npcPortraitImage != null && npcPortraitImage.sprite != null
+                ? npcPortraitImage.sprite
+                : mataiosPortrait;
+            restUiController.ShowBase(
+                snapshot.CurrentFloor,
+                snapshot.Mental,
+                snapshot.PlayerHp,
+                snapshot.PlayerMaxHp,
+                snapshot.Gold,
+                snapshot.GlitchLevel,
+                restScene,
+                restMataios);
+        }
+
         private void EnsureRestInteractionPanel()
         {
-            if (restInteractionPanel != null)
+            if (restUiController != null)
             {
                 return;
             }
 
             EnsureEventSystem();
-            var panelObject = new GameObject("Rest Interaction Panel");
-            panelObject.transform.SetParent(HudParent, false);
-
-            restInteractionPanel = panelObject.AddComponent<RectTransform>();
-            restInteractionPanel.anchorMin = new Vector2(0.06f, 0.46f);
-            restInteractionPanel.anchorMax = new Vector2(0.94f, 0.84f);
-            restInteractionPanel.pivot = new Vector2(0.5f, 0.5f);
-            restInteractionPanel.anchoredPosition = Vector2.zero;
-            restInteractionPanel.sizeDelta = Vector2.zero;
-
-            var image = panelObject.AddComponent<Image>();
-            image.color = new Color(0.025f, 0.032f, 0.040f, 0.58f);
-
-            var title = CreateHudText("Rest Interaction Title", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-36f, 56f), TitleFontSize, TextAnchor.MiddleCenter, new Color(0.92f, 0.96f, 0.94f, 1f));
-            title.transform.SetParent(panelObject.transform, false);
-            title.text = "휴식";
-
-            restAskMoodButton = CreateRestActionButton(panelObject.transform, "Rest Button Ask Mood", new Vector2(0.17f, 0.77f), "rest.ask_mood");
-            restTrainButton = CreateRestActionButton(panelObject.transform, "Rest Button Train", new Vector2(0.50f, 0.77f), "rest.train");
-            restRecoverButton = CreateRestActionButton(panelObject.transform, "Rest Button Recover", new Vector2(0.83f, 0.77f), "rest.recover");
-
-            restInputField = CreateRestInputField(panelObject.transform);
-            restSubmitButton = CreateRestButton(panelObject.transform, "Rest Submit Button", "전달", new Vector2(0.16f, 0.13f), new Vector2(0.46f, 0.26f));
-            restSubmitButton.onClick.AddListener(SubmitRestInteraction);
-            restContinueButton = CreateRestButton(panelObject.transform, "Rest Continue Button", "계속", new Vector2(0.54f, 0.13f), new Vector2(0.84f, 0.26f));
-            restContinueButton.onClick.AddListener(ContinueAfterRestInteraction);
-            restContinueButton.gameObject.SetActive(false);
-
-            restResponsePanel = CreatePanel("Rest Response Bubble", panelObject.transform, new Vector2(0.06f, 0.30f), new Vector2(0.94f, 0.50f), new Color(0.10f, 0.13f, 0.15f, 0.96f));
-            restResponseText = CreateHudText("Rest Response Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), new Vector2(20f, 10f), new Vector2(-20f, -10f), RestBodyFontSize, TextAnchor.MiddleLeft, new Color(0.88f, 0.93f, 0.92f, 1f));
-            restResponseText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            restResponseText.transform.SetParent(panelObject.transform, false);
-            restResponseText.transform.SetParent(restResponsePanel, false);
-            restResponseText.text = string.Empty;
-            restResponsePanel.gameObject.SetActive(false);
-            restInteractionPanel.gameObject.SetActive(false);
+            var panelObject = new GameObject("Rest UI Module", typeof(RectTransform));
+            restUiController = panelObject.AddComponent<RestUiController>();
+            restUiController.Initialize(HudParent, SelectRestAction, SubmitRestInteraction, ContinueAfterRestInteraction);
+            restInteractionPanel = restUiController.Root;
+            restResponseText = restUiController.ResponseText;
+            restInputField = restUiController.InputField;
+            restAskMoodButton = restUiController.AskMoodButton;
+            restTrainButton = restUiController.TrainButton;
+            restRecoverButton = restUiController.RecoverButton;
+            restAskMoodIconImage = restUiController.AskMoodIcon;
+            restTrainIconImage = restUiController.TrainIcon;
+            restRecoverIconImage = restUiController.RecoverIcon;
+            restSubmitButton = restUiController.SubmitButton;
+            restContinueButton = restUiController.DepartButton;
+            restResponsePanel = restUiController.ResponsePanel;
             ApplyRestActionIcons();
-        }
-
-        private Button CreateRestActionButton(Transform parent, string name, Vector2 center, string actionId)
-        {
-            var button = CreateRestButton(parent, name, BuildRestActionCardLabel(actionId), center, center);
-            var rect = button.GetComponent<RectTransform>();
-            if (rect != null)
-            {
-                rect.anchorMin = center;
-                rect.anchorMax = center;
-                rect.pivot = new Vector2(0.5f, 0.5f);
-                rect.anchoredPosition = Vector2.zero;
-                rect.sizeDelta = new Vector2(RestActionCardWidth, RestActionCardHeight);
-            }
-
-            var labelText = button.GetComponentInChildren<Text>();
-            if (labelText != null)
-            {
-                var labelRect = labelText.GetComponent<RectTransform>();
-                labelRect.anchorMin = new Vector2(0f, 0f);
-                labelRect.anchorMax = new Vector2(1f, 0.37f);
-                labelRect.offsetMin = new Vector2(10f, 8f);
-                labelRect.offsetMax = new Vector2(-10f, -8f);
-                labelText.fontSize = RestActionCardFontSize;
-                labelText.resizeTextMinSize = 18;
-                labelText.resizeTextMaxSize = RestActionCardFontSize;
-                labelText.alignment = TextAnchor.MiddleCenter;
-                labelText.lineSpacing = 0.92f;
-            }
-
-            var labelScrim = CreatePanel(name + " Label Scrim", button.transform, new Vector2(0f, 0f), new Vector2(1f, 0.38f), new Color(0.015f, 0.020f, 0.025f, 0.72f));
-            labelScrim.SetSiblingIndex(0);
-            if (labelText != null)
-            {
-                labelText.transform.SetAsLastSibling();
-            }
-
-            var cardImage = button.targetGraphic as Image;
-            if (actionId == "rest.ask_mood")
-            {
-                restAskMoodIconImage = cardImage;
-            }
-            else if (actionId == "rest.train")
-            {
-                restTrainIconImage = cardImage;
-            }
-            else if (actionId == "rest.recover")
-            {
-                restRecoverIconImage = cardImage;
-            }
-
-            button.onClick.AddListener(() => SelectRestAction(actionId));
-            return button;
         }
 
         private void ApplyRestActionIcons()
@@ -2720,6 +2666,12 @@ namespace HwigiTower.UI
 
         private void ApplyRestActionIcon(Image image, string actionId)
         {
+            if (restUiController != null)
+            {
+                restUiController.SetActionSprite(actionId, ResolveRestActionIcon(actionId));
+                return;
+            }
+
             if (image == null)
             {
                 return;
@@ -2733,6 +2685,12 @@ namespace HwigiTower.UI
 
         private void UpdateRestActionCardStates()
         {
+            if (restUiController != null)
+            {
+                restUiController.SetActionSelection(_pendingRestActionId);
+                return;
+            }
+
             ApplyRestActionCardState(restAskMoodIconImage, "rest.ask_mood");
             ApplyRestActionCardState(restTrainIconImage, "rest.train");
             ApplyRestActionCardState(restRecoverIconImage, "rest.recover");
@@ -2766,33 +2724,6 @@ namespace HwigiTower.UI
             return null;
         }
 
-        private static string BuildRestActionCardLabel(string actionId)
-        {
-            return ResolveRestActionTitle(actionId) + "\n" + ResolveRestActionPreview(actionId);
-        }
-
-        private static string ResolveRestActionTitle(string actionId)
-        {
-            return actionId switch
-            {
-                "rest.ask_mood" => "대화",
-                "rest.train" => "단련",
-                "rest.recover" => "휴식",
-                _ => "행동"
-            };
-        }
-
-        private static string ResolveRestActionPreview(string actionId)
-        {
-            return actionId switch
-            {
-                "rest.ask_mood" => "마타이오스와 대화",
-                "rest.train" => "다음 전투 보너스",
-                "rest.recover" => "HP 회복",
-                _ => "선택"
-            };
-        }
-
         private static string ResolveButtonLabel(Button button)
         {
             var label = button == null ? null : button.GetComponentInChildren<Text>();
@@ -2812,58 +2743,6 @@ namespace HwigiTower.UI
             image.color = color;
             image.raycastTarget = false;
             return rect;
-        }
-
-        private Button CreateRestButton(Transform parent, string name, string label, Vector2 anchorMin, Vector2 anchorMax)
-        {
-            var buttonObject = new GameObject(name);
-            buttonObject.transform.SetParent(parent, false);
-            var rect = buttonObject.AddComponent<RectTransform>();
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            var image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.12f, 0.16f, 0.19f, 0.98f);
-            var button = buttonObject.AddComponent<Button>();
-            button.targetGraphic = image;
-
-            var text = CreateHudText(name + " Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, BodyFontSize, TextAnchor.MiddleCenter, PrimaryTextColor);
-            text.lineSpacing = DenseLineSpacing;
-            text.transform.SetParent(buttonObject.transform, false);
-            text.text = label;
-            return button;
-        }
-
-        private InputField CreateRestInputField(Transform parent)
-        {
-            var inputObject = new GameObject("Rest Utterance Input");
-            inputObject.transform.SetParent(parent, false);
-            var rect = inputObject.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.06f, 0.535f);
-            rect.anchorMax = new Vector2(0.94f, 0.705f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            var image = inputObject.AddComponent<Image>();
-            image.color = new Color(0.96f, 0.985f, 0.98f, 1f);
-            var input = inputObject.AddComponent<InputField>();
-            input.targetGraphic = image;
-
-            var text = CreateHudText("Rest Input Text", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, RestInputFontSize, TextAnchor.MiddleLeft, new Color(0.05f, 0.07f, 0.08f, 1f));
-            text.transform.SetParent(inputObject.transform, false);
-            text.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
-            text.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
-            input.textComponent = text;
-
-            var placeholder = CreateHudText("Rest Input Placeholder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, RestBodyFontSize, TextAnchor.MiddleLeft, new Color(0.16f, 0.22f, 0.24f, 1f));
-            placeholder.transform.SetParent(inputObject.transform, false);
-            placeholder.GetComponent<RectTransform>().offsetMin = new Vector2(18f, 0f);
-            placeholder.GetComponent<RectTransform>().offsetMax = new Vector2(-18f, 0f);
-            placeholder.text = "마타이오스에게 전할 말";
-            input.placeholder = placeholder;
-            return input;
         }
 
         private void SelectRestAction(string actionId)
@@ -2960,6 +2839,11 @@ namespace HwigiTower.UI
 
         private void HideRestInteractionPanel()
         {
+            if (restUiController != null)
+            {
+                restUiController.Hide();
+            }
+
             if (restInteractionPanel != null)
             {
                 restInteractionPanel.gameObject.SetActive(false);
@@ -2972,6 +2856,12 @@ namespace HwigiTower.UI
 
         private void SetRestActionButtonsInteractable(bool interactable)
         {
+            if (restUiController != null)
+            {
+                restUiController.SetActionButtonsInteractable(interactable);
+                return;
+            }
+
             if (restAskMoodButton != null)
             {
                 restAskMoodButton.interactable = interactable;
@@ -2990,6 +2880,12 @@ namespace HwigiTower.UI
 
         private void SetRestActionCardsVisible(bool visible)
         {
+            if (restUiController != null)
+            {
+                restUiController.SetChoiceCardsVisible(visible);
+                return;
+            }
+
             SetButtonVisible(restAskMoodButton, visible);
             SetButtonVisible(restTrainButton, visible);
             SetButtonVisible(restRecoverButton, visible);
@@ -2997,6 +2893,12 @@ namespace HwigiTower.UI
 
         private void SetRestInputPhaseVisible(bool inputVisible, bool committed)
         {
+            if (restUiController != null)
+            {
+                restUiController.SetInputPhaseVisible(inputVisible, committed);
+                return;
+            }
+
             if (restInputField != null)
             {
                 restInputField.gameObject.SetActive(inputVisible && !committed);
@@ -3020,6 +2922,12 @@ namespace HwigiTower.UI
 
         private void SetRestResponseVisible(bool visible)
         {
+            if (restUiController != null)
+            {
+                restUiController.SetResponseVisible(visible);
+                return;
+            }
+
             if (restResponsePanel != null)
             {
                 restResponsePanel.gameObject.SetActive(visible);

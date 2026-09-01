@@ -227,7 +227,7 @@
       "interactive": false,
       "frameStyle": false
     },
-    "mataiosSanityBar": {
+    "mataiosStateLabel": {
       "x": 0.545,
       "y": 0.7,
       "w": 0.38,
@@ -235,9 +235,9 @@
       "fontSize": 26,
       "visible": true,
       "layer": "party",
-      "type": "gauge",
-      "label": "\uC774\uC131",
-      "color": "sanity",
+      "type": "text",
+      "label": "\uC0C1\uD0DC",
+      "color": "",
       "interactive": false,
       "frameStyle": false
     },
