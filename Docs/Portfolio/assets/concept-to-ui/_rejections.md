@@ -54,3 +54,51 @@
 - 사양 ⟂ 코드 상수 대조 **12/12 PASS** (LobbyLayout.cs 상수를 정규식 추출해 `lobby_actual_layout.json` 생성)
 - **Codex 자기보고와 일치.** 자기보고 불신 원칙에 따라 별도 도구로 재현했고 어긋남 0
 - 미검증: Unity EditMode·PlayMode·PNG 캡처 (라이선스 exit 198)
+
+### 2026-09-01 · 휴식 · 사양 작성 중 · 자체 채점 (발송 전 검출)
+- 위반: **R-05** — `departButton` 높이 0.048 = 92px < 96px
+- 처리: 사양 발행 전 0.052 로 정정. **코덱스에게 가지 않았다**
+- 근본 원인: 1단 실패 3회째. 다만 **이번은 채점기가 발송 전에 잡았다**
+- 의미: 승격 확정된 「사양이 요구하는 것이 실현 가능한가」 검사가 자동화되면서 라운드 비용이 0이 됐다. R1·R2 는 각각 라운드 하나를 썼다
+- 승격 후보: no (이미 승격됨 · 이번은 그 효과 확인)
+
+### 2026-09-01 · 로비·전투 · 정적 레인 종결 · 독립 재현
+- 브랜치 `origin/codex/hwigi-lobby-ui-pilot-r3` · 커밋 `120f37c`(로비) `e9d5454`(전투)
+- 로비: 사양 8/8 + actual 12/12 **PASS**
+- 전투: C-01~C-07 + actual 27/27 **PASS**, C-08 은 런타임 대비 측정 대기
+- Codex 자기보고와 차이 **0건**
+- Codex 가 `DumpLayout` 순수 C# 도구와 `*LayoutContract.cs` 를 만들어 **Unity 없이 actual 을 뽑는 경로**를 열었다. §14-2 요청 그대로
+- 미검증: Unity EditMode·PlayMode·PNG 캡처 (라이선스)
+
+### 2026-09-01 · 휴식 · 위탁 직전 검사 (발송 전 검출 · 2건)
+- 위반 ①: **사양이 데이터 모델에 없는 것을 요구** — `mataiosSanityBar` · `variants.*.trigger`「마타이오스 이성 0.3~0.6 / < 0.3」
+- 실제: `Assets/_Project/Scripts` 전수 `Sanity` **0건**. 「이성」 대응 필드는 `PrototypeRunSnapshot.Mental`(int, −100~+100) 하나뿐이고 **플레이어 것**이다. 마타이오스 전용 이성 값은 없다. 그의 상태 축은 GDD 상 **붕괴도**(Glitch / S0~S5)이고 코드는 `ModifyGlitchLevel` — 별개 축이다
+- 기대: 사양이 트리거로 쓸 정규화 0~1 값
+- 처리: **작가 판정 대기** (축 이름·범위 결정 필요)
+- 근본 원인: **1단 실패 4회째, 같은 유형 2회째**(R2 `runStatus` 회차와 동종). 승격된 2단 판정이 이번에도 잡았고 **라운드 소모 0**
+
+- 위반 ②: **`D-029` 잠긴 결정 충돌** — `variants.broken.reward`「대화 선택 시 즉시 이성 회복 + **다음 전투 1턴 강화**」
+- 실제: D-029(2026-05-22 LOCKED) = 붕괴도는 전투 타이머·능력 발동 조건·공격력 modifier·시너지 배율의 기본 입력으로 **사용하지 않는다**. 붕괴 상태에서 파생된 보상이 다음 전투를 강화하면 관계 축이 전투 modifier 로 되돌아온다
+- 기대: 회복 보상이 관계·회복 축 안에서 닫힐 것
+- 처리: **작가 판정 대기.** 사양을 고치는 것은 스킬 4단(사양 수정 후 3단 재시작)이지만, 이 절은 `D-NNN` 영역이라 AI 가 단독으로 못 고친다
+- 🔴 **동일 문구가 `combat_layout_spec_v2.json` `variants.broken.reward` 에도 있다**(「즉시 이성 회복 + 1턴 강화 효과」). 그 사양은 **27/27 PASS 로 통과했다** — 채점기가 좌표만 보고 `variants` 의 보상·서사 절은 안 본다. 다만 `combat_actual_layout.json` 에 `variants` 가 없고 `CombatLayoutContract.cs` 에도 strained/broken 이 없어 **코드로 실현된 적은 없다.** 되돌릴 것 없음
+- 승격 후보: **yes** — 「사양의 `variants.reward`·`recovery` 절이 잠긴 결정과 충돌하지 않는가」를 2단 완료 판정에 추가. 좌표 채점기로는 영원히 안 잡힌다
+
+### 2026-09-01 · 휴식·전투 · 사양 수정 (작가 판정 A-1 · B-1 반영)
+- 판정: **A-1** 마타이오스 상태 축을 붕괴도로 교체 / **B-1** `broken` 보상에서 전투 강화 절 삭제
+- 휴식 → **v1.1**, 전투 → **v2.1**. 자체 채점 재실행 = 휴식 **9/9 PASS** · 전투 **8 PASS · C-08 SKIP**
+- 축 실사: `PrototypeRunSnapshot.GlitchLevel`(int 0~100) **실재**. `NpcStage` enum·`NpcStateMachine` 은 있으나 `AttachNpcStateMachine` 호출처가 **테스트뿐**이고 `NpcStateMachineDefinition` 에셋이 없다 → 프로토타입 런타임에서 null. 바인딩 대상 아님
+- 🔴 **파생 검출 3건째** — GDD D-012 P2 「`Glitch`/붕괴도 키를 normal UI 에 노출하지 않는다」. 붕괴도를 게이지·숫자로 그리면 이 조항 위반이라 `mataiosSanityBar` 를 **`mataiosStateLabel`(비수치 authored 문구)** 로 교체. 규칙 신설 = 휴식 `R-09` · 전투 `C-09`(`textAbsent` 「붕괴도」)
+- 🔴 **임계값(붕괴도 → 표시 단계)은 정하지 않았다.** `thresholds.*: undecided` 로 두고 variants 를 `status: blocked` 로 내렸다. 아트 4종 미입고와 합쳐 어차피 비활성이므로 라운드를 막지 않는다. 확정 시 OQ-022 식 temporary contract·코드 hard-code 금지
+- 🆕 **`dataBinding` 블록 신설**(휴식 사양). 슬롯마다 런타임 출처·타입·범위·정규화 식을 적는다. 승격된 2단 판정「사양이 요구하는 데이터가 실제로 존재하는가」의 **기계화**. `sanityChip` 은 `Mental`(−100~+100)이라 0~1 이 아니다 — 정규화 식을 사양이 들고 코드가 추측하지 않는다
+- ⚠️ **전투 회귀 1건 발생(의도된 것)** — 슬롯 rename 으로 `combat_actual_layout.json` 대조가 27/27 → **26/27 · `mataiosStateLabel` 런타임 보고에 없음**. 코드가 존재하지 않는 값에 붙어 있었다는 뜻이고, 채점기가 드리프트를 제대로 잡은 것이다. 조치 = `CombatLayoutContract.cs` 슬롯 1개 rename + `DumpLayout` 재실행
+- 승격 후보: **yes** — 「사양 슬롯마다 런타임 출처가 적혀 있는가」를 2단 완료 판정에 추가. `dataBinding` 이 그 서식이다
+
+### 2026-09-01 · 정정 · 「워크트리가 날아갔다」는 내 오판이었다
+- 주장: 「`/private/tmp/hwigi-lobby-ui-pilot-20260901` 워크트리가 소멸했다」 (본 세션 초반 보고)
+- 근거로 쓴 것: `git worktree list` 의 `prunable` 표시와 `ls -d /private/tmp/...` 실패
+- 🔴 **둘 다 리눅스 VM 에서 읽었다.** `device_bash` 는 맥이 아니라 그 안의 VM 이고, 연결 폴더 밖은 아예 다른 파일시스템이다. **맥의 `/private/tmp` 는 이 VM 에 존재한 적이 없다** — 그러니 「없다」가 아니라 「내가 볼 수 없다」였다. `prunable` 도 VM 안의 git 이 같은 이유로 붙인 표시다
+- 반증한 것: 작가가 맥에서 `git worktree prune` 을 돌렸는데 **등록부가 안 지워졌다**(`.git/worktrees/hwigi-lobby-ui-pilot-20260901` 잔존, `locked` 파일 없음). prune 은 디렉터리가 실제로 없을 때만 지운다 → **맥에는 살아 있다**
+- 파생 피해: 브랜치가 그 워크트리에 물려 있어 `git worktree add` 가 거부됐고, 그게 v1·v2 실패의 진짜 원인이었다. v1 은 빈 폴더만 만들고 `cd` 는 성공시켜 이후 git 4개가 리포 밖에서 돌았다(오류 검사 부재 = 내 스크립트 결함)
+- 처리: v3 에서 **`git worktree move`** 로 tmp 작업물을 보존한 채 안전 경로로 옮긴다. 삭제·재생성이 아니다
+- 승격 후보: **yes** — 「연결 폴더 밖 경로에 대해 `device_bash` 로 부재를 단정하지 않는다. 없다고 말하려면 맥에서 확인한다」. 색인 계열 교훈(`feedback_check_the_index_first`)의 파일시스템 판본

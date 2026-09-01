@@ -154,12 +154,34 @@ def r_field_equals(slots, mc):
         return [f"{mc['slot']}.{mc['field']}={v!r}, 기대 {mc['value']!r}"]
     return []
 
+
+def r_no_dup_content(slots, mc):
+    seen, bad = {}, []
+    for n, s in slots.items():
+        c = str(s.get("content", "")).strip()
+        if not c:
+            continue
+        if c in seen:
+            bad.append(f"「{c}」 가 {seen[c]} 와 {n} 에 중복")
+        seen[c] = n
+    return bad
+
+def r_min_area(slots, mc):
+    s = slots.get(mc["slot"])
+    if not s:
+        return [f"슬롯 없음: {mc['slot']}"]
+    area = s.get("w", 0) * s.get("h", 0)
+    if area < mc["value"]:
+        return [f"{mc['slot']} 면적 {area:.3f} < {mc['value']}"]
+    return []
+
 RULES = {
     "minY": r_min_y, "count": r_count, "noOverlap": r_no_overlap,
     "textAbsent": r_text_absent, "fieldRequired": r_field_required,
     "fieldAbsent": r_field_absent, "minTouchPx": r_min_touch,
     "bandOrder": r_band_order, "relative": r_relative,
     "fieldBound": r_field_bound, "fieldEquals": r_field_equals,
+    "noDuplicateContent": r_no_dup_content, "minArea": r_min_area,
 }
 
 # ---------- 실행 ----------

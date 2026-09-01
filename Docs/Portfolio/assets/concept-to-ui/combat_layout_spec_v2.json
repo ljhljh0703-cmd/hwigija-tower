@@ -112,6 +112,16 @@
       "text": "어떤 variants 에서도 threatReadout 과 행동 버튼의 대비가 4.5:1 이상",
       "check": "붕괴 상태 캡처에서 대비 측정",
       "manualCheck": "런타임 캡처에서 대비 측정 필요 — 자동 채점 대상 아님"
+    },
+    {
+      "id": "C-09",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 나오지 않는다",
+      "check": "slots[*].content 에 「붕괴도」 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2. rest 사양 R-09 와 같은 규칙"
     }
   ],
   "bands": {
@@ -316,7 +326,7 @@
       "label": "체력",
       "color": "hp"
     },
-    "mataiosSanityBar": {
+    "mataiosStateLabel": {
       "band": "party",
       "x": 0.545,
       "y": 0.7,
@@ -324,9 +334,10 @@
       "h": 0.016,
       "order": 35,
       "layer": "party",
-      "label": "이성",
-      "color": "sanity",
-      "notes": "v1의 파란 바. 무엇인지 안 적혀 있었다. 이성으로 명시한다"
+      "label": "상태",
+      "notes": "v2.1 · 마타이오스 전용 이성 값은 코드에 없다(Sanity 전수 0건). 그의 축은 붕괴도이고 숫자·게이지 노출은 D-012 P2 금지 → 비수치 authored 라벨로 바꾼다",
+      "type": "text",
+      "style": "label"
     },
     "attackButton": {
       "band": "action",
@@ -396,7 +407,7 @@
   },
   "variants": {
     "strained": {
-      "trigger": "마타이오스 이성 0.3 ~ 0.6",
+      "trigger": "붕괴도(GlitchLevel) 중간대 — 임계값 undecided",
       "slots": {
         "mataiosCard": {
           "art": "mataios_strained",
@@ -404,10 +415,14 @@
         }
       },
       "tone": "채도 -15%, 비네트 0.5",
-      "notes": "붕괴 전조. 카드 표정만 바뀐다. 수치는 안 건드린다"
+      "notes": "붕괴 전조. 카드 표정만 바뀐다. 수치는 안 건드린다",
+      "status": "blocked",
+      "blockedBy": [
+        "thresholds.undecided"
+      ]
     },
     "broken": {
-      "trigger": "마타이오스 이성 < 0.3",
+      "trigger": "붕괴도(GlitchLevel) 상단대 — 임계값 undecided",
       "slots": {
         "mataiosCard": {
           "art": "mataios_broken",
@@ -426,8 +441,12 @@
       },
       "tone": "채도 -35%, 비네트 0.7",
       "recovery": "회복 조건을 recoveryPrompt 에 표시한다. 예 — 「이번 턴 방어를 선택」 · 「적 처치」",
-      "reward": "조건 충족 시 즉시 이성 회복 + 1턴 강화 효과",
-      "notes": "카제나 방식. 붕괴가 막다른 길이 아니라 선택지가 된다. recoveryPrompt 가 안 보이면 이 variants 는 실패다"
+      "reward": "조건 충족 시 붕괴도 완화. ⚠ 「1턴 강화 효과」 절은 삭제됨 — D-029 는 붕괴도를 전투 타이머·능력 발동 조건·공격력 modifier·시너지 배율의 입력으로 쓰지 않는다. 붕괴 회복의 보상은 관계·회복 축 안에서 닫는다",
+      "notes": "카제나 방식. 붕괴가 막다른 길이 아니라 선택지가 된다. recoveryPrompt 가 안 보이면 이 variants 는 실패다",
+      "status": "blocked",
+      "blockedBy": [
+        "thresholds.undecided"
+      ]
     }
   },
   "invariantUnderVariants": [
@@ -454,5 +473,13 @@
       ]
     }
   },
-  "checker": "Tools/check_layout.py"
+  "checker": "Tools/check_layout.py",
+  "thresholds": {
+    "_note": "붕괴도 → 표시 단계 임계값. 작가 결정 대기. rest 사양과 같은 값을 쓴다",
+    "strainedFrom": "undecided",
+    "brokenFrom": "undecided"
+  },
+  "revisions": [
+    "v2.1 2026-09-01 · D-029 충돌 제거(broken.reward 전투 강화 절 삭제) · mataiosSanityBar → mataiosStateLabel(비수치) · C-09 신설 · 임계값 미정 → variants blocked. 구현된 적 없는 절이라 되돌릴 코드 없음"
+  ]
 }
