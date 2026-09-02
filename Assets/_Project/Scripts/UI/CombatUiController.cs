@@ -116,7 +116,7 @@ namespace HwigiTower.UI
             }
 
             target.sprite = sprite;
-            target.color = sprite == null ? CombatUiTokens.Gold : Color.white;
+            target.color = sprite == null ? CombatUiTokens.Gold : UiColorTokens.NoTint;
             target.gameObject.SetActive(true);
         }
 

@@ -1,6 +1,6 @@
 {
   "screen": "rest",
-  "capturedAt": "2026-09-02T01:25:18.1259280Z runtime RectTransform capture",
+  "capturedAt": "2026-09-02T03:27:23.6848470Z runtime RectTransform capture",
   "source": "runtime",
   "slots": {
     "floorChip": {"x": 0.04, "y": 0.03, "w": 0.18, "h": 0.044, "fontSize": 26, "visible": true},

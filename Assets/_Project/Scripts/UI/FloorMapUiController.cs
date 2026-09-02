@@ -212,7 +212,7 @@ namespace HwigiTower.UI
             var icon = CreateImage(rect, "Node Icon", new Vector2(0.24f, 0.32f), new Vector2(0.76f, 0.84f), FloorMapUiTokens.Gold);
             icon.sprite = _resolveNodeIcon == null ? null : _resolveNodeIcon(node.Type);
             icon.preserveAspect = true;
-            icon.color = node.Locked ? FloorMapUiTokens.InkMute : node.Completed ? FloorMapUiTokens.InkDim : icon.sprite == null ? FloorMapUiTokens.Gold : Color.white;
+            icon.color = node.Locked ? FloorMapUiTokens.InkMute : node.Completed ? FloorMapUiTokens.InkDim : icon.sprite == null ? FloorMapUiTokens.Gold : UiColorTokens.NoTint;
             _nodeIconImages.Add(icon);
 
             var label = CreateChildText(rect, "Label", ResolveNodeTypeLabel(node.Type), UiTokenContract.MicroFontSize, node.Locked ? FloorMapUiTokens.InkMute : FloorMapUiTokens.Ink, new Vector2(0.06f, 0.06f), new Vector2(0.94f, 0.28f));

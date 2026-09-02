@@ -1,6 +1,6 @@
 {
   "screen": "ending",
-  "capturedAt": "2026-09-02T01:25:22.7131500Z runtime RectTransform capture",
+  "capturedAt": "2026-09-02T03:27:28.2069520Z runtime RectTransform capture",
   "source": "runtime",
   "slots": {
     "endingTitle": {"x": 0.08, "y": 0.052, "w": 0.84, "h": 0.07, "fontSize": 54, "visible": true},

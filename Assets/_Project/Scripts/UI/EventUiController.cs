@@ -71,7 +71,7 @@ namespace HwigiTower.UI
             _root.offsetMin = Vector2.zero;
             _root.offsetMax = Vector2.zero;
             var backdrop = gameObject.AddComponent<Image>();
-            backdrop.color = new Color(EventUiTokens.VoidBg.r, EventUiTokens.VoidBg.g, EventUiTokens.VoidBg.b, 0.88f);
+            backdrop.color = UiColorTokens.WithAlpha(EventUiTokens.VoidBg, UiTokenContract.ScrimAlpha);
             backdrop.raycastTarget = false;
 
             BuildResourceStrip();

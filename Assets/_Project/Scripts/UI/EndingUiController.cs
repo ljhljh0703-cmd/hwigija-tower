@@ -40,7 +40,7 @@ namespace HwigiTower.UI
             _root.offsetMin = Vector2.zero;
             _root.offsetMax = Vector2.zero;
             var backdrop = gameObject.AddComponent<Image>();
-            backdrop.color = new Color(EndingUiTokens.VoidBg.r, EndingUiTokens.VoidBg.g, EndingUiTokens.VoidBg.b, 0.88f);
+            backdrop.color = UiColorTokens.WithAlpha(EndingUiTokens.VoidBg, UiTokenContract.ScrimAlpha);
             backdrop.raycastTarget = false;
 
             _titleText = CreateTextSlot("Ending Title", EndingLayout.EndingTitle, EndingUiTokens.Ink);
@@ -62,7 +62,7 @@ namespace HwigiTower.UI
             _root.gameObject.SetActive(true);
             _titleText.text = EndingLayout.EndingTitle.Content;
             _sceneImage.sprite = sceneSprite;
-            _sceneImage.color = sceneSprite == null ? EndingUiTokens.PanelBg : new Color(1f, 1f, 1f, 0.62f);
+            _sceneImage.color = sceneSprite == null ? EndingUiTokens.PanelBg : UiColorTokens.WithAlpha(UiColorTokens.NoTint, UiTokenContract.SceneTintAlpha);
             _sceneImage.gameObject.SetActive(true);
             _summaryText.text = "도달 층 " + snapshot.CurrentFloor + "\n해결 노드 " + snapshot.NodesResolved + " | 전투 승 " + snapshot.BattlesWon + " | 기억 조각 " + snapshot.MemoryFragmentCount;
             ConfigureChoice(_restButton, EndingLayout.ChoiceRest, interactable);

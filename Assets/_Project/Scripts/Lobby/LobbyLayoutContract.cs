@@ -129,6 +129,7 @@ namespace HwigiTower.Lobby
         public const string SanityWarnHex = "#B98A3C";
         public const string SanityBrokenHex = "#A8425A";
         public const string GoldCoinHex = "#D8B45C";
+        public const string NoTintHex = "#FFFFFF";
 
         public const int TitleFontSize = 96;
         public const int ScreenFontSize = 54;
@@ -148,6 +149,8 @@ namespace HwigiTower.Lobby
         public const int CornerSize = 36;
         public const int TapTargetMinPx = 96;
         public const float VignetteStrength = 0.35f;
+        public const float ScrimAlpha = 0.88f;
+        public const float SceneTintAlpha = 0.62f;
     }
 
     public static class LobbyBuildInfo

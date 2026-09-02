@@ -48,7 +48,7 @@ namespace HwigiTower.UI
             _root.offsetMin = Vector2.zero;
             _root.offsetMax = Vector2.zero;
             var backdrop = gameObject.AddComponent<Image>();
-            backdrop.color = new Color(BossGateUiTokens.VoidBg.r, BossGateUiTokens.VoidBg.g, BossGateUiTokens.VoidBg.b, 0.88f);
+            backdrop.color = UiColorTokens.WithAlpha(BossGateUiTokens.VoidBg, UiTokenContract.ScrimAlpha);
             backdrop.raycastTarget = false;
 
             BuildResourceStrip();
@@ -77,7 +77,7 @@ namespace HwigiTower.UI
             _hpFill.fillAmount = Ratio(snapshot.PlayerHp, snapshot.PlayerMaxHp);
             _titleText.text = "문 앞";
             _sceneImage.sprite = sceneSprite;
-            _sceneImage.color = sceneSprite == null ? BossGateUiTokens.PanelBg : new Color(1f, 1f, 1f, 0.62f);
+            _sceneImage.color = sceneSprite == null ? BossGateUiTokens.PanelBg : UiColorTokens.WithAlpha(UiColorTokens.NoTint, UiTokenContract.SceneTintAlpha);
             _sceneImage.gameObject.SetActive(true);
             _readinessText.text = "체력 " + snapshot.PlayerHp + "/" + snapshot.PlayerMaxHp + "\n이성 " + snapshot.Mental + "\n보유품 " + snapshot.ItemCount;
             _engageChoiceStableId = engageChoiceStableId ?? string.Empty;

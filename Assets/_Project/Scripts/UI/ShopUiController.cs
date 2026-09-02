@@ -106,7 +106,7 @@ namespace HwigiTower.UI
             _hpFill.fillAmount = Ratio(snapshot.PlayerHp, snapshot.PlayerMaxHp);
             _titleText.text = title;
             _sceneImage.sprite = sceneSprite;
-            _sceneImage.color = sceneSprite == null ? ShopUiTokens.PanelBg : new Color(1f, 1f, 1f, 0.62f);
+            _sceneImage.color = sceneSprite == null ? ShopUiTokens.PanelBg : UiColorTokens.WithAlpha(UiColorTokens.NoTint, UiTokenContract.SceneTintAlpha);
             _sceneImage.gameObject.SetActive(true);
             _ownedStripText.text = "보유 수 " + snapshot.ItemCount;
 
