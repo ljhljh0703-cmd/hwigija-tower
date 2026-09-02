@@ -1,0 +1,2586 @@
+{
+    "source": "runtime",
+    "runId": "room.prototype",
+    "floors": [
+        {
+            "floor": 1,
+            "phase": "beforeSelect",
+            "selectedMapNodeId": "",
+            "selectionApplied": false,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                    "Type": "Event",
+                    "Floor": 1,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.20272421836853028,
+                    "NormalizedY": 0.14343911409378053,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.2.0.ENC_REST_01",
+                        "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                    "Type": "Event",
+                    "Floor": 1,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.48943987488746645,
+                    "NormalizedY": 0.16705740988254548,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                        "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.1.layer.1.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.7662304043769836,
+                    "NormalizedY": 0.1653216928243637,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.1.layer.2.0.ENC_REST_01",
+                    "Type": "Rest",
+                    "Floor": 1,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.22320973873138429,
+                    "NormalizedY": 0.37066954374313357,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.3.0.ENC_MORAL_CHOICE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.1.0.EVT_F01_JAR_ROOM"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.4863836169242859,
+                    "NormalizedY": 0.3644435703754425,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                        "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.2.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.776542603969574,
+                    "NormalizedY": 0.36453777551651,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                        "floor.1.layer.1.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                    "Type": "Event",
+                    "Floor": 1,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.22585517168045045,
+                    "NormalizedY": 0.5824687480926514,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.2.0.ENC_REST_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5171893239021301,
+                    "NormalizedY": 0.5850738883018494,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.3.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7843617796897888,
+                    "NormalizedY": 0.5937339663505554,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.4.0.ENC_SHOP_01",
+                    "Type": "Shop",
+                    "Floor": 1,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.5.0.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                        "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                        "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.5.0.ENC_COMBAT_GATE_01",
+                    "Type": "Boss",
+                    "Floor": 1,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 1,
+            "phase": "afterSelect",
+            "selectedMapNodeId": "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+            "selectionApplied": true,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                    "Type": "Event",
+                    "Floor": 1,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.20272421836853028,
+                    "NormalizedY": 0.14343911409378053,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.2.0.ENC_REST_01",
+                        "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                    "Type": "Event",
+                    "Floor": 1,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.48943987488746645,
+                    "NormalizedY": 0.16705740988254548,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                        "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.1.layer.1.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7662304043769836,
+                    "NormalizedY": 0.1653216928243637,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.1.layer.2.0.ENC_REST_01",
+                    "Type": "Rest",
+                    "Floor": 1,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.22320973873138429,
+                    "NormalizedY": 0.37066954374313357,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.3.0.ENC_MORAL_CHOICE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.1.0.EVT_F01_JAR_ROOM"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.4863836169242859,
+                    "NormalizedY": 0.3644435703754425,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                        "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.2.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.776542603969574,
+                    "NormalizedY": 0.36453777551651,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                        "floor.1.layer.1.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                    "Type": "Event",
+                    "Floor": 1,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.22585517168045045,
+                    "NormalizedY": 0.5824687480926514,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.2.0.ENC_REST_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5171893239021301,
+                    "NormalizedY": 0.5850738883018494,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.3.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 1,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7843617796897888,
+                    "NormalizedY": 0.5937339663505554,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.4.0.ENC_SHOP_01",
+                    "Type": "Shop",
+                    "Floor": 1,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.1.layer.5.0.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                        "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                        "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.1.layer.5.0.ENC_COMBAT_GATE_01",
+                    "Type": "Boss",
+                    "Floor": 1,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.1.layer.4.0.ENC_SHOP_01"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 2,
+            "phase": "beforeSelect",
+            "selectedMapNodeId": "",
+            "selectionApplied": false,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.2.layer.1.0.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.20238052308559419,
+                    "NormalizedY": 0.15142570436000825,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.2.layer.1.1.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.5006147623062134,
+                    "NormalizedY": 0.15286928415298463,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.2.1.ENC_COMBAT_GATE_02"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.2.layer.1.2.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.7964615821838379,
+                    "NormalizedY": 0.16745547950267793,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001",
+                    "Type": "Event",
+                    "Floor": 2,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2167820781469345,
+                    "NormalizedY": 0.3696690797805786,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.3.0.ENC_COMBAT_GATE_02",
+                        "floor.2.layer.3.1.ENC_REST_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.1.0.ENC_COMBAT_GATE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.2.1.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.48516520857810976,
+                    "NormalizedY": 0.37850508093833926,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.3.1.ENC_REST_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.1.1.ENC_COMBAT_GATE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001",
+                    "Type": "Event",
+                    "Floor": 2,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7724019289016724,
+                    "NormalizedY": 0.3638092577457428,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.3.2.ENC_F02_MORAL_CHOICE_001",
+                        "floor.2.layer.3.1.ENC_REST_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.1.2.ENC_COMBAT_GATE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.3.0.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.21864958107471467,
+                    "NormalizedY": 0.6099095344543457,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.3.1.ENC_REST_02",
+                    "Type": "Rest",
+                    "Floor": 2,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5178560018539429,
+                    "NormalizedY": 0.5907039642333984,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001",
+                        "floor.2.layer.2.1.ENC_COMBAT_GATE_02",
+                        "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.3.2.ENC_F02_MORAL_CHOICE_001",
+                    "Type": "Event",
+                    "Floor": 2,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.768576443195343,
+                    "NormalizedY": 0.6084496378898621,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.4.0.ENC_F02_SHOP_001",
+                    "Type": "Shop",
+                    "Floor": 2,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.5.0.ENC_COMBAT_GATE_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.3.0.ENC_COMBAT_GATE_02",
+                        "floor.2.layer.3.1.ENC_REST_02",
+                        "floor.2.layer.3.2.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.5.0.ENC_COMBAT_GATE_02",
+                    "Type": "Boss",
+                    "Floor": 2,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 2,
+            "phase": "afterSelect",
+            "selectedMapNodeId": "floor.2.layer.1.0.ENC_COMBAT_GATE_02",
+            "selectionApplied": true,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.2.layer.1.0.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.20238052308559419,
+                    "NormalizedY": 0.15142570436000825,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.2.layer.1.1.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5006147623062134,
+                    "NormalizedY": 0.15286928415298463,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.2.1.ENC_COMBAT_GATE_02"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.2.layer.1.2.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7964615821838379,
+                    "NormalizedY": 0.16745547950267793,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001",
+                    "Type": "Event",
+                    "Floor": 2,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2167820781469345,
+                    "NormalizedY": 0.3696690797805786,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.3.0.ENC_COMBAT_GATE_02",
+                        "floor.2.layer.3.1.ENC_REST_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.1.0.ENC_COMBAT_GATE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.2.1.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.48516520857810976,
+                    "NormalizedY": 0.37850508093833926,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.3.1.ENC_REST_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.1.1.ENC_COMBAT_GATE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001",
+                    "Type": "Event",
+                    "Floor": 2,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7724019289016724,
+                    "NormalizedY": 0.3638092577457428,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.3.2.ENC_F02_MORAL_CHOICE_001",
+                        "floor.2.layer.3.1.ENC_REST_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.1.2.ENC_COMBAT_GATE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.3.0.ENC_COMBAT_GATE_02",
+                    "Type": "Combat",
+                    "Floor": 2,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.21864958107471467,
+                    "NormalizedY": 0.6099095344543457,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.3.1.ENC_REST_02",
+                    "Type": "Rest",
+                    "Floor": 2,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5178560018539429,
+                    "NormalizedY": 0.5907039642333984,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.2.0.ENC_F02_MORAL_CHOICE_001",
+                        "floor.2.layer.2.1.ENC_COMBAT_GATE_02",
+                        "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.3.2.ENC_F02_MORAL_CHOICE_001",
+                    "Type": "Event",
+                    "Floor": 2,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.768576443195343,
+                    "NormalizedY": 0.6084496378898621,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.2.2.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.4.0.ENC_F02_SHOP_001",
+                    "Type": "Shop",
+                    "Floor": 2,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.2.layer.5.0.ENC_COMBAT_GATE_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.3.0.ENC_COMBAT_GATE_02",
+                        "floor.2.layer.3.1.ENC_REST_02",
+                        "floor.2.layer.3.2.ENC_F02_MORAL_CHOICE_001"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.2.layer.5.0.ENC_COMBAT_GATE_02",
+                    "Type": "Boss",
+                    "Floor": 2,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.2.layer.4.0.ENC_F02_SHOP_001"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 3,
+            "phase": "beforeSelect",
+            "selectedMapNodeId": "",
+            "selectionApplied": false,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.3.layer.1.0.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.21449507772922517,
+                    "NormalizedY": 0.16876350343227387,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.2.0.ENC_REST_03"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.3.layer.1.1.ENC_MORAL_CHOICE_02",
+                    "Type": "Event",
+                    "Floor": 3,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.49688977003097536,
+                    "NormalizedY": 0.1675986647605896,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.2.1.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.3.layer.1.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.7623845338821411,
+                    "NormalizedY": 0.14674422144889832,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.3.layer.2.0.ENC_REST_03",
+                    "Type": "Rest",
+                    "Floor": 3,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.20692463219165803,
+                    "NormalizedY": 0.38000255823135378,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.3.0.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.1.0.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.2.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.509571373462677,
+                    "NormalizedY": 0.36381790041923525,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.1.1.ENC_MORAL_CHOICE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02",
+                    "Type": "Event",
+                    "Floor": 3,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7857821583747864,
+                    "NormalizedY": 0.36405208706855776,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.3.2.ENC_MORAL_CHOICE_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.1.1.ENC_MORAL_CHOICE_02",
+                        "floor.3.layer.1.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.3.0.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2090514451265335,
+                    "NormalizedY": 0.5907626152038574,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.2.0.ENC_REST_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.3.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.49363380670547488,
+                    "NormalizedY": 0.5888272523880005,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.2.0.ENC_REST_03",
+                        "floor.3.layer.2.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.3.2.ENC_MORAL_CHOICE_02",
+                    "Type": "Event",
+                    "Floor": 3,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.78583824634552,
+                    "NormalizedY": 0.5935444235801697,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.4.0.ENC_SHOP_03",
+                    "Type": "Shop",
+                    "Floor": 3,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.5.0.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.3.0.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.3.1.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.3.2.ENC_MORAL_CHOICE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.5.0.ENC_COMBAT_GATE_01",
+                    "Type": "Boss",
+                    "Floor": 3,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 3,
+            "phase": "afterSelect",
+            "selectedMapNodeId": "floor.3.layer.1.0.ENC_COMBAT_GATE_01",
+            "selectionApplied": true,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.3.layer.1.0.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.21449507772922517,
+                    "NormalizedY": 0.16876350343227387,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.2.0.ENC_REST_03"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.3.layer.1.1.ENC_MORAL_CHOICE_02",
+                    "Type": "Event",
+                    "Floor": 3,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.49688977003097536,
+                    "NormalizedY": 0.1675986647605896,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.2.1.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.3.layer.1.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7623845338821411,
+                    "NormalizedY": 0.14674422144889832,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.3.layer.2.0.ENC_REST_03",
+                    "Type": "Rest",
+                    "Floor": 3,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.20692463219165803,
+                    "NormalizedY": 0.38000255823135378,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.3.0.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.1.0.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.2.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.509571373462677,
+                    "NormalizedY": 0.36381790041923525,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.1.1.ENC_MORAL_CHOICE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02",
+                    "Type": "Event",
+                    "Floor": 3,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7857821583747864,
+                    "NormalizedY": 0.36405208706855776,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.3.2.ENC_MORAL_CHOICE_02"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.1.1.ENC_MORAL_CHOICE_02",
+                        "floor.3.layer.1.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.3.0.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2090514451265335,
+                    "NormalizedY": 0.5907626152038574,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.2.0.ENC_REST_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.3.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 3,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.49363380670547488,
+                    "NormalizedY": 0.5888272523880005,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.2.0.ENC_REST_03",
+                        "floor.3.layer.2.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.3.2.ENC_MORAL_CHOICE_02",
+                    "Type": "Event",
+                    "Floor": 3,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.78583824634552,
+                    "NormalizedY": 0.5935444235801697,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.2.2.ENC_MEMORY_FRAGMENT_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.4.0.ENC_SHOP_03",
+                    "Type": "Shop",
+                    "Floor": 3,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.3.layer.5.0.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.3.0.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.3.1.ENC_COMBAT_GATE_01",
+                        "floor.3.layer.3.2.ENC_MORAL_CHOICE_02"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.3.layer.5.0.ENC_COMBAT_GATE_01",
+                    "Type": "Boss",
+                    "Floor": 3,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.3.layer.4.0.ENC_SHOP_03"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 4,
+            "phase": "beforeSelect",
+            "selectedMapNodeId": "",
+            "selectionApplied": false,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.4.layer.1.0.ENC_MORAL_CHOICE_03",
+                    "Type": "Event",
+                    "Floor": 4,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.21415138244628907,
+                    "NormalizedY": 0.1467500925064087,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.2.0.ENC_MORAL_CHOICE_03",
+                        "floor.4.layer.2.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.4.layer.1.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.5080646276473999,
+                    "NormalizedY": 0.15341052412986756,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.2.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.4.layer.1.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.7926157116889954,
+                    "NormalizedY": 0.14887800812721253,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.2.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.4.layer.2.0.ENC_MORAL_CHOICE_03",
+                    "Type": "Event",
+                    "Floor": 4,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2364969700574875,
+                    "NormalizedY": 0.37900209426879885,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.3.0.ENC_MEMORY_FRAGMENT_03",
+                        "floor.4.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.1.0.ENC_MORAL_CHOICE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.2.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5083529353141785,
+                    "NormalizedY": 0.37787941098213198,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.1.0.ENC_MORAL_CHOICE_03",
+                        "floor.4.layer.1.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.2.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7816414833068848,
+                    "NormalizedY": 0.3633235692977905,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.3.2.ENC_REST_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.1.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.3.0.ENC_MEMORY_FRAGMENT_03",
+                    "Type": "Event",
+                    "Floor": 4,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.23784586787223817,
+                    "NormalizedY": 0.5882033705711365,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.2.0.ENC_MORAL_CHOICE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.3.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.4943004548549652,
+                    "NormalizedY": 0.5944573283195496,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.2.0.ENC_MORAL_CHOICE_03",
+                        "floor.4.layer.2.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.3.2.ENC_REST_01",
+                    "Type": "Rest",
+                    "Floor": 4,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7700528502464294,
+                    "NormalizedY": 0.6082600951194763,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.2.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.4.0.ENC_SHOP_04",
+                    "Type": "Shop",
+                    "Floor": 4,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.5.0.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.3.0.ENC_MEMORY_FRAGMENT_03",
+                        "floor.4.layer.3.1.ENC_COMBAT_GATE_01",
+                        "floor.4.layer.3.2.ENC_REST_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.5.0.ENC_COMBAT_GATE_01",
+                    "Type": "Boss",
+                    "Floor": 4,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 4,
+            "phase": "afterSelect",
+            "selectedMapNodeId": "floor.4.layer.1.0.ENC_MORAL_CHOICE_03",
+            "selectionApplied": true,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.4.layer.1.0.ENC_MORAL_CHOICE_03",
+                    "Type": "Event",
+                    "Floor": 4,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.21415138244628907,
+                    "NormalizedY": 0.1467500925064087,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.2.0.ENC_MORAL_CHOICE_03",
+                        "floor.4.layer.2.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.4.layer.1.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5080646276473999,
+                    "NormalizedY": 0.15341052412986756,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.2.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.4.layer.1.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7926157116889954,
+                    "NormalizedY": 0.14887800812721253,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.2.2.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.4.layer.2.0.ENC_MORAL_CHOICE_03",
+                    "Type": "Event",
+                    "Floor": 4,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2364969700574875,
+                    "NormalizedY": 0.37900209426879885,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.3.0.ENC_MEMORY_FRAGMENT_03",
+                        "floor.4.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.1.0.ENC_MORAL_CHOICE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.2.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5083529353141785,
+                    "NormalizedY": 0.37787941098213198,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.3.1.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.1.0.ENC_MORAL_CHOICE_03",
+                        "floor.4.layer.1.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.2.2.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7816414833068848,
+                    "NormalizedY": 0.3633235692977905,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.3.2.ENC_REST_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.1.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.3.0.ENC_MEMORY_FRAGMENT_03",
+                    "Type": "Event",
+                    "Floor": 4,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.23784586787223817,
+                    "NormalizedY": 0.5882033705711365,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.2.0.ENC_MORAL_CHOICE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.3.1.ENC_COMBAT_GATE_01",
+                    "Type": "Combat",
+                    "Floor": 4,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.4943004548549652,
+                    "NormalizedY": 0.5944573283195496,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.2.0.ENC_MORAL_CHOICE_03",
+                        "floor.4.layer.2.1.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.3.2.ENC_REST_01",
+                    "Type": "Rest",
+                    "Floor": 4,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7700528502464294,
+                    "NormalizedY": 0.6082600951194763,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.2.2.ENC_COMBAT_GATE_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.4.0.ENC_SHOP_04",
+                    "Type": "Shop",
+                    "Floor": 4,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.4.layer.5.0.ENC_COMBAT_GATE_01"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.3.0.ENC_MEMORY_FRAGMENT_03",
+                        "floor.4.layer.3.1.ENC_COMBAT_GATE_01",
+                        "floor.4.layer.3.2.ENC_REST_01"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.4.layer.5.0.ENC_COMBAT_GATE_01",
+                    "Type": "Boss",
+                    "Floor": 4,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.4.layer.4.0.ENC_SHOP_04"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 5,
+            "phase": "beforeSelect",
+            "selectedMapNodeId": "",
+            "selectionApplied": false,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.5.layer.1.0.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.22626595199108125,
+                    "NormalizedY": 0.16408789157867433,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.5.layer.1.1.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.5043396949768066,
+                    "NormalizedY": 0.16813990473747254,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.5.layer.1.2.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": true,
+                    "Completed": false,
+                    "Locked": false,
+                    "NormalizedX": 0.7945386171340942,
+                    "NormalizedY": 0.15816675126552583,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.2.2.ENC_COMBAT_GATE_03"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04",
+                    "Type": "Event",
+                    "Floor": 5,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.226639524102211,
+                    "NormalizedY": 0.389335572719574,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.3.0.ENC_REST_05",
+                        "floor.5.layer.3.1.ENC_COMBAT_GATE_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.1.0.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05",
+                    "Type": "Event",
+                    "Floor": 5,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.4967590868473053,
+                    "NormalizedY": 0.36319226026535036,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.3.1.ENC_COMBAT_GATE_03",
+                        "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.1.1.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.2.2.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7950217127799988,
+                    "NormalizedY": 0.36356639862060549,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.1.2.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.3.0.ENC_REST_05",
+                    "Type": "Rest",
+                    "Floor": 5,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2282477170228958,
+                    "NormalizedY": 0.5990564823150635,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.3.1.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5060782432556152,
+                    "NormalizedY": 0.5925806164741516,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04",
+                        "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04",
+                    "Type": "Event",
+                    "Floor": 5,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7873146533966065,
+                    "NormalizedY": 0.5933548808097839,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05",
+                        "floor.5.layer.2.2.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.4.0.ENC_SHOP_05",
+                    "Type": "Shop",
+                    "Floor": 5,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.5.0.ENC_COMBAT_GATE_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.3.0.ENC_REST_05",
+                        "floor.5.layer.3.1.ENC_COMBAT_GATE_03",
+                        "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.5.0.ENC_COMBAT_GATE_03",
+                    "Type": "Boss",
+                    "Floor": 5,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ]
+                }
+            ]
+        },
+        {
+            "floor": 5,
+            "phase": "afterSelect",
+            "selectedMapNodeId": "floor.5.layer.1.0.ENC_COMBAT_GATE_03",
+            "selectionApplied": true,
+            "nodes": [
+                {
+                    "MapNodeId": "floor.5.layer.1.0.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 1,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.22626595199108125,
+                    "NormalizedY": 0.16408789157867433,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.5.layer.1.1.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 1,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5043396949768066,
+                    "NormalizedY": 0.16813990473747254,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.5.layer.1.2.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 1,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7945386171340942,
+                    "NormalizedY": 0.15816675126552583,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.2.2.ENC_COMBAT_GATE_03"
+                    ],
+                    "PreviousMapNodeIds": []
+                },
+                {
+                    "MapNodeId": "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04",
+                    "Type": "Event",
+                    "Floor": 5,
+                    "Layer": 2,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.226639524102211,
+                    "NormalizedY": 0.389335572719574,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.3.0.ENC_REST_05",
+                        "floor.5.layer.3.1.ENC_COMBAT_GATE_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.1.0.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05",
+                    "Type": "Event",
+                    "Floor": 5,
+                    "Layer": 2,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.4967590868473053,
+                    "NormalizedY": 0.36319226026535036,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.3.1.ENC_COMBAT_GATE_03",
+                        "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.1.1.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.2.2.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 2,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7950217127799988,
+                    "NormalizedY": 0.36356639862060549,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.1.2.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.3.0.ENC_REST_05",
+                    "Type": "Rest",
+                    "Floor": 5,
+                    "Layer": 3,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.2282477170228958,
+                    "NormalizedY": 0.5990564823150635,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.3.1.ENC_COMBAT_GATE_03",
+                    "Type": "Combat",
+                    "Floor": 5,
+                    "Layer": 3,
+                    "Index": 1,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5060782432556152,
+                    "NormalizedY": 0.5925806164741516,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.2.0.ENC_MEMORY_FRAGMENT_04",
+                        "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04",
+                    "Type": "Event",
+                    "Floor": 5,
+                    "Layer": 3,
+                    "Index": 2,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.7873146533966065,
+                    "NormalizedY": 0.5933548808097839,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.2.1.ENC_MEMORY_FRAGMENT_05",
+                        "floor.5.layer.2.2.ENC_COMBAT_GATE_03"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.4.0.ENC_SHOP_05",
+                    "Type": "Shop",
+                    "Floor": 5,
+                    "Layer": 4,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.75,
+                    "Current": false,
+                    "NextMapNodeIds": [
+                        "floor.5.layer.5.0.ENC_COMBAT_GATE_03"
+                    ],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.3.0.ENC_REST_05",
+                        "floor.5.layer.3.1.ENC_COMBAT_GATE_03",
+                        "floor.5.layer.3.2.ENC_MEMORY_FRAGMENT_04"
+                    ]
+                },
+                {
+                    "MapNodeId": "floor.5.layer.5.0.ENC_COMBAT_GATE_03",
+                    "Type": "Boss",
+                    "Floor": 5,
+                    "Layer": 5,
+                    "Index": 0,
+                    "Selectable": false,
+                    "Completed": false,
+                    "Locked": true,
+                    "NormalizedX": 0.5,
+                    "NormalizedY": 0.9100000262260437,
+                    "Current": false,
+                    "NextMapNodeIds": [],
+                    "PreviousMapNodeIds": [
+                        "floor.5.layer.4.0.ENC_SHOP_05"
+                    ]
+                }
+            ]
+        }
+    ],
+    "determinismPairA": {
+        "floor": 1,
+        "phase": "beforeSelect",
+        "selectedMapNodeId": "",
+        "selectionApplied": false,
+        "nodes": [
+            {
+                "MapNodeId": "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                "Type": "Event",
+                "Floor": 1,
+                "Layer": 1,
+                "Index": 0,
+                "Selectable": true,
+                "Completed": false,
+                "Locked": false,
+                "NormalizedX": 0.20272421836853028,
+                "NormalizedY": 0.14343911409378053,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.2.0.ENC_REST_01",
+                    "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": []
+            },
+            {
+                "MapNodeId": "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                "Type": "Event",
+                "Floor": 1,
+                "Layer": 1,
+                "Index": 1,
+                "Selectable": true,
+                "Completed": false,
+                "Locked": false,
+                "NormalizedX": 0.48943987488746645,
+                "NormalizedY": 0.16705740988254548,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                    "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": []
+            },
+            {
+                "MapNodeId": "floor.1.layer.1.2.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 1,
+                "Index": 2,
+                "Selectable": true,
+                "Completed": false,
+                "Locked": false,
+                "NormalizedX": 0.7662304043769836,
+                "NormalizedY": 0.1653216928243637,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": []
+            },
+            {
+                "MapNodeId": "floor.1.layer.2.0.ENC_REST_01",
+                "Type": "Rest",
+                "Floor": 1,
+                "Layer": 2,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.22320973873138429,
+                "NormalizedY": 0.37066954374313357,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.3.0.ENC_MORAL_CHOICE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.1.0.EVT_F01_JAR_ROOM"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 2,
+                "Index": 1,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.4863836169242859,
+                "NormalizedY": 0.3644435703754425,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.3.1.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                    "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.2.2.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 2,
+                "Index": 2,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.776542603969574,
+                "NormalizedY": 0.36453777551651,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                    "floor.1.layer.1.2.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                "Type": "Event",
+                "Floor": 1,
+                "Layer": 3,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.22585517168045045,
+                "NormalizedY": 0.5824687480926514,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.2.0.ENC_REST_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 3,
+                "Index": 1,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.5171893239021301,
+                "NormalizedY": 0.5850738883018494,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.3.2.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 3,
+                "Index": 2,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.7843617796897888,
+                "NormalizedY": 0.5937339663505554,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.4.0.ENC_SHOP_01",
+                "Type": "Shop",
+                "Floor": 1,
+                "Layer": 4,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.5,
+                "NormalizedY": 0.75,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.5.0.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                    "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                    "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.5.0.ENC_COMBAT_GATE_01",
+                "Type": "Boss",
+                "Floor": 1,
+                "Layer": 5,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.5,
+                "NormalizedY": 0.9100000262260437,
+                "Current": false,
+                "NextMapNodeIds": [],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ]
+            }
+        ]
+    },
+    "determinismPairB": {
+        "floor": 1,
+        "phase": "beforeSelect",
+        "selectedMapNodeId": "",
+        "selectionApplied": false,
+        "nodes": [
+            {
+                "MapNodeId": "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                "Type": "Event",
+                "Floor": 1,
+                "Layer": 1,
+                "Index": 0,
+                "Selectable": true,
+                "Completed": false,
+                "Locked": false,
+                "NormalizedX": 0.20272421836853028,
+                "NormalizedY": 0.14343911409378053,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.2.0.ENC_REST_01",
+                    "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": []
+            },
+            {
+                "MapNodeId": "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                "Type": "Event",
+                "Floor": 1,
+                "Layer": 1,
+                "Index": 1,
+                "Selectable": true,
+                "Completed": false,
+                "Locked": false,
+                "NormalizedX": 0.48943987488746645,
+                "NormalizedY": 0.16705740988254548,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                    "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": []
+            },
+            {
+                "MapNodeId": "floor.1.layer.1.2.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 1,
+                "Index": 2,
+                "Selectable": true,
+                "Completed": false,
+                "Locked": false,
+                "NormalizedX": 0.7662304043769836,
+                "NormalizedY": 0.1653216928243637,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": []
+            },
+            {
+                "MapNodeId": "floor.1.layer.2.0.ENC_REST_01",
+                "Type": "Rest",
+                "Floor": 1,
+                "Layer": 2,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.22320973873138429,
+                "NormalizedY": 0.37066954374313357,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.3.0.ENC_MORAL_CHOICE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.1.0.EVT_F01_JAR_ROOM"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.2.1.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 2,
+                "Index": 1,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.4863836169242859,
+                "NormalizedY": 0.3644435703754425,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.3.1.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.1.0.EVT_F01_JAR_ROOM",
+                    "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.2.2.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 2,
+                "Index": 2,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.776542603969574,
+                "NormalizedY": 0.36453777551651,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01",
+                    "floor.1.layer.1.2.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                "Type": "Event",
+                "Floor": 1,
+                "Layer": 3,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.22585517168045045,
+                "NormalizedY": 0.5824687480926514,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.2.0.ENC_REST_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 3,
+                "Index": 1,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.5171893239021301,
+                "NormalizedY": 0.5850738883018494,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.2.1.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.3.2.ENC_COMBAT_GATE_01",
+                "Type": "Combat",
+                "Floor": 1,
+                "Layer": 3,
+                "Index": 2,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.7843617796897888,
+                "NormalizedY": 0.5937339663505554,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.2.2.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.4.0.ENC_SHOP_01",
+                "Type": "Shop",
+                "Floor": 1,
+                "Layer": 4,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.5,
+                "NormalizedY": 0.75,
+                "Current": false,
+                "NextMapNodeIds": [
+                    "floor.1.layer.5.0.ENC_COMBAT_GATE_01"
+                ],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.3.0.ENC_MORAL_CHOICE_01",
+                    "floor.1.layer.3.1.ENC_COMBAT_GATE_01",
+                    "floor.1.layer.3.2.ENC_COMBAT_GATE_01"
+                ]
+            },
+            {
+                "MapNodeId": "floor.1.layer.5.0.ENC_COMBAT_GATE_01",
+                "Type": "Boss",
+                "Floor": 1,
+                "Layer": 5,
+                "Index": 0,
+                "Selectable": false,
+                "Completed": false,
+                "Locked": true,
+                "NormalizedX": 0.5,
+                "NormalizedY": 0.9100000262260437,
+                "Current": false,
+                "NextMapNodeIds": [],
+                "PreviousMapNodeIds": [
+                    "floor.1.layer.4.0.ENC_SHOP_01"
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "specVersion": "1.0",
+  "subject": "map-flow",
+  "authority": "wiki/projects/hwiglija-tower-gdd.md §D-034 Map Flow / Route Reveal / Commitment 🔒 LOCKED 2026-05-27",
+  "checker": "Tools/check_mapflow.py",
+  "_why": "맵 진행 테스트 14건이 기준선부터 실패한다. M1 격리 실행으로 **테스트 오염 가설은 기각**됐다 — 진짜 회귀다. 고치려면 「무엇이 맞는 상태인가」가 기계로 판정돼야 한다. D-034 는 잠겨 있지만 산문이라 대조가 안 된다. 이 파일이 그 산문을 **덤프 대조 가능한 계약**으로 옮긴 것이다. UI 레인이 화면에 한 것을 맵에 한다.",
+  "_boundary": "🔴 **여기 적힌 값은 전부 D-034 원문에서 옮긴 것이다. 내가 정한 수치는 하나도 없다.** D-034 에 없는 것은 `undecided` 로 두고 검사하지 않는다. 코드가 계약과 다르면 **코드가 틀린 것**이다(D-034 는 LOCKED).",
+  "dumpContract": {
+    "_note": "런타임이 뱉을 덤프. UI 레인의 `<screen>_runtime_actual_layout.json` 과 같은 자리다",
+    "path": "Docs/Portfolio/assets/concept-to-ui/mapflow_runtime_dump.json",
+    "source": "PrototypeRunSnapshot.FloorMapNodes (PrototypeFloorMapNodeView[]) + CurrentFloor + SelectedMapNodeId",
+    "fields": "MapNodeId · Type · Floor · Layer · Index · Selectable · Completed · Locked · NormalizedX · NormalizedY · Current · NextMapNodeIds · PreviousMapNodeIds",
+    "shape": "{ \"source\": \"runtime\", \"runId\": <string>, \"floors\": [ { \"floor\": N, \"selectedMapNodeId\": <string>, \"nodes\": [ ...위 13필드... ] } ] }",
+    "when": "각 층 진입 직후(선택 전) 1회 + 노드 1개 해결 직후 1회. **선택 전/후 두 스냅샷이 있어야 commitment 규칙을 잰다**"
+  },
+  "constraints": [
+    {
+      "id": "MF-01",
+      "text": "지도는 3개 logical sparse lane 으로 생성한다",
+      "source": "D-034 「지도는 5컬럼 visual grid 를 유지하되, 3개 logical sparse lane 으로 생성한다」",
+      "check": "층별 고유 lane 수 == 3",
+      "machineCheck": {
+        "type": "laneCount",
+        "eq": 3
+      }
+    },
+    {
+      "id": "MF-02",
+      "text": "대부분의 non-Shop/non-Boss 노드는 outgoing edge 가 1개다",
+      "source": "D-034 「대부분의 non-Shop/non-Boss node outgoing edge 는 1개다. 2갈래 branch 는 이벤트/휴식 등 의미 있는 선택 차이가 있을 때만 가끔 허용」",
+      "check": "outgoing==1 인 노드 비율이 다수",
+      "machineCheck": {
+        "type": "outgoingEdges",
+        "applyTo": {
+          "typeNot": [
+            "Shop",
+            "Boss"
+          ]
+        },
+        "mostlyEq": 1
+      },
+      "note": "「대부분」·「가끔」은 D-034 원문 표현이다. 정확한 임계는 D-034 에 없다 → 검사기는 **비율을 출력만 하고 FAIL 은 outgoing==0 일 때만 낸다.** 0 은 진행 불가라 어떤 해석으로도 위반이다"
+    },
+    {
+      "id": "MF-03",
+      "text": "all-to-all layer 연결 금지 · adjacent-lane cross edge 는 floor 당 0-2개 이하",
+      "source": "D-034 「all-to-all layer 연결은 금지한다. adjacent-lane cross edge 는 첫 구현에서 floor 당 0-2개 이하로 제한」",
+      "check": "cross-lane edge 수 <= 2 (층당)",
+      "machineCheck": {
+        "type": "crossLaneEdges",
+        "maxPerFloor": 2
+      }
+    },
+    {
+      "id": "MF-04",
+      "text": "Rest 는 Floor 시작 직후/Layer 1 에 나오지 않는다",
+      "source": "D-034 「Rest 는 Floor 시작 직후/Layer 1 에 나오지 않는다」",
+      "check": "Layer==1 에 Type==Rest 인 노드 0개",
+      "machineCheck": {
+        "type": "nodeTypeAbsentInLayer",
+        "nodeType": "Rest",
+        "layer": 1
+      }
+    },
+    {
+      "id": "MF-05",
+      "text": "Rest 는 Layer 2/3 에서 floor 당 0-1개",
+      "source": "D-034 「첫 구현은 Layer 2/3 에서 floor 당 0-1개 후보를 기준으로 둔다」",
+      "check": "층당 Rest 노드 수 <= 1",
+      "machineCheck": {
+        "type": "nodeTypeCountPerFloor",
+        "nodeType": "Rest",
+        "max": 1
+      }
+    },
+    {
+      "id": "MF-06",
+      "text": "미래 노드는 type 을 보여주되 선택 불가면 disabled 다",
+      "source": "D-034 「미래 node 는 type 을 face-up 으로 보여주되, 아직 선택 불가하면 dark/disabled 상태로 둔다」",
+      "check": "Selectable==false && Completed==false 인 노드는 Locked==true 이고 Type 이 비어 있지 않다",
+      "machineCheck": {
+        "type": "futureNodesLockedWithType"
+      }
+    },
+    {
+      "id": "MF-07",
+      "text": "🔴 **선택 가능한 노드가 층마다 1개 이상 있다 (선택 전 스냅샷)**",
+      "source": "D-034 「선택 가능 node 는 lit/active 상태이며, click 시 즉시 encounter 로 진입한다」의 성립 전제",
+      "check": "선택 전 스냅샷에서 Selectable==true 인 노드 >= 1",
+      "machineCheck": {
+        "type": "minSelectable",
+        "phase": "beforeSelect",
+        "min": 1
+      },
+      "note": "**실패 14건의 증상이 정확히 여기다** — `Expected selectable map nodes on floor 5 → 0` · `Missing selectable map node ... among <빈 목록>`. 이 검사가 빨간불이면 M2 는 여기부터 판다"
+    },
+    {
+      "id": "MF-08",
+      "text": "노드를 고른 뒤에는 다른 노드를 고를 수 없다 (commitment)",
+      "source": "D-034 「active encounter 중 route 선택 취소, map 복귀 후 다른 노드 선택, utility map 을 통한 commitment 회피는 금지」",
+      "check": "선택 후 스냅샷에서 Selectable==true 인 노드 == 0",
+      "machineCheck": {
+        "type": "maxSelectable",
+        "phase": "afterSelect",
+        "max": 0
+      },
+      "note": "🔴 **MF-07 과 짝이다.** 코드가 `_selectedMapNodeId` 가 차 있으면 전부 선택 불가로 만든다 — 그 규칙 자체는 D-034 대로다. **문제는 그 값이 언제 지워지는가**이고, 지우는 지점이 6곳이다. 둘을 같이 재야 「commitment 인가 stuck 인가」가 갈린다"
+    },
+    {
+      "id": "MF-09",
+      "text": "Boss clear 후 다음 층 지도가 생성·표시된다",
+      "source": "D-034 「Boss clear 후 다음 층 선택 시 이전 result UI 를 clear 하고 새 floor map generated/visible 상태를 보장」",
+      "check": "다음 층 스냅샷에 노드 >= 1 이고 Selectable >= 1",
+      "machineCheck": {
+        "type": "nextFloorMapPresent"
+      }
+    },
+    {
+      "id": "MF-10",
+      "text": "맵 생성은 run id + floor seed 로 결정적이다",
+      "source": "D-034 Pillar 점검 P4 「route generation 과 reveal/commitment state 는 run id + floor seed 및 run state 로 결정 가능」",
+      "check": "같은 runId 로 두 번 생성한 덤프가 바이트 동일",
+      "machineCheck": {
+        "type": "deterministicByRunId"
+      },
+      "note": "M1 에서 `DeterministicSeed.Combine(RunId, floor)` 경로가 확인됐다. 이 검사는 그 확인을 자동화한 것이다"
+    }
+  ],
+  "undecided": {
+    "_note": "D-034 에 값이 없는 것. **검사하지 않고, 지어내지도 않는다**",
+    "branchFrequency": "「2갈래는 가끔」의 정확한 빈도. D-034 는 「가끔」이라고만 쓴다",
+    "restWeightedProbability": "D-034 §범위 = 「Rest exact weighted probability 는 이후 balance tuning 이며 route-system blocker 가 아니다」",
+    "laneColumnMapping": "3 logical lane 이 5 visual column 에 어떻게 앉는지. D-034 는 컬럼 수만 정한다"
+  },
+  "outOfScope": {
+    "_note": "맵과 다른 뿌리로 보이는 실패 3건. M2 범위 밖이고 별건으로 센다",
+    "RoomController_ExplorationContextResetsToNormalBgm": "오디오 NullReference",
+    "GenericCounterplay_HeavyPressureAndSkillOpeningChangeChoices": "전투 문구 「빈틈 +2」 불일치 — D-037/D-038 영역",
+    "ItemAndAbilityEffects_ApplyToCombatLoop": "아이템·능력 효과가 전투에 0 — D-031/OQ-020 영역"
+  },
+  "revisions": [
+    "v1.0 2026-09-02 · 최초. D-034 원문을 덤프 대조 가능한 10개 제약으로 옮김. M1 결과(오염 가설 기각·진짜 회귀)를 받아 M2 의 기준으로 발행. 내가 정한 수치 0"
+  ]
+}
