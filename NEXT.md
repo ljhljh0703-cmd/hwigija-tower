@@ -15,22 +15,32 @@
 
 ## 실행할 것
 
-**M3 재실행 — ⛔ 지금은 막혀 있다. 작가가 Unity 라이선스를 고쳐야 한다.**
+**🟢 차단 해제 (2026-09-02). 작가가 Unity CLI 를 손봤다. 지금 간다.**
+
+**순서: ① F1-a → ② M3.** F1-a 는 Unity 가 필요 없으니 먼저 털어라.
 
 ```
 정본  Docs/Portfolio/assets/concept-to-ui/DISPATCH-map-flow-m3.md
 계약  Docs/Portfolio/assets/concept-to-ui/map_flow_spec.json  **v1.2**
 검사  Tools/check_mapflow.py
-브랜치 codex/hwigi-lobby-ui-pilot-r3 @ de228dd
+fixture Assets/_Project/Tests/PlayMode/MapFlowRuntimeDumpTests.cs  @ 8eb9548 (게이트 ACCEPT 완료)
+브랜치 codex/hwigi-lobby-ui-pilot-r3
 ```
 
-### 막힌 이유 — 네 잘못이 아니다
+### 착수 전 30초 — 라이선스가 진짜 풀렸는지 네가 먼저 확인해라
 
-Unity Licensing Client 프로토콜 불일치(`Unsupported protocol version '1.18.1'`).
-`-nographics` 유무 두 경로 모두 **테스트 도달 전** 중단. **우회하지 않고 측정 실패로 기록한 것이 맞다.**
-**작가가 라이선스를 고칠 때까지 재시도하지 마라.** 재시도 횟수에 넣지도 마라.
+```bash
+bash Tools/unity_license_probe.sh
+```
 
-### 라이선스가 풀리면 — 계약이 v1.2 로 바뀌었다
+🔴 **작가의 「실행 완」은 내가 확인하지 못했다** — 라이선스 클라이언트는 연결 폴더 밖이라 **내 사정권 밖이다.**
+그러니 **PASS 를 본 뒤에 M3 를 돌려라.** 본 프로젝트(1.3GB)를 먼저 여는 것보다 이게 빠르다.
+
+- **PASS** → 그대로 M3 진행.
+- **FAIL/OTHER** → **M3 중단.** 우회하지 마라. `exit` 코드와 로그 마지막 12줄을 그대로 반환하면 끝이다.
+  **재시도 횟수에 넣지 마라.** 이건 네 잘못이 아니다.
+
+### 계약이 v1.2 로 바뀌었다 — 구증거 재사용 불가
 
 **M3 착수 때 네가 지적한 것이 맞았다.** 「완주인지 막힘인지 구분하려면 `Skipped` 와 활성 레이어가 필요하다」 — 그대로다.
 
@@ -46,6 +56,9 @@ Unity Licensing Client 프로토콜 불일치(`Unsupported protocol version '1.1
 | 덤프 요구 | 노드별 **`Skipped`** · 그 시점 **활성 레이어** · **`floorActive`**(층 진행 중 여부) |
 
 검사기는 `floorActive` 가 없으면 **「재지 못한 것」으로 FAIL** 낸다. 조용히 통과시키지 않는다.
+
+✅ **fixture 는 이미 준비돼 있다(`8eb9548`).** 게이트가 대조했고 수용했다 — 더 손댈 것 없다.
+`floorActive = !FloorComplete && !RunCompleted` 가 맞다: `FailRun()` 이 `CompleteRun()` 을 부르므로 **실패 종료가 「막힘」으로 오분류되지 않는다.** **덤프 뜨는 것부터 시작해라.**
 
 ### 표적 하나
 
