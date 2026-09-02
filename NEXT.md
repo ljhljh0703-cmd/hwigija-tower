@@ -52,6 +52,33 @@ Unity Licensing Client 프로토콜 불일치(`Unsupported protocol version '1.1
 
 ⛔ 고치지 마라(M4 가 수리) · `MF-03`(cross-lane 4>2)도 지금 고치지 마라 · 범위 밖 3건 무접촉 · UI 12화면 무접촉.
 
+## F1 — 폰트 도입 (G1 확정됨, 2026-09-02)
+
+**작가가 결정했다. 더 물을 것 없다.** `ui_tokens.json` 의 `font` 절이 정본이다.
+
+| 역할 | 폰트 | 라이선스 |
+|---|---|---|
+| 제목 `display` | **Noto Serif KR** (본명조) · weight 700 | SIL OFL 1.1 |
+| 본문 `body` | **Pretendard** · weight 400 | SIL OFL 1.1 |
+| 숫자 `numeric` | body(Pretendard) · weight 500 · tabularNums | 동일 |
+
+### F1-a — 지금 할 수 있다 (Unity 불필요)
+
+1. 두 폰트 원본(정적 TTF/OTF, variable 아님)을 `Assets/_Project/ThirdParty/Fonts/` 에 배치
+2. **OFL 원문 1장**을 `Assets/_Project/ThirdParty/Fonts/OFL.txt` 로 동봉 + 각 폰트 출처 URL 을 `NOTICE.md` 에 기록
+   - Pretendard: https://github.com/orioncactus/pretendard
+   - Noto Serif KR: https://fonts.google.com/noto/specimen/Noto+Serif+KR
+3. 커밋. **여기까지가 무승인 범위다.**
+
+### F1-b — Unity 라이선스가 풀린 뒤
+
+4. TMP SDF 에셋 생성. **⛔ 한글 완성형 11,172자 정적 굽기 금지** — 4096² 다중 아틀라스가 되어 모바일 메모리를 먹는다.
+   **Dynamic SDF + 프로젝트 실사용 글자만 사전 구움**(리포 내 한글 문자열 전수 스캔 결과를 character set 으로). atlas 2048².
+5. 12화면 런타임 재캡처. **완료 조건은 런타임 실측이다** — 에셋이 생겼다는 것은 완료가 아니다.
+6. `python3 Tools/check_layout.py` 4종 재실행. 글자 폭이 바뀌므로 **레이아웃이 깨질 수 있다.** 깨지면 고치지 말고 **어느 화면 어느 필드가 얼마나 넘쳤는지 수치로 반환**하라.
+
+**못 한 것은 못 했다고 적는다. 정적 산출로 대체하지 마라.**
+
 ## 이미 확인된 것 — 다시 검증하지 않는다
 
 | | |
@@ -74,13 +101,14 @@ Unity Licensing Client 프로토콜 불일치(`Unsupported protocol version '1.1
 
 ## 참고 — UI 레인은 종결됨 (아래는 남긴 자산)
 
-**12화면 런타임 통과 + G2 완료 (`434bc6c`).** 코덱스가 집을 「대기」 항목이 없다.
+**12화면 런타임 통과 + G2 완료 (`434bc6c`).** UI 12화면 자체는 더 손댈 것이 없다.
+**단, `## F1-a` 는 지금 집을 수 있다 — Unity 없이 된다.**
 `QUEUE.md` 의 남은 항목은 **전부 이 레인 밖**이다 — 손대지 마라.
 
 | 남은 것 | 누구 |
 |---|---|
-| G1 명조 폰트 라이선스 | **작가** — 라이선스 선택은 코덱스가 못 한다 |
-| push (`c72b191`~`434bc6c` 7커밋) | **작가** |
+| ~~G1 명조 폰트 라이선스~~ | ✅ **2026-09-02 확정** → 위 `## F1` 로 이관. 코덱스가 집는다 |
+| push (`c72b191`~`184ae9c` 10커밋, 로컬 전용) | **작가** |
 | 아트 아이콘 6종 재생성 | 이미지 생성 레인 (여기 아님) |
 | 모놀리스 감축 · bake-test isolation | 별건 백로그 |
 

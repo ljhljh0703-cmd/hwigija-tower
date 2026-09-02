@@ -31,30 +31,55 @@
     "sceneTint": 0.62
   },
   "font": {
+    "_decision": "G1 확정 2026-09-02 — 작가 승인. 둘 다 SIL OFL 1.1, 게임 내장(embedding) 명시 허용. 라이선스 원문 1장을 Assets/_Project/ThirdParty/Fonts/OFL.txt 로 동봉한다.",
     "display": {
-      "family": "명조 계열",
-      "candidates": [
-        "Gowun Batang",
-        "Song Myung",
-        "Nanum Myeongjo"
-      ],
+      "family": "Noto Serif KR",
+      "fallback": "Noto Serif",
+      "license": "SIL OFL 1.1",
+      "licenseUrl": "https://openfontlicense.org/",
       "weight": 700,
+      "availableWeights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        900
+      ],
       "letterSpacing": 0.04,
-      "note": "TMP 에셋으로 구울 것. 라이선스 확인 필요"
+      "note": "TMP SDF 에셋으로 구울 것. 정적 아틀라스 금지 — Dynamic SDF + 사용 글자 사전 구움."
     },
     "body": {
-      "family": "고딕 계열",
-      "candidates": [
-        "Pretendard",
-        "IBM Plex Sans KR"
+      "family": "Pretendard",
+      "fallback": "Noto Sans KR",
+      "license": "SIL OFL 1.1",
+      "licenseUrl": "https://github.com/orioncactus/pretendard/blob/main/LICENSE",
+      "weight": 400,
+      "availableWeights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
       ],
-      "weight": 400
+      "note": "TMP SDF 에셋으로 구울 것. Dynamic SDF + 사용 글자 사전 구움."
     },
     "numeric": {
       "family": "body",
       "weight": 500,
       "tabularNums": true,
-      "note": "HP·골드·이성 등 자릿수 정렬"
+      "note": "HP·골드 등 자릿수 정렬. 붕괴도는 수치 노출 금지(D-012 P2) — 여기 해당 없음."
+    },
+    "atlas": {
+      "strategy": "dynamic-sdf",
+      "prebakeSource": "프로젝트 내 한글 문자열 전수 스캔 결과만",
+      "forbidden": "한글 완성형 11,172자 정적 굽기 — 4096² 다중 아틀라스가 되어 모바일 메모리를 잡아먹는다",
+      "atlasSize": 2048
     }
   },
   "typeScale": {
@@ -104,7 +129,7 @@
     },
     "vignette": {
       "strength": 0.35,
-      "note": "이성 하락 시 강해진다. variants가 덮어씀"
+      "note": "붕괴도(GlitchLevel) 상승 시 강해진다 — 시각 연출 전용, 전투 입력 아님(D-029). variants가 덮어씀"
     }
   },
   "bands": {
