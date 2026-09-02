@@ -31,10 +31,15 @@ def check(spec, dump):
         print("  [FAIL] floors 가 비어 있다 — 빈 덤프는 통과가 아니다")
         return 1
 
+    have_phases = {fl.get("phase", "beforeSelect") for fl in floors}
     by_id = {c["id"]: c for c in spec["constraints"]}
     for cid in sorted(by_id):
         c = by_id[cid]
         mc = c.get("machineCheck")
+        if mc and mc.get("phase") and mc["phase"] not in have_phases:
+            print(f"  [SKIP] {cid} — 덤프에 phase={mc['phase']!r} 스냅샷이 0개다. "
+                  f"**아무것도 재지 않았다. 통과가 아니다** (있는 phase: {sorted(have_phases)})")
+            skips += 1; continue
         if not mc:
             print(f"  [SKIP] {cid} — machineCheck 없음. **통과가 아니다**"); skips += 1; continue
         t = mc["type"]; bad = []
@@ -75,18 +80,38 @@ def check(spec, dump):
                         if not nd.get("Type"): bad.append(f"floor{fno} {nd['MapNodeId']} Type 비어 있음")
             elif t == "minSelectable":
                 if phase != mc["phase"]: continue
+                if mc.get("onlyIfFloorActive"):
+                    # 🩸 v1.2: 「미완료가 남았는가」는 틀린 조건이었다. sparse route 는 안 지나간 레인 노드가
+                    # 항상 미완료로 남는다. 옳은 조건은 「층이 아직 진행 중인가」이고, 그건 덤프가 실어야 한다.
+                    if "floorActive" not in fl:
+                        bad.append(f"floor{fno}({phase}) `floorActive` 필드가 없다 — "
+                                   f"**완주와 막힘을 구분할 수 없다. 재지 못한 것이다**")
+                        continue
+                    if not fl.get("floorActive"):
+                        continue
                 k = sum(1 for nd in n if nd.get("Selectable"))
                 if k < mc["min"]:
-                    bad.append(f"floor{fno}({phase}) 선택 가능 {k} < {mc['min']} — **진행 불가**")
+                    bad.append(f"floor{fno}({phase}) 선택 가능 {k} < {mc['min']} — **진행 불가** "
+                               f"(미완료 {sum(1 for x in n if not x.get('Completed'))}개 남음)")
             elif t == "maxSelectable":
                 if phase != mc["phase"]: continue
                 k = sum(1 for nd in n if nd.get("Selectable"))
                 if k > mc["max"]:
                     bad.append(f"floor{fno}({phase}) 선택 가능 {k} > {mc['max']} — commitment 회피 가능")
             elif t == "nextFloorMapPresent":
+                if mc.get("onlyIfFloorActive"):
+                    if "floorActive" not in fl:
+                        bad.append(f"floor{fno}({phase}) `floorActive` 필드가 없다 — 재지 못한 것이다"); continue
+                    if not fl.get("floorActive"): continue
                 if not n: bad.append(f"floor{fno} 노드 0개")
                 elif phase == "beforeSelect" and not any(nd.get("Selectable") for nd in n):
                     bad.append(f"floor{fno} 새 지도에 선택 가능 노드 0")
+            elif t == "unvisitedSkippedAtFloorEnd":
+                if fl.get("floorActive") is not False: continue
+                miss = [nd["MapNodeId"] for nd in n
+                        if not nd.get("Completed") and not nd.get("Skipped")]
+                if miss:
+                    bad.append(f"floor{fno} 층 종료인데 Skipped 아닌 미완료 {len(miss)}개: {miss[:3]}")
             elif t == "deterministicByRunId":
                 pass  # 별도 2회 실행 비교. 아래에서 처리
             else:
