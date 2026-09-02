@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.0286755">
+  <test-suite type="TestSuite" id="1000" name="회귀자는 탑을 오른다" fullname="회귀자는 탑을 오른다" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.028676" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1224" name="HwigiTower.EditModeTests.dll" fullname="/Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Library/ScriptAssemblies/HwigiTower.EditModeTests.dll" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.024862" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="24430" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1225" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.024032" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1226" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.023299" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1227" name="EditMode" fullname="HwigiTower.Tests.EditMode" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.022555" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1001" name="AudioLobbyTests" fullname="HwigiTower.Tests.EditMode.AudioLobbyTests" classname="HwigiTower.Tests.EditMode.AudioLobbyTests" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.020337" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1006" name="RoomController_ExplorationContextResetsToNormalBgm" fullname="HwigiTower.Tests.EditMode.AudioLobbyTests.RoomController_ExplorationContextResetsToNormalBgm" methodname="RoomController_ExplorationContextResetsToNormalBgm" classname="HwigiTower.Tests.EditMode.AudioLobbyTests" runstate="Runnable" seed="282960033" result="Failed" label="Error" start-time="2026-09-02 04:39:21Z" end-time="2026-09-02 04:39:21Z" duration="0.014262" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                  <stack-trace><![CDATA[  at HwigiTower.Tests.EditMode.AudioLobbyTests.RoomController_ExplorationContextResetsToNormalBgm () [0x0007a] in /Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Assets/_Project/Tests/EditMode/AudioLobbyTests.cs:94 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <67e9686a86934ae8b0ef7cc81c6b4608>:0 ]]></stack-trace>
+                </failure>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/godju/회귀자는 탑을 오른다/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

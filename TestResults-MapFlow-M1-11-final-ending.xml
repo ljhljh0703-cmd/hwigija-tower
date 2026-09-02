@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.749276">
+  <test-suite type="TestSuite" id="1033" name="회귀자는 탑을 오른다" fullname="회귀자는 탑을 오른다" runstate="Runnable" testcasecount="22" result="Failed" site="Child" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.749276" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1026" name="HwigiTower.PlayModeTests.dll" fullname="/Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Library/ScriptAssemblies/HwigiTower.PlayModeTests.dll" runstate="Runnable" testcasecount="22" result="Failed" site="Child" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.745427" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="25143" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1027" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="22" result="Failed" site="Child" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.745006" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1028" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="22" result="Failed" site="Child" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.744701" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1029" name="PlayMode" fullname="HwigiTower.Tests.PlayMode" runstate="Runnable" testcasecount="22" result="Failed" site="Child" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.744391" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1010" name="PrototypeRoomSmokeTests" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" testcasecount="15" result="Failed" site="Child" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.743728" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1022" name="PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap" methodname="PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="2145245023" result="Failed" start-time="2026-09-02 04:41:44Z" end-time="2026-09-02 04:41:45Z" duration="0.737391" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests+<PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap>d__13.MoveNext () [0x000f9] in /Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Assets/_Project/Tests/PlayMode/PrototypeRoomSmokeTests.cs:414
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/godju/회귀자는 탑을 오른다/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

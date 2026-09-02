@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.0543932">
+  <test-suite type="TestSuite" id="1000" name="회귀자는 탑을 오른다" fullname="회귀자는 탑을 오른다" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.054393" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1224" name="HwigiTower.EditModeTests.dll" fullname="/Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Library/ScriptAssemblies/HwigiTower.EditModeTests.dll" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.049739" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="24707" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1225" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.048100" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1226" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.046583" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1227" name="EditMode" fullname="HwigiTower.Tests.EditMode" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.045068" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1097" name="RuntimeShellTests" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" testcasecount="126" result="Failed" site="Child" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.043010" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1153" name="Floor1_FirstLayer_DoesNotClassifyJarEventAsCombat" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.Floor1_FirstLayer_DoesNotClassifyJarEventAsCombat" methodname="Floor1_FirstLayer_DoesNotClassifyJarEventAsCombat" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="853490853" result="Failed" start-time="2026-09-02 04:40:11Z" end-time="2026-09-02 04:40:11Z" duration="0.031360" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.EditMode.RuntimeShellTests.Floor1_FirstLayer_DoesNotClassifyJarEventAsCombat () [0x00046] in /Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Assets/_Project/Tests/EditMode/RuntimeShellTests.cs:1343
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/godju/회귀자는 탑을 오른다/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

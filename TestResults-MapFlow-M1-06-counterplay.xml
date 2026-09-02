@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.0587904">
+  <test-suite type="TestSuite" id="1000" name="회귀자는 탑을 오른다" fullname="회귀자는 탑을 오른다" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.058790" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1224" name="HwigiTower.EditModeTests.dll" fullname="/Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Library/ScriptAssemblies/HwigiTower.EditModeTests.dll" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.053900" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="24759" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1225" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.052006" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1226" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.050401" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1227" name="EditMode" fullname="HwigiTower.Tests.EditMode" runstate="Runnable" testcasecount="214" result="Failed" site="Child" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.044753" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1097" name="RuntimeShellTests" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" testcasecount="126" result="Failed" site="Child" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.040671" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1173" name="GenericCounterplay_HeavyPressureAndSkillOpeningChangeChoices" fullname="HwigiTower.Tests.EditMode.RuntimeShellTests.GenericCounterplay_HeavyPressureAndSkillOpeningChangeChoices" methodname="GenericCounterplay_HeavyPressureAndSkillOpeningChangeChoices" classname="HwigiTower.Tests.EditMode.RuntimeShellTests" runstate="Runnable" seed="1695180958" result="Failed" start-time="2026-09-02 04:40:19Z" end-time="2026-09-02 04:40:19Z" duration="0.027058" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: String containing "빈틈 +2"
+  But was:  "사용 가능 / 사용 후 CD 4"
+]]></message>
+                  <stack-trace><![CDATA[at NUnit.Framework.StringAssert.Contains (System.String expected, System.String actual, System.String message, System.Object[] args) [0x00007] in <f577cd9686154d6ab10efd7e65e64366>:0
+at NUnit.Framework.StringAssert.Contains (System.String expected, System.String actual) [0x00000] in <f577cd9686154d6ab10efd7e65e64366>:0
+at HwigiTower.Tests.EditMode.RuntimeShellTests.GenericCounterplay_HeavyPressureAndSkillOpeningChangeChoices () [0x000bf] in /Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Assets/_Project/Tests/EditMode/RuntimeShellTests.cs:1723
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/godju/회귀자는 탑을 오른다/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
