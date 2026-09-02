@@ -124,7 +124,10 @@ namespace HwigiTower.Lobby
         public const string InkDimHex = "#A2957F";
         public const string InkMuteHex = "#6B6152";
         public const string HpHex = "#8E2F1F";
+        public const string HpAllyHex = "#5C7A4A";
         public const string SanityHex = "#6E86A8";
+        public const string SanityWarnHex = "#B98A3C";
+        public const string SanityBrokenHex = "#A8425A";
         public const string GoldCoinHex = "#D8B45C";
 
         public const int TitleFontSize = 96;
