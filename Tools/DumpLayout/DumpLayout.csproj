@@ -9,7 +9,10 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="../../Assets/_Project/Scripts/Lobby/LobbyLayoutContract.cs" Link="LobbyLayoutContract.cs" />
+    <Compile Include="../../Assets/_Project/Scripts/UI/BossGateLayoutContract.cs" Link="BossGateLayoutContract.cs" />
     <Compile Include="../../Assets/_Project/Scripts/UI/CombatLayoutContract.cs" Link="CombatLayoutContract.cs" />
+    <Compile Include="../../Assets/_Project/Scripts/UI/EndingLayoutContract.cs" Link="EndingLayoutContract.cs" />
+    <Compile Include="../../Assets/_Project/Scripts/UI/EventLayoutContract.cs" Link="EventLayoutContract.cs" />
     <Compile Include="../../Assets/_Project/Scripts/UI/FloorMapLayoutContract.cs" Link="FloorMapLayoutContract.cs" />
     <Compile Include="../../Assets/_Project/Scripts/UI/RestLayoutContract.cs" Link="RestLayoutContract.cs" />
     <Compile Include="../../Assets/_Project/Scripts/UI/ShopLayoutContract.cs" Link="ShopLayoutContract.cs" />

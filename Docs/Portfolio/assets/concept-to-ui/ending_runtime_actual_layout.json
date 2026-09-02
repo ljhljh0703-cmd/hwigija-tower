@@ -1,0 +1,13 @@
+{
+  "screen": "ending",
+  "capturedAt": "2026-09-02T01:25:22.7131500Z runtime RectTransform capture",
+  "source": "runtime",
+  "slots": {
+    "endingTitle": {"x": 0.08, "y": 0.052, "w": 0.84, "h": 0.07, "fontSize": 54, "visible": true},
+    "endingScene": {"x": 0, "y": 0.16, "w": 1, "h": 0.26, "visible": true},
+    "runSummary": {"x": 0.06, "y": 0.436, "w": 0.88, "h": 0.146, "fontSize": 34, "visible": true},
+    "choiceRest": {"x": 0.06, "y": 0.626, "w": 0.88, "h": 0.13, "fontSize": 42, "visible": true},
+    "choiceContinue": {"x": 0.06, "y": 0.774, "w": 0.88, "h": 0.13, "fontSize": 42, "visible": true},
+    "irreversibleNote": {"x": 0.08, "y": 0.922, "w": 0.84, "h": 0.032, "fontSize": 26, "visible": true}
+  }
+}

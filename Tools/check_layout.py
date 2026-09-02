@@ -33,12 +33,28 @@ def overlaps(a, b):
         return (ix0, iy0, ix1, iy1)
     return None
 
+SEL_KEYS = {"layer", "role", "interactive", "hasField", "type", "color", "style", "band"}
+
 def matches(slot, sel):
     if not sel:
         return True
+    # 🔴 2026-09-02: 모르는 선택자 키를 조용히 무시하면 필터가 전부 매치한다.
+    # 그러면 max/count 검사가 「아무것도 안 걸려서 통과」로 위장된다. 사양 오류로 터뜨린다.
+    unknown = set(sel) - SEL_KEYS
+    if unknown:
+        raise ValueError(f"알 수 없는 선택자 키 {sorted(unknown)} — 오타이거나 미지원. "
+                         f"지원: {sorted(SEL_KEYS)}")
     if "layer" in sel and slot.get("layer") not in sel["layer"]:
         return False
     if "role" in sel and slot.get("role") not in sel["role"]:
+        return False
+    if "type" in sel and slot.get("type") not in sel["type"]:
+        return False
+    if "color" in sel and slot.get("color") not in sel["color"]:
+        return False
+    if "style" in sel and slot.get("style") not in sel["style"]:
+        return False
+    if "band" in sel and slot.get("band") not in sel["band"]:
         return False
     if "interactive" in sel and bool(slot.get("interactive")) != sel["interactive"]:
         return False
@@ -175,6 +191,23 @@ def r_min_area(slots, mc):
         return [f"{mc['slot']} 면적 {area:.3f} < {mc['value']}"]
     return []
 
+
+def r_same_field(slots, mc):
+    """여러 슬롯의 같은 필드 값이 서로 같은지. 「선택지들이 같은 무게」 같은 설계 불변식용.
+    2026-09-02 신설 — 엔딩 두 선택지 동일 크기 강제. 기존 규칙으로는 표현 불가였다."""
+    names = mc.get("slots") or list(selected(slots, mc.get("applyTo", {})).keys())
+    field = mc["field"]
+    vals, bad = {}, []
+    for n in names:
+        s = slots.get(n)
+        if not s:
+            bad.append(f"슬롯 없음: {n}"); continue
+        vals[n] = s.get(field)
+    uniq = set(v for v in vals.values() if v is not None)
+    if len(uniq) > 1:
+        bad.append(f"{field} 불일치: " + ", ".join(f"{n}={v}" for n, v in vals.items()))
+    return bad
+
 RULES = {
     "minY": r_min_y, "count": r_count, "noOverlap": r_no_overlap,
     "textAbsent": r_text_absent, "fieldRequired": r_field_required,
@@ -182,6 +215,7 @@ RULES = {
     "bandOrder": r_band_order, "relative": r_relative,
     "fieldBound": r_field_bound, "fieldEquals": r_field_equals,
     "noDuplicateContent": r_no_dup_content, "minArea": r_min_area,
+    "sameField": r_same_field,
 }
 
 # ---------- 실행 ----------

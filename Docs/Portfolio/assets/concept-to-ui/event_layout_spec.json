@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 2,
+  "specVersion": "1.0",
+  "screen": "event",
+  "tokens": "ui_tokens.json",
+  "checker": "Tools/check_layout.py",
+  "wiringChecker": "Tools/check_wiring.py",
+  "dataChecker": "Tools/check_databinding.py",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "layoutIntent": "무슨 일이 벌어졌는지 읽히고, 고를 수 있는 것과 없는 것을 가른다. 선택지 수가 크게 흔들리는 화면이라 **목록이 늘어나도 조작 위치가 안 움직이는 것**이 이 화면의 조건이다.",
+  "_why_scroll": "🔴 **선택지 수 실측 = 2~14개**(41개 인카운터 전수). `EVT_F01_CULTIST_FUNERAL` 14 · `EVT_F03_BALCONY` 10 · `EVT_F02_BANDIT_DEN` 9. 최빈은 3개(19건)지만 상한이 14다. **고정 행 사양은 성립하지 않는다** — 상점(5 고정)과 다르다. 스크롤 목록 + 고정 조작부로 간다.",
+  "changeFromCapture": [
+    "선택지를 스크롤 목록으로 — 2~14개가 다 들어와야 한다",
+    "목록이 길어져도 나가기·자원 칩 위치가 안 움직인다",
+    "못 고르는 선택지의 이유를 각 행 안에 붙인다 (DisabledVisible)",
+    "Hidden 정책 선택지는 표현 층에서도 그리지 않는다 — 상점과 다른 점"
+  ],
+  "dataBinding": {
+    "_note": "2026-09-02. 41개 인카운터 에셋 전수 대조로 채웠다",
+    "floorChip": {
+      "source": "PrototypeRunSnapshot.CurrentFloor",
+      "type": "int",
+      "present": true
+    },
+    "sanityChip": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "normalize": "(Mental + 100) / 200",
+      "present": true,
+      "note": "0~1 이 아니다"
+    },
+    "hpChip": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "goldChip": {
+      "source": "PrototypeRunSnapshot.Gold",
+      "type": "int",
+      "present": true
+    },
+    "choiceList": {
+      "source": "PrototypeRoomController.BuildEncounterChoiceViews → PrototypeEncounterChoiceView[]",
+      "fields": "ChoiceStableId · TextKey · Visible · Enabled · ReasonTextKey · HintText",
+      "present": true,
+      "count": "**가변 2~14.** 실측 분포 = 2개 7건 · 3개 19건 · 4개 9건 · 5개 1건 · 6개 2건 · 9개 1건 · 10개 1건 · 14개 1건 (총 41). 최빈 3, 상한 14",
+      "policy": "혼재. 이벤트 대부분 DisabledVisible, `ENC_MORAL_CHOICE_*` 는 Hidden 을 함께 쓴다 → **Hidden 은 안 그린다**(Visible=false)"
+    },
+    "_absent": {
+      "choiceIcon": "선택지별 아이콘 참조 없음",
+      "eventArt": "인카운터별 아트 참조 필드 없음. 배경은 노드 종류로만 고른다",
+      "choiceOrder": "표시 순서 필드 없음. 데이터 배열 순서를 그대로 쓴다"
+    }
+  },
+  "constraints": [
+    {
+      "id": "E-01",
+      "text": "고정 조작부는 y >= 0.86",
+      "check": "interactive 중 layer=fixed",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.86,
+        "applyTo": {
+          "layer": [
+            "fixed"
+          ]
+        }
+      },
+      "rationale": "목록이 2개든 14개든 나가기 위치가 안 움직여야 한다"
+    },
+    {
+      "id": "E-02",
+      "text": "터치 타깃 최소 96px",
+      "check": "h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "E-03",
+      "text": "목록 뷰포트는 화면의 34% 이상",
+      "check": "choiceList 면적 >= 0.34",
+      "machineCheck": {
+        "type": "minArea",
+        "slot": "choiceList",
+        "value": 0.34
+      },
+      "rationale": "상한 14개를 스크롤로 받으려면 한 번에 최소 3행은 보여야 한다"
+    },
+    {
+      "id": "E-04",
+      "text": "같은 문구가 두 슬롯에 중복되지 않는다",
+      "check": "content 중복 0건",
+      "machineCheck": {
+        "type": "noDuplicateContent"
+      }
+    },
+    {
+      "id": "E-05",
+      "text": "목록은 슬롯 1개다 — 행을 사양에 고정하지 않는다",
+      "check": "role=choice 슬롯 수 상한 1",
+      "machineCheck": {
+        "type": "count",
+        "applyTo": {
+          "role": [
+            "choice"
+          ]
+        },
+        "max": 1
+      },
+      "rationale": "🔴 선택지가 2~14 로 흔들린다. 행을 슬롯으로 박으면 14개 인카운터에서 깨진다. 행은 런타임 반복이고 사양은 **뷰포트 하나**만 고정한다"
+    },
+    {
+      "id": "E-06",
+      "text": "층 순서는 resource → judgement → subject → action → fixed",
+      "check": "bands 순서",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "resource",
+          "judgement",
+          "subject",
+          "action",
+          "fixed"
+        ]
+      }
+    },
+    {
+      "id": "E-07",
+      "text": "목록이 고정 조작부를 덮지 않는다",
+      "check": "choiceList ⟂ y>=0.86 영역",
+      "machineCheck": {
+        "type": "noOverlap",
+        "region": {
+          "x0": 0.0,
+          "y0": 0.86,
+          "x1": 1.0,
+          "y1": 1.0
+        },
+        "applyTo": {
+          "role": [
+            "choice"
+          ]
+        }
+      },
+      "rationale": "14행이 들어와도 나가기 버튼이 가려지면 안 된다"
+    },
+    {
+      "id": "E-08",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 없다",
+      "check": "slots[*].content 에 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2"
+    }
+  ],
+  "bands": {
+    "resource": {
+      "y": 0.0,
+      "h": 0.1
+    },
+    "judgement": {
+      "y": 0.1,
+      "h": 0.08
+    },
+    "subject": {
+      "y": 0.18,
+      "h": 0.26
+    },
+    "action": {
+      "y": 0.44,
+      "h": 0.42
+    },
+    "fixed": {
+      "y": 0.86,
+      "h": 0.14
+    }
+  },
+  "slots": {
+    "floorChip": {
+      "band": "resource",
+      "x": 0.04,
+      "y": 0.03,
+      "w": 0.18,
+      "h": 0.044,
+      "order": 1,
+      "layer": "hud",
+      "type": "chip",
+      "style": "numeric",
+      "label": "층"
+    },
+    "sanityChip": {
+      "band": "resource",
+      "x": 0.24,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 2,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "이성",
+      "color": "sanity"
+    },
+    "hpChip": {
+      "band": "resource",
+      "x": 0.5,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 3,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "체력",
+      "color": "hp"
+    },
+    "goldChip": {
+      "band": "resource",
+      "x": 0.76,
+      "y": 0.03,
+      "w": 0.2,
+      "h": 0.044,
+      "order": 4,
+      "layer": "hud",
+      "type": "chip",
+      "label": "골드",
+      "color": "gold_coin"
+    },
+    "eventTitle": {
+      "band": "judgement",
+      "x": 0.06,
+      "y": 0.106,
+      "w": 0.88,
+      "h": 0.062,
+      "order": 10,
+      "layer": "title",
+      "type": "text",
+      "style": "screen",
+      "notes": "인카운터 이름. 데이터에 아트 참조가 없어 제목이 장면을 대신한다"
+    },
+    "eventBody": {
+      "band": "subject",
+      "x": 0.06,
+      "y": 0.19,
+      "w": 0.88,
+      "h": 0.23,
+      "order": 20,
+      "layer": "content",
+      "type": "text",
+      "style": "body",
+      "notes": "상황 서술. 스크롤 없이 들어가는 분량으로 authored — 넘치면 목록이 밀린다"
+    },
+    "choiceList": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.45,
+      "w": 0.92,
+      "h": 0.39,
+      "order": 30,
+      "layer": "actions",
+      "type": "scrollList",
+      "role": "choice",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "🔴 **행이 아니라 뷰포트 하나다.** 행은 런타임 반복 — 2~14개. 각 행: 문구 + (Enabled=false 면) 그 행 안에 ReasonTextKey. Hidden 정책 선택지는 그리지 않는다. 행 높이 최소 96px"
+    },
+    "scrollHint": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.846,
+      "w": 0.92,
+      "h": 0.028,
+      "order": 31,
+      "layer": "hud",
+      "type": "text",
+      "style": "label",
+      "notes": "목록이 뷰포트를 넘칠 때만 찬다. 14개짜리에서 필요"
+    },
+    "leaveButton": {
+      "band": "fixed",
+      "x": 0.3,
+      "y": 0.888,
+      "w": 0.4,
+      "h": 0.056,
+      "order": 50,
+      "layer": "fixed",
+      "type": "button",
+      "interactive": true,
+      "content": "물러난다",
+      "notes": "107px. 목록 길이와 무관하게 이 자리 고정(E-01·E-07)"
+    }
+  },
+  "variants": {
+    "_note": "이벤트에 붕괴 variants 를 두지 않는다. 무대는 휴식·전투다"
+  },
+  "invariantUnderVariants": [
+    "선택지가 2개든 14개든 나가기 버튼 좌표가 안 바뀐다",
+    "못 고르는 선택지는 비활성 + 이유로 남는다(DisabledVisible). Hidden 정책은 그리지 않는다",
+    "「붕괴도」 수치와 용어를 노출하지 않는다"
+  ],
+  "assetFallbacks": {
+    "event_art": {
+      "present": false,
+      "fallback": "노드 종류 배경 재사용",
+      "status": "인카운터별 아트 참조 필드 없음",
+      "note": "임의 대체 금지. 제목·본문으로 장면을 세운다"
+    }
+  },
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "hpChip",
+      "eventTitle",
+      "eventBody",
+      "choiceList",
+      "leaveButton"
+    ]
+  },
+  "revisions": [
+    "v1.0 2026-09-02 · 최초. 🔴 인카운터 41종 전수 실측으로 선택지 2~14 확인 → 고정 행 폐기, 스크롤 목록 + 고정 조작부. `E-05`(행을 슬롯으로 박지 않는다)·`E-07`(목록이 조작부 침범 금지) 신설"
+  ]
+}

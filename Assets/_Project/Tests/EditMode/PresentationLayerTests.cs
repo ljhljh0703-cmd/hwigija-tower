@@ -396,7 +396,53 @@ namespace HwigiTower.Tests.EditMode
         }
 
         [Test]
-        public void BossGateChoices_DoNotShowManualFightButtonAfterMapCommit()
+        public void EventUi_ScrollsVariableChoicesAndOmitsHiddenPolicies()
+        {
+            var funeral = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_CULTIST_FUNERAL.asset");
+            var moral = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_MORAL_CHOICE_01.asset");
+            Assert.IsNotNull(funeral);
+            Assert.IsNotNull(moral);
+
+            var state = new PrototypeRunState("run-ui-event-scroll", new GameFlowEventBus());
+            var hud = CreateHud(out _);
+            var funeralViews = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, funeral);
+            hud.ShowChoices(funeral, funeralViews, _ => { });
+
+            Assert.IsTrue(hud.EventUiVisible);
+            Assert.AreEqual(14, hud.EventChoiceCount);
+            Assert.AreEqual(14, hud.ChoiceButtonCount);
+            Assert.IsNotEmpty(hud.EventScrollHint);
+            for (var i = 0; i < hud.ChoiceButtonCount; i++)
+            {
+                var label = hud.GetChoiceButton(i).GetComponentInChildren<Text>();
+                Assert.IsNotNull(label);
+                StringAssert.DoesNotContain("CHOICE_", label.text);
+                StringAssert.DoesNotContain("Glitch", label.text);
+            }
+
+            var moralViews = PrototypeEncounterRuntimeResolver.BuildChoiceViews(state, moral);
+            var visibleCount = 0;
+            for (var i = 0; i < moralViews.Length; i++)
+            {
+                if (moralViews[i].Visible)
+                {
+                    visibleCount++;
+                }
+            }
+
+            hud.ShowChoices(moral, moralViews, _ => { });
+            Assert.AreEqual(visibleCount, hud.EventChoiceCount);
+
+            hud.ShowChoices(moral, new[]
+            {
+                moralViews[0],
+                new PrototypeEncounterChoiceView("CHOICE_EVENT_HIDDEN", "PLACEHOLDER_HIDDEN", false, true, string.Empty, string.Empty)
+            }, _ => { });
+            Assert.AreEqual(1, hud.EventChoiceCount);
+        }
+
+        [Test]
+        public void BossGateShowsReadinessInsteadOfAChoiceList()
         {
             var boss = AssetDatabase.LoadAssetAtPath<EncounterData>("Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset");
             Assert.IsNotNull(boss);
@@ -406,9 +452,55 @@ namespace HwigiTower.Tests.EditMode
 
             hud.ShowChoices(boss, views, _ => { });
 
-            Assert.AreEqual(0, hud.ChoiceButtonCount);
-            StringAssert.DoesNotContain("전투 시작", hud.ResultMessage);
-            StringAssert.DoesNotContain("CHOICE_", hud.ResultMessage);
+            Assert.IsTrue(hud.BossGateUiVisible);
+            Assert.AreEqual(1, hud.ChoiceButtonCount);
+            StringAssert.Contains("체력", hud.BossGateReadinessText);
+            StringAssert.Contains("이성", hud.BossGateReadinessText);
+            StringAssert.Contains("보유품", hud.BossGateReadinessText);
+            StringAssert.DoesNotContain("준비도", hud.BossGateReadinessText);
+        }
+
+        [Test]
+        public void EndingUi_UsesRunSummaryAndKeepsAuthoredChoicesEqual()
+        {
+            var hud = CreateHud(out _);
+            var snapshot = new PrototypeRunSnapshot(
+                "run-ui-ending",
+                18,
+                24,
+                5,
+                7,
+                30,
+                9,
+                3,
+                17,
+                6,
+                4,
+                true,
+                currentFloor: 5,
+                runClear: true,
+                endingChoicePending: true,
+                memoryFragmentCount: 3);
+
+            hud.ShowRunState(snapshot);
+
+            Assert.IsTrue(hud.EndingUiVisible);
+            Assert.IsTrue(hud.EndingRestButtonVisible);
+            Assert.IsTrue(hud.EndingContinueButtonVisible);
+            StringAssert.Contains("도달 층 5", hud.EndingRunSummaryText);
+            StringAssert.Contains("해결 노드 17", hud.EndingRunSummaryText);
+            StringAssert.Contains("전투 승 6", hud.EndingRunSummaryText);
+            StringAssert.Contains("기억 조각 3", hud.EndingRunSummaryText);
+            StringAssert.DoesNotContain("골드", hud.EndingRunSummaryText);
+            StringAssert.DoesNotContain("Glitch", hud.EndingRunSummaryText);
+
+            Assert.IsNotNull(hud.EndingRestButton);
+            Assert.IsNotNull(hud.EndingContinueButton);
+            var rest = hud.EndingRestButton.GetComponent<RectTransform>();
+            var continuation = hud.EndingContinueButton.GetComponent<RectTransform>();
+            Assert.AreEqual(rest.anchorMin.x, continuation.anchorMin.x);
+            Assert.AreEqual(rest.anchorMax.x, continuation.anchorMax.x);
+            Assert.AreEqual(rest.anchorMax.y - rest.anchorMin.y, continuation.anchorMax.y - continuation.anchorMin.y);
         }
 
         [Test]

@@ -15,7 +15,10 @@ var capturedAt = ReadArgument(args, "--captured-at") ??
 var document = screen switch
 {
     "lobby" => BuildLobbyDocument(capturedAt),
+    "bossgate" => BuildBossGateDocument(capturedAt),
     "combat" => BuildCombatDocument(capturedAt),
+    "ending" => BuildEndingDocument(capturedAt),
+    "event" => BuildEventDocument(capturedAt),
     "floormap" => BuildFloorMapDocument(capturedAt),
     "rest" => BuildRestDocument(capturedAt),
     "shop" => BuildShopDocument(capturedAt),
@@ -62,6 +65,17 @@ static LayoutDocument BuildLobbyDocument(string capturedAt)
     };
 }
 
+static LayoutDocument BuildBossGateDocument(string capturedAt)
+{
+    return new LayoutDocument
+    {
+        Screen = "bossgate",
+        CapturedAt = capturedAt,
+        Source = "contract",
+        Slots = BossGateLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualBossGateSlot)
+    };
+}
+
 static LayoutDocument BuildCombatDocument(string capturedAt)
 {
     return new LayoutDocument
@@ -70,6 +84,28 @@ static LayoutDocument BuildCombatDocument(string capturedAt)
         CapturedAt = capturedAt,
         Source = "contract",
         Slots = CombatLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualCombatSlot)
+    };
+}
+
+static LayoutDocument BuildEventDocument(string capturedAt)
+{
+    return new LayoutDocument
+    {
+        Screen = "event",
+        CapturedAt = capturedAt,
+        Source = "contract",
+        Slots = EventLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualEventSlot)
+    };
+}
+
+static LayoutDocument BuildEndingDocument(string capturedAt)
+{
+    return new LayoutDocument
+    {
+        Screen = "ending",
+        CapturedAt = capturedAt,
+        Source = "contract",
+        Slots = EndingLayout.AllSlots.ToDictionary(slot => slot.Key, ToActualEndingSlot)
     };
 }
 
@@ -120,7 +156,64 @@ static ActualSlot ToActualLobbySlot(LobbySlot slot)
     };
 }
 
+static ActualSlot ToActualBossGateSlot(BossGateSlot slot)
+{
+    return new ActualSlot
+    {
+        X = slot.X,
+        Y = slot.Y,
+        W = slot.Width,
+        H = slot.Height,
+        FontSize = slot.FontSize,
+        Visible = true,
+        Layer = slot.Layer,
+        Type = slot.Type,
+        Label = slot.Label,
+        Color = slot.ColorToken,
+        Interactive = slot.Interactive,
+        FrameStyle = slot.HasFrame
+    };
+}
+
 static ActualSlot ToActualCombatSlot(CombatSlot slot)
+{
+    return new ActualSlot
+    {
+        X = slot.X,
+        Y = slot.Y,
+        W = slot.Width,
+        H = slot.Height,
+        FontSize = slot.FontSize,
+        Visible = true,
+        Layer = slot.Layer,
+        Type = slot.Type,
+        Label = slot.Label,
+        Color = slot.ColorToken,
+        Interactive = slot.Interactive,
+        FrameStyle = slot.HasFrame
+    };
+}
+
+static ActualSlot ToActualEventSlot(EventSlot slot)
+{
+    return new ActualSlot
+    {
+        X = slot.X,
+        Y = slot.Y,
+        W = slot.Width,
+        H = slot.Height,
+        FontSize = slot.FontSize,
+        Visible = true,
+        Layer = slot.Layer,
+        Type = slot.Type,
+        Label = slot.Label,
+        Color = slot.ColorToken,
+        Interactive = slot.Interactive,
+        FrameStyle = slot.HasFrame
+    };
+}
+
+static ActualSlot ToActualEndingSlot(EndingSlot slot)
 {
     return new ActualSlot
     {

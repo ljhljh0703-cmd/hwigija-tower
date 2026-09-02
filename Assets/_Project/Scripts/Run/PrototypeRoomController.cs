@@ -504,8 +504,9 @@ namespace HwigiTower.Run
                 return new PrototypeNodeResolution(string.Empty, string.Empty, "route unavailable", RunState != null && RunState.RunCompleted);
             }
 
+            var cancelled = RunState.CancelSelectedMapNode();
             SaveCurrentRun();
-            return new PrototypeNodeResolution("node.map", string.Empty, "route cancel unavailable", false);
+            return new PrototypeNodeResolution("node.map", string.Empty, cancelled ? "route selection cancelled" : "route cancel unavailable", false);
         }
 
         public PrototypeNodeResolution ResolveCurrentRouteRestInteraction(EncounterSelection selection, string actionId, string utterance)

@@ -86,6 +86,9 @@ namespace HwigiTower.UI
         [SerializeField] private RestUiController restUiController;
         [SerializeField] private FloorMapUiController floorMapUiController;
         [SerializeField] private ShopUiController shopUiController;
+        [SerializeField] private EventUiController eventUiController;
+        [SerializeField] private BossGateUiController bossGateUiController;
+        [SerializeField] private EndingUiController endingUiController;
         [SerializeField] private RectTransform restInteractionPanel;
         [SerializeField] private Text restResponseText;
         [SerializeField] private InputField restInputField;
@@ -165,6 +168,7 @@ namespace HwigiTower.UI
         private bool _cutsceneFinishedSubscribed;
         private bool _shopPresentationActive;
         private bool _eventPresentationActive;
+        private bool _bossGatePresentationActive;
         private string _utilityMode = string.Empty;
         private string _utilityCharacterMode = "player";
         private string _lastResultMessage = string.Empty;
@@ -270,8 +274,14 @@ namespace HwigiTower.UI
         public bool RouteHeaderVisible => routeText != null && routeText.gameObject.activeInHierarchy;
         public bool MemoryPanelVisible => memoryText != null && memoryText.gameObject.activeInHierarchy;
         public bool RouteActionButtonVisible => routeActionButton != null && routeActionButton.gameObject.activeSelf;
-        public bool EndingRestButtonVisible => endingRestButton != null && endingRestButton.gameObject.activeSelf;
-        public bool EndingContinueButtonVisible => endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
+        public bool EndingRestButtonVisible => endingUiController != null && endingUiController.Visible
+            ? endingUiController.RestButton != null && endingUiController.RestButton.gameObject.activeSelf
+            : endingRestButton != null && endingRestButton.gameObject.activeSelf;
+        public bool EndingContinueButtonVisible => endingUiController != null && endingUiController.Visible
+            ? endingUiController.ContinueButton != null && endingUiController.ContinueButton.gameObject.activeSelf
+            : endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
+        public Button EndingRestButton => endingUiController != null && endingUiController.Visible ? endingUiController.RestButton : endingRestButton;
+        public Button EndingContinueButton => endingUiController != null && endingUiController.Visible ? endingUiController.ContinueButton : endingContinueButton;
         public bool RestInteractionPanelVisible => restInteractionPanel != null && restInteractionPanel.gameObject.activeSelf;
         public string RestResponseMessage => restResponseText == null ? string.Empty : restResponseText.text;
         public bool RawDebugTextVisible => showRawDebugText;
@@ -366,8 +376,18 @@ namespace HwigiTower.UI
         public float CurrentEnemyHpFillAmount => enemyHpFill == null ? -1f : enemyHpFill.fillAmount;
         public float CurrentPlayerHpFillAmount => playerHpFill == null ? -1f : playerHpFill.fillAmount;
         public float CurrentMataiosHpFillAmount => mataiosHpFill == null ? -1f : mataiosHpFill.fillAmount;
-        public bool EventCutsceneVisible => eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy;
-        public string EventCutsceneMessage => ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
+        public bool EventCutsceneVisible => (eventUiController != null && eventUiController.Visible) ||
+            (eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy);
+        public string EventCutsceneMessage => eventUiController != null && eventUiController.Visible
+            ? (eventUiController.TitleText + "\n" + eventUiController.BodyText).Trim()
+            : ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
+        public bool EventUiVisible => eventUiController != null && eventUiController.Visible;
+        public int EventChoiceCount => eventUiController == null ? 0 : eventUiController.ChoiceCount;
+        public string EventScrollHint => eventUiController == null ? string.Empty : eventUiController.ScrollHint;
+        public bool BossGateUiVisible => bossGateUiController != null && bossGateUiController.Visible;
+        public string BossGateReadinessText => bossGateUiController == null ? string.Empty : bossGateUiController.ReadinessText;
+        public bool EndingUiVisible => endingUiController != null && endingUiController.Visible;
+        public string EndingRunSummaryText => endingUiController == null ? string.Empty : endingUiController.RunSummaryText;
         public bool UtilityPanelVisible => utilityPanel != null && utilityPanel.gameObject.activeInHierarchy;
         public string UtilityPanelMessage => utilityText == null ? string.Empty : utilityText.text;
         public string UtilityButtonLabels => string.Join("|", new[]
@@ -582,14 +602,14 @@ namespace HwigiTower.UI
                 return;
             }
 
-            if (endingRestButton != null && endingRestButton.gameObject.activeSelf && endingRestButton.interactable &&
+            if (EndingRestButton != null && EndingRestButton.gameObject.activeSelf && EndingRestButton.interactable &&
                 keyboard.digit1Key.wasPressedThisFrame)
             {
                 ResolveEndingRest();
                 return;
             }
 
-            if (endingContinueButton != null && endingContinueButton.gameObject.activeSelf && endingContinueButton.interactable &&
+            if (EndingContinueButton != null && EndingContinueButton.gameObject.activeSelf && EndingContinueButton.interactable &&
                 keyboard.digit2Key.wasPressedThisFrame)
             {
                 ResolveEndingContinue();
@@ -736,6 +756,18 @@ namespace HwigiTower.UI
 
         public void ShowChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
         {
+            if (!showRawDebugText && IsBossGateEncounter(encounter))
+            {
+                ShowBossGateChoices(encounter, choiceViews, onChoiceSelected);
+                return;
+            }
+
+            if (!showRawDebugText && IsEventCutsceneEncounter(encounter))
+            {
+                ShowEventChoices(encounter, choiceViews, onChoiceSelected);
+                return;
+            }
+
             if (!showRawDebugText && encounter != null && encounter.Type == EncounterType.Shop)
             {
                 ShowShopChoices(encounter, choiceViews, onChoiceSelected);
@@ -936,12 +968,242 @@ namespace HwigiTower.UI
             return lineBreak < 0 ? value : value.Substring(0, lineBreak);
         }
 
+        private void ShowEventChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
+        {
+            ClearChoices();
+            HideRestInteractionPanel();
+            EnsureScreenLayers();
+            HideEventCutsceneLayout();
+            HideUtilityPanel();
+            SetLayerVisible(actionLayer, false);
+            SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(objectiveLayer, false);
+            SetLayerVisible(visualLayer, false);
+            SetLayerVisible(npcReactionLayer, false);
+            SetLayerVisible(resultLayer, false);
+            SetResultVisible(false);
+            EnsureEventSystem();
+            ApplyPresentationSlot(encounter.Id);
+            HideMerchantPresentation();
+            _shopPresentationActive = false;
+            _eventPresentationActive = true;
+            EnsureEventUi(onChoiceSelected);
+            if (eventUiController == null)
+            {
+                return;
+            }
+
+            var presentations = new List<EventChoicePresentation>();
+            var source = choiceViews ?? Array.Empty<PrototypeEncounterChoiceView>();
+            for (var i = 0; i < source.Length; i++)
+            {
+                var view = source[i];
+                if (!view.Visible)
+                {
+                    continue;
+                }
+
+                presentations.Add(new EventChoicePresentation(view.ChoiceStableId, BuildChoiceLabel(view, i), view.Enabled));
+            }
+
+            var snapshot = _roomController == null ? _lastSnapshot : _roomController.GetSnapshot();
+            eventUiController.Show(
+                snapshot,
+                ResolveEventHeader(encounter),
+                ResolveEventBody(encounter, ResolvePresentationSlot(encounter.Id)),
+                presentations);
+            for (var i = 0; i < eventUiController.ChoiceCount; i++)
+            {
+                _choiceButtons.Add(eventUiController.GetChoiceButton(i));
+            }
+
+            if (routeText != null && !showRawDebugText)
+            {
+                routeText.gameObject.SetActive(false);
+            }
+
+            if (interactionText != null)
+            {
+                interactionText.text = string.Empty;
+                interactionText.gameObject.SetActive(false);
+            }
+
+            ShowResultMessage(string.Empty);
+        }
+
+        private void EnsureEventUi(Action<string> onChoiceSelected)
+        {
+            if (eventUiController == null)
+            {
+                var moduleObject = new GameObject("Event UI Module", typeof(RectTransform));
+                moduleObject.transform.SetParent(HudParent, false);
+                eventUiController = moduleObject.AddComponent<EventUiController>();
+            }
+
+            eventUiController.Initialize(HudParent, choiceStableId =>
+            {
+                ClearChoices();
+                HideEventCutsceneLayout();
+                onChoiceSelected?.Invoke(choiceStableId);
+            }, LeaveCurrentEvent);
+        }
+
+        private void HideEventUi()
+        {
+            if (eventUiController != null)
+            {
+                eventUiController.Hide();
+            }
+        }
+
+        private void LeaveCurrentEvent()
+        {
+            ClearChoices();
+            HideEventCutsceneLayout();
+            if (_roomController == null)
+            {
+                return;
+            }
+
+            _roomController.CancelCurrentRouteSelection();
+            ShowResultMessage(string.Empty);
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
+        private void ShowBossGateChoices(EncounterData encounter, PrototypeEncounterChoiceView[] choiceViews, Action<string> onChoiceSelected)
+        {
+            ClearChoices();
+            HideRestInteractionPanel();
+            EnsureScreenLayers();
+            HideEventCutsceneLayout();
+            HideUtilityPanel();
+            SetLayerVisible(actionLayer, false);
+            SetLayerVisible(nodeMapLayer, false);
+            SetLayerVisible(objectiveLayer, false);
+            SetLayerVisible(visualLayer, false);
+            SetLayerVisible(npcReactionLayer, false);
+            SetLayerVisible(resultLayer, false);
+            SetResultVisible(false);
+            EnsureEventSystem();
+            ApplyPresentationSlot(encounter.Id);
+            var sceneSprite = encounterBackgroundImage == null ? null : encounterBackgroundImage.sprite;
+            HideMerchantPresentation();
+            _shopPresentationActive = false;
+            _eventPresentationActive = false;
+            _bossGatePresentationActive = true;
+            EnsureBossGateUi(onChoiceSelected);
+            if (bossGateUiController == null)
+            {
+                return;
+            }
+
+            var engage = default(PrototypeEncounterChoiceView);
+            var source = choiceViews ?? Array.Empty<PrototypeEncounterChoiceView>();
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (source[i].Visible && ChoiceStartsCombat(encounter, source[i].ChoiceStableId))
+                {
+                    engage = source[i];
+                    break;
+                }
+            }
+
+            var snapshot = _roomController == null ? _lastSnapshot : _roomController.GetSnapshot();
+            bossGateUiController.Show(snapshot, sceneSprite, engage.ChoiceStableId, engage.Enabled);
+            _choiceButtons.Add(bossGateUiController.EngageButton);
+            if (routeText != null && !showRawDebugText)
+            {
+                routeText.gameObject.SetActive(false);
+            }
+
+            if (interactionText != null)
+            {
+                interactionText.text = string.Empty;
+                interactionText.gameObject.SetActive(false);
+            }
+
+            ShowResultMessage(string.Empty);
+        }
+
+        private void EnsureBossGateUi(Action<string> onChoiceSelected)
+        {
+            if (bossGateUiController == null)
+            {
+                var moduleObject = new GameObject("Boss Gate UI Module", typeof(RectTransform));
+                moduleObject.transform.SetParent(HudParent, false);
+                bossGateUiController = moduleObject.AddComponent<BossGateUiController>();
+            }
+
+            bossGateUiController.Initialize(HudParent, choiceStableId =>
+            {
+                ClearChoices();
+                onChoiceSelected?.Invoke(choiceStableId);
+            }, LeaveBossGate);
+        }
+
+        private void HideBossGateUi()
+        {
+            if (bossGateUiController != null)
+            {
+                bossGateUiController.Hide();
+            }
+        }
+
+        private void EnsureEndingUi()
+        {
+            if (endingUiController == null)
+            {
+                var moduleObject = new GameObject("Ending UI Module", typeof(RectTransform));
+                moduleObject.transform.SetParent(HudParent, false);
+                endingUiController = moduleObject.AddComponent<EndingUiController>();
+            }
+
+            endingUiController.Initialize(HudParent, ResolveEndingRest, ResolveEndingContinue);
+            if (endingRestButton != null && !endingUiController.Owns(endingRestButton))
+            {
+                endingRestButton.gameObject.SetActive(false);
+            }
+
+            if (endingContinueButton != null && !endingUiController.Owns(endingContinueButton))
+            {
+                endingContinueButton.gameObject.SetActive(false);
+            }
+
+        }
+
+        private void HideEndingUi()
+        {
+            if (endingUiController != null)
+            {
+                endingUiController.Hide();
+            }
+        }
+
+        private void LeaveBossGate()
+        {
+            ClearChoices();
+            if (_roomController == null)
+            {
+                return;
+            }
+
+            _roomController.CancelCurrentRouteSelection();
+            ShowResultMessage(string.Empty);
+            ShowRunState(_roomController.GetSnapshot());
+        }
+
         public void ClearChoices()
         {
             HideShopUi();
+            HideEventUi();
+            HideBossGateUi();
+            HideEndingUi();
             for (var i = 0; i < _choiceButtons.Count; i++)
             {
-                if (_choiceButtons[i] != null && (shopUiController == null || !shopUiController.Owns(_choiceButtons[i])))
+                if (_choiceButtons[i] != null &&
+                    (shopUiController == null || !shopUiController.Owns(_choiceButtons[i])) &&
+                    (eventUiController == null || !eventUiController.Owns(_choiceButtons[i])) &&
+                    (bossGateUiController == null || !bossGateUiController.Owns(_choiceButtons[i])))
                 {
                     DestroyHudObject(_choiceButtons[i].gameObject);
                 }
@@ -954,6 +1216,7 @@ namespace HwigiTower.UI
             HideFloorMapUi();
             ClearMapDecorations();
             _shopPresentationActive = false;
+            _bossGatePresentationActive = false;
             HideMerchantPresentation();
         }
 
@@ -1335,13 +1598,13 @@ namespace HwigiTower.UI
             }
 
             AutoShowMapIfNeeded(snapshot);
+            UpdateEndingButtons(snapshot);
             UpdateScreenLayers(snapshot);
             UpdateBossRewardPopup(snapshot);
             UpdateLevelRewardPopup(snapshot);
             UpdateNextFloorButton(snapshot);
             UpdateRouteActionButton(snapshot);
             UpdateRestartButton(snapshot);
-            UpdateEndingButtons(snapshot);
             UpdatePresentationState(snapshot);
             UpdateRouteIndicator(snapshot);
             UpdatePrimaryHeaderVisibility(snapshot);
@@ -1352,6 +1615,7 @@ namespace HwigiTower.UI
             UpdateDemoCompletePanel(snapshot);
             UpdateCutsceneTriggers(snapshot);
             AutoShowMapIfNeeded(snapshot);
+            UpdateRunStateTextVisibility();
         }
 
         private void UpdateScreenLayers(PrototypeRunSnapshot snapshot)
@@ -1361,18 +1625,19 @@ namespace HwigiTower.UI
             var mapVisible = IsMapRouteState(snapshot);
             var shopVisible = !snapshot.IsInCombat && !restVisible && _shopPresentationActive;
             var eventVisible = _eventPresentationActive;
-            SetLayerVisible(topStatusLayer, true);
+            var bossGateVisible = _bossGatePresentationActive && bossGateUiController != null && bossGateUiController.Visible;
+            SetLayerVisible(topStatusLayer, !HasDedicatedPresentationUi());
             SetLayerVisible(objectiveLayer, false);
-            SetLayerVisible(visualLayer, !snapshot.IsInCombat && !eventVisible && !mapVisible);
+            SetLayerVisible(visualLayer, !snapshot.IsInCombat && !eventVisible && !mapVisible && !bossGateVisible);
             SetLayerVisible(nodeMapLayer, mapVisible && floorMapUiController == null);
             if (floorMapUiController != null && floorMapUiController.Root != null)
             {
                 SetLayerVisible(floorMapUiController.Root, mapVisible);
             }
-            SetLayerVisible(npcReactionLayer, showRawDebugText && !snapshot.IsInCombat && !snapshot.EndingChoicePending && !eventVisible && !mapVisible && !shopVisible && !restVisible);
-            SetLayerVisible(actionLayer, !snapshot.IsInCombat && !snapshot.RunCompleted && !mapVisible);
-            SetLayerVisible(resultLayer, !snapshot.IsInCombat && !eventVisible && !mapVisible && !shopVisible && !restVisible && resultText != null && resultText.gameObject.activeSelf);
-            SetLayerVisible(endingLayer, snapshot.EndingChoicePending && !snapshot.IsInCombat);
+            SetLayerVisible(npcReactionLayer, showRawDebugText && !snapshot.IsInCombat && !snapshot.EndingChoicePending && !eventVisible && !mapVisible && !shopVisible && !restVisible && !bossGateVisible);
+            SetLayerVisible(actionLayer, !snapshot.IsInCombat && !snapshot.RunCompleted && !mapVisible && !bossGateVisible);
+            SetLayerVisible(resultLayer, !snapshot.IsInCombat && !eventVisible && !mapVisible && !shopVisible && !restVisible && !bossGateVisible && resultText != null && resultText.gameObject.activeSelf);
+            SetLayerVisible(endingLayer, snapshot.EndingChoicePending && !snapshot.IsInCombat && (showRawDebugText || !EndingUiVisible));
         }
 
         private bool IsMapSelectionVisible(PrototypeRunSnapshot snapshot)
@@ -1402,7 +1667,8 @@ namespace HwigiTower.UI
                 !snapshot.HasSelectedMapNode &&
                 !RestInteractionPanelVisible &&
                 !_shopPresentationActive &&
-                !_eventPresentationActive;
+                !_eventPresentationActive &&
+                !_bossGatePresentationActive;
         }
 
         private void AutoShowMapIfNeeded(PrototypeRunSnapshot snapshot)
@@ -1415,7 +1681,8 @@ namespace HwigiTower.UI
                 snapshot.StairUnlocked ||
                 RestInteractionPanelVisible ||
                 _shopPresentationActive ||
-                _eventPresentationActive)
+                _eventPresentationActive ||
+                _bossGatePresentationActive)
             {
                 return;
             }
@@ -2657,6 +2924,7 @@ namespace HwigiTower.UI
         private void HideEventCutsceneLayout(bool restoreRouteText = true)
         {
             _eventPresentationActive = false;
+            HideEventUi();
             if (eventCutscenePanel != null)
             {
                 eventCutscenePanel.gameObject.SetActive(false);
@@ -4207,8 +4475,28 @@ namespace HwigiTower.UI
 
         private void UpdateEndingButtons(PrototypeRunSnapshot snapshot)
         {
-            EnsureEndingButtons();
             var visible = snapshot.EndingChoicePending && !snapshot.IsInCombat;
+            if (!showRawDebugText)
+            {
+                EnsureEndingUi();
+                if (endingUiController != null)
+                {
+                    if (visible)
+                    {
+                        var slot = ResolveCurrentPresentationSlot(snapshot);
+                        endingUiController.Show(snapshot, slot == null ? null : slot.BackgroundSprite, _roomController != null);
+                    }
+                    else
+                    {
+                        endingUiController.Hide();
+                    }
+
+                    return;
+                }
+            }
+
+            HideEndingUi();
+            EnsureEndingButtons();
             if (endingRestButton != null)
             {
                 SetButtonLabel(endingRestButton, showRawDebugText ? "PLACEHOLDER_ENDING_REST" : "안식");
@@ -4349,6 +4637,7 @@ namespace HwigiTower.UI
                 !selection.HasEncounter ||
                 selection.Encounter == null ||
                 selection.Encounter.Type != EncounterType.Battle ||
+                IsBossGateEncounter(selection.Encounter) ||
                 selection.Node == null ||
                 selection.Node.Kind != NodeKind.Battle)
             {
@@ -4585,8 +4874,9 @@ namespace HwigiTower.UI
             var restVisible = RestInteractionPanelVisible;
             var shopVisible = _shopPresentationActive && !snapshot.IsInCombat;
             var mapVisible = IsMapRouteState(snapshot);
-            routeText.gameObject.SetActive((!snapshot.IsInCombat && !_eventPresentationActive && !restVisible && !shopVisible && !mapVisible) || showRawDebugText);
-            if ((snapshot.IsInCombat || _eventPresentationActive || restVisible || shopVisible || mapVisible) && !showRawDebugText)
+            var dedicatedPresentation = HasDedicatedPresentationUi();
+            routeText.gameObject.SetActive((!snapshot.IsInCombat && !_eventPresentationActive && !restVisible && !shopVisible && !mapVisible && !dedicatedPresentation) || showRawDebugText);
+            if ((snapshot.IsInCombat || _eventPresentationActive || restVisible || shopVisible || mapVisible || dedicatedPresentation) && !showRawDebugText)
             {
                 if (mapVisible)
                 {
@@ -4705,7 +4995,8 @@ namespace HwigiTower.UI
                 _eventPresentationActive ||
                 _shopPresentationActive ||
                 RestInteractionPanelVisible ||
-                IsMapRouteState(snapshot);
+                IsMapRouteState(snapshot) ||
+                HasDedicatedPresentationUi();
             interactionText.gameObject.SetActive(!hiddenByEncounterState);
         }
 
@@ -4788,7 +5079,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            if ((_eventPresentationActive || _shopPresentationActive || RestInteractionPanelVisible || IsMapRouteState(snapshot)) && !showRawDebugText)
+            if ((_eventPresentationActive || _shopPresentationActive || RestInteractionPanelVisible || IsMapRouteState(snapshot) || HasDedicatedPresentationUi()) && !showRawDebugText)
             {
                 memoryText.gameObject.SetActive(false);
                 memoryText.text = string.Empty;
@@ -5617,7 +5908,7 @@ namespace HwigiTower.UI
         {
             EnsureTopHudIcons();
             ApplyTopHudIconSprites();
-            var visible = !showRawDebugText && !string.IsNullOrEmpty(snapshot.RunId);
+            var visible = !showRawDebugText && !HasDedicatedPresentationUi() && !string.IsNullOrEmpty(snapshot.RunId);
             SetImageVisible(topGoldIconImage, visible);
             SetImageVisible(topMemoryIconImage, false);
             SetImageVisible(topAffinityIconImage, false);
@@ -5901,7 +6192,7 @@ namespace HwigiTower.UI
                 return;
             }
 
-            demoCompleteText.gameObject.SetActive((snapshot.RunClear || snapshot.RunFailed) && !snapshot.IsInCombat);
+            demoCompleteText.gameObject.SetActive((snapshot.RunClear || snapshot.RunFailed) && !snapshot.IsInCombat && !EndingUiVisible);
             if (snapshot.RunFailed)
             {
                 demoCompleteText.text = showRawDebugText ? "run.failed\nRestart Ready" : "실패\n재시작 가능";
@@ -5935,6 +6226,8 @@ namespace HwigiTower.UI
                 !RestInteractionPanelVisible &&
                 !_shopPresentationActive &&
                 !_eventPresentationActive &&
+                !BossGateUiVisible &&
+                !EndingUiVisible &&
                 !IsMapRouteState(snapshot) &&
                 !BossRewardPopupVisible;
             SetResultVisible(visible);
@@ -7501,9 +7794,14 @@ namespace HwigiTower.UI
 
             var slot = ResolveCurrentPresentationSlot(snapshot);
             ApplyPresentationSlot(slot);
-            if (_shopPresentationActive || snapshot.IsInCombat || _eventPresentationActive)
+            if (_shopPresentationActive || snapshot.IsInCombat || _eventPresentationActive || _bossGatePresentationActive)
             {
                 HideLegacyEncounterVisuals(hideBackground: false);
+            }
+
+            if (BossGateUiVisible || EndingUiVisible)
+            {
+                HideLegacyEncounterVisuals(hideBackground: true);
             }
 
             if (!snapshot.IsInCombat && _shopPresentationActive && (shopUiController == null || !shopUiController.Visible))
@@ -7518,6 +7816,25 @@ namespace HwigiTower.UI
             if (interactionText != null && !showRawDebugText && snapshot.RunClear && !snapshot.IsInCombat)
             {
                 interactionText.text = snapshot.EndingChoicePending ? "엔딩 선택" : "클리어";
+            }
+        }
+
+        private bool HasDedicatedPresentationUi()
+        {
+            return !showRawDebugText && (EventUiVisible || BossGateUiVisible || EndingUiVisible);
+        }
+
+        private void UpdateRunStateTextVisibility()
+        {
+            var visible = !HasDedicatedPresentationUi();
+            if (runStateText != null)
+            {
+                runStateText.gameObject.SetActive(visible);
+            }
+
+            if (focusText != null)
+            {
+                focusText.gameObject.SetActive(visible);
             }
         }
 
@@ -7786,9 +8103,7 @@ namespace HwigiTower.UI
         private static bool IsBossGateEncounter(EncounterData encounter)
         {
             return encounter != null &&
-                (encounter.Id == "ENC_COMBAT_GATE_01" ||
-                 encounter.Id == "ENC_COMBAT_GATE_02" ||
-                 encounter.Id == "ENC_COMBAT_GATE_03");
+                encounter.Id == "ENC_COMBAT_GATE_02";
         }
 
         private static PrototypeEncounterChoiceView[] BuildBossGateChoiceViews(PrototypeEncounterChoiceView[] sourceViews)

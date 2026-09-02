@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 2,
+  "specVersion": "1.0",
+  "screen": "ending",
+  "tokens": "ui_tokens.json",
+  "checker": "Tools/check_layout.py",
+  "wiringChecker": "Tools/check_wiring.py",
+  "dataChecker": "Tools/check_databinding.py",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "layoutIntent": "한 번의 런이 무엇이었는지 보이고, 두 길 중 하나를 고르게 한다. 이 화면의 판단 대상은 자원이 아니라 **관계**다 — 그래서 자원 칩을 두지 않는다.",
+  "_why_no_resource_strip": "전 화면이 자원 칩 4개로 열리지만 이 화면만 뺀다. 런이 끝난 자리라 체력·골드가 다음 판단에 쓰이지 않는다. 칩을 남기면 마지막 선택이 자원 최적화처럼 읽힌다. 대신 **런 요약**이 그 자리를 쓴다.",
+  "changeFromCapture": [
+    "자원 칩 4개를 런 요약으로 교체 — 마지막 선택은 자원 판단이 아니다",
+    "두 선택지를 같은 무게로 — 어느 쪽도 「정답」으로 보이지 않게",
+    "선택 결과를 미리 요약하지 않는다 — 데이터에 결과 텍스트가 없다"
+  ],
+  "dataBinding": {
+    "_note": "2026-09-02. PrototypeRunState.ResolveEndingChoice + 스냅샷 대조",
+    "runSummary": {
+      "source": "PrototypeRunSnapshot.CurrentFloor / NodesResolved / BattlesWon / MemoryFragmentCount",
+      "present": true,
+      "note": "런이 무엇이었는지의 재료. 실재 필드만 쓴다"
+    },
+    "endingGate": {
+      "source": "PrototypeRunSnapshot.EndingChoicePending",
+      "type": "bool",
+      "present": true,
+      "note": "`RunClear && !EndingRest && !EndingContinue` 로 산출된다. false 면 이 화면 자체가 안 뜬다"
+    },
+    "choiceRest": {
+      "source": "PrototypeRunSnapshot.EndingRest",
+      "type": "bool",
+      "present": true,
+      "choiceId": "PLACEHOLDER_ENDING_REST",
+      "note": "⚠️ id 가 `PLACEHOLDER_` 로 시작한다. **문구가 확정되지 않았다는 뜻이다.** 사양은 슬롯과 좌표만 고정하고 **문구는 authored 로 남긴다**"
+    },
+    "choiceContinue": {
+      "source": "PrototypeRunSnapshot.EndingContinue",
+      "type": "bool",
+      "present": true,
+      "choiceId": "PLACEHOLDER_ENDING_CONTINUE",
+      "note": "동일"
+    },
+    "resolvedId": {
+      "source": "PrototypeRunSnapshot.EndingChoiceId",
+      "type": "string",
+      "present": true,
+      "note": "선택 후 채워진다. 재선택 차단 근거"
+    },
+    "_absent": {
+      "endingOutcomeText": "선택별 결말 텍스트가 데이터에 없다. **미리보기·요약을 지어내지 않는다**",
+      "mataiosFinalState": "마타이오스의 최종 상태를 담는 전용 필드 없음. GlitchLevel 은 있으나 D-012 P2 로 비노출",
+      "runDuration": "플레이 시간 필드 없음"
+    }
+  },
+  "constraints": [
+    {
+      "id": "N-01",
+      "text": "누를 수 있는 요소는 y >= 0.60",
+      "check": "interactive 슬롯 전부",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.6,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "N-02",
+      "text": "터치 타깃 최소 96px",
+      "check": "h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "N-03",
+      "text": "엔딩 선택지는 정확히 2개",
+      "check": "role=ending 슬롯 수 == 2",
+      "machineCheck": {
+        "type": "count",
+        "applyTo": {
+          "role": [
+            "ending"
+          ]
+        },
+        "eq": 2
+      },
+      "rationale": "실측 = PLACEHOLDER_ENDING_REST · PLACEHOLDER_ENDING_CONTINUE 둘뿐"
+    },
+    {
+      "id": "N-04",
+      "text": "두 선택지의 크기가 같다",
+      "check": "choiceRest.w == choiceContinue.w (그리고 h 도)",
+      "machineCheck": {
+        "type": "sameField",
+        "slots": [
+          "choiceRest",
+          "choiceContinue"
+        ],
+        "field": "w"
+      },
+      "rationale": "🔴 **이 화면의 핵심 제약.** 한쪽이 크면 그게 정답으로 읽힌다. P1 3악장 종착에서 그건 설계 실패다"
+    },
+    {
+      "id": "N-04b",
+      "text": "두 선택지의 높이도 같다",
+      "check": "choiceRest.h == choiceContinue.h",
+      "machineCheck": {
+        "type": "sameField",
+        "slots": [
+          "choiceRest",
+          "choiceContinue"
+        ],
+        "field": "h"
+      },
+      "rationale": "N-04 의 짝. 폭만 같고 높이가 다르면 여전히 한쪽이 무겁다"
+    },
+    {
+      "id": "N-05",
+      "text": "자원 칩을 두지 않는다",
+      "check": "color=gold_coin 슬롯 0개",
+      "machineCheck": {
+        "type": "count",
+        "applyTo": {
+          "color": [
+            "gold_coin"
+          ]
+        },
+        "max": 0
+      },
+      "rationale": "런이 끝난 자리다. 칩을 남기면 마지막 선택이 자원 최적화처럼 읽힌다"
+    },
+    {
+      "id": "N-06",
+      "text": "층 순서는 judgement → subject → action",
+      "check": "bands 순서",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "judgement",
+          "subject",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "N-07",
+      "text": "같은 문구가 두 슬롯에 중복되지 않는다",
+      "check": "content 중복 0건",
+      "machineCheck": {
+        "type": "noDuplicateContent"
+      }
+    },
+    {
+      "id": "N-08",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 없다",
+      "check": "slots[*].content 에 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2"
+    }
+  ],
+  "bands": {
+    "judgement": {
+      "y": 0.0,
+      "h": 0.16
+    },
+    "subject": {
+      "y": 0.16,
+      "h": 0.44
+    },
+    "action": {
+      "y": 0.6,
+      "h": 0.4
+    }
+  },
+  "slots": {
+    "endingTitle": {
+      "band": "judgement",
+      "x": 0.08,
+      "y": 0.052,
+      "w": 0.84,
+      "h": 0.07,
+      "order": 10,
+      "layer": "title",
+      "type": "text",
+      "style": "screen",
+      "notes": "런이 끝났음을 알리는 한 줄. authored"
+    },
+    "endingScene": {
+      "band": "subject",
+      "x": 0.0,
+      "y": 0.16,
+      "w": 1.0,
+      "h": 0.26,
+      "order": 20,
+      "layer": "background",
+      "type": "image",
+      "notes": "종착 배경. 선택별 아트는 데이터에 없다 — 하나로 간다"
+    },
+    "runSummary": {
+      "band": "subject",
+      "x": 0.06,
+      "y": 0.436,
+      "w": 0.88,
+      "h": 0.146,
+      "order": 21,
+      "layer": "content",
+      "type": "card",
+      "frameStyle": true,
+      "notes": "도달 층 · 해결 노드 · 전투 승수 · 기억 조각. **실재 필드만.** 자원 칩 자리를 대신한다(N-05)"
+    },
+    "choiceRest": {
+      "band": "action",
+      "x": 0.06,
+      "y": 0.626,
+      "w": 0.88,
+      "h": 0.13,
+      "order": 40,
+      "layer": "actions",
+      "type": "card",
+      "role": "ending",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "안식 쪽. `PLACEHOLDER_ENDING_REST`. **문구 미확정 — authored 로 남긴다.** 크기는 choiceContinue 와 같아야 한다(N-04)"
+    },
+    "choiceContinue": {
+      "band": "action",
+      "x": 0.06,
+      "y": 0.774,
+      "w": 0.88,
+      "h": 0.13,
+      "order": 41,
+      "layer": "actions",
+      "type": "card",
+      "role": "ending",
+      "interactive": true,
+      "frameStyle": true,
+      "notes": "동행 쪽. `PLACEHOLDER_ENDING_CONTINUE`. 크기 동일(N-04)"
+    },
+    "irreversibleNote": {
+      "band": "action",
+      "x": 0.08,
+      "y": 0.922,
+      "w": 0.84,
+      "h": 0.032,
+      "order": 50,
+      "layer": "hud",
+      "type": "text",
+      "style": "label",
+      "notes": "되돌릴 수 없다는 고지. EndingChoiceId 가 차면 이 화면은 다시 안 뜬다"
+    }
+  },
+  "variants": {
+    "_note": "엔딩에 붕괴 variants 를 두지 않는다. 마타이오스의 최종 상태는 authored 문구로만 드러난다"
+  },
+  "invariantUnderVariants": [
+    "두 선택지의 좌표·크기·대비가 같다. 어느 쪽도 강조되지 않는다",
+    "자원 칩이 없다",
+    "선택 결과를 미리 요약하지 않는다 — 데이터에 없다",
+    "「붕괴도」 수치와 용어를 노출하지 않는다"
+  ],
+  "assetFallbacks": {
+    "ending_scene_variants": {
+      "present": false,
+      "fallback": "단일 종착 배경",
+      "status": "선택별 아트 없음",
+      "note": "임의 대체 금지"
+    }
+  },
+  "openQuestions": [
+    {
+      "id": "OQ-UI-01",
+      "text": "엔딩 선택지 문구가 `PLACEHOLDER_*` 로 남아 있다. 확정 문구는 작가·TONE BIBLE 소관이고 이 사양의 범위가 아니다",
+      "owner": "작가",
+      "blocking": false,
+      "note": "슬롯·좌표는 문구와 무관하게 성립한다. 구현을 막지 않는다"
+    }
+  ],
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "endingTitle",
+      "runSummary",
+      "choiceRest",
+      "choiceContinue"
+    ]
+  },
+  "revisions": [
+    "v1.0 2026-09-02 · 최초. 실측 선택지 2개(PLACEHOLDER_ENDING_REST/CONTINUE). 자원 칩 제거(N-05)·두 선택지 동일 크기 강제(N-04)·결과 미리보기 금지. 문구는 미확정이라 authored 로 남긴다"
+  ]
+}

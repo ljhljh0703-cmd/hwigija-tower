@@ -1,6 +1,6 @@
 {
   "screen": "floormap",
-  "capturedAt": "2026-09-01T23:16:30.3208730Z runtime RectTransform capture",
+  "capturedAt": "2026-09-02T01:25:17.1897610Z runtime RectTransform capture",
   "source": "runtime",
   "slots": {
     "floorChip": {"x": 0.04, "y": 0.03, "w": 0.18, "h": 0.044, "fontSize": 26, "visible": true},

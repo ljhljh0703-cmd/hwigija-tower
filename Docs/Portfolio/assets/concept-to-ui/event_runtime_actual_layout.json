@@ -1,0 +1,16 @@
+{
+  "screen": "event",
+  "capturedAt": "2026-09-02T01:25:17.6527150Z runtime RectTransform capture",
+  "source": "runtime",
+  "slots": {
+    "floorChip": {"x": 0.04, "y": 0.03, "w": 0.18, "h": 0.044, "fontSize": 26, "visible": true},
+    "sanityChip": {"x": 0.24, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "hpChip": {"x": 0.5, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "goldChip": {"x": 0.76, "y": 0.03, "w": 0.2, "h": 0.044, "fontSize": 26, "visible": true},
+    "eventTitle": {"x": 0.06, "y": 0.106, "w": 0.88, "h": 0.062, "fontSize": 54, "visible": true},
+    "eventBody": {"x": 0.06, "y": 0.19, "w": 0.88, "h": 0.23, "fontSize": 34, "visible": true},
+    "choiceList": {"x": 0.04, "y": 0.45, "w": 0.92, "h": 0.39, "fontSize": 26, "visible": true},
+    "scrollHint": {"x": 0.04, "y": 0.846, "w": 0.92, "h": 0.028, "fontSize": 26, "visible": false},
+    "leaveButton": {"x": 0.3, "y": 0.888, "w": 0.4, "h": 0.056, "fontSize": 42, "visible": true}
+  }
+}

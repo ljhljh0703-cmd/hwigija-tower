@@ -138,7 +138,11 @@ namespace HwigiTower.Tests.PlayMode
                 var selection = controller.CreateQaEncounterSelection(encounterId);
                 Assert.IsTrue(selection.HasEncounter, "Missing QA encounter selection for " + encounterId);
                 hud.OpenQaRouteStep(selection);
-            });
+                if (encounterId == "EVT_F01_JAR_ROOM")
+                {
+                    Assert.IsTrue(hud.EventUiVisible);
+                }
+            }, encounterId == "EVT_F01_JAR_ROOM" ? "event" : null);
         }
 
         private static IEnumerator CaptureShopScreen()
@@ -224,24 +228,23 @@ namespace HwigiTower.Tests.PlayMode
                 Assert.IsFalse(hud.PreRunPlaceholderVisible, "Ending capture must not show pre-run placeholder.");
                 if (snapshot.EndingChoicePending)
                 {
+                    Assert.IsTrue(hud.EndingUiVisible, "Expected ending layout module to own the ending choice surface.");
                     Assert.IsTrue(
                         hud.EndingRestButtonVisible || hud.EndingContinueButtonVisible,
                         "Expected current ending choice UI to expose an ending action.");
                 }
-            });
+            }, "ending");
         }
 
         private static IEnumerator CaptureBossGateChoices()
         {
             yield return CapturePrototypeRoomScreen("12_boss_gate_choices.png", (controller, hud) =>
             {
-                var selection = controller.CreateQaEncounterSelection("ENC_COMBAT_GATE_03");
+                var selection = controller.CreateQaEncounterSelection("ENC_COMBAT_GATE_02");
                 Assert.IsTrue(selection.HasEncounter, "Missing QA boss gate selection");
                 hud.OpenQaRouteStep(selection);
-                Assert.IsTrue(
-                    controller.RunState.IsInCombat || hud.ChoiceButtonCount > 0,
-                    "Expected boss gate to either auto-start combat or expose current gate choices.");
-            });
+                Assert.IsTrue(hud.BossGateUiVisible, "Expected boss gate readiness surface.");
+            }, "bossgate");
         }
 
         private static IEnumerator CapturePrototypeRoomScreen(string fileName, System.Action<PrototypeRoomController, PrototypeHud> arrange, string runtimeLayoutScreen = null)
@@ -349,6 +352,55 @@ namespace HwigiTower.Tests.PlayMode
                     new RuntimeSlotRequest("selectedNodeCard", "FloorMap Selected Card"),
                     new RuntimeSlotRequest("departButton", "FloorMap Depart Button"),
                     new RuntimeSlotRequest("backButton", "FloorMap Back Button")
+                });
+                return;
+            }
+
+            if (screen == "event")
+            {
+                WriteRuntimeActual(screen, root, new[]
+                {
+                    new RuntimeSlotRequest("floorChip", "Event floorChip"),
+                    new RuntimeSlotRequest("sanityChip", "Event sanityChip"),
+                    new RuntimeSlotRequest("hpChip", "Event hpChip"),
+                    new RuntimeSlotRequest("goldChip", "Event goldChip"),
+                    new RuntimeSlotRequest("eventTitle", "Event Title"),
+                    new RuntimeSlotRequest("eventBody", "Event Body"),
+                    new RuntimeSlotRequest("choiceList", "Event Choice List"),
+                    new RuntimeSlotRequest("scrollHint", "Event Scroll Hint"),
+                    new RuntimeSlotRequest("leaveButton", "Event Leave Button")
+                });
+                return;
+            }
+
+            if (screen == "ending")
+            {
+                WriteRuntimeActual(screen, root, new[]
+                {
+                    new RuntimeSlotRequest("endingTitle", "Ending Title"),
+                    new RuntimeSlotRequest("endingScene", "Ending Scene"),
+                    new RuntimeSlotRequest("runSummary", "Ending Run Summary"),
+                    new RuntimeSlotRequest("choiceRest", "Ending Button Rest"),
+                    new RuntimeSlotRequest("choiceContinue", "Ending Button Continue"),
+                    new RuntimeSlotRequest("irreversibleNote", "Ending Irreversible Note")
+                });
+                return;
+            }
+
+            if (screen == "bossgate")
+            {
+                WriteRuntimeActual(screen, root, new[]
+                {
+                    new RuntimeSlotRequest("floorChip", "BossGate floorChip"),
+                    new RuntimeSlotRequest("sanityChip", "BossGate sanityChip"),
+                    new RuntimeSlotRequest("hpChip", "BossGate hpChip"),
+                    new RuntimeSlotRequest("goldChip", "BossGate goldChip"),
+                    new RuntimeSlotRequest("gateTitle", "Boss Gate Title"),
+                    new RuntimeSlotRequest("gateScene", "Boss Gate Scene"),
+                    new RuntimeSlotRequest("readinessPanel", "Boss Gate Readiness Panel"),
+                    new RuntimeSlotRequest("engageButton", "Boss Gate Engage Button"),
+                    new RuntimeSlotRequest("warningLine", "Boss Gate Warning Line"),
+                    new RuntimeSlotRequest("retreatButton", "Boss Gate Retreat Button")
                 });
                 return;
             }

@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="46" result="Passed" total="46" passed="46" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="1.0453542">
+  <test-suite type="TestSuite" id="1000" name="회귀자는 탑을 오른다" fullname="회귀자는 탑을 오른다" runstate="Runnable" testcasecount="214" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="1.045354" total="46" passed="46" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1224" name="HwigiTower.EditModeTests.dll" fullname="/Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Library/ScriptAssemblies/HwigiTower.EditModeTests.dll" runstate="Runnable" testcasecount="214" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="1.041653" total="46" passed="46" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="88299" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1225" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="214" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="1.040748" total="46" passed="46" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1226" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="214" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="1.039929" total="46" passed="46" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1227" name="EditMode" fullname="HwigiTower.Tests.EditMode" runstate="Runnable" testcasecount="214" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="1.039095" total="46" passed="46" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1044" name="PresentationLayerTests" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" testcasecount="46" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="1.037256" total="46" passed="46" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1063" name="BossGateShowsReadinessInsteadOfAChoiceList" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.BossGateShowsReadinessInsteadOfAChoiceList" methodname="BossGateShowsReadinessInsteadOfAChoiceList" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1290872640" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.035490" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1057" name="ChoiceViews_BuildPublicConsequenceHints" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.ChoiceViews_BuildPublicConsequenceHints" methodname="ChoiceViews_BuildPublicConsequenceHints" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="955083990" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.002622" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1075" name="CombatAutoStart_HidesMapResultAndMemorySurfaces" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.CombatAutoStart_HidesMapResultAndMemorySurfaces" methodname="CombatAutoStart_HidesMapResultAndMemorySurfaces" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="5574702" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.131258" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1076" name="CombatAutoStart_ShowsEnemyAndActionButtons" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.CombatAutoStart_ShowsEnemyAndActionButtons" methodname="CombatAutoStart_ShowsEnemyAndActionButtons" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="980551804" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.009568" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1073" name="CombatNodeTap_EntersCombatState" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.CombatNodeTap_EntersCombatState" methodname="CombatNodeTap_EntersCombatState" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="328486342" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.009059" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1081" name="CombatPresentation_StillSeparatesPlayerAndMataiosDamage" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.CombatPresentation_StillSeparatesPlayerAndMataiosDamage" methodname="CombatPresentation_StillSeparatesPlayerAndMataiosDamage" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1115102192" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.005960" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="CombatVictory_ResultPanelDelayedUntilDefeatFeedbackCompletes" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.CombatVictory_ResultPanelDelayedUntilDefeatFeedbackCompletes" methodname="CombatVictory_ResultPanelDelayedUntilDefeatFeedbackCompletes" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1171603640" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.007507" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="CutsceneData_EmptyStepsIsSafeScaffold" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.CutsceneData_EmptyStepsIsSafeScaffold" methodname="CutsceneData_EmptyStepsIsSafeScaffold" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1661938137" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.000089" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="DemoPresentationData_AllEventEncountersHavePresentationSlots" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.DemoPresentationData_AllEventEncountersHavePresentationSlots" methodname="DemoPresentationData_AllEventEncountersHavePresentationSlots" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1990081506" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.072286" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1051" name="DemoPresentationData_BindsCombatActionIconsAndPlayerSlot" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.DemoPresentationData_BindsCombatActionIconsAndPlayerSlot" methodname="DemoPresentationData_BindsCombatActionIconsAndPlayerSlot" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="2053491733" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.000426" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1046" name="DemoPresentationData_BindsLateRouteSprites" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.DemoPresentationData_BindsLateRouteSprites" methodname="DemoPresentationData_BindsLateRouteSprites" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="2105333732" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.000375" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1050" name="DemoPresentationData_BindsNodeIcons" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.DemoPresentationData_BindsNodeIcons" methodname="DemoPresentationData_BindsNodeIcons" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1090047312" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.000333" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="DemoPresentationData_BindsRestActionIcons" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.DemoPresentationData_BindsRestActionIcons" methodname="DemoPresentationData_BindsRestActionIcons" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1736622209" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.000132" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="DemoPresentationData_BindsShopRestUiSupportAndIcons" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.DemoPresentationData_BindsShopRestUiSupportAndIcons" methodname="DemoPresentationData_BindsShopRestUiSupportAndIcons" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1198929505" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.000242" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1045" name="DemoPresentationData_ResolvesSlotsByEncounterStableId" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.DemoPresentationData_ResolvesSlotsByEncounterStableId" methodname="DemoPresentationData_ResolvesSlotsByEncounterStableId" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="18383746" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.000398" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1064" name="EndingUi_UsesRunSummaryAndKeepsAuthoredChoicesEqual" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.EndingUi_UsesRunSummaryAndKeepsAuthoredChoicesEqual" methodname="EndingUi_UsesRunSummaryAndKeepsAuthoredChoicesEqual" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="399063142" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:44Z" duration="0.005905" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1062" name="EventUi_ScrollsVariableChoicesAndOmitsHiddenPolicies" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.EventUi_ScrollsVariableChoicesAndOmitsHiddenPolicies" methodname="EventUi_ScrollsVariableChoicesAndOmitsHiddenPolicies" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1299198311" result="Passed" start-time="2026-09-02 01:24:44Z" end-time="2026-09-02 01:24:45Z" duration="0.523280" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1074" name="FreshRun_FirstCombatNodeTap_AutoStartsCombat" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.FreshRun_FirstCombatNodeTap_AutoStartsCombat" methodname="FreshRun_FirstCombatNodeTap_AutoStartsCombat" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="286524491" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.023475" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1070" name="FreshRun_Floor1MapShowsSelectableNodes" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.FreshRun_Floor1MapShowsSelectableNodes" methodname="FreshRun_Floor1MapShowsSelectableNodes" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="755117534" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.011194" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1060" name="Gate2P0_CombatLogStaysDenseAndSkillShowsDisabledReason" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Gate2P0_CombatLogStaysDenseAndSkillShowsDisabledReason" methodname="Gate2P0_CombatLogStaysDenseAndSkillShowsDisabledReason" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1009350659" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005505" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1059" name="Gate2P0_PublicSanitizerRemovesInternalLabels" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Gate2P0_PublicSanitizerRemovesInternalLabels" methodname="Gate2P0_PublicSanitizerRemovesInternalLabels" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1131108693" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.000301" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1068" name="Hud_BossClearRewardUsesProminentPopupWithNextFloorCta" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_BossClearRewardUsesProminentPopupWithNextFloorCta" methodname="Hud_BossClearRewardUsesProminentPopupWithNextFloorCta" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="572719445" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.007198" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1080" name="Hud_CombatIntroBlocksActionsWithoutManualStartButton" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_CombatIntroBlocksActionsWithoutManualStartButton" methodname="Hud_CombatIntroBlocksActionsWithoutManualStartButton" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1130029937" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005594" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1078" name="Hud_CombatScreenShowsIntentWithoutRawEnemyId" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_CombatScreenShowsIntentWithoutRawEnemyId" methodname="Hud_CombatScreenShowsIntentWithoutRawEnemyId" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="2058861724" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.008264" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="Hud_CombatSummaryShowsBuildAndMataiosAssist" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_CombatSummaryShowsBuildAndMataiosAssist" methodname="Hud_CombatSummaryShowsBuildAndMataiosAssist" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="837265248" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005731" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1090" name="Hud_CombatVisualsCanUseEnemySpecificPresentationSlot" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_CombatVisualsCanUseEnemySpecificPresentationSlot" methodname="Hud_CombatVisualsCanUseEnemySpecificPresentationSlot" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="186362232" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.007047" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1083" name="Hud_EnemyDefeatFeedbackAppearsBeforeResultSurface" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_EnemyDefeatFeedbackAppearsBeforeResultSurface" methodname="Hud_EnemyDefeatFeedbackAppearsBeforeResultSurface" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1475874986" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005631" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1067" name="Hud_FloorClearResultHidesMapStatusButtonsAndKeepsObjective" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_FloorClearResultHidesMapStatusButtonsAndKeepsObjective" methodname="Hud_FloorClearResultHidesMapStatusButtonsAndKeepsObjective" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="2125360601" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.006084" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1066" name="Hud_LevelRewardPopupShowsGrowthChoices" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_LevelRewardPopupShowsGrowthChoices" methodname="Hud_LevelRewardPopupShowsGrowthChoices" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1417011510" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005949" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="Hud_LowHpWarningUsesConfiguredThresholdAndClearsOnHeal" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_LowHpWarningUsesConfiguredThresholdAndClearsOnHeal" methodname="Hud_LowHpWarningUsesConfiguredThresholdAndClearsOnHeal" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1248104180" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005268" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1069" name="Hud_MapScreenShowsNodeIconsAndHidesRawIds" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_MapScreenShowsNodeIconsAndHidesRawIds" methodname="Hud_MapScreenShowsNodeIconsAndHidesRawIds" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1444413621" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.003661" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1082" name="Hud_PlayerHitFeedbackShowsLocalDamageState" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_PlayerHitFeedbackShowsLocalDamageState" methodname="Hud_PlayerHitFeedbackShowsLocalDamageState" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="228806813" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005787" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1077" name="Hud_PortraitShellUsesMobileBoundsAndHidesGlitch" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_PortraitShellUsesMobileBoundsAndHidesGlitch" methodname="Hud_PortraitShellUsesMobileBoundsAndHidesGlitch" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="216535726" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.006019" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1089" name="Hud_PublicRouteAndCombatFeedbackHideDebugIds" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_PublicRouteAndCombatFeedbackHideDebugIds" methodname="Hud_PublicRouteAndCombatFeedbackHideDebugIds" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="466900789" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005728" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1086" name="Hud_RestInteractionUsesThePortraitRestLayoutContract" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_RestInteractionUsesThePortraitRestLayoutContract" methodname="Hud_RestInteractionUsesThePortraitRestLayoutContract" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1626201371" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.013453" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1088" name="Hud_ResultSummaryShowsJarOutcomeWithoutDebugIds" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_ResultSummaryShowsJarOutcomeWithoutDebugIds" methodname="Hud_ResultSummaryShowsJarOutcomeWithoutDebugIds" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="268120433" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.001520" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1087" name="Hud_ResultSummaryShowsPlayerFacingDeltas" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_ResultSummaryShowsPlayerFacingDeltas" methodname="Hud_ResultSummaryShowsPlayerFacingDeltas" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1669130569" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.001719" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1058" name="Hud_ShopDisabledCardsKeepProductComparisonDetails" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_ShopDisabledCardsKeepProductComparisonDetails" methodname="Hud_ShopDisabledCardsKeepProductComparisonDetails" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="958747826" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.012043" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1065" name="Hud_UtilityButtonsExposeStatusMapAndLoadoutWithoutGlitch" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.Hud_UtilityButtonsExposeStatusMapAndLoadoutWithoutGlitch" methodname="Hud_UtilityButtonsExposeStatusMapAndLoadoutWithoutGlitch" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1886105538" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.005724" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1061" name="JarRoomChoices_ShowProbabilityHintsInPublicUi" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.JarRoomChoices_ShowProbabilityHintsInPublicUi" methodname="JarRoomChoices_ShowProbabilityHintsInPublicUi" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="87413303" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.029337" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1071" name="MapState_DoesNotShowEventResultPanel" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.MapState_DoesNotShowEventResultPanel" methodname="MapState_DoesNotShowEventResultPanel" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="642450691" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.003596" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1072" name="MapState_DoesNotUseEventPresentationBackground" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.MapState_DoesNotUseEventPresentationBackground" methodname="MapState_DoesNotUseEventPresentationBackground" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1457047426" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.006100" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1049" name="ProjectSettings_UseFinalAndroidIdentity" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.ProjectSettings_UseFinalAndroidIdentity" methodname="ProjectSettings_UseFinalAndroidIdentity" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="135713467" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.000269" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="ProjectSettings_UsePortraitDemoResolution" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.ProjectSettings_UsePortraitDemoResolution" methodname="ProjectSettings_UsePortraitDemoResolution" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="1534169559" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.000206" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="RepresentativeEventEditorSmoke_UsesPublicPresentationSurface" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.RepresentativeEventEditorSmoke_UsesPublicPresentationSurface" methodname="RepresentativeEventEditorSmoke_UsesPublicPresentationSurface" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="2106447353" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.030753" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="RestLayout_ChoiceCardLabelsStayPublicAndHideGlitch" fullname="HwigiTower.Tests.EditMode.PresentationLayerTests.RestLayout_ChoiceCardLabelsStayPublicAndHideGlitch" methodname="RestLayout_ChoiceCardLabelsStayPublicAndHideGlitch" classname="HwigiTower.Tests.EditMode.PresentationLayerTests" runstate="Runnable" seed="286837243" result="Passed" start-time="2026-09-02 01:24:45Z" end-time="2026-09-02 01:24:45Z" duration="0.000205" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/godju/회귀자는 탑을 오른다/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
