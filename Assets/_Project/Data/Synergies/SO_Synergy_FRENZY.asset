@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92c2bb63873a4439af7205ef58521344, type: 3}
+  m_Name: SO_Synergy_FRENZY
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Abilities.SynergyData
+  tag: "\uAC80"
+  requiredCount: 3
+  effectDescription: "\uAC80 x3: Attack extra hit; chain bonus after Attack."
+  numericParams:
+  - key: synergy.extra_atk_multiplier
+    value: 0.5
+  - key: synergy.attack_chain_extra_atk_multiplier
+    value: 0.75

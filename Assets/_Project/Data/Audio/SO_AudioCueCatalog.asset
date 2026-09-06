@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8279c542e5e14b68ae359325a27f918, type: 3}
+  m_Name: SO_AudioCueCatalog
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Audio.AudioCueCatalog
+  cues:
+  - {fileID: 11400000, guid: 1456c8ea5c0c24b46ab6faf289e44b43, type: 2}
+  - {fileID: 11400000, guid: cee064976104e450193ab512e5bd8e7e, type: 2}
+  - {fileID: 11400000, guid: 95e52848604d94d9e9efe68abfd8862e, type: 2}
+  - {fileID: 11400000, guid: b425df739e07f424eaf6cf3ca5f7cbfe, type: 2}
+  - {fileID: 11400000, guid: 9432beb9304b8474b998595d5871840c, type: 2}
+  - {fileID: 11400000, guid: 2c54c5f4483724367b6ff550175741e5, type: 2}
+  - {fileID: 11400000, guid: 3f271e7287a9a41d09acab1324ae8034, type: 2}
+  - {fileID: 11400000, guid: 22315463a92634210aa3744ef12bd844, type: 2}
+  - {fileID: 11400000, guid: 6da3bf7d9a5e546328429dd9d32db97f, type: 2}
+  - {fileID: 11400000, guid: c5a4377ac5804422ebbd3c0a6e21b479, type: 2}
+  - {fileID: 11400000, guid: 7970e352c25ff4ea9886306eb0c7c5d9, type: 2}

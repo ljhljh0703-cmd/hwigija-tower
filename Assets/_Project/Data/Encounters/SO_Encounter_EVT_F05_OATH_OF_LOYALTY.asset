@@ -1,0 +1,240 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F05_OATH_OF_LOYALTY
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F05_OATH_OF_LOYALTY
+  type: 6
+  floor: 5
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F05_OATH_OF_LOYALTY
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F05_OATH_OF_LOYALTY.asset
+  sourceHash: sha256:95c5f174193b3bf5433a69a6483a5ea84ebcefa698099381b41544a81f486283
+  contentCategory: GeneralEncounter
+  npcStage: S5_REST_OR_CONTINUE
+  bodyTextKey: EVT_F05_OATH_OF_LOYALTY_BODY
+  writerStatus: sheet-normalized-temp-effects
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F05_OATH_OF_LOYALTY_KING
+  - CHOICE_EVT_F05_OATH_OF_LOYALTY_KINGDOM
+  choices:
+  - stableId: CHOICE_EVT_F05_OATH_OF_LOYALTY_KING
+    textKey: CHOICE_EVT_F05_OATH_OF_LOYALTY_KING_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyHp
+      amount: -8
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyMental
+      amount: -2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_GENERIC_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F05_OATH_OF_LOYALTY_KING
+  - stableId: CHOICE_EVT_F05_OATH_OF_LOYALTY_KINGDOM
+    textKey: CHOICE_EVT_F05_OATH_OF_LOYALTY_KINGDOM_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyHp
+      amount: -8
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyMental
+      amount: -2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_GENERIC_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F05_OATH_OF_LOYALTY_KINGDOM

@@ -1,0 +1,520 @@
+fileFormatVersion: 2
+guid: 7182560263f734a59a51eb2c184c9672
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4979783963582083850
+    second: enc_memory_fragment_01_art_0
+  - first:
+      213: -1379796256042751585
+    second: enc_memory_fragment_01_art_1
+  - first:
+      213: -4995601340216234666
+    second: enc_memory_fragment_01_art_2
+  - first:
+      213: 4495379556273601808
+    second: enc_memory_fragment_01_art_3
+  - first:
+      213: -7979012237384400471
+    second: enc_memory_fragment_01_art_4
+  - first:
+      213: -7997483430038286030
+    second: enc_memory_fragment_01_art_5
+  - first:
+      213: -7629206897830200586
+    second: enc_memory_fragment_01_art_6
+  - first:
+      213: 372594982436098671
+    second: enc_memory_fragment_01_art_7
+  - first:
+      213: 2078987667816293653
+    second: enc_memory_fragment_01_art_8
+  - first:
+      213: -6938549923065757940
+    second: enc_memory_fragment_01_art_9
+  - first:
+      213: -159605152205644315
+    second: enc_memory_fragment_01_art_10
+  - first:
+      213: 3237994046072412508
+    second: enc_memory_fragment_01_art_11
+  - first:
+      213: -8331309369299968877
+    second: enc_memory_fragment_01_art_12
+  - first:
+      213: -280328455802864990
+    second: enc_memory_fragment_01_art_13
+  - first:
+      213: -1702426488684580685
+    second: enc_memory_fragment_01_art_14
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_0
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 855
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fcc0808ed044eab0800000000000000
+      internalID: -4979783963582083850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_1
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 76
+        width: 560
+        height: 893
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9968289d9af9dce0800000000000000
+      internalID: -1379796256042751585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_2
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 799
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65d22f48c0f0caab0800000000000000
+      internalID: -4995601340216234666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_3
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 759
+        width: 40
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01dbd3e83ebc26e30800000000000000
+      internalID: 4495379556273601808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_4
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 710
+        width: 10
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a1453c05aad44190800000000000000
+      internalID: -7979012237384400471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_5
+      rect:
+        serializedVersion: 2
+        x: 247
+        y: 705
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 231de7f513b330190800000000000000
+      internalID: -7997483430038286030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_6
+      rect:
+        serializedVersion: 2
+        x: 799
+        y: 668
+        width: 45
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fafed86fbc9f1690800000000000000
+      internalID: -7629206897830200586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_7
+      rect:
+        serializedVersion: 2
+        x: 175
+        y: 579
+        width: 51
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6252359929bb2500800000000000000
+      internalID: 372594982436098671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_8
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 647
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 515ab98d44c0adc10800000000000000
+      internalID: 2078987667816293653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_9
+      rect:
+        serializedVersion: 2
+        x: 746
+        y: 460
+        width: 80
+        height: 198
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0ff9536b9155bf90800000000000000
+      internalID: -6938549923065757940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_10
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 543
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5edd57ea5f7f8cdf0800000000000000
+      internalID: -159605152205644315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_11
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 496
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c59d9f4ed6aafec20800000000000000
+      internalID: 3237994046072412508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_12
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 450
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39cddf0154e316c80800000000000000
+      internalID: -8331309369299968877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_13
+      rect:
+        serializedVersion: 2
+        x: 820
+        y: 467
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2aabf6331c21c1cf0800000000000000
+      internalID: -280328455802864990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enc_memory_fragment_01_art_14
+      rect:
+        serializedVersion: 2
+        x: 786
+        y: 365
+        width: 53
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b07dbdd024cf58e0800000000000000
+      internalID: -1702426488684580685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      enc_memory_fragment_01_art_0: -4979783963582083850
+      enc_memory_fragment_01_art_1: -1379796256042751585
+      enc_memory_fragment_01_art_10: -159605152205644315
+      enc_memory_fragment_01_art_11: 3237994046072412508
+      enc_memory_fragment_01_art_12: -8331309369299968877
+      enc_memory_fragment_01_art_13: -280328455802864990
+      enc_memory_fragment_01_art_14: -1702426488684580685
+      enc_memory_fragment_01_art_2: -4995601340216234666
+      enc_memory_fragment_01_art_3: 4495379556273601808
+      enc_memory_fragment_01_art_4: -7979012237384400471
+      enc_memory_fragment_01_art_5: -7997483430038286030
+      enc_memory_fragment_01_art_6: -7629206897830200586
+      enc_memory_fragment_01_art_7: 372594982436098671
+      enc_memory_fragment_01_art_8: 2078987667816293653
+      enc_memory_fragment_01_art_9: -6938549923065757940
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

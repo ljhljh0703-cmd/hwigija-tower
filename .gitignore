@@ -1,0 +1,78 @@
+# Unity generated folders
+**/[Ll]ibrary/
+**/[Tt]emp/
+**/[Oo]bj/
+**/[Bb]in/
+**/[Bb]uild/
+**/[Bb]uilds/
+**/[Ll]ogs/
+**/[Uu]ser[Ss]ettings/
+**/[Mm]emory[Cc]aptures/
+**/[Rr]ecordings/
+**/.utmp/
+
+# Unity generated files
+*.log
+sysinfo.txt
+mono_crash.*
+crashlytics-build.properties
+InitTestScene*.unity*
+**/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# IDE and editor caches
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.DotSettings.user
+ExportedObj/
+.consulo/
+
+# Unity generated meta files for ignored binaries
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+*.blend1
+*.blend1.meta
+
+# Build outputs and packages
+*.apk
+*.aab
+*.app
+*.ipa
+*.unitypackage
+*.unitypackage.meta
+
+# Platform/tool caches
+.gradle/
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Addressables generated content
+**/ServerData/
+**/[Aa]ssets/[Ss]treaming[Aa]ssets/aa*
+**/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/link.xml*
+**/[Aa]ssets/[Aa]ddressables_[Tt]emp*
+**/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Visual Scripting generated data
+**/[Aa]ssets/Unity.VisualScripting.Generated/
+
+# Generated Rider plugin
+**/[Aa]ssets/Plugins/Editor/JetBrains*

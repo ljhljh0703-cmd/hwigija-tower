@@ -1,0 +1,2810 @@
+{
+  "schemaVersion": "0.2",
+  "packStableId": "PACK_FULL_25_V003",
+  "sourceHash": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "assetBake": {
+    "mode": "updateExisting",
+    "identity": "stableIdThenAssetPath",
+    "basePath": "Assets/_Project/Data/Encounters/",
+    "assetPathPattern": "Assets/_Project/Data/Encounters/SO_Encounter_<STABLE_ID>.asset",
+    "prohibitDeleteRecreate": true
+  },
+  "packManifest": {
+    "expectedFullCounts": {
+      "NpcRest": 8,
+      "NpcMemoryFragment": 5,
+      "GeneralEncounter": 7,
+      "MoralChoice": 3,
+      "MetaText": 2
+    }
+  },
+  "encounters": [
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_01.asset",
+      "seedKey": "SEED_ENC_REST_01",
+      "sourceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "floor": 1,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S0_FIRST_MEETING",
+      "memoryFragment": null,
+      "glitchLevel": 15,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_01_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_01_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 6,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_01_REST",
+            "stage": "S0_FIRST_MEETING",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_01_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_01_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_01_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_01_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_01_CONTINUE",
+            "stage": "S0_FIRST_MEETING",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_01_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_02",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_02.asset",
+      "seedKey": "SEED_ENC_REST_02",
+      "sourceHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "floor": 1,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S1_AWARENESS",
+      "memoryFragment": null,
+      "glitchLevel": 20,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_02_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_02_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_02_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 7,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_02_REST",
+            "stage": "S1_AWARENESS",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_02_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_02_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_02_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_02_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_02_CONTINUE",
+            "stage": "S1_AWARENESS",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_02_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_03",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_03.asset",
+      "seedKey": "SEED_ENC_REST_03",
+      "sourceHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "floor": 2,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S2_COMPANION",
+      "memoryFragment": null,
+      "glitchLevel": 25,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_03_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_03_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_03_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 8,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_03_REST",
+            "stage": "S2_COMPANION",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_03_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_03_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_03_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_03_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_03_CONTINUE",
+            "stage": "S2_COMPANION",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_03_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_04",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_04.asset",
+      "seedKey": "SEED_ENC_REST_04",
+      "sourceHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "floor": 2,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S3_FRACTURE",
+      "memoryFragment": null,
+      "glitchLevel": 30,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_04_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_04_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_04_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 9,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_04_REST",
+            "stage": "S3_FRACTURE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_04_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_04_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_04_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_04_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_04_CONTINUE",
+            "stage": "S3_FRACTURE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_04_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_05",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_05.asset",
+      "seedKey": "SEED_ENC_REST_05",
+      "sourceHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "floor": 3,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S4_COLLAPSE",
+      "memoryFragment": null,
+      "glitchLevel": 35,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_05_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_05_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_05_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 10,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_05_REST",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_05_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_05_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_05_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_05_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_05_CONTINUE",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_05_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_06",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_06.asset",
+      "seedKey": "SEED_ENC_REST_06",
+      "sourceHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "floor": 3,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S5_REST_OR_CONTINUE",
+      "memoryFragment": null,
+      "glitchLevel": 40,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_06_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_06_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_06_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 11,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_06_REST",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_06_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_06_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_06_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_06_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_06_CONTINUE",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "collapse",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_06_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_07",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_07.asset",
+      "seedKey": "SEED_ENC_REST_07",
+      "sourceHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "floor": 4,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S5_REST_OR_CONTINUE",
+      "memoryFragment": null,
+      "glitchLevel": 45,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_07_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_07_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_07_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 12,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_07_REST",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_07_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_07_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_07_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_07_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_07_CONTINUE",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "collapse",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_07_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REST_08",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REST_08.asset",
+      "seedKey": "SEED_ENC_REST_08",
+      "sourceHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+      "floor": 4,
+      "encounterType": "Rest",
+      "contentCategory": "NpcRest",
+      "tags": [
+        "rest",
+        "npc",
+        "skeleton"
+      ],
+      "npcStage": "S5_REST_OR_CONTINUE",
+      "memoryFragment": null,
+      "glitchLevel": 50,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REST_08_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_08_REST",
+          "textKey": "PLACEHOLDER_CHOICE_REST_08_REST",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": 13,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 3
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_08_REST",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_08_REST"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REST_08_CONTINUE",
+          "textKey": "PLACEHOLDER_CHOICE_REST_08_CONTINUE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_REST_08_SKIPPED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REST_08_CONTINUE",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "collapse",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REST_08_CONTINUE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MEMORY_FRAGMENT_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MEMORY_FRAGMENT_01.asset",
+      "seedKey": "SEED_ENC_MEMORY_FRAGMENT_01",
+      "sourceHash": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+      "floor": 1,
+      "encounterType": "MemoryFragment",
+      "contentCategory": "NpcMemoryFragment",
+      "tags": [
+        "memory",
+        "fragment",
+        "skeleton"
+      ],
+      "npcStage": "S1_AWARENESS",
+      "memoryFragment": {
+        "stableId": "MEM_FRAGMENT_01",
+        "stage": "S1_AWARENESS",
+        "textKey": "PLACEHOLDER_MEM_FRAGMENT_01"
+      },
+      "glitchLevel": 27,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MEMORY_FRAGMENT_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_01_UNLOCK",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_01_UNLOCK",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "MemoryFragmentLocked",
+              "memoryFragmentId": "MEM_FRAGMENT_01"
+            }
+          ],
+          "effects": [
+            {
+              "kind": "UnlockMemoryFragment",
+              "memoryFragment": {
+                "stableId": "MEM_FRAGMENT_01",
+                "stage": "S1_AWARENESS",
+                "textKey": "PLACEHOLDER_MEM_FRAGMENT_01"
+              }
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 6,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 2,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MEM_FRAGMENT_01_UNLOCKED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_01_UNLOCK",
+            "stage": "S1_AWARENESS",
+            "toneHint": "fracture",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_01_UNLOCK"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_01_WITHDRAW",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_01_WITHDRAW",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -1,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_01_WITHDRAW",
+            "stage": "S1_AWARENESS",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_01_WITHDRAW"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MEMORY_FRAGMENT_02",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MEMORY_FRAGMENT_02.asset",
+      "seedKey": "SEED_ENC_MEMORY_FRAGMENT_02",
+      "sourceHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "floor": 2,
+      "encounterType": "MemoryFragment",
+      "contentCategory": "NpcMemoryFragment",
+      "tags": [
+        "memory",
+        "fragment",
+        "skeleton"
+      ],
+      "npcStage": "S2_COMPANION",
+      "memoryFragment": {
+        "stableId": "MEM_FRAGMENT_02",
+        "stage": "S2_COMPANION",
+        "textKey": "PLACEHOLDER_MEM_FRAGMENT_02"
+      },
+      "glitchLevel": 39,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MEMORY_FRAGMENT_02_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_02_UNLOCK",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_02_UNLOCK",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "MemoryFragmentLocked",
+              "memoryFragmentId": "MEM_FRAGMENT_02"
+            }
+          ],
+          "effects": [
+            {
+              "kind": "UnlockMemoryFragment",
+              "memoryFragment": {
+                "stableId": "MEM_FRAGMENT_02",
+                "stage": "S2_COMPANION",
+                "textKey": "PLACEHOLDER_MEM_FRAGMENT_02"
+              }
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 6,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 2,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MEM_FRAGMENT_02_UNLOCKED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_02_UNLOCK",
+            "stage": "S2_COMPANION",
+            "toneHint": "fracture",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_02_UNLOCK"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_02_WITHDRAW",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_02_WITHDRAW",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -1,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_02_WITHDRAW",
+            "stage": "S2_COMPANION",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_02_WITHDRAW"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MEMORY_FRAGMENT_03",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MEMORY_FRAGMENT_03.asset",
+      "seedKey": "SEED_ENC_MEMORY_FRAGMENT_03",
+      "sourceHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "floor": 3,
+      "encounterType": "MemoryFragment",
+      "contentCategory": "NpcMemoryFragment",
+      "tags": [
+        "memory",
+        "fragment",
+        "skeleton"
+      ],
+      "npcStage": "S3_FRACTURE",
+      "memoryFragment": {
+        "stableId": "MEM_FRAGMENT_03",
+        "stage": "S3_FRACTURE",
+        "textKey": "PLACEHOLDER_MEM_FRAGMENT_03"
+      },
+      "glitchLevel": 51,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MEMORY_FRAGMENT_03_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_03_UNLOCK",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_03_UNLOCK",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "MemoryFragmentLocked",
+              "memoryFragmentId": "MEM_FRAGMENT_03"
+            }
+          ],
+          "effects": [
+            {
+              "kind": "UnlockMemoryFragment",
+              "memoryFragment": {
+                "stableId": "MEM_FRAGMENT_03",
+                "stage": "S3_FRACTURE",
+                "textKey": "PLACEHOLDER_MEM_FRAGMENT_03"
+              }
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 6,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 2,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MEM_FRAGMENT_03_UNLOCKED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_03_UNLOCK",
+            "stage": "S3_FRACTURE",
+            "toneHint": "fracture",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_03_UNLOCK"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_03_WITHDRAW",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_03_WITHDRAW",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -1,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_03_WITHDRAW",
+            "stage": "S3_FRACTURE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_03_WITHDRAW"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MEMORY_FRAGMENT_04",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MEMORY_FRAGMENT_04.asset",
+      "seedKey": "SEED_ENC_MEMORY_FRAGMENT_04",
+      "sourceHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "floor": 4,
+      "encounterType": "MemoryFragment",
+      "contentCategory": "NpcMemoryFragment",
+      "tags": [
+        "memory",
+        "fragment",
+        "skeleton"
+      ],
+      "npcStage": "S4_COLLAPSE",
+      "memoryFragment": {
+        "stableId": "MEM_FRAGMENT_04",
+        "stage": "S4_COLLAPSE",
+        "textKey": "PLACEHOLDER_MEM_FRAGMENT_04"
+      },
+      "glitchLevel": 63,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MEMORY_FRAGMENT_04_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_04_UNLOCK",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_04_UNLOCK",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "MemoryFragmentLocked",
+              "memoryFragmentId": "MEM_FRAGMENT_04"
+            }
+          ],
+          "effects": [
+            {
+              "kind": "UnlockMemoryFragment",
+              "memoryFragment": {
+                "stableId": "MEM_FRAGMENT_04",
+                "stage": "S4_COLLAPSE",
+                "textKey": "PLACEHOLDER_MEM_FRAGMENT_04"
+              }
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 6,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 2,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MEM_FRAGMENT_04_UNLOCKED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_04_UNLOCK",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "collapse",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_04_UNLOCK"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_04_WITHDRAW",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_04_WITHDRAW",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -1,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_04_WITHDRAW",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_04_WITHDRAW"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MEMORY_FRAGMENT_05",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MEMORY_FRAGMENT_05.asset",
+      "seedKey": "SEED_ENC_MEMORY_FRAGMENT_05",
+      "sourceHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "floor": 5,
+      "encounterType": "MemoryFragment",
+      "contentCategory": "NpcMemoryFragment",
+      "tags": [
+        "memory",
+        "fragment",
+        "skeleton"
+      ],
+      "npcStage": "S5_REST_OR_CONTINUE",
+      "memoryFragment": {
+        "stableId": "MEM_FRAGMENT_05",
+        "stage": "S5_REST_OR_CONTINUE",
+        "textKey": "PLACEHOLDER_MEM_FRAGMENT_05"
+      },
+      "glitchLevel": 75,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MEMORY_FRAGMENT_05_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_05_UNLOCK",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_05_UNLOCK",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "MemoryFragmentLocked",
+              "memoryFragmentId": "MEM_FRAGMENT_05"
+            }
+          ],
+          "effects": [
+            {
+              "kind": "UnlockMemoryFragment",
+              "memoryFragment": {
+                "stableId": "MEM_FRAGMENT_05",
+                "stage": "S5_REST_OR_CONTINUE",
+                "textKey": "PLACEHOLDER_MEM_FRAGMENT_05"
+              }
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 6,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": -1,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetNpcStage",
+              "npcStage": "S5_REST_OR_CONTINUE"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_05_UNLOCK",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "collapse",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_05_UNLOCK"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MEMORY_05_WITHDRAW",
+          "textKey": "PLACEHOLDER_CHOICE_MEMORY_05_WITHDRAW",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -1,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MEMORY_05_WITHDRAW",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MEMORY_05_WITHDRAW"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_COMBAT_GATE_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_01.asset",
+      "seedKey": "SEED_ENC_COMBAT_GATE_01",
+      "sourceHash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "floor": 1,
+      "encounterType": "CombatGate",
+      "contentCategory": "GeneralEncounter",
+      "tags": [
+        "combat",
+        "gate",
+        "skeleton"
+      ],
+      "npcStage": "S0_FIRST_MEETING",
+      "memoryFragment": null,
+      "glitchLevel": 28,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_COMBAT_GATE_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_COMBAT_01_ENGAGE",
+          "textKey": "PLACEHOLDER_CHOICE_COMBAT_01_ENGAGE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "StartCombat",
+              "combatHandoff": {
+                "kind": "CombatHandoff",
+                "stableId": "COMBAT_GATE_01",
+                "sourceEncounterId": "ENC_COMBAT_GATE_01",
+                "sourceChoiceId": "CHOICE_COMBAT_01_ENGAGE",
+                "seedKey": "SEED_COMBAT_GATE_01",
+                "sourceHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+                "floor": 1,
+                "enemyRefs": [
+                  "ENEMY_FRACTURE_HOUND"
+                ],
+                "playerSnapshot": {
+                  "kind": "PlayerSnapshotCaptureSpec",
+                  "captureMode": "RuntimeAtChoiceCommit",
+                  "include": [
+                    "hp",
+                    "maxHp",
+                    "mental",
+                    "gold",
+                    "glitchLevel",
+                    "affinity",
+                    "abilityRefs",
+                    "itemRefs",
+                    "statusRefs",
+                    "flagsHash",
+                    "runSeed"
+                  ]
+                },
+                "npcStage": "S0_FIRST_MEETING",
+                "onVictoryEffects": [
+                  {
+                    "kind": "ModifyGold",
+                    "amount": 7
+                  },
+                  {
+                    "kind": "ModifyGlitchLevel",
+                    "amount": -2,
+                    "clamp": "0..100"
+                  },
+                  {
+                    "kind": "ModifyAffinity",
+                    "amount": 2,
+                    "clamp": "-100..100"
+                  },
+                  {
+                    "kind": "SetFlag",
+                    "flag": "FLAG_COMBAT_GATE_01_VICTORY",
+                    "value": true
+                  }
+                ],
+                "onDefeatEffects": [
+                  {
+                    "kind": "ModifyHp",
+                    "amount": -5,
+                    "clampToMax": true
+                  },
+                  {
+                    "kind": "ModifyGlitchLevel",
+                    "amount": 5,
+                    "clamp": "0..100"
+                  },
+                  {
+                    "kind": "ModifyAffinity",
+                    "amount": -2,
+                    "clamp": "-100..100"
+                  }
+                ],
+                "deathPolicy": {
+                  "mode": "Regression",
+                  "memoryRetention": "UnlockedFragmentsOnly"
+                },
+                "returnNode": {
+                  "onVictory": "NODE_COMBAT_GATE_01_VICTORY",
+                  "onDefeat": "NODE_COMBAT_GATE_01_DEFEAT"
+                },
+                "postCombatText": {
+                  "victoryTextKey": "PLACEHOLDER_POST_COMBAT_GATE_01_VICTORY",
+                  "defeatTextKey": "PLACEHOLDER_POST_COMBAT_GATE_01_DEFEAT",
+                  "deathTextKey": "PLACEHOLDER_POST_COMBAT_GATE_01_DEATH"
+                },
+                "npcImmediateReaction": {
+                  "reactionKey": "NPC_REACT_COMBAT_GATE_01_START",
+                  "stage": "S0_FIRST_MEETING",
+                  "toneHint": "warning",
+                  "textKey": "PLACEHOLDER_NPC_REACT_COMBAT_GATE_01_START"
+                },
+                "promptHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+                "cacheKey": "CACHE_COMBAT_GATE_01_S0_FIRST_MEETING"
+              }
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_COMBAT_01_ENGAGE",
+            "stage": "S0_FIRST_MEETING",
+            "toneHint": "warning",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_COMBAT_01_ENGAGE"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_COMBAT_01_PREPARE",
+          "textKey": "PLACEHOLDER_CHOICE_COMBAT_01_PREPARE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_COMBAT_01_PREPARED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_COMBAT_01_PREPARE",
+            "stage": "S0_FIRST_MEETING",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_COMBAT_01_PREPARE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_SHOP_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_01.asset",
+      "seedKey": "SEED_ENC_SHOP_01",
+      "sourceHash": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "floor": 2,
+      "encounterType": "Shop",
+      "contentCategory": "GeneralEncounter",
+      "tags": [
+        "shop",
+        "gold",
+        "skeleton"
+      ],
+      "npcStage": "S1_AWARENESS",
+      "memoryFragment": null,
+      "glitchLevel": 17,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_SHOP_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_SHOP_01_BUY_ITEM",
+          "textKey": "PLACEHOLDER_CHOICE_SHOP_01_BUY_ITEM",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "gold",
+              "value": 5
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyGold",
+              "amount": -5
+            },
+            {
+              "kind": "AddItem",
+              "itemRef": "ITEM_FIELD_BANDAGE",
+              "count": 1
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_SHOP_01_BUY_ITEM",
+            "stage": "S1_AWARENESS",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_SHOP_01_BUY_ITEM"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_SHOP_01_BUY_ABILITY",
+          "textKey": "PLACEHOLDER_CHOICE_SHOP_01_BUY_ABILITY",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "gold",
+              "value": 12
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyGold",
+              "amount": -12
+            },
+            {
+              "kind": "AddAbility",
+              "abilityRef": "ABILITY_SCOUT"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -1,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_SHOP_01_BUY_ABILITY",
+            "stage": "S1_AWARENESS",
+            "toneHint": "trust",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_SHOP_01_BUY_ABILITY"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_SHOP_01_LEAVE",
+          "textKey": "PLACEHOLDER_CHOICE_SHOP_01_LEAVE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_SHOP_01_LEAVE",
+            "stage": "S1_AWARENESS",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_SHOP_01_LEAVE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_REMNANT_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_REMNANT_01.asset",
+      "seedKey": "SEED_ENC_REMNANT_01",
+      "sourceHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "floor": 2,
+      "encounterType": "Remnant",
+      "contentCategory": "GeneralEncounter",
+      "tags": [
+        "remnant",
+        "reward",
+        "skeleton"
+      ],
+      "npcStage": "S2_COMPANION",
+      "memoryFragment": null,
+      "glitchLevel": 28,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_REMNANT_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REMNANT_01_SEARCH",
+          "textKey": "PLACEHOLDER_CHOICE_REMNANT_01_SEARCH",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "GrantRewardBundle",
+              "rewardBundleRef": "REWARD_CACHE_SMALL"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 2,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REMNANT_01_SEARCH",
+            "stage": "S2_COMPANION",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REMNANT_01_SEARCH"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_REMNANT_01_IGNORE",
+          "textKey": "PLACEHOLDER_CHOICE_REMNANT_01_IGNORE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 1
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": -1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_REMNANT_01_IGNORE",
+            "stage": "S2_COMPANION",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_REMNANT_01_IGNORE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_COMBAT_GATE_02",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_02.asset",
+      "seedKey": "SEED_ENC_COMBAT_GATE_02",
+      "sourceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "floor": 3,
+      "encounterType": "CombatGate",
+      "contentCategory": "GeneralEncounter",
+      "tags": [
+        "combat",
+        "gate",
+        "skeleton"
+      ],
+      "npcStage": "S3_FRACTURE",
+      "memoryFragment": null,
+      "glitchLevel": 36,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_COMBAT_GATE_02_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_COMBAT_02_ENGAGE",
+          "textKey": "PLACEHOLDER_CHOICE_COMBAT_02_ENGAGE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "StartCombat",
+              "combatHandoff": {
+                "kind": "CombatHandoff",
+                "stableId": "COMBAT_GATE_02",
+                "sourceEncounterId": "ENC_COMBAT_GATE_02",
+                "sourceChoiceId": "CHOICE_COMBAT_02_ENGAGE",
+                "seedKey": "SEED_COMBAT_GATE_02",
+                "sourceHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+                "floor": 3,
+                "enemyRefs": [
+                  "ENEMY_EMPTY_ARMOR"
+                ],
+                "playerSnapshot": {
+                  "kind": "PlayerSnapshotCaptureSpec",
+                  "captureMode": "RuntimeAtChoiceCommit",
+                  "include": [
+                    "hp",
+                    "maxHp",
+                    "mental",
+                    "gold",
+                    "glitchLevel",
+                    "affinity",
+                    "abilityRefs",
+                    "itemRefs",
+                    "statusRefs",
+                    "flagsHash",
+                    "runSeed"
+                  ]
+                },
+                "npcStage": "S3_FRACTURE",
+                "onVictoryEffects": [
+                  {
+                    "kind": "ModifyGold",
+                    "amount": 9
+                  },
+                  {
+                    "kind": "ModifyGlitchLevel",
+                    "amount": -2,
+                    "clamp": "0..100"
+                  },
+                  {
+                    "kind": "ModifyAffinity",
+                    "amount": 2,
+                    "clamp": "-100..100"
+                  },
+                  {
+                    "kind": "SetFlag",
+                    "flag": "FLAG_COMBAT_GATE_02_VICTORY",
+                    "value": true
+                  }
+                ],
+                "onDefeatEffects": [
+                  {
+                    "kind": "ModifyHp",
+                    "amount": -7,
+                    "clampToMax": true
+                  },
+                  {
+                    "kind": "ModifyGlitchLevel",
+                    "amount": 5,
+                    "clamp": "0..100"
+                  },
+                  {
+                    "kind": "ModifyAffinity",
+                    "amount": -2,
+                    "clamp": "-100..100"
+                  }
+                ],
+                "deathPolicy": {
+                  "mode": "Regression",
+                  "memoryRetention": "UnlockedFragmentsOnly"
+                },
+                "returnNode": {
+                  "onVictory": "NODE_COMBAT_GATE_02_VICTORY",
+                  "onDefeat": "NODE_COMBAT_GATE_02_DEFEAT"
+                },
+                "postCombatText": {
+                  "victoryTextKey": "PLACEHOLDER_POST_COMBAT_GATE_02_VICTORY",
+                  "defeatTextKey": "PLACEHOLDER_POST_COMBAT_GATE_02_DEFEAT",
+                  "deathTextKey": "PLACEHOLDER_POST_COMBAT_GATE_02_DEATH"
+                },
+                "npcImmediateReaction": {
+                  "reactionKey": "NPC_REACT_COMBAT_GATE_02_START",
+                  "stage": "S3_FRACTURE",
+                  "toneHint": "warning",
+                  "textKey": "PLACEHOLDER_NPC_REACT_COMBAT_GATE_02_START"
+                },
+                "promptHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+                "cacheKey": "CACHE_COMBAT_GATE_02_S3_FRACTURE"
+              }
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_COMBAT_02_ENGAGE",
+            "stage": "S3_FRACTURE",
+            "toneHint": "warning",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_COMBAT_02_ENGAGE"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_COMBAT_02_PREPARE",
+          "textKey": "PLACEHOLDER_CHOICE_COMBAT_02_PREPARE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_COMBAT_02_PREPARED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_COMBAT_02_PREPARE",
+            "stage": "S3_FRACTURE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_COMBAT_02_PREPARE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_STORY_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_STORY_01.asset",
+      "seedKey": "SEED_ENC_STORY_01",
+      "sourceHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "floor": 3,
+      "encounterType": "Story",
+      "contentCategory": "GeneralEncounter",
+      "tags": [
+        "story",
+        "route",
+        "skeleton"
+      ],
+      "npcStage": "S3_FRACTURE",
+      "memoryFragment": null,
+      "glitchLevel": 42,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_STORY_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_STORY_01_MARK_PATH",
+          "textKey": "PLACEHOLDER_CHOICE_STORY_01_MARK_PATH",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_STORY_01_MARKED",
+              "value": true
+            },
+            {
+              "kind": "ModifyMental",
+              "amount": 1
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_STORY_01_MARK_PATH",
+            "stage": "S3_FRACTURE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_STORY_01_MARK_PATH"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_STORY_01_RUSH",
+          "textKey": "PLACEHOLDER_CHOICE_STORY_01_RUSH",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -2
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 2,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_STORY_01_RUSH",
+            "stage": "S3_FRACTURE",
+            "toneHint": "fracture",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_STORY_01_RUSH"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_SHOP_02",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_SHOP_02.asset",
+      "seedKey": "SEED_ENC_SHOP_02",
+      "sourceHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "floor": 4,
+      "encounterType": "Shop",
+      "contentCategory": "GeneralEncounter",
+      "tags": [
+        "shop",
+        "gold",
+        "skeleton"
+      ],
+      "npcStage": "S4_COLLAPSE",
+      "memoryFragment": null,
+      "glitchLevel": 22,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_SHOP_02_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_SHOP_02_BUY_ITEM",
+          "textKey": "PLACEHOLDER_CHOICE_SHOP_02_BUY_ITEM",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "gold",
+              "value": 7
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyGold",
+              "amount": -7
+            },
+            {
+              "kind": "AddItem",
+              "itemRef": "ITEM_LANTERN_OIL",
+              "count": 1
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_SHOP_02_BUY_ITEM",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "relief",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_SHOP_02_BUY_ITEM"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_SHOP_02_BUY_ABILITY",
+          "textKey": "PLACEHOLDER_CHOICE_SHOP_02_BUY_ABILITY",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "gold",
+              "value": 14
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyGold",
+              "amount": -14
+            },
+            {
+              "kind": "AddAbility",
+              "abilityRef": "ABILITY_RECALL_ANCHOR"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -1,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_SHOP_02_BUY_ABILITY",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "trust",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_SHOP_02_BUY_ABILITY"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_SHOP_02_LEAVE",
+          "textKey": "PLACEHOLDER_CHOICE_SHOP_02_LEAVE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_SHOP_02_LEAVE",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_SHOP_02_LEAVE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_COMBAT_GATE_03",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_COMBAT_GATE_03.asset",
+      "seedKey": "SEED_ENC_COMBAT_GATE_03",
+      "sourceHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "floor": 5,
+      "encounterType": "CombatGate",
+      "contentCategory": "GeneralEncounter",
+      "tags": [
+        "combat",
+        "gate",
+        "skeleton"
+      ],
+      "npcStage": "S4_COLLAPSE",
+      "memoryFragment": null,
+      "glitchLevel": 44,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_COMBAT_GATE_03_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_COMBAT_03_ENGAGE",
+          "textKey": "PLACEHOLDER_CHOICE_COMBAT_03_ENGAGE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "StartCombat",
+              "combatHandoff": {
+                "kind": "CombatHandoff",
+                "stableId": "COMBAT_GATE_03",
+                "sourceEncounterId": "ENC_COMBAT_GATE_03",
+                "sourceChoiceId": "CHOICE_COMBAT_03_ENGAGE",
+                "seedKey": "SEED_COMBAT_GATE_03",
+                "sourceHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+                "floor": 5,
+                "enemyRefs": [
+                  "ENEMY_COLLAPSE_ECHO"
+                ],
+                "playerSnapshot": {
+                  "kind": "PlayerSnapshotCaptureSpec",
+                  "captureMode": "RuntimeAtChoiceCommit",
+                  "include": [
+                    "hp",
+                    "maxHp",
+                    "mental",
+                    "gold",
+                    "glitchLevel",
+                    "affinity",
+                    "abilityRefs",
+                    "itemRefs",
+                    "statusRefs",
+                    "flagsHash",
+                    "runSeed"
+                  ]
+                },
+                "npcStage": "S4_COLLAPSE",
+                "onVictoryEffects": [
+                  {
+                    "kind": "ModifyGold",
+                    "amount": 11
+                  },
+                  {
+                    "kind": "ModifyGlitchLevel",
+                    "amount": -2,
+                    "clamp": "0..100"
+                  },
+                  {
+                    "kind": "ModifyAffinity",
+                    "amount": 2,
+                    "clamp": "-100..100"
+                  },
+                  {
+                    "kind": "SetFlag",
+                    "flag": "FLAG_COMBAT_GATE_03_VICTORY",
+                    "value": true
+                  }
+                ],
+                "onDefeatEffects": [
+                  {
+                    "kind": "ModifyHp",
+                    "amount": -9,
+                    "clampToMax": true
+                  },
+                  {
+                    "kind": "ModifyGlitchLevel",
+                    "amount": 5,
+                    "clamp": "0..100"
+                  },
+                  {
+                    "kind": "ModifyAffinity",
+                    "amount": -2,
+                    "clamp": "-100..100"
+                  }
+                ],
+                "deathPolicy": {
+                  "mode": "Regression",
+                  "memoryRetention": "UnlockedFragmentsOnly"
+                },
+                "returnNode": {
+                  "onVictory": "NODE_COMBAT_GATE_03_VICTORY",
+                  "onDefeat": "NODE_COMBAT_GATE_03_DEFEAT"
+                },
+                "postCombatText": {
+                  "victoryTextKey": "PLACEHOLDER_POST_COMBAT_GATE_03_VICTORY",
+                  "defeatTextKey": "PLACEHOLDER_POST_COMBAT_GATE_03_DEFEAT",
+                  "deathTextKey": "PLACEHOLDER_POST_COMBAT_GATE_03_DEATH"
+                },
+                "npcImmediateReaction": {
+                  "reactionKey": "NPC_REACT_COMBAT_GATE_03_START",
+                  "stage": "S4_COLLAPSE",
+                  "toneHint": "warning",
+                  "textKey": "PLACEHOLDER_NPC_REACT_COMBAT_GATE_03_START"
+                },
+                "promptHash": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+                "cacheKey": "CACHE_COMBAT_GATE_03_S4_COLLAPSE"
+              }
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_COMBAT_03_ENGAGE",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "warning",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_COMBAT_03_ENGAGE"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_COMBAT_03_PREPARE",
+          "textKey": "PLACEHOLDER_CHOICE_COMBAT_03_PREPARE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_COMBAT_03_PREPARED",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_COMBAT_03_PREPARE",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_COMBAT_03_PREPARE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MORAL_CHOICE_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MORAL_CHOICE_01.asset",
+      "seedKey": "SEED_ENC_MORAL_CHOICE_01",
+      "sourceHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "floor": 2,
+      "encounterType": "MoralChoice",
+      "contentCategory": "MoralChoice",
+      "tags": [
+        "moral",
+        "affinity",
+        "skeleton"
+      ],
+      "npcStage": "S1_AWARENESS",
+      "memoryFragment": null,
+      "glitchLevel": 35,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 50
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MORAL_CHOICE_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_01_AID",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_01_AID",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "hp",
+              "value": 6
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": -3,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 6,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -3,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MORAL_01_AID",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_HP"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_01_AID",
+            "stage": "S1_AWARENESS",
+            "toneHint": "trust",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_01_AID"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_01_REFUSE",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_01_REFUSE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -2
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": -5,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 4,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MORAL_01_REFUSE",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_01_REFUSE",
+            "stage": "S1_AWARENESS",
+            "toneHint": "fracture",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_01_REFUSE"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_01_TRADE",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_01_TRADE",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "gold",
+              "value": 2
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyGold",
+              "amount": -2
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "AddItem",
+              "itemRef": "ITEM_TORN_CHARM",
+              "count": 1
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_GOLD"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_01_TRADE",
+            "stage": "S1_AWARENESS",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_01_TRADE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MORAL_CHOICE_02",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MORAL_CHOICE_02.asset",
+      "seedKey": "SEED_ENC_MORAL_CHOICE_02",
+      "sourceHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "floor": 3,
+      "encounterType": "MoralChoice",
+      "contentCategory": "MoralChoice",
+      "tags": [
+        "moral",
+        "affinity",
+        "skeleton"
+      ],
+      "npcStage": "S2_COMPANION",
+      "memoryFragment": null,
+      "glitchLevel": 50,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 50
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MORAL_CHOICE_02_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_02_AID",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_02_AID",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "hp",
+              "value": 7
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": -4,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 6,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -3,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MORAL_02_AID",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_HP"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_02_AID",
+            "stage": "S2_COMPANION",
+            "toneHint": "trust",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_02_AID"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_02_REFUSE",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_02_REFUSE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -2
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": -5,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 4,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MORAL_02_REFUSE",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_02_REFUSE",
+            "stage": "S2_COMPANION",
+            "toneHint": "fracture",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_02_REFUSE"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_02_TRADE",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_02_TRADE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyGold",
+              "amount": 0
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "GrantRewardBundle",
+              "rewardBundleRef": "REWARD_CACHE_MEMORY"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_02_TRADE",
+            "stage": "S2_COMPANION",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_02_TRADE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_MORAL_CHOICE_03",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_MORAL_CHOICE_03.asset",
+      "seedKey": "SEED_ENC_MORAL_CHOICE_03",
+      "sourceHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "floor": 4,
+      "encounterType": "MoralChoice",
+      "contentCategory": "MoralChoice",
+      "tags": [
+        "moral",
+        "affinity",
+        "skeleton"
+      ],
+      "npcStage": "S4_COLLAPSE",
+      "memoryFragment": null,
+      "glitchLevel": 65,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 50
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_MORAL_CHOICE_03_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_03_AID",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_03_AID",
+          "requirementMode": "All",
+          "requirements": [
+            {
+              "kind": "StatAtLeast",
+              "stat": "hp",
+              "value": 8
+            }
+          ],
+          "effects": [
+            {
+              "kind": "ModifyHp",
+              "amount": -5,
+              "clampToMax": true
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 6,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -3,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MORAL_03_AID",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "DisabledVisible",
+            "reasonTextKey": "PLACEHOLDER_REASON_NOT_ENOUGH_HP"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_03_AID",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "trust",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_03_AID"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_03_REFUSE",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_03_REFUSE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -2
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": -5,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 4,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_MORAL_03_REFUSE",
+              "value": true
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_03_REFUSE",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "collapse",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_03_REFUSE"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_MORAL_03_TRADE",
+          "textKey": "PLACEHOLDER_CHOICE_MORAL_03_TRADE",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyGold",
+              "amount": 0
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 1,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "GrantRewardBundle",
+              "rewardBundleRef": "REWARD_CACHE_MEMORY"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_MORAL_03_TRADE",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_MORAL_03_TRADE"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_META_TEXT_01",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_META_TEXT_01.asset",
+      "seedKey": "SEED_ENC_META_TEXT_01",
+      "sourceHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+      "floor": 5,
+      "encounterType": "MetaText",
+      "contentCategory": "MetaText",
+      "tags": [
+        "meta",
+        "placeholder",
+        "skeleton"
+      ],
+      "npcStage": "S5_REST_OR_CONTINUE",
+      "memoryFragment": null,
+      "glitchLevel": 70,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 45
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_META_TEXT_01_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_META_01_RECALL",
+          "textKey": "PLACEHOLDER_CHOICE_META_01_RECALL",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 2
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_META_01_RECALL",
+              "value": true
+            },
+            {
+              "kind": "SetNpcStage",
+              "npcStage": "S5_REST_OR_CONTINUE"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_META_01_RECALL",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_META_01_RECALL"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_META_01_SEAL",
+          "textKey": "PLACEHOLDER_CHOICE_META_01_SEAL",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 2,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": 1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_META_01_SEAL",
+            "stage": "S5_REST_OR_CONTINUE",
+            "toneHint": "blank",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_META_01_SEAL"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "Encounter",
+      "stableId": "ENC_META_TEXT_02",
+      "assetPath": "Assets/_Project/Data/Encounters/SO_Encounter_ENC_META_TEXT_02.asset",
+      "seedKey": "SEED_ENC_META_TEXT_02",
+      "sourceHash": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+      "floor": 5,
+      "encounterType": "MetaText",
+      "contentCategory": "MetaText",
+      "tags": [
+        "meta",
+        "placeholder",
+        "skeleton"
+      ],
+      "npcStage": "S4_COLLAPSE",
+      "memoryFragment": null,
+      "glitchLevel": 80,
+      "nodeRules": {
+        "choiceCountMin": 2,
+        "choiceCountMax": 3,
+        "timeLimitSeconds": 60
+      },
+      "bodyTextKey": "PLACEHOLDER_ENC_META_TEXT_02_BODY",
+      "writerStatus": "placeholder",
+      "choices": [
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_META_02_RECALL",
+          "textKey": "PLACEHOLDER_CHOICE_META_02_RECALL",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": 2
+            },
+            {
+              "kind": "SetFlag",
+              "flag": "FLAG_META_02_RECALL",
+              "value": true
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": -2,
+              "clamp": "0..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_META_02_RECALL",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "neutral",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_META_02_RECALL"
+          }
+        },
+        {
+          "kind": "Choice",
+          "stableId": "CHOICE_META_02_SEAL",
+          "textKey": "PLACEHOLDER_CHOICE_META_02_SEAL",
+          "requirementMode": "All",
+          "requirements": [],
+          "effects": [
+            {
+              "kind": "ModifyMental",
+              "amount": -1
+            },
+            {
+              "kind": "ModifyGlitchLevel",
+              "amount": 2,
+              "clamp": "0..100"
+            },
+            {
+              "kind": "ModifyAffinity",
+              "amount": -1,
+              "clamp": "-100..100"
+            }
+          ],
+          "unavailablePolicy": {
+            "mode": "Hidden"
+          },
+          "npcImmediateReaction": {
+            "reactionKey": "NPC_REACT_CHOICE_META_02_SEAL",
+            "stage": "S4_COLLAPSE",
+            "toneHint": "collapse",
+            "textKey": "PLACEHOLDER_NPC_REACT_CHOICE_META_02_SEAL"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F01_TREASURE
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F01_TREASURE
+  type: 6
+  floor: 1
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F01_TREASURE
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_TREASURE.asset
+  sourceHash: sha256:fae5e9862d1b288befde3c23dde0f3c66d2ffc2567ea43e90aedc4ba18c5ece0
+  contentCategory: GeneralEncounter
+  npcStage: S1_AWARENESS
+  bodyTextKey: EVT_F01_TREASURE_BODY
+  writerStatus: sheet-normalized-temp-effects
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F01_TREASURE_OPEN
+  - CHOICE_EVT_F01_TREASURE_OPEN_GOLD
+  - CHOICE_EVT_F01_TREASURE_OPEN_HP
+  choices:
+  - stableId: CHOICE_EVT_F01_TREASURE_OPEN
+    textKey: CHOICE_EVT_F01_TREASURE_OPEN_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyMental
+      amount: 2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_GENERIC_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_TREASURE_OPEN
+  - stableId: CHOICE_EVT_F01_TREASURE_OPEN_GOLD
+    textKey: CHOICE_EVT_F01_TREASURE_OPEN_GOLD_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyGold
+      amount: 20
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_TREASURE_OPEN_GOLD
+  - stableId: CHOICE_EVT_F01_TREASURE_OPEN_HP
+    textKey: CHOICE_EVT_F01_TREASURE_OPEN_HP_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyHp
+      amount: -5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_TREASURE_OPEN_HP

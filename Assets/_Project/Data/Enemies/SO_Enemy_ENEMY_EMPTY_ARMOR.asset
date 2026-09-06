@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 933b6e451a5a4ab7b6ad4d99210d7644, type: 3}
+  m_Name: SO_Enemy_ENEMY_EMPTY_ARMOR
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Combat.EnemyData
+  id: ENEMY_EMPTY_ARMOR
+  hp: 12
+  attack: 3
+  patternId: PATTERN_PLACEHOLDER
+  pattern: {fileID: 0}
+  goldReward: 0
+  xpReward: 0
+  glitchDelta: 0
+  affinityDelta: 0

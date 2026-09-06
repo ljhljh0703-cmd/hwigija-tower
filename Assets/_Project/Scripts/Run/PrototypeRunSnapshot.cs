@@ -1,0 +1,262 @@
+namespace HwigiTower.Run
+{
+    public readonly struct PrototypeRunSnapshot
+    {
+        public PrototypeRunSnapshot(
+            string runId,
+            int playerHp,
+            int playerMaxHp,
+            int playerAttack,
+            int mental,
+            int gold,
+            int glitchLevel,
+            int affinity,
+            int nodesResolved,
+            int battlesWon,
+            int abilityCount,
+            bool runCompleted,
+            string demoStatus = "",
+            string nextDemoNodeId = "",
+            string nextDemoEncounterId = "",
+            int demoStepCount = 0,
+            int demoResolvedStepCount = 0,
+            int memoryFragmentCount = 0,
+            string lastMemoryFragmentId = "",
+            string lastMemoryFragmentTitleKey = "",
+            string lastMemoryFragmentBodyKey = "",
+            string lastCombatId = "",
+            string lastCombatEnemyId = "",
+            string lastCombatResultId = "",
+            string lastCombatRoundResult = "",
+            bool isInCombat = false,
+            int enemyHp = 0,
+            int enemyMaxHp = 0,
+            int enemyAttack = 0,
+            int combatRound = 0,
+            int lastCombatGoldReward = 0,
+            int lastCombatGlitchDelta = 0,
+            int lastCombatAffinityDelta = 0,
+            bool lastCombatEnemyDefeated = false,
+            int lastCombatComboDamage = 0,
+            int currentFloor = 1,
+            bool stairUnlocked = false,
+            bool runClear = false,
+            bool runFailed = false,
+            bool restartReady = false,
+            bool bossGateUnlocked = false,
+            string runStatus = "",
+            string lastNpcReactionKey = "",
+            int itemCount = 0,
+            bool endingChoicePending = false,
+            bool endingRest = false,
+            bool endingContinue = false,
+            string endingChoiceId = "",
+            PrototypeFloorMapNodeView[] floorMapNodes = null,
+            string selectedMapNodeId = "",
+            int mataiosHp = 16,
+            int mataiosMaxHp = 16,
+            int mataiosAttack = 3,
+            bool mataiosDown = false,
+            bool mataiosTargetable = true,
+            string lastMataiosCombatAction = "",
+            int lastMataiosCombatDamage = 0,
+            int lastMataiosProtectReduction = 0,
+            bool lastMataiosDownEvent = false,
+            int combatXp = 0,
+            int combatXpToNextLevel = 20,
+            int combatLevel = 1,
+            bool levelUpRewardPending = false,
+            int pendingLevelRewardChoices = 0,
+            int levelAttackBonus = 0,
+            int levelMaxHpBonus = 0,
+            int skillCooldownReduction = 0,
+            string lastGrowthMessage = "",
+            string combatBuildSummary = "",
+            int mataiosActionPowerBonus = 0,
+            int mataiosMaxHpBonus = 0,
+            bool scoutAttackReady = false,
+            bool scoutDamageReductionReady = false,
+            int commandSlotLimit = 5,
+            string[] ownedCommandIds = null,
+            string[] equippedCommandIds = null,
+            string pendingCommandEquipId = "")
+        {
+            RunId = runId ?? string.Empty;
+            PlayerHp = playerHp;
+            PlayerMaxHp = playerMaxHp;
+            PlayerAttack = playerAttack;
+            Mental = mental;
+            Gold = gold;
+            GlitchLevel = glitchLevel;
+            Affinity = affinity;
+            NodesResolved = nodesResolved;
+            BattlesWon = battlesWon;
+            AbilityCount = abilityCount;
+            CombatXp = System.Math.Max(0, combatXp);
+            CombatXpToNextLevel = combatXpToNextLevel <= 0 ? 1 : combatXpToNextLevel;
+            CombatLevel = combatLevel < 1 ? 1 : combatLevel;
+            LevelUpRewardPending = levelUpRewardPending;
+            PendingLevelRewardChoices = System.Math.Max(0, pendingLevelRewardChoices);
+            LevelAttackBonus = System.Math.Max(0, levelAttackBonus);
+            LevelMaxHpBonus = System.Math.Max(0, levelMaxHpBonus);
+            SkillCooldownReduction = System.Math.Max(0, skillCooldownReduction);
+            LastGrowthMessage = lastGrowthMessage ?? string.Empty;
+            CombatBuildSummary = combatBuildSummary ?? string.Empty;
+            MataiosActionPowerBonus = System.Math.Max(0, mataiosActionPowerBonus);
+            MataiosMaxHpBonus = System.Math.Max(0, mataiosMaxHpBonus);
+            ScoutAttackReady = scoutAttackReady;
+            ScoutDamageReductionReady = scoutDamageReductionReady;
+            CommandSlotLimit = commandSlotLimit <= 0 ? 5 : commandSlotLimit;
+            OwnedCommandIds = ownedCommandIds ?? System.Array.Empty<string>();
+            EquippedCommandIds = equippedCommandIds ?? System.Array.Empty<string>();
+            PendingCommandEquipId = pendingCommandEquipId ?? string.Empty;
+            RunCompleted = runCompleted;
+            DemoStatus = demoStatus ?? string.Empty;
+            NextDemoNodeId = nextDemoNodeId ?? string.Empty;
+            NextDemoEncounterId = nextDemoEncounterId ?? string.Empty;
+            DemoStepCount = demoStepCount;
+            DemoResolvedStepCount = demoResolvedStepCount;
+            MemoryFragmentCount = memoryFragmentCount;
+            LastMemoryFragmentId = lastMemoryFragmentId ?? string.Empty;
+            LastMemoryFragmentTitleKey = lastMemoryFragmentTitleKey ?? string.Empty;
+            LastMemoryFragmentBodyKey = lastMemoryFragmentBodyKey ?? string.Empty;
+            LastCombatId = lastCombatId ?? string.Empty;
+            LastCombatEnemyId = lastCombatEnemyId ?? string.Empty;
+            LastCombatResultId = lastCombatResultId ?? string.Empty;
+            LastCombatRoundResult = lastCombatRoundResult ?? string.Empty;
+            IsInCombat = isInCombat;
+            EnemyHp = enemyHp;
+            EnemyMaxHp = enemyMaxHp;
+            EnemyAttack = System.Math.Max(0, enemyAttack);
+            CombatRound = combatRound;
+            LastCombatGoldReward = lastCombatGoldReward;
+            LastCombatGlitchDelta = lastCombatGlitchDelta;
+            LastCombatAffinityDelta = lastCombatAffinityDelta;
+            LastCombatEnemyDefeated = lastCombatEnemyDefeated;
+            LastCombatComboDamage = lastCombatComboDamage;
+            CurrentFloor = currentFloor < 1 ? 1 : currentFloor;
+            StairUnlocked = stairUnlocked;
+            RunClear = runClear;
+            RunFailed = runFailed;
+            RestartReady = restartReady;
+            BossGateUnlocked = bossGateUnlocked;
+            RunStatus = string.IsNullOrEmpty(runStatus) ? runClear ? "run.clear" : runFailed ? "run.failed" : "run.active" : runStatus;
+            LastNpcReactionKey = lastNpcReactionKey ?? string.Empty;
+            ItemCount = itemCount;
+            EndingChoicePending = endingChoicePending;
+            EndingRest = endingRest;
+            EndingContinue = endingContinue;
+            EndingChoiceId = endingChoiceId ?? string.Empty;
+            FloorMapNodes = floorMapNodes ?? new PrototypeFloorMapNodeView[0];
+            SelectedMapNodeId = selectedMapNodeId ?? string.Empty;
+            MataiosHp = System.Math.Max(0, mataiosHp);
+            MataiosMaxHp = mataiosMaxHp <= 0 ? 16 : mataiosMaxHp;
+            MataiosAttack = System.Math.Max(0, mataiosAttack);
+            MataiosDown = mataiosDown;
+            MataiosTargetable = mataiosTargetable;
+            LastMataiosCombatAction = lastMataiosCombatAction ?? string.Empty;
+            LastMataiosCombatDamage = System.Math.Max(0, lastMataiosCombatDamage);
+            LastMataiosProtectReduction = System.Math.Max(0, lastMataiosProtectReduction);
+            LastMataiosDownEvent = lastMataiosDownEvent;
+        }
+
+        public string RunId { get; }
+        public int PlayerHp { get; }
+        public int PlayerMaxHp { get; }
+        public int PlayerAttack { get; }
+        public int Mental { get; }
+        public int Gold { get; }
+        public int GlitchLevel { get; }
+        public int Affinity { get; }
+        public int NodesResolved { get; }
+        public int BattlesWon { get; }
+        public int AbilityCount { get; }
+        public int CombatXp { get; }
+        public int CombatXpToNextLevel { get; }
+        public int CombatLevel { get; }
+        public bool LevelUpRewardPending { get; }
+        public int PendingLevelRewardChoices { get; }
+        public int LevelAttackBonus { get; }
+        public int LevelMaxHpBonus { get; }
+        public int SkillCooldownReduction { get; }
+        public string LastGrowthMessage { get; }
+        public string CombatBuildSummary { get; }
+        public int MataiosActionPowerBonus { get; }
+        public int MataiosMaxHpBonus { get; }
+        public bool ScoutAttackReady { get; }
+        public bool ScoutDamageReductionReady { get; }
+        public int CommandSlotLimit { get; }
+        public string[] OwnedCommandIds { get; }
+        public string[] EquippedCommandIds { get; }
+        public string PendingCommandEquipId { get; }
+        public bool CommandReplacementPending => !string.IsNullOrEmpty(PendingCommandEquipId);
+        public bool RunCompleted { get; }
+        public string DemoStatus { get; }
+        public string NextDemoNodeId { get; }
+        public string NextDemoEncounterId { get; }
+        public int DemoStepCount { get; }
+        public int DemoResolvedStepCount { get; }
+        public int MemoryFragmentCount { get; }
+        public string LastMemoryFragmentId { get; }
+        public string LastMemoryFragmentTitleKey { get; }
+        public string LastMemoryFragmentBodyKey { get; }
+        public string LastCombatId { get; }
+        public string LastCombatEnemyId { get; }
+        public string LastCombatResultId { get; }
+        public string LastCombatRoundResult { get; }
+        public bool IsInCombat { get; }
+        public int EnemyHp { get; }
+        public int EnemyMaxHp { get; }
+        public int EnemyAttack { get; }
+        public int CombatRound { get; }
+        public int LastCombatGoldReward { get; }
+        public int LastCombatGlitchDelta { get; }
+        public int LastCombatAffinityDelta { get; }
+        public bool LastCombatEnemyDefeated { get; }
+        public int LastCombatComboDamage { get; }
+        public int CurrentFloor { get; }
+        public bool StairUnlocked { get; }
+        public bool RunClear { get; }
+        public bool RunFailed { get; }
+        public bool RestartReady { get; }
+        public bool BossGateUnlocked { get; }
+        public string RunStatus { get; }
+        public string LastNpcReactionKey { get; }
+        public int ItemCount { get; }
+        public bool EndingChoicePending { get; }
+        public bool EndingRest { get; }
+        public bool EndingContinue { get; }
+        public string EndingChoiceId { get; }
+        public PrototypeFloorMapNodeView[] FloorMapNodes { get; }
+        public string SelectedMapNodeId { get; }
+        public int MataiosHp { get; }
+        public int MataiosMaxHp { get; }
+        public int MataiosAttack { get; }
+        public bool MataiosDown { get; }
+        public bool MataiosTargetable { get; }
+        public string LastMataiosCombatAction { get; }
+        public int LastMataiosCombatDamage { get; }
+        public int LastMataiosProtectReduction { get; }
+        public bool LastMataiosDownEvent { get; }
+        public bool HasFloorMap => FloorMapNodes.Length > 0;
+        public bool HasSelectedMapNode => !string.IsNullOrEmpty(SelectedMapNodeId);
+
+        public bool IsCommandEquipped(string commandId)
+        {
+            if (string.IsNullOrEmpty(commandId) || EquippedCommandIds == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < EquippedCommandIds.Length; i++)
+            {
+                if (EquippedCommandIds[i] == commandId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+}

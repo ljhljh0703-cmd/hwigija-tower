@@ -1,0 +1,6 @@
+policy,source,cumulative_reward,episode_length,win_proxy,attack_share,defend_share,skill_share,policy_failure_mode
+PPO10k,TensorBoard final scalar,1.605229,2.055046,1.000000,0.266310,0.013761,0.719929,Skill-heavy learned policy; Defend collapsed.
+RandomPolicy,baseline evaluator,1.325538,4.429000,0.933000,0.335064,0.334161,0.330774,"Random baseline is noisy and not action-efficient."
+AttackSpamPolicy,baseline evaluator,1.581029,3.149000,1.000000,1.000000,0.000000,0.000000,"Attack spam is already strong, so PPO must beat speed/reward rather than just win rate."
+SkillSpamPolicy,baseline evaluator,1.609308,3.000000,1.000000,0.000000,0.000000,1.000000,"Skill spam solves the current short duel quickly, exposing weak Skill cost/context."
+DefendHeavyPolicy,baseline evaluator,-1.139359,7.870000,0.003000,0.237230,0.762389,0.000381,"Defend extends survival but lacks payoff under current reward/enemy pressure."

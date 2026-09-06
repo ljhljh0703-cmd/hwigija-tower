@@ -1,0 +1,29 @@
+{
+  "screen": "combat",
+  "capturedAt": "2026-09-02T03:27:26.4148820Z runtime RectTransform capture",
+  "source": "runtime",
+  "slots": {
+    "floorChip": {"x": 0.04, "y": 0.03, "w": 0.18, "h": 0.044, "fontSize": 26, "visible": true},
+    "sanityChip": {"x": 0.24, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "hpChip": {"x": 0.5, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "goldChip": {"x": 0.76, "y": 0.03, "w": 0.2, "h": 0.044, "fontSize": 26, "visible": true},
+    "threatReadout": {"x": 0.06, "y": 0.108, "w": 0.88, "h": 0.062, "fontSize": 42, "visible": true},
+    "enemyPanel": {"x": 0.063, "y": 0.186, "w": 0.874, "h": 0.368, "fontSize": 26, "visible": true},
+    "enemyTitle": {"x": 0.1, "y": 0.196, "w": 0.8, "h": 0.038, "fontSize": 34, "visible": true},
+    "enemyHpBar": {"x": 0.148, "y": 0.238, "w": 0.704, "h": 0.022, "visible": true},
+    "enemyStatusChips": {"x": 0.22, "y": 0.266, "w": 0.56, "h": 0.028, "fontSize": 26, "visible": true},
+    "enemyImage": {"x": 0.2, "y": 0.3, "w": 0.6, "h": 0.246, "visible": true},
+    "damageEffectOverlay": {"x": 0.4, "y": 0.32, "w": 0.2, "h": 0.1, "fontSize": 0, "visible": false},
+    "playerCard": {"x": 0.055, "y": 0.572, "w": 0.42, "h": 0.152, "fontSize": 34, "visible": true},
+    "playerHpBar": {"x": 0.075, "y": 0.678, "w": 0.38, "h": 0.016, "visible": true},
+    "playerSanityBar": {"x": 0.075, "y": 0.7, "w": 0.38, "h": 0.016, "visible": true},
+    "mataiosCard": {"x": 0.525, "y": 0.572, "w": 0.42, "h": 0.152, "fontSize": 22, "visible": true},
+    "mataiosHpBar": {"x": 0.545, "y": 0.678, "w": 0.38, "h": 0.016, "visible": true},
+    "mataiosStateLabel": {"x": 0.545, "y": 0.7, "w": 0.38, "h": 0.016, "fontSize": 26, "visible": true},
+    "attackButton": {"x": 0.06, "y": 0.76, "w": 0.27, "h": 0.11, "fontSize": 19, "visible": true},
+    "defendButton": {"x": 0.365, "y": 0.76, "w": 0.27, "h": 0.11, "fontSize": 19, "visible": true},
+    "skillButton": {"x": 0.67, "y": 0.76, "w": 0.27, "h": 0.11, "fontSize": 19, "visible": true},
+    "combatLog": {"x": 0.06, "y": 0.888, "w": 0.7, "h": 0.056, "fontSize": 22, "visible": true},
+    "itemInspectButton": {"x": 0.79, "y": 0.888, "w": 0.15, "h": 0.056, "fontSize": 22, "visible": true}
+  }
+}

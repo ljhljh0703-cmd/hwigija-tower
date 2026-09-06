@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6458b62def0be452b9583eb5e23472c0, type: 3}
+  m_Name: SO_Node_Battle
+  m_EditorClassIdentifier: 
+  nodeId: node.battle
+  kind: 0
+  displayName: "\uC804\uD22C"
+  placeholderOutcome: "\uC804\uD22C"
+  possibleEncounters:
+  - {fileID: 11400000, guid: faac232f0094947389f2d9bbdb7ac410, type: 2}
+  - {fileID: 11400000, guid: 9edfff75c49d24a02b10dd8d89cf13c1, type: 2}
+  - {fileID: 11400000, guid: 2a1b367059730497598a3ea2ad1bbe9d, type: 2}
+  - {fileID: 11400000, guid: 2e82e5cbaad2c4b308d5bbbab4f720d8, type: 2}
+  - {fileID: 11400000, guid: 460f2c6a0de9a444faec4a6ac96f6352, type: 2}
+  - {fileID: 11400000, guid: dcfafe08fc51e49859c36db0d30d09f9, type: 2}
+  - {fileID: 11400000, guid: bc0f259bcc20c4ac995d328692760a2f, type: 2}
+  - {fileID: 11400000, guid: cfe261a462d75491ca8c59ebc23d9f43, type: 2}
+  - {fileID: 11400000, guid: 5e0df8d3a5b244dd9bac749bf01edb70, type: 2}
+  - {fileID: 11400000, guid: 7d8ebee6653194f11b0366fad3ed6f8b, type: 2}
+  - {fileID: 11400000, guid: 56ae216cbc01741cd8aa80115bffa898, type: 2}
+  - {fileID: 11400000, guid: 71c53d42698d448bcbf8560e50c2d227, type: 2}
+  - {fileID: 11400000, guid: 2e5a28f9efe6244f2896fb85e598d34a, type: 2}
+  - {fileID: 11400000, guid: ac27dc81c195142aeb5d5445503dd2b1, type: 2}
+  - {fileID: 11400000, guid: 1dd5bf2936d9f4c809f3383dbe0d8ea1, type: 2}
+  - {fileID: 11400000, guid: 2a4f0b651e0b04fe594919a500d8fe79, type: 2}
+  - {fileID: 11400000, guid: 413d9d65bf3264894aaf88b664cd5183, type: 2}
+  - {fileID: 11400000, guid: 450c69e9dd9a248f1991d3a4cc85b7ec, type: 2}
+  - {fileID: 11400000, guid: 2da99f6a24db94715bdfa903b62e3f9e, type: 2}
+  - {fileID: 11400000, guid: 975a77ebe97de42d1b5c196afedf689e, type: 2}
+  - {fileID: 11400000, guid: a53efa50efdf7414a969440151f3409c, type: 2}
+  - {fileID: 11400000, guid: 54d48349040fc420abee44305a029c3d, type: 2}
+  - {fileID: 11400000, guid: 325ae76dd4623417286cf54d8baa47f0, type: 2}
+  - {fileID: 11400000, guid: fb2a3779afec64d5e835ddb39e46c52f, type: 2}
+  - {fileID: 11400000, guid: cd3ab81d630164440bc6db8153e694a6, type: 2}
+  - {fileID: 11400000, guid: ecdd4eac1864a4aa5afa8b657062dfb4, type: 2}
+  - {fileID: 11400000, guid: e5dfdc49569854fb7af7703292f176fd, type: 2}
+  - {fileID: 11400000, guid: 3bd1e84b6ca3541e5a372d2f2e87d45e, type: 2}
+  fallbackEnemy: {fileID: 11400000, guid: a3c69785c051b4d87b4b7c519505c51d, type: 2}
+  grantedAbility: {fileID: 0}
+  trackedSynergies:
+  - {fileID: 11400000, guid: 21d4e2ad9a2c49c086d7a56294bdb4f1, type: 2}

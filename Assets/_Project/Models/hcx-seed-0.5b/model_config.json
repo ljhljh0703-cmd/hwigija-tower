@@ -1,0 +1,70 @@
+{
+  "modelId": "hcx-seed-0.5b",
+  "baseModel": "naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-0.5B",
+  "trainingMethod": "BIW + SFT + LoRA (pending)",
+  "version": "0.1.0",
+  "status": "eval_pending",
+
+  "runtime": "llama-cpp",
+  "runtimeFallback": "mlc-llm",
+  "platform": "android-arm64-vulkan",
+
+  "compiledPath": "LLM/hcx-seed-0.5b/compiled/android",
+  "tokenizerPath": "LLM/hcx-seed-0.5b/tokenizer",
+
+  "contextWindow": 512,
+  "maxInputTokens": 450,
+  "maxOutputTokens": 100,
+
+  "temperature": 0.4,
+  "temperatureByStage": {
+    "S0": 0.3,
+    "S1": 0.3,
+    "S2": 0.4,
+    "S3": 0.7,
+    "S4": 0.9,
+    "S5": 0.2
+  },
+  "topP": 0.9,
+  "repetitionPenalty": 1.1,
+  "stopTokens": ["\n\n", "</s>", "[END]"],
+
+  "deterministicCacheRequired": true,
+  "cacheKeyFormat": "run_id + prompt_hash",
+  "deterministicDemoRuns": [1, 2, 3, 4, 5],
+
+  "quantization": {
+    "target": "Q4_K_M",
+    "format": "gguf",
+    "fallbackFormat": "q4f16_1_mlc"
+  },
+
+  "license": "naver-hyperclova-seed-community",
+  "checksum": null,
+
+  "constraints": {
+    "callsPerRun": 3,
+    "latencyFirstTokenMs": 200,
+    "latencyFullOutputMs": 1500,
+    "modelFileSizeMb": 400,
+    "runtimeMemoryMb": 500
+  },
+
+  "honorificByStage": {
+    "S0": "당신",
+    "S1": "당신",
+    "S2": "오빠",
+    "S3": "오빠/당신 혼재",
+    "S4": "호칭 상실",
+    "S5_rest": "오빠",
+    "S5_loop": "당신"
+  },
+
+  "systemPrompt": "너는 마타이오스. 잃어버린 것을 찾아 탑에 들어온 소녀 전사.\n은발, 대검, 피로한 눈. 말은 짧고 여백이 많다.\n기억이 선명할 때는 따뜻하게, 흐려질 때는 단편적으로 말한다.\n모르는 것은 모른다고 한다. 지어내지 않는다.",
+
+  "knownFailureCases": [
+    "hyperclovax 아키텍처 MLC-LLM 네이티브 미지원 가능성 — llama.cpp 우선 경로로 우회",
+    "S3-S4 temperature 0.7-0.9에서 한국어 문법 파탄 가능성 — LoRA 후 재검증 필요",
+    "0.5B 모델 instruction following 약할 수 있음 — system prompt 무시 시 few-shot 전환"
+  ]
+}

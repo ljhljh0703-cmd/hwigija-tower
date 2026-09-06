@@ -1,0 +1,320 @@
+---
+created: 2026-04-28
+updated: 2026-04-28
+type: project
+tags: [design-journal, hwiglija-tower, flick]
+project: 회귀자는 탑을 오른다
+---
+
+# hwigi-tower — Design Journal
+
+> 본 파일은 **기획 사고 과정**의 archive.
+> [[hwiglija-tower-gdd]] = 결정 (*무엇을*), 본 파일 = 사고 (*왜·다른 옵션은·무엇이 기각되었는가*).
+> [[hwiglija-tower-progress.md|progress]] = 실행 (*무엇을 했는가*) 와 명확히 분리.
+
+## 본 파일을 쓰는 시점
+
+- 새 결정 카드 (D-NNN) 잠금 직전 — 대안 옵션·기각 사유 기록
+- OQ 를 close 할 때 — 다른 답이 가능했던 이유와 선택 사유
+- Pillar 와 충돌하는 매력적 아이디어가 떠올랐을 때 — 기각하되 archive (나중에 다시 검토 가능)
+- 작가 + Claude 대화에서 *판단의 무게가 있는* 순간
+
+## 본 파일을 쓰지 않는 시점
+
+- 단순 코드 작업 (→ progress.md)
+- 결정이 이미 SSOT 에 있는 사실 인용 (→ GDD §2 참조로 충분)
+- 톤·문체 샘플 (→ tone-bible.md)
+
+---
+
+## 항목 포맷
+
+```markdown
+### YYYY-MM-DD — <한 줄 제목>
+
+**맥락**: 왜 이 사고가 필요했나
+**옵션들**:
+- A) <설명> → 채택 / 기각 (사유)
+- B) <설명> → 채택 / 기각 (사유)
+- C) <설명> → 채택 / 기각 (사유)
+**선택**: <어떤 것을 골랐는가>
+**Pillar 점검**: P1-P5 중 어느 것에 정렬·위배되는가
+**Ambiguity 점수** ([[ouroboros]] 차용): 0.0-1.0 정성 평가. 0.2 이하면 잠금 가능, 초과 시 추가 디벨롭 필요
+**기각된 매력**: 매력적이었지만 버린 옵션의 어떤 부분이 아쉬웠는가
+**재검토 조건**: 나중에 이 결정을 다시 열 만한 트리거 (있으면)
+**연결**: D-NNN / OQ-NNN
+```
+
+---
+
+## 사고 로그 (최신이 위)
+
+### 2026-05-27 — 피드백 규칙은 UI polish가 아니라 거짓말 없는 선택 계약이다
+
+**맥락**: 2026-05-27 피드백은 화면 배치 문제가 아니라, 런 시작/지도/전투 preview/audio가 플레이어에게 어떤 결정을 요구하는지 불명확하다는 문제를 드러냈다. 개발 세션이 이를 단순 UI polish로 처리하면 route commitment와 combat preview source가 다시 drift할 위험이 있다.
+
+**옵션들**:
+- A) 피드백을 모두 UI/QA polish로 분류 → 기각. Attack/Defend/Skill preview와 map route reveal은 실제 시스템 규칙이 없으면 UI가 숫자와 상태를 추측하게 된다.
+- B) D-034 route/reveal을 잠그고, combat preview/enemy stat/audio feedback은 D-036으로 별도 잠금 → 채택. 지도 구조와 전투 피드백의 책임을 분리하면서 개발 가능한 계약을 만든다.
+- C) D-033 enemy intent/OQ-025까지 같이 닫아 combat preview를 완전하게 만듦 → 기각. Enemy별 deck/payload 숫자는 아직 open이며, 지금 닫으면 scope를 넘고 임의 수치를 만들게 된다.
+- D) pre-run screen에 기억/장비/스토리 내용을 임시로 채움 → 기각. 슬롯은 예약하되 최종 스토리/대사와 새 meta rule은 작가/PM 결정 없이 넣지 않는다.
+
+**선택**: B. D-034는 pre-run placeholder, sparse lane, face-up future node, disabled/active reveal, irreversible node commitment까지 잠근다. D-036은 resolver-owned combat preview, enemy stat surface, read-only combat item inspect, map/boss BGM state, low HP P1 feedback을 잠근다. OQ-019와 OQ-025는 open 유지한다.
+
+**Pillar 점검**: P1은 위험/회복 압박을 더 읽히게 하되 회복을 강화하지 않는다. P2는 AI/RL/서사 생성 없이 시스템 판독성만 고친다. P3는 sparse route와 compact preview로 모바일 선택 밀도를 제한한다. P4는 resolver preview와 seeded route로 결정성을 보장한다. P5는 숫자/노드/BGM/low HP feedback이 즉시 체감되도록 한다.
+
+**Ambiguity 점수**: 0.17. Route/reveal/preview source/audio state는 잠금 가능하다. Enemy intent payload와 `ITEM_07` 패턴 대응은 각각 OQ-025/OQ-019가 필요하다.
+
+**기각된 매력**: A는 빠르고 C는 전투 정보가 더 완전해 보인다. 하지만 A는 근본 규칙을 남기고, C는 아직 잠기지 않은 enemy payload를 임의 확정하게 만든다.
+
+**재검토 조건**: D-034/D-036 구현 후에도 preview mismatch, boss BGM leakage, map route 선택률/이탈률, low HP 피드백 과잉/부족이 반복될 때.
+
+**연결**: D-034 / D-036 / OQ-019 open / OQ-025 open / OQ-026 close
+
+---
+
+### 2026-05-26 — ContextPolicy는 runtime ML이 아니라 Mataios deterministic brain으로 흡수한다
+
+**맥락**: ML-Agents Exp04-06은 PPO를 본편에 붙일 근거를 만들기보다, 명시적 ContextPolicy가 spam policy와 PPO보다 안정적인 전투 판단 후보임을 보여줬다. Game/System Track에서는 이 결과를 본편 C# runtime 변경 전에 GDD/system design으로 잠가야 한다.
+
+**옵션들**:
+- A) Exp06 ONNX/PPO를 본편 runtime에 연결 → 기각. Exp06은 Skill share와 ContextPolicyGap에서 실패했고, D-032/D-033의 runtime RL 금지선과 P4 결정성을 흔든다.
+- B) OQ-024 단순 table을 그대로 유지 → 기각. baseline으로는 충분하지만 Exp04-06이 보여준 high threat/tempo/skill context 학습을 버린다.
+- C) ContextPolicy를 명시 rule table로 변환해 Mataios combat brain으로 잠금 → 채택. AI Track의 유효한 부분만 사람 읽을 수 있는 deterministic policy로 흡수한다.
+- D) enemy intent 구현까지 기다린 뒤 policy를 다시 설계 → 부분 기각. Enemy threat가 없으면 fallback을 쓰되, brain contract는 지금 잠가 개발 순서를 명확히 해야 한다.
+
+**선택**: C. D-035로 `MataiosCombatContext → MataiosCombatBrain → MataiosActionPlan` 구조를 잠그고, OQ-024는 fallback/payload 기준으로 유지한다. 첫 구현은 새 수치를 추가하지 않고 OQ-024 payload를 재사용한다. Enemy threat는 D-033 intent 또는 deterministic preview에서 오며, training-only `stepIndex % 3` cadence는 production에 넣지 않는다.
+
+**Pillar 점검**: P1은 붕괴도를 policy input으로 금지해 정렬. P2는 AI evidence를 기술 과시가 아니라 캐릭터 행동 규칙 개선으로 사용해 정렬. P3는 ordered table로 입력 밀도를 제한해 정렬. P4는 no RNG/no model inference로 정렬. P5는 Protect/tempo/Skill setup/finisher를 round log에 즉시 드러내야 정렬.
+
+**Ambiguity 점수**: 0.16. Architecture와 first implementation payload 재사용은 잠금 가능하다. 새 tempo/Skill-support 수치를 만들려면 별도 Balance OQ가 필요하지만 first runtime blocker는 아니다.
+
+**기각된 매력**: A는 포트폴리오상 "AI가 플레이한다"는 그림이 강하지만, 현재 지표와 본편 결정성 기준에 맞지 않는다. D는 더 깔끔하지만 개발 세션이 policy 경계를 알 수 없어 지연된다.
+
+**재검토 조건**: D-033 enemy intent 구현 후에도 D-035 brain이 Protect/Skill setup을 과소 또는 과다 사용하거나, Mataios가 전투를 자동 해결하는 양상이 보일 때.
+
+**연결**: D-035 / OQ-024 fallback / `design/mataios-context-policy-combat-brain-spec.md`
+
+---
+
+### 2026-05-25 — Map Flow는 dense graph가 아니라 route commitment 표면이어야 한다
+
+**맥락**: 현재 지도는 런타임 UI가 생겼지만, route generator가 5컬럼 위에 6개 path를 만들고 여러 path가 node를 공유하면서 all-to-all에 가까운 인상을 준다. 또한 노드 선택 후 결과/지도 전환이 느슨하면 선택의 무게가 약해진다.
+
+**옵션들**:
+- A) 기존 5컬럼/6 path 구조를 유지하고 UI만 정리 → 기각. 시각 밀도와 선택 무게 문제의 원인이 route graph 자체에 남는다.
+- B) 5컬럼은 유지하되 3 logical lane sparse route로 재해석 → 채택 후보. 기존 UI 좌표계를 보존하면서 로그라이크식 route choice를 만들 수 있다.
+- C) Slay the Spire처럼 대형 노드 맵으로 확대 → 기각. 모바일 세로 5-7분 런에서 지도 조작 밀도가 커지고, 현재 구현 범위를 벗어난다.
+- D) 경로 선택을 다시 팝업으로 되돌림 → 기각. 이미 visible map surface가 있으며, 사용자 피드백의 핵심은 지도 제거가 아니라 route commitment 부재다.
+
+**선택**: B를 D-034 후보로 제안한다. 5컬럼 visual grid는 유지하고, 3개 sparse lane + adjacent cross-lane branch 1-2개 이하 + irreversible node commitment + delayed Rest + next-floor map visibility를 기준으로 삼는다. PM 확정 전에는 OQ-026 open으로 둔다.
+
+**Pillar 점검**: P1은 Rest를 초반에서 밀어 회복 auto-pick을 줄인다. P3는 3 branch layer + Shop + Boss로 선택 밀도를 제한한다. P4는 run_id+floor deterministic generation으로 정렬한다. P5는 노드 선택 즉시 조우 진입과 sibling skip/lock으로 결과를 즉시 보이게 한다.
+
+**Ambiguity 점수**: 0.22. Route structure와 commitment 원칙은 잠금 가능하지만, Floor 1 Rest 완전 금지 여부와 Rest exact frequency는 PM 확인이 필요하다.
+
+**기각된 매력**: C는 지도 자체가 더 풍부해 보이고, D는 구현 비용이 낮다. 하지만 C는 scope를 키우고, D는 현재 visible route surface를 포기한다.
+
+**재검토 조건**: sparse lane 적용 후에도 route 선택률/Rest 선택률/층 전환 QA에서 선택 무게가 개선되지 않을 때.
+
+**연결**: D-034 candidate / OQ-026 / `design/map-flow-route-commitment-spec.md`
+
+---
+
+### 2026-05-24 — Combat Core Rebuild는 D-032 위의 상위 전투 결정
+
+**맥락**: D-032로 마타이오스 actor baseline은 잠겼지만, 현재 전투의 더 큰 문제는 Attack spam damage race다. 마타이오스를 추가해도 enemy intent와 counterplay가 없으면 Defend/Skill 선택 이유와 긴장감은 회복되지 않는다.
+
+**옵션들**:
+- A) D-032를 계속 확장해 enemy intent, feedback, balance까지 모두 넣음 → 기각. D-032의 책임이 actor baseline에서 전투 코어 전체로 비대해진다.
+- B) D-033으로 Combat Core Rebuild를 별도 잠금 → 채택. D-032는 2인 actor 기준선으로 유지하고, D-033은 intent/counterplay/feedback/balance batch를 관리한다.
+- C) 전투 수치만 올려 Attack spam을 막음 → 기각. damage race가 더 아프기만 해지고 Defend/Skill의 의미가 생기지 않는다.
+- D) 다중 적을 바로 넣음 → 기각. 모바일 5-7분 런과 1차 구현 범위를 동시에 흔든다.
+
+**선택**: B. D-033은 visible enemy intent, action counterplay, Mataios strategic support, SFX/VFX/log feedback, AI QA metric을 상위 전투 코어로 잠근다. Enemy별 exact intent deck과 payload 수치는 OQ-025로 분리한다.
+
+**Pillar 점검**: P1은 down/collapse pressure를 전투 scaling이 아닌 런 압박으로 유지해 정렬. P3는 적 1체와 compact log로 정렬. P4는 deterministic intent pattern으로 정렬. P5는 intent와 feedback이 선택 결과를 즉시 보여주므로 정렬.
+
+**Ambiguity 점수**: 0.18. 전투 코어 방향과 배치 순서는 잠글 수 있으나 enemy별 deck 숫자는 OQ-025가 필요하다.
+
+**기각된 매력**: C는 가장 빠르고 D는 전투 다양성이 크게 늘어난다. 하지만 둘 다 현재 문제의 원인인 "읽고 대응할 정보 부족"을 직접 고치지 못하거나 범위를 과도하게 키운다.
+
+**재검토 조건**: Batch 2 이후에도 Defend/Skill 사용률이 낮거나 Attack spam win rate가 높게 유지될 때.
+
+**연결**: D-033 / OQ-025 / `design/combat-core-rebuild-spec.md`
+
+---
+
+### 2026-05-24 — 2인 파티 전투는 actor화하되 자동 최적화는 제한
+
+**맥락**: 현재 전투는 플레이어만 싸우고 마타이오스는 UI/서사에 머무는 느낌이 강하다. 다음 Stage에서 동행자 정체성을 전투 구조에 넣되, D-029 이후 붕괴도/관계 상태를 전투 수치 modifier로 되돌리면 안 된다.
+
+**옵션들**:
+- A) 마타이오스를 직접 조작 가능한 2번째 캐릭터로 추가 → 기각. 입력 밀도가 늘어 5-7분 모바일 전투가 무거워지고, 플레이어 빌드 선택 표면이 흐려진다.
+- B) 마타이오스를 deterministic automatic actor로 추가 → 채택. 파티감을 만들면서 조작 부담과 비결정성을 억제할 수 있다.
+- C) 실시간 RL/학습 policy를 본편 runtime에 넣음 → 기각. P4 결정성, 구현 리스크, 본편 범위를 모두 흔든다.
+- D) 마타이오스를 계속 UI 보조 연출로만 둠 → 기각. 프로젝트 차별점인 동행자가 전투 경험에서 사라진다.
+
+**선택**: B. `Player + Mataios vs Enemy` 2인 파티 전투를 D-032로 잠그고, 마타이오스는 자동 행동 actor가 된다. Down은 전투 패배가 아니라 붕괴 이벤트/회복 압박으로 연결한다. 숫자와 down 표시 방식, `광폭` chain scope는 OQ-021~024로 분리한다.
+
+**Pillar 점검**: P1은 down/collapse/recovery 압박으로 정렬. P3는 적 1체와 자동 동료로 입력 밀도를 제한해 정렬. P4는 deterministic policy와 fixed turn order로 정렬. P5는 마타이오스 행동/down/collapse를 즉시 로그/UI에 보여야 정렬.
+
+**Ambiguity 점수**: 0.2. 구조는 잠글 수 있으나 exact HP/action power/down penalty/policy threshold는 PM 결정이 필요하다.
+
+**기각된 매력**: A는 파티 RPG 감각이 강하고 C는 포트폴리오 기술 어필이 크다. 다만 이번 본편 전투 Stage에서는 둘 다 플레이어 선택 표면과 결정성을 해친다.
+
+**재검토 조건**: 2인 파티 1차 구현 후 마타이오스가 전투를 자동 해결하거나, 반대로 존재감이 로그에만 머무를 때.
+
+**연결**: D-032 / OQ-021 / OQ-022 / OQ-023 / OQ-024 / `design/two-actor-party-combat-lock-spec.md`
+
+**2026-05-24 PM 보정**:
+- OQ-021/OQ-024는 1차 구현값으로 닫는다. 이 값들은 최종 밸런스 잠금이 아니라 구현 unblock용 기준값이다.
+- OQ-022는 temporary implementation contract로만 partial-close한다. 붕괴도 +5, 전투당 1회, non-blocking log/overlay는 플레이 후 교체 가능해야 하며 hard-coded modal/수치가 되면 안 된다.
+- OQ-023은 defer한다. 1차 구현은 기존 `광폭/FRENZY` Player action chain을 유지하고, Mataios action은 chain 유지/강화/파괴에 관여하지 않는다.
+
+---
+
+### 2026-05-22 — OQ-020 숫자는 첫 플레이테스트 기준값
+
+**맥락**: D-031 effect contract가 닫힌 뒤 첫 Build Surface 개발 brief가 숫자 입력만 기다리고 있었다. PM이 `SWORD_03`, `광폭`, `반사`의 첫 numeric baseline을 제공했다.
+
+**옵션들**:
+- A) 숫자를 최종 밸런스 잠금으로 기록 → 기각. 현재는 playable surface를 런에 올리는 단계다.
+- B) 숫자를 OQ-020 1차 플레이테스트 기준값으로 기록 → 채택. 구현을 unblock하되 Balance Pass 재조정 여지를 남긴다.
+- C) 숫자 기록을 개발 세션에만 넘김 → 기각. SSOT와 handoff brief가 다시 어긋난다.
+
+**선택**: B. `SWORD_03` HP 3/+5, `광폭` ATK×0.5→직전 Attack 시 ×0.75, `반사` 받은 피해 50% 반사+다음 Attack 1회 ×1.5로 기준값을 넣는다.
+
+**Pillar 점검**: P3는 짧게 읽히는 수치 규칙. P4는 chain/break/1회 소비를 결정적으로 적용 가능. P5는 해당 공격 또는 다음 공격에서 즉시 체감.
+
+**Ambiguity 점수**: 0.1. 기준값은 구현 가능하고 최종 밸런스 검증은 후속 Balance Pass다.
+
+**기각된 매력**: A는 결정이 단단해 보인다. 다만 아직 build surface가 런에서 비교되지 않았다.
+
+**재검토 조건**: 첫 Build Surface 플레이테스트에서 검 연쇄 auto-pick, HP-cost dead pick, 결 반격 과보상/저보상이 드러날 때.
+
+**연결**: D-031 / OQ-020 close
+
+---
+
+### 2026-05-22 — OQ-018 계약 close와 첫 Build Surface 배치 경계
+
+**맥락**: PM이 `SWORD_03`, `광폭`, `반사`의 효과 계약을 승인했다. 첫 개발 배치가 즉시 시작될 수 있도록 계약은 닫아야 하지만, 지시에는 실제 numeric baseline 숫자가 없었다.
+
+**옵션들**:
+- A) 계약 close와 동시에 개발 세션이 숫자를 채우게 둠 → 기각. "최종 밸런스 아님"과 "임의 수치 확정 금지"를 혼동해 값이 drift할 수 있다.
+- B) 계약은 D-031로 잠그고, 숫자 입력은 플레이테스트 기준값 OQ-020으로 분리 → 채택. 개발 brief는 구현 범위와 미결정을 동시에 고정한다.
+- C) OQ-018을 계속 open으로 남김 → 기각. 효과 계약이 승인된 사실이 구현 handoff에 약하게 남는다.
+
+**선택**: B. OQ-018은 close하고 첫 배치 brief는 dead pick 차단, controlled item pool, 검 x3 surface, `ARTS_03` skill 축을 필수로 고정한다. `ITEM_07`, `반사` runtime, full quantity exposure, 밸런스 튜닝은 보류한다.
+
+**Pillar 점검**: P3는 첫 배치 선택 표면을 좁혀 정렬. P4는 계약과 수치 입력을 분리해 결정적 구현 경계가 선명. P5는 노출되는 pick이 실제 효과로 닿아야 한다는 dead-pick guard로 정렬.
+
+**Ambiguity 점수**: 0.15. 첫 배치 범위는 잠글 수 있고 남은 numeric 입력은 명시 OQ다.
+
+**기각된 매력**: A는 개발 속도가 가장 빠르다. 다만 플레이테스트 숫자가 설계 승인 없이 코드에 사실상 잠길 위험이 있다.
+
+**재검토 조건**: PM이 OQ-020 숫자를 승인하거나, 개발 세션이 구현상 숫자 입력 전에 별도 data placeholder 전략을 제시할 때.
+
+**연결**: D-031 / OQ-018 close / OQ-020 / `design/first-build-surface-development-brief.md`
+
+---
+
+### 2026-05-22 — OQ-017은 축을 잠그고 수치와 패턴 계약을 분리
+
+**맥락**: D-029로 관계 상태 전투 modifier를 걷어낸 뒤 `SWORD_03`, `광폭`, `반사`, `ITEM_07`이 빈 슬롯이 되었다. Build Surface Lock 전에 이 슬롯들을 비워 두면 구현 세션이 다시 flat stat이나 관계 전투 축으로 후퇴할 위험이 있었다.
+
+**옵션들**:
+- A) 네 슬롯의 exact 효과와 수치를 한 번에 확정 → 기각. `ITEM_07`은 적 패턴 결과 공통 계약이 없고, 나머지도 resolver 범위 확인 전 수치가 먼저 굳는다.
+- B) 빌드 축만 잠그고 수치 계약(OQ-018)과 `ITEM_07` 패턴 결과 계약(OQ-019)을 분리 → 채택. 구현 handoff가 dead pick을 피하면서도 방향 drift를 막는다.
+- C) OQ-017을 계속 open으로 두고 Build Surface Lock 뒤로 미룸 → 기각. 검/결의 역할 표면이 흐린 채 spec이 나가게 된다.
+
+**선택**: B. `SWORD_03`은 HP 리스크 강공, `광폭`은 공격 연쇄 유지, `반사`는 방어 결과의 짧은 반격 기회, `ITEM_07`은 패턴 대응 보조 축으로 잠근다. exact 수치와 `ITEM_07` 공통 패턴 계약은 별도 OQ로 남긴다.
+
+**Pillar 점검**: P1은 관계 붕괴 축과 전투 리스크 축을 분리해 정렬. P3는 검/결/패턴 대응의 선택 이유를 짧게 읽게 해 정렬. P4는 계약이 없는 효과를 수치로 먼저 잠그지 않아 정렬. P5는 노출되는 빌드가 실제 전투 결과로 닿아야 한다는 spec exit criteria로 정렬.
+
+**Ambiguity 점수**: 0.25. 축은 잠겼지만 OQ-018/OQ-019가 닫히기 전 deep logic 구현 범위는 미확정.
+
+**기각된 매력**: A는 빠르다. 다만 수치와 resolver 계약이 잘못 잠기면 Balance Pass 전에 다시 설계를 뜯는다.
+
+**재검토 조건**: 1차 playable build pool이 공격/방어/skill/synergy 축을 실제로 비교 가능하게 만든 뒤, OQ-018 효과 계약이 그 표면에서 겹치거나 dead pick을 만들 때.
+
+**연결**: D-030 / OQ-017 close / OQ-018 / OQ-019
+
+---
+
+### 2026-05-22 — 붕괴도는 관계 압박으로 남기고 전투 빌드 축에서 분리
+
+**맥락**: Playable Build Surface audit에서 능력·아이템·유물·시너지 표면 자체가 아직 런타임에 충분히 닿지 않는 상태가 드러났다. 그 와중에 기존 Glitch 전투 효과가 타이머·공격력·시너지 배율까지 물고 있어, 플레이어가 관계 상태와 전투 빌드 평가를 동시에 해석해야 하는 문제가 생겼다.
+
+**옵션들**:
+- A) 기존 Glitch 전투 압박/파워 축 유지 → 기각. 관계 붕괴가 공격력 최적화와 섞여 P3의 짧은 런 판독성을 해치고, 빌드 재미의 주 표면을 흐린다.
+- B) Glitch를 **붕괴도**로 치환해 호감도·회복·관계 붕괴 축에 남기고 전투 modifier에서는 분리 → 채택. 전투 재미는 능력·아이템·유물·시너지와 적 패턴 대응에서 만든다.
+- C) 붕괴 상태를 시스템에서 제거하고 서사 표현만 남김 → 기각. P1의 회복→붕괴→망각 악장과 플레이어가 회복할 수 있는 관계 압박을 약화한다.
+
+**선택**: B. D-022의 붕괴 연동 타이머 축소를 철회하고 D-025의 정서 modifier 원리를 재고한다. 기존 `ABILITY_SWORD_03`, `ITEM_07`, `광폭`, `반사` 심화 로직은 대체 효과를 임의 확정하지 않고 OQ-017로 넘긴다.
+
+**Pillar 점검**: P1은 붕괴도를 관계·회복 압박으로 보존해 정렬. P3는 전투 판독 축을 분리해 정렬. P4는 전투 입력 범위를 빌드·패턴 중심으로 줄여 정렬. P5는 빌드 결과와 관계 결과가 각각 즉시 보이는 표면을 요구한다.
+
+**Ambiguity 점수**: 0.2. 방향은 잠글 수 있으나 OQ-017의 대체 효과는 별도 결정 필요.
+
+**기각된 매력**: A의 “붕괴할수록 강해진다”는 역설은 P1을 수치로 강하게 보이게 한다. 다만 현재 게임에서 그것을 전투 최적화 보상으로 만들면 관계 붕괴의 의미와 빌드 비교를 동시에 왜곡한다.
+
+**재검토 조건**: 관계 상태를 전투에 다시 넣지 않고도 P1의 붕괴 체감이 휴식·인카운터·회복 표면에서 전혀 전달되지 않을 때.
+
+**연결**: D-029 / D-022 / D-025 / OQ-017
+
+---
+
+### 2026-04-28 — D-019 잃어버린 것 = 유대 + 기억 + 재망각의 종착
+
+**맥락**: 마타이오스 (μάταιος "무가치함") 이름이 이미 결정되어 있었고, NPC 가 *무엇을* 잃었는지에 따라 게임 전체의 의미가 정해지는 분기점이었다.
+
+**옵션들** (작가 머릿속에서 거친 것을 archive):
+- A) **사람 (가족·연인 등 구체 인물)** → 기각. 너무 직접적이어서 P1(망각의 양가성)이 비극으로만 환원될 위험. 또한 외주 아트가 "그 사람"을 그려야 하는 부담.
+- B) **목적·신념** → 기각. 추상적이어서 플레이어 감정 이입 약함. 회차 기억 트리거(D-011)와 의미적 연결이 약함.
+- C) **플레이어와의 유대 + 본인의 기억** → ✅ **채택**. 회차 기억 시스템(D-011)이 곧 회복의 메커니즘이 되고, 5단계 붕괴(D-012)가 곧 재상실의 메커니즘이 되어 *시스템과 서사가 동일 구조*. 이름의 무가치함이 결말에서 의미 통합.
+
+**선택**: C. 추가로 **종착 = 재망각** 을 명시 잠금 → 안식/동행 양 엔딩이 모두 망각으로 수렴, 단지 *능동/수동* 만 다름. 이로써 D-013 엔딩 분기가 단순 good/bad 가 아닌 *망각의 윤리적 양태* 가 됨.
+
+**Pillar 점검**:
+- P1 (되찾는 것은 잃기 위해서다) — 본 결정이 P1 의 원천. 강한 정렬.
+- P2 (LLM 한계 = in-game 진실) — S3-S4 의 LLM decay 가 곧 마타이오스의 재상실. 강한 정렬.
+- P3 (캐주얼 + 미드코어) — 5분 런에선 "기시감" 가벼운 터치, 누적 12+회차에서 무게 도래. 정렬.
+
+**기각된 매력**:
+- A 옵션의 매력: 외주 아트 1장으로 "그 사람" 일러스트가 메모리 파편 5개에 점진 노출되며 정체가 드러나는 *시각적 회수* 가 강력했을 것. 다만 P1 의 양가성을 깨뜨림.
+
+**재검토 조건**: 없음 (코어 narrative 잠금).
+
+**연결**: D-019 / OQ-005 close
+
+---
+
+### 2026-04-28 — Pillar P1-P5 추출
+
+**맥락**: D-001~019 잠긴 결정들이 의미적으로 통합되어 있다는 것은 GDD §2 만 봐서는 보이지 않는다. 작가·Codex·외주가 새 결정을 제안할 때 *기준*이 필요했다.
+
+**옵션들**:
+- A) Pillar 없이 매번 작가 직관으로 판단 → 기각. 솔로 + AI 협업 환경에서 직관 의존은 drift 누적.
+- B) 10+ Pillar 로 세밀하게 → 기각. Pillar 가 너무 많으면 *모든* 제안이 어느 하나에 걸려서 결국 무시됨.
+- C) 5개 Pillar + 3개 Anti-Pillar → ✅ 채택. 5개는 외울 수 있는 한계. 3개 Anti-Pillar 는 *명시적 거부 라인* 으로 작동.
+
+**선택**: C. P1-P5 는 모두 기존 잠긴 결정에서 *추출*된 것이지 새로 발명한 게 아니다 — 이로써 잠금 정당성 확보.
+
+**Pillar 자체의 검증**: P1-P5 가 서로 충돌하지 않는지 빠른 점검:
+- P1 (망각) ↔ P3 (캐주얼+미드코어): 상호 보완 — 캐주얼 호흡 위에 망각의 무게가 누적
+- P2 (LLM 한계 노출) ↔ P4 (결정성): 긴장 — S0-S2 는 결정성 우선(캐싱), S3-S4 는 한계 노출 허용. 단계로 분할되어 충돌 없음
+- P5 (즉시 반응) ↔ P4 (결정성): 양립 — 즉시 반응도 시드된 분기로 결정적 가능
+
+**Pillar 점검**: 메타 (Pillar 가 Pillar 인지 점검).
+
+**기각된 매력**: B 옵션의 세밀함은 외주 협업 시 더 강한 가드레일이 되었을 것. 다만 솔로 운영 비용이 비대.
+
+**재검토 조건**: W2 종료 시점에 5개 Pillar 가 실제 의사결정에서 *작동했는가* 회고. 작동 안 한 Pillar 는 삭제 또는 통합.
+
+**연결**: GDD §0.6 / v0.2.0 MINOR bump
+
+---
+
+<!-- 신규 항목은 이 위에 prepend -->

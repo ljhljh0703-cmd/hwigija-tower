@@ -1,0 +1,272 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F01_JAR_ROOM
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F01_JAR_ROOM
+  type: 6
+  floor: 1
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F01_JAR_ROOM
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F01_JAR_ROOM.asset
+  sourceHash: sha256:5b121cb3395a99908ef85ab52a36dbbb5551c6f462fa4e4235a19084d851ac92
+  contentCategory: GeneralEncounter
+  npcStage: S1_AWARENESS
+  bodyTextKey: EVT_F01_JAR_ROOM_BODY
+  writerStatus: sheet-normalized-temp-effects
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F01_JAR_ROOM_PATTERNED
+  - CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+  - CHOICE_EVT_F01_JAR_ROOM_PLAIN
+  - CHOICE_EVT_F01_JAR_ROOM_CRACKED
+  choices:
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_PATTERNED
+    textKey: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyGold
+      amount: 10
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_PATTERNED
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+    textKey: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: StartCombat
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId: TEMP_COMBAT_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+        sourceEncounterId: EVT_F01_JAR_ROOM
+        sourceChoiceId: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+        seedKey: SEED_TEMP_CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+        sourceHash: sha256:temporary-effect
+        floor: 1
+        enemyRefs:
+        - ENEMY_SLIME_01
+        npcStage: S1_AWARENESS
+        onVictoryEffects:
+        - kind: ModifyGold
+          amount: 6
+          flag:
+          value: 0
+          itemRef:
+          count: 0
+          abilityRef:
+          rewardBundleRef:
+          memoryFragmentId:
+          memoryFragmentTextKey:
+          npcStage:
+          targetEncounterId:
+          targetNodeId:
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT_COMBAT_VICTORY
+        defeatTextKey: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT_COMBAT_DEFEAT
+        deathTextKey: CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT_COMBAT_DEATH
+        npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT_COMBAT
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_PATTERNED_ELITE_COMBAT
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_PLAIN
+    textKey: CHOICE_EVT_F01_JAR_ROOM_PLAIN_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyHp
+      amount: 8
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyMental
+      amount: 2
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_PLAIN
+  - stableId: CHOICE_EVT_F01_JAR_ROOM_CRACKED
+    textKey: CHOICE_EVT_F01_JAR_ROOM_CRACKED_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: AddAbility
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef: ABILITY_ARTS_03
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    - kind: ModifyAffinity
+      amount: -1
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F01_JAR_ROOM_CRACKED

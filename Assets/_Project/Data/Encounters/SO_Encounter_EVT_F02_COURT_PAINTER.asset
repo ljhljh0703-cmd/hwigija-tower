@@ -1,0 +1,194 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7cffa72e1c541f7af487c21832993cd, type: 3}
+  m_Name: SO_Encounter_EVT_F02_COURT_PAINTER
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Encounters.EncounterData
+  id: EVT_F02_COURT_PAINTER
+  type: 6
+  floor: 2
+  weight: 1
+  deterministicSeedKey: SEED_EVT_F02_COURT_PAINTER
+  enemy: {fileID: 0}
+  assetPath: Assets/_Project/Data/Encounters/SO_Encounter_EVT_F02_COURT_PAINTER.asset
+  sourceHash: sha256:c2ecf84c2396a4f2c4fd2931e85285a2dd7c0f11e142d4e47b1fd9a7e2f5d478
+  contentCategory: GeneralEncounter
+  npcStage: S2_COMPANION
+  bodyTextKey: EVT_F02_COURT_PAINTER_BODY
+  writerStatus: sheet-normalized-temp-effects
+  glitchLevel: 0
+  timeLimitSeconds: 0
+  choiceStableIds:
+  - CHOICE_EVT_F02_COURT_PAINTER_PORTRAIT
+  - CHOICE_EVT_F02_COURT_PAINTER_STILL_LIFE
+  - CHOICE_EVT_F02_COURT_PAINTER_LANDSCAPE
+  - CHOICE_EVT_F02_COURT_PAINTER_ACTION_39
+  choices:
+  - stableId: CHOICE_EVT_F02_COURT_PAINTER_PORTRAIT
+    textKey: CHOICE_EVT_F02_COURT_PAINTER_PORTRAIT_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_ARTS_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_PORTRAIT
+  - stableId: CHOICE_EVT_F02_COURT_PAINTER_STILL_LIFE
+    textKey: CHOICE_EVT_F02_COURT_PAINTER_STILL_LIFE_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: ModifyHp
+      amount: 5
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_STILL_LIFE
+  - stableId: CHOICE_EVT_F02_COURT_PAINTER_LANDSCAPE
+    textKey: CHOICE_EVT_F02_COURT_PAINTER_LANDSCAPE_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: AddAbility
+      amount: 0
+      flag:
+      value: 0
+      itemRef:
+      count: 0
+      abilityRef: ABILITY_ARTS_03
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_LANDSCAPE
+  - stableId: CHOICE_EVT_F02_COURT_PAINTER_ACTION_39
+    textKey: CHOICE_EVT_F02_COURT_PAINTER_ACTION_39_TEXT
+    requirementMode: All
+    requirements: []
+    effects:
+    - kind: AddItem
+      amount: 0
+      flag:
+      value: 0
+      itemRef: RELIC_ARTS_01
+      count: 1
+      abilityRef:
+      rewardBundleRef:
+      memoryFragmentId:
+      memoryFragmentTextKey:
+      npcStage:
+      targetEncounterId:
+      targetNodeId:
+      combatHandoff:
+        stableId:
+        sourceEncounterId:
+        sourceChoiceId:
+        seedKey:
+        sourceHash:
+        floor: 0
+        enemyRefs: []
+        npcStage:
+        onVictoryEffects: []
+        onDefeatEffects: []
+        onVictoryReturnNode:
+        onDefeatReturnNode:
+        victoryTextKey:
+        defeatTextKey:
+        deathTextKey:
+        npcReactionKey:
+        promptHash:
+        cacheKey:
+    unavailablePolicyMode: DisabledVisible
+    unavailableReasonTextKey:
+    npcReactionKey: NPC_REACT_CHOICE_EVT_F02_COURT_PAINTER_ACTION_39

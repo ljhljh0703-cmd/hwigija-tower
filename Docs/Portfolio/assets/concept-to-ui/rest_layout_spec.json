@@ -1,0 +1,497 @@
+{
+  "schemaVersion": 2,
+  "screen": "rest",
+  "tokens": "ui_tokens.json",
+  "checker": "Tools/check_layout.py",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "sourceCapture": "Builds/PortfolioScreenshots/hwigi-tower-0739f53-20260702/04_rest_mataios.png",
+  "layoutIntent": "모닥불 앞의 두 사람을 화면의 주인공으로 두고, 선택 셋을 엄지 범위로 내린다. 마타이오스의 상태가 이 화면의 판단 대상이다.",
+  "changeFromCapture": [
+    "선택지 3개가 y 0.21~0.30 상단에 몰려 있던 것을 하단 action 층으로 내림",
+    "화면 아래 3분의 2가 비어 있던 것을 subject 층(모닥불 씬)으로 채움 — 아트가 이미 거기 있다",
+    "카드 위·아래 라벨 이중 표기 제거. 「대화 / 대화 · 마타이오스와 대화」 → 한 번만",
+    "상단 텍스트 한 줄을 자원 칩 4개로 분해 (전투와 동일 규격)",
+    "마타이오스 상태 카드 신설 — 이 화면이 붕괴 연출의 주 무대다"
+  ],
+  "dataBinding": {
+    "_note": "사양이 요구하는 값이 런타임에 실제로 있는가. 2026-09-01 승격된 2단 완료 판정. 출처 없는 슬롯은 구현 위탁 전에 여기서 걸린다.",
+    "floorChip": {
+      "source": "PrototypeRunSnapshot.CurrentFloor",
+      "type": "int",
+      "present": true
+    },
+    "sanityChip": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "normalize": "(Mental + 100) / 200",
+      "present": true,
+      "note": "플레이어 이성. 0~1 이 아니다 — 정규화 식을 코드에 두지 말고 이 사양에서 읽는다"
+    },
+    "hpChip": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "goldChip": {
+      "source": "PrototypeRunSnapshot.Gold",
+      "type": "int",
+      "present": true
+    },
+    "playerHpBar": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "mataiosStateLabel": {
+      "source": "PrototypeRunSnapshot.GlitchLevel",
+      "type": "int",
+      "range": [
+        0,
+        100
+      ],
+      "present": true,
+      "display": "non_numeric",
+      "note": "마타이오스 전용 「이성」 값은 코드에 없다(Sanity 전수 0건). 그의 상태 축은 붕괴도(GlitchLevel)다. D-012 5단계 붕괴 모델의 표시 축이며, 숫자·게이지·「붕괴도」 용어를 화면에 내지 않는다(R-09)"
+    },
+    "_absent": {
+      "mataiosSanity": "없음. v1.0 의 mataiosSanityBar 는 존재하지 않는 값을 요구했다 → 삭제",
+      "NpcStage(S0~S5)": "enum·NpcStateMachine 은 있으나 AttachNpcStateMachine 호출처가 테스트뿐이고 NpcStateMachineDefinition 에셋이 없다. 프로토타입 런타임에서 null — 바인딩 대상 아님"
+    }
+  },
+  "constraints": [
+    {
+      "id": "R-01",
+      "text": "누를 수 있는 요소는 y >= 0.66",
+      "check": "interactive 슬롯 전부",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.66,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "R-02",
+      "text": "선택지는 정확히 3개이고 서로 같은 무게다",
+      "check": "role=choice 슬롯 수 == 3",
+      "machineCheck": {
+        "type": "count",
+        "applyTo": {
+          "role": [
+            "choice"
+          ]
+        },
+        "eq": 3
+      }
+    },
+    {
+      "id": "R-03",
+      "text": "모닥불 씬이 화면의 30% 이상을 차지한다",
+      "check": "restScene 면적 >= 0.30",
+      "machineCheck": {
+        "type": "minArea",
+        "slot": "restScene",
+        "value": 0.3
+      },
+      "rationale": "이 게임에서 가장 좋은 아트다. 캡처에서는 아래 3분의 2가 비어 있었다"
+    },
+    {
+      "id": "R-04",
+      "text": "같은 문구가 두 슬롯에 중복되지 않는다",
+      "check": "content 중복 0건",
+      "machineCheck": {
+        "type": "noDuplicateContent"
+      },
+      "rationale": "캡처에서 카드 위와 아래에 같은 말이 두 번 적혀 있었다"
+    },
+    {
+      "id": "R-05",
+      "text": "터치 타깃 최소 96px",
+      "check": "h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "R-06",
+      "text": "이성 칩은 자원 스트립 앞쪽에 있다",
+      "check": "sanityChip.x < 0.5",
+      "machineCheck": {
+        "type": "fieldBound",
+        "slot": "sanityChip",
+        "field": "x",
+        "lt": 0.5
+      }
+    },
+    {
+      "id": "R-07",
+      "text": "층 순서는 resource → judgement → subject → party → action",
+      "check": "bands 순서",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "resource",
+          "judgement",
+          "subject",
+          "party",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "R-08",
+      "text": "마타이오스 상태 카드는 선택지보다 위에 있다",
+      "check": "mataiosState.y < choiceTalk.y",
+      "machineCheck": {
+        "type": "relative",
+        "a": "mataiosState",
+        "b": "choiceTalk",
+        "field": "y",
+        "op": "lt"
+      },
+      "rationale": "무엇을 고를지 정하기 전에 그의 상태를 본다"
+    },
+    {
+      "id": "R-09",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 나오지 않는다",
+      "check": "slots[*].content 에 「붕괴도」 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2 — Glitch/붕괴도 키를 normal UI 에 노출하지 않는다. 숫자 노출은 전투·최적화 자원처럼 읽힌다"
+    }
+  ],
+  "bands": {
+    "resource": {
+      "y": 0.0,
+      "h": 0.1
+    },
+    "judgement": {
+      "y": 0.1,
+      "h": 0.06
+    },
+    "subject": {
+      "y": 0.16,
+      "h": 0.44
+    },
+    "party": {
+      "y": 0.6,
+      "h": 0.14
+    },
+    "action": {
+      "y": 0.74,
+      "h": 0.26
+    }
+  },
+  "slots": {
+    "floorChip": {
+      "band": "resource",
+      "x": 0.04,
+      "y": 0.03,
+      "w": 0.18,
+      "h": 0.044,
+      "order": 1,
+      "layer": "hud",
+      "type": "chip",
+      "label": "층",
+      "style": "numeric"
+    },
+    "sanityChip": {
+      "band": "resource",
+      "x": 0.24,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 2,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "이성",
+      "color": "sanity"
+    },
+    "hpChip": {
+      "band": "resource",
+      "x": 0.5,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 3,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "체력",
+      "color": "hp"
+    },
+    "goldChip": {
+      "band": "resource",
+      "x": 0.76,
+      "y": 0.03,
+      "w": 0.2,
+      "h": 0.044,
+      "order": 4,
+      "layer": "hud",
+      "type": "chip",
+      "label": "골드",
+      "color": "gold_coin"
+    },
+    "screenTitle": {
+      "band": "judgement",
+      "x": 0.1,
+      "y": 0.106,
+      "w": 0.8,
+      "h": 0.048,
+      "order": 10,
+      "layer": "title",
+      "type": "text",
+      "style": "screen",
+      "content": "모닥불",
+      "notes": "구 「휴식」. 아래 선택지에 「휴식」이 이미 있어 중복이었다(R-04). 장소 이름으로 바꾼다"
+    },
+    "restScene": {
+      "band": "subject",
+      "x": 0.0,
+      "y": 0.16,
+      "w": 1.0,
+      "h": 0.44,
+      "order": 20,
+      "layer": "background",
+      "type": "image",
+      "notes": "모닥불과 두 인물. 기존 배경 아트를 그대로 쓰되 화면의 주인공 자리로 올린다"
+    },
+    "mataiosState": {
+      "band": "party",
+      "x": 0.52,
+      "y": 0.61,
+      "w": 0.44,
+      "h": 0.118,
+      "order": 30,
+      "layer": "party",
+      "type": "card",
+      "frameStyle": true,
+      "variantsRef": [
+        "strained",
+        "broken"
+      ],
+      "notes": "이 화면이 붕괴 연출의 주 무대다. 그가 실제로 화면에 앉아 있다"
+    },
+    "mataiosStateLabel": {
+      "band": "party",
+      "x": 0.54,
+      "y": 0.698,
+      "w": 0.4,
+      "h": 0.024,
+      "order": 31,
+      "layer": "party",
+      "type": "text",
+      "style": "label",
+      "notes": "붕괴 단계를 authored 문구로 보인다. 게이지·숫자·「붕괴도」 금지(R-09·D-012 P2). 문구는 런타임 authored — 사양에 content 를 박지 않는다(R-04 중복 회피)"
+    },
+    "playerState": {
+      "band": "party",
+      "x": 0.04,
+      "y": 0.61,
+      "w": 0.44,
+      "h": 0.118,
+      "order": 32,
+      "layer": "party",
+      "type": "card",
+      "frameStyle": true
+    },
+    "playerHpBar": {
+      "band": "party",
+      "x": 0.06,
+      "y": 0.7,
+      "w": 0.4,
+      "h": 0.016,
+      "order": 33,
+      "layer": "party",
+      "label": "체력",
+      "color": "hp"
+    },
+    "choiceTalk": {
+      "band": "action",
+      "x": 0.04,
+      "y": 0.756,
+      "w": 0.28,
+      "h": 0.17,
+      "order": 40,
+      "layer": "actions",
+      "type": "card",
+      "role": "choice",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "마타이오스와 대화",
+      "notes": "라벨은 한 번만. 카드 안에만 적는다"
+    },
+    "choiceTrain": {
+      "band": "action",
+      "x": 0.36,
+      "y": 0.756,
+      "w": 0.28,
+      "h": 0.17,
+      "order": 41,
+      "layer": "actions",
+      "type": "card",
+      "role": "choice",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "단련 · 다음 전투 보너스"
+    },
+    "choiceSleep": {
+      "band": "action",
+      "x": 0.68,
+      "y": 0.756,
+      "w": 0.28,
+      "h": 0.17,
+      "order": 42,
+      "layer": "actions",
+      "type": "card",
+      "role": "choice",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "휴식 · 체력 회복"
+    },
+    "departButton": {
+      "band": "action",
+      "x": 0.3,
+      "y": 0.938,
+      "w": 0.4,
+      "h": 0.052,
+      "order": 50,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "content": "다시 오른다",
+      "notes": "구 화면에 없던 명시적 진행 버튼. 선택 후 어디로 가는지가 안 보였다. 높이 0.048→0.052 정정 — 92px 로 R-05(96px) 미달, 채점기가 발송 전 검출"
+    }
+  },
+  "variants": {
+    "strained": {
+      "trigger": "붕괴도(GlitchLevel) 중간대 — 임계값 undecided",
+      "slots": {
+        "mataiosState": {
+          "art": "mataios_strained",
+          "frameColor": "sanityWarn"
+        },
+        "restScene": {
+          "art": "rest_strained"
+        }
+      },
+      "tone": "채도 -15%, 비네트 0.5",
+      "notes": "모닥불 씬의 그가 같이 바뀐다. 카드만 바뀌면 화면이 따로 논다",
+      "status": "blocked",
+      "blockedBy": [
+        "assetFallbacks.mataios_strained",
+        "assetFallbacks.rest_strained",
+        "thresholds.undecided"
+      ]
+    },
+    "broken": {
+      "trigger": "붕괴도(GlitchLevel) 상단대 — 임계값 undecided",
+      "slots": {
+        "mataiosState": {
+          "art": "mataios_broken",
+          "frameColor": "sanityBroken"
+        },
+        "restScene": {
+          "art": "rest_broken"
+        },
+        "recoveryPrompt": {
+          "band": "party",
+          "x": 0.52,
+          "y": 0.722,
+          "w": 0.44,
+          "h": 0.03,
+          "type": "text",
+          "style": "label",
+          "color": "sanityBroken"
+        }
+      },
+      "tone": "채도 -35%, 비네트 0.7",
+      "recovery": "이 화면에서는 「마타이오스와 대화」가 회복 조건이다. recoveryPrompt 에 그렇게 표시한다",
+      "reward": "대화 선택 시 붕괴도 완화. 기존 rest 경로가 이미 ModifyGlitchLevel(-3) 을 쓴다 — 새 효과가 아니다. ⚠ 전투 강화 절은 삭제됨(D-029: 붕괴도를 전투 modifier 입력으로 쓰지 않는다). 다음 전투 버프는 「단련」 선택(rest.train → MATAIOS_TRAINING_BUFF_ACTIVE)이 이미 담당하며 그쪽은 빌드 축이라 D-029 밖이다",
+      "notes": "카제나 방식. 붕괴가 막다른 길이 아니라 이 화면의 선택지 하나를 의미 있게 만든다. 의미는 관계·회복 축 안에서 닫는다",
+      "status": "blocked",
+      "blockedBy": [
+        "assetFallbacks.mataios_broken",
+        "assetFallbacks.rest_broken",
+        "thresholds.undecided"
+      ]
+    }
+  },
+  "invariantUnderVariants": [
+    "선택지 3개는 어떤 상태에서도 좌표·대비가 안 바뀐다",
+    "broken 상태에서 recoveryPrompt 는 반드시 보인다",
+    "restScene 아트 교체는 톤만 바꾸고 인물 배치를 바꾸지 않는다",
+    "붕괴도 수치와 「붕괴도」 용어를 화면에 노출하지 않는다"
+  ],
+  "assetFallbacks": {
+    "mataios_strained": {
+      "present": false,
+      "fallback": null,
+      "status": "미구현",
+      "note": "아트 입고 전까지 strained variant 비활성"
+    },
+    "mataios_broken": {
+      "present": false,
+      "fallback": null,
+      "status": "미구현",
+      "note": "동일"
+    },
+    "rest_strained": {
+      "present": false,
+      "fallback": null,
+      "status": "미구현",
+      "note": "동일. 임의 대체 금지"
+    },
+    "rest_broken": {
+      "present": false,
+      "fallback": null,
+      "status": "미구현",
+      "note": "동일"
+    }
+  },
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "sanityChip",
+      "restScene",
+      "mataiosState",
+      "choiceTalk",
+      "choiceTrain",
+      "choiceSleep"
+    ],
+    "requiredVisibleInVariant": {
+      "broken": [
+        "choiceTalk",
+        "choiceTrain",
+        "choiceSleep",
+        "recoveryPrompt"
+      ]
+    }
+  },
+  "revisions": [
+    "v1.0 2026-09-01 · 최초. departButton 높이는 자체 채점 FAIL 후 0.052 로 정정하고 발행",
+    "v1.1 2026-09-01 · 위탁 직전 검사 2건 반영. ① 마타이오스 이성 → 붕괴도(GlitchLevel) 축으로 교체, mataiosSanityBar 삭제·mataiosStateLabel(비수치) 신설, dataBinding 블록 신설 ② variants.broken.reward 에서 전투 강화 절 삭제(D-029). R-09 신설. 임계값은 작가 결정 대기 → variants blocked"
+  ],
+  "thresholds": {
+    "_note": "붕괴도 → 표시 단계 임계값. 작가 결정 대기. AI 가 임의로 정하지 않는다",
+    "strainedFrom": "undecided",
+    "brokenFrom": "undecided",
+    "precedent": "OQ-022 방식의 temporary implementation contract 로 낼 수 있다. 확정 시 코드 hard-code 금지 — 데이터로 둔다"
+  },
+  "specVersion": "1.1"
+}

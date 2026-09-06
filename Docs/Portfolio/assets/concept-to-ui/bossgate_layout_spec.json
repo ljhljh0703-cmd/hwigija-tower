@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 2,
+  "specVersion": "1.0",
+  "screen": "bossgate",
+  "tokens": "ui_tokens.json",
+  "checker": "Tools/check_layout.py",
+  "wiringChecker": "Tools/check_wiring.py",
+  "dataChecker": "Tools/check_databinding.py",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "layoutIntent": "돌아갈 수 없는 문 앞이라는 것을 알리고, 지금 상태로 들어갈지 정하게 한다. 선택지가 하나뿐이라 **판단 대상은 「들어갈까」가 아니라 「지금 들어가도 되나」**다 — 그래서 내 상태가 화면의 주인공이다.",
+  "_why_this_shape": "🔴 실측: `ENC_COMBAT_GATE_01·02·03` 전부 **선택지 1개**(`CHOICE_COMBAT_0N_ENGAGE`). 고를 게 없으니 선택지 목록을 그리는 것은 낭비다. 대신 **자기 상태 점검판**을 크게 둔다 — 체력·이성·보유품이 판단 재료다. 이 화면이 로그라이크에서 「준비됐나」를 묻는 자리다.",
+  "changeFromCapture": [
+    "선택지 목록을 없앤다 — 하나뿐이라 목록이 아니다",
+    "자기 상태 점검판을 subject 층 주인공으로 — 체력·이성·보유품",
+    "되돌아갈 수 있는 경로를 명시 — 문 앞에서 물러날 수 있어야 한다"
+  ],
+  "dataBinding": {
+    "_note": "2026-09-02. ENC_COMBAT_GATE_01~03 에셋 + 스냅ساط 대조",
+    "floorChip": {
+      "source": "PrototypeRunSnapshot.CurrentFloor",
+      "type": "int",
+      "present": true
+    },
+    "sanityChip": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "normalize": "(Mental + 100) / 200",
+      "present": true,
+      "note": "0~1 이 아니다"
+    },
+    "hpChip": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "goldChip": {
+      "source": "PrototypeRunSnapshot.Gold",
+      "type": "int",
+      "present": true
+    },
+    "readinessPanel": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp / Mental / ItemCount",
+      "present": true,
+      "note": "판단 재료 셋. 새 「준비도」 지표를 만들지 않는다 — 그건 새 게임 수치이고 D-029 영역이다"
+    },
+    "gateStatus": {
+      "source": "PrototypeRunSnapshot.BossGateUnlocked",
+      "type": "bool",
+      "present": true,
+      "note": "false 면 진입 버튼 비활성"
+    },
+    "engageButton": {
+      "source": "PrototypeRoomController.BuildEncounterChoiceViews → PrototypeEncounterChoiceView[]",
+      "fields": "ChoiceStableId · TextKey · Visible · Enabled · ReasonTextKey",
+      "present": true,
+      "count": "**1.** ENC_COMBAT_GATE_01·02·03 전부 ENGAGE 하나뿐 (실측)"
+    },
+    "_absent": {
+      "readinessScore": "준비도 점수 필드 없음. **만들지 않는다** — 새 수치 신설은 D-029 재검토 대상",
+      "bossPreview": "보스 정보 미리보기 필드 없음. 이름·체력 어느 것도 데이터에 없다",
+      "retreatChoice": "물러나기 선택지가 데이터에 없다. 지도로 돌아가는 것은 표현 층 네비게이션이다"
+    }
+  },
+  "constraints": [
+    {
+      "id": "G-01",
+      "text": "누를 수 있는 요소는 y >= 0.72",
+      "check": "interactive 슬롯 전부",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.72,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "G-02",
+      "text": "터치 타깃 최소 96px",
+      "check": "h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "G-03",
+      "text": "상태 점검판이 화면의 26% 이상",
+      "check": "readinessPanel 면적 >= 0.26",
+      "machineCheck": {
+        "type": "minArea",
+        "slot": "readinessPanel",
+        "value": 0.26
+      },
+      "rationale": "선택지가 하나뿐이라 판단 재료가 화면의 주인공이어야 한다"
+    },
+    {
+      "id": "G-04",
+      "text": "같은 문구가 두 슬롯에 중복되지 않는다",
+      "check": "content 중복 0건",
+      "machineCheck": {
+        "type": "noDuplicateContent"
+      }
+    },
+    {
+      "id": "G-05",
+      "text": "진입 버튼은 정확히 1개",
+      "check": "role=engage 슬롯 수 == 1",
+      "machineCheck": {
+        "type": "count",
+        "applyTo": {
+          "role": [
+            "engage"
+          ]
+        },
+        "eq": 1
+      },
+      "rationale": "실측 선택지 1개. 늘리면 데이터에 없는 것을 그리는 것이다"
+    },
+    {
+      "id": "G-06",
+      "text": "층 순서는 resource → judgement → subject → action",
+      "check": "bands 순서",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "resource",
+          "judgement",
+          "subject",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "G-07",
+      "text": "물러나기는 진입 버튼보다 위에 두지 않는다",
+      "check": "engageButton.y < retreatButton.y",
+      "machineCheck": {
+        "type": "relative",
+        "a": "engageButton",
+        "b": "retreatButton",
+        "field": "y",
+        "op": "lt"
+      },
+      "rationale": "주 동선이 위, 취소가 아래. 오조작 시 되돌리는 쪽이 엄지 끝에 있다"
+    },
+    {
+      "id": "G-08",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 없다",
+      "check": "slots[*].content 에 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2"
+    }
+  ],
+  "bands": {
+    "resource": {
+      "y": 0.0,
+      "h": 0.1
+    },
+    "judgement": {
+      "y": 0.1,
+      "h": 0.08
+    },
+    "subject": {
+      "y": 0.18,
+      "h": 0.54
+    },
+    "action": {
+      "y": 0.72,
+      "h": 0.28
+    }
+  },
+  "slots": {
+    "floorChip": {
+      "band": "resource",
+      "x": 0.04,
+      "y": 0.03,
+      "w": 0.18,
+      "h": 0.044,
+      "order": 1,
+      "layer": "hud",
+      "type": "chip",
+      "style": "numeric",
+      "label": "층"
+    },
+    "sanityChip": {
+      "band": "resource",
+      "x": 0.24,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 2,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "이성",
+      "color": "sanity"
+    },
+    "hpChip": {
+      "band": "resource",
+      "x": 0.5,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 3,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "체력",
+      "color": "hp"
+    },
+    "goldChip": {
+      "band": "resource",
+      "x": 0.76,
+      "y": 0.03,
+      "w": 0.2,
+      "h": 0.044,
+      "order": 4,
+      "layer": "hud",
+      "type": "chip",
+      "label": "골드",
+      "color": "gold_coin"
+    },
+    "gateTitle": {
+      "band": "judgement",
+      "x": 0.08,
+      "y": 0.108,
+      "w": 0.84,
+      "h": 0.058,
+      "order": 10,
+      "layer": "title",
+      "type": "text",
+      "style": "screen",
+      "notes": "문 앞이라는 것을 알리는 한 줄. 보스 이름은 데이터에 없다 — 쓰지 않는다"
+    },
+    "gateScene": {
+      "band": "subject",
+      "x": 0.0,
+      "y": 0.18,
+      "w": 1.0,
+      "h": 0.24,
+      "order": 20,
+      "layer": "background",
+      "type": "image",
+      "notes": "관문 배경. 보스 미리보기 아트는 없다"
+    },
+    "readinessPanel": {
+      "band": "subject",
+      "x": 0.02,
+      "y": 0.432,
+      "w": 0.96,
+      "h": 0.284,
+      "order": 21,
+      "layer": "content",
+      "type": "card",
+      "frameStyle": true,
+      "notes": "체력·이성·보유품 셋만. **새 「준비도」 지표를 만들지 않는다**(D-029). 면적 0.273 — G-03(0.26) 충족. 발행 전 채점에서 0.202 로 FAIL 나 관문 씬을 줄이고 넓혔다"
+    },
+    "engageButton": {
+      "band": "action",
+      "x": 0.14,
+      "y": 0.76,
+      "w": 0.72,
+      "h": 0.072,
+      "order": 40,
+      "layer": "actions",
+      "type": "button",
+      "role": "engage",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "문을 연다",
+      "notes": "138px. BossGateUnlocked=false 면 비활성 + 이유를 버튼 아래 warningLine 에"
+    },
+    "warningLine": {
+      "band": "action",
+      "x": 0.08,
+      "y": 0.848,
+      "w": 0.84,
+      "h": 0.034,
+      "order": 41,
+      "layer": "actions",
+      "type": "text",
+      "style": "label",
+      "notes": "되돌릴 수 없다는 고지, 또는 잠김 사유. 둘이 동시에 찰 일은 없다"
+    },
+    "retreatButton": {
+      "band": "action",
+      "x": 0.3,
+      "y": 0.9,
+      "w": 0.4,
+      "h": 0.056,
+      "order": 50,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "content": "지도로 돌아간다",
+      "notes": "데이터에 선택지로 없다 — 표현 층 네비게이션이다. 107px"
+    }
+  },
+  "variants": {
+    "_note": "관문에 붕괴 variants 를 두지 않는다"
+  },
+  "invariantUnderVariants": [
+    "진입 버튼이 잠겨도 물러나기는 항상 누를 수 있다",
+    "「붕괴도」 수치와 용어를 노출하지 않는다",
+    "새 준비도 점수를 만들지 않는다 — 체력·이성·보유품 그대로 보인다"
+  ],
+  "assetFallbacks": {
+    "boss_preview": {
+      "present": false,
+      "fallback": null,
+      "status": "데이터에 필드 없음",
+      "note": "보스 이름·체력·아트 어느 것도 없다. 지어내지 말 것"
+    }
+  },
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "hpChip",
+      "sanityChip",
+      "readinessPanel",
+      "engageButton",
+      "retreatButton"
+    ]
+  },
+  "revisions": [
+    "v1.0 2026-09-02 · 최초. 실측 선택지 1개 → 목록 폐기, 상태 점검판 중심. 준비도 점수 신설 금지(D-029)·보스 미리보기 필드 부재 명시",
+    "v1.0a 2026-09-02 · 발송 전 자체 채점 FAIL 정정 — readinessPanel 면적 0.202 → **0.273**(G-03 0.26). gateScene 0.28→0.24 로 줄여 자리를 냈다. 채점기가 발송 전에 잡았고 코덱스에 가지 않았다"
+  ]
+}

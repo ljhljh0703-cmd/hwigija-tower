@@ -1,0 +1,19 @@
+{
+    "name": "HwigiTower.PlayModeTests",
+    "rootNamespace": "HwigiTower.Tests",
+    "references": [
+        "HwigiTower.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "noEngineReferences": false
+}

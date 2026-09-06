@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="21" result="Failed(Child)" total="21" passed="12" failed="8" inconclusive="0" skipped="1" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:16Z" duration="9.7439834">
+  <test-suite type="TestSuite" id="1032" name="회귀자는 탑을 오른다" fullname="회귀자는 탑을 오른다" runstate="Runnable" testcasecount="21" result="Failed" site="Child" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:16Z" duration="9.743983" total="21" passed="12" failed="8" inconclusive="0" skipped="1" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1025" name="HwigiTower.PlayModeTests.dll" fullname="/private/tmp/hwigi-runtime-baseline-e9d5454/Library/ScriptAssemblies/HwigiTower.PlayModeTests.dll" runstate="Runnable" testcasecount="21" result="Failed" site="Child" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:16Z" duration="9.739839" total="21" passed="12" failed="8" inconclusive="0" skipped="1" asserts="0">
+      <properties>
+        <property name="_PID" value="11124" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1026" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="21" result="Failed" site="Child" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:16Z" duration="9.739269" total="21" passed="12" failed="8" inconclusive="0" skipped="1" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1027" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="21" result="Failed" site="Child" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:16Z" duration="9.738851" total="21" passed="12" failed="8" inconclusive="0" skipped="1" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1028" name="PlayMode" fullname="HwigiTower.Tests.PlayMode" runstate="Runnable" testcasecount="21" result="Failed" site="Child" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:16Z" duration="9.738499" total="21" passed="12" failed="8" inconclusive="0" skipped="1" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1001" name="LobbySmokeTests" fullname="HwigiTower.Tests.PlayMode.LobbySmokeTests" classname="HwigiTower.Tests.PlayMode.LobbySmokeTests" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:09Z" duration="2.727062" total="6" passed="4" failed="2" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1007" name="Lobby_ContinueUsesSavedRunAndKeepsHpOutOfLobbyStatus" fullname="HwigiTower.Tests.PlayMode.LobbySmokeTests.Lobby_ContinueUsesSavedRunAndKeepsHpOutOfLobbyStatus" methodname="Lobby_ContinueUsesSavedRunAndKeepsHpOutOfLobbyStatus" classname="HwigiTower.Tests.PlayMode.LobbySmokeTests" runstate="Runnable" seed="1429863529" result="Passed" start-time="2026-09-01 14:11:07Z" end-time="2026-09-01 14:11:08Z" duration="1.189316" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[There can be only one active Event System.
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1002" name="Lobby_LoadsV11LayoutAndNoSaveVariant" fullname="HwigiTower.Tests.PlayMode.LobbySmokeTests.Lobby_LoadsV11LayoutAndNoSaveVariant" methodname="Lobby_LoadsV11LayoutAndNoSaveVariant" classname="HwigiTower.Tests.PlayMode.LobbySmokeTests" runstate="Runnable" seed="1171965390" result="Failed" start-time="2026-09-01 14:11:08Z" end-time="2026-09-01 14:11:08Z" duration="0.227061" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: False
+  But was:  True
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.LobbySmokeTests+<Lobby_LoadsV11LayoutAndNoSaveVariant>d__2.MoveNext () [0x0012f] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/LobbySmokeTests.cs:55
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[There can be only one active Event System.
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1006" name="Lobby_NewGameLoadsPrototypeRoom" fullname="HwigiTower.Tests.PlayMode.LobbySmokeTests.Lobby_NewGameLoadsPrototypeRoom" methodname="Lobby_NewGameLoadsPrototypeRoom" classname="HwigiTower.Tests.PlayMode.LobbySmokeTests" runstate="Runnable" seed="809689906" result="Passed" start-time="2026-09-01 14:11:08Z" end-time="2026-09-01 14:11:09Z" duration="0.526291" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There can be only one active Event System.
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1003" name="Lobby_RebuildsTheV11RuntimeUiIfCanvasIsMissing" fullname="HwigiTower.Tests.PlayMode.LobbySmokeTests.Lobby_RebuildsTheV11RuntimeUiIfCanvasIsMissing" methodname="Lobby_RebuildsTheV11RuntimeUiIfCanvasIsMissing" classname="HwigiTower.Tests.PlayMode.LobbySmokeTests" runstate="Runnable" seed="1937542507" result="Passed" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:09Z" duration="0.264456" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[There can be only one active Event System.
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1005" name="Lobby_RecordPanelOpensAndClosesFromTheUtilityRow" fullname="HwigiTower.Tests.PlayMode.LobbySmokeTests.Lobby_RecordPanelOpensAndClosesFromTheUtilityRow" methodname="Lobby_RecordPanelOpensAndClosesFromTheUtilityRow" classname="HwigiTower.Tests.PlayMode.LobbySmokeTests" runstate="Runnable" seed="1781000259" result="Passed" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:09Z" duration="0.264773" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There can be only one active Event System.
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1004" name="Lobby_SettingsPanelOpensAndClosesFromTheUtilityRow" fullname="HwigiTower.Tests.PlayMode.LobbySmokeTests.Lobby_SettingsPanelOpensAndClosesFromTheUtilityRow" methodname="Lobby_SettingsPanelOpensAndClosesFromTheUtilityRow" classname="HwigiTower.Tests.PlayMode.LobbySmokeTests" runstate="Runnable" seed="524574049" result="Failed" label="Error" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:09Z" duration="0.248329" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                  <stack-trace><![CDATA[  at HwigiTower.Tests.PlayMode.LobbySmokeTests+<Lobby_SettingsPanelOpensAndClosesFromTheUtilityRow>d__4.MoveNext () [0x0009c] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/LobbySmokeTests.cs:108 
+  at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44 ]]></stack-trace>
+                </failure>
+                <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There can be only one active Event System.
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1008" name="PortraitUiScreenshotQaTests" fullname="HwigiTower.Tests.PlayMode.PortraitUiScreenshotQaTests" classname="HwigiTower.Tests.PlayMode.PortraitUiScreenshotQaTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:09Z" duration="0.015157" total="1" passed="0" failed="0" inconclusive="0" skipped="1" asserts="0">
+              <properties />
+              <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              <test-case id="1009" name="PortraitUiV3_CapturesRequiredQaScreens" fullname="HwigiTower.Tests.PlayMode.PortraitUiScreenshotQaTests.PortraitUiV3_CapturesRequiredQaScreens" methodname="PortraitUiV3_CapturesRequiredQaScreens" classname="HwigiTower.Tests.PlayMode.PortraitUiScreenshotQaTests" runstate="Explicit" seed="1027198453" result="Skipped" label="Explicit" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:09Z" duration="0.000077" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="_SKIPREASON" value="Screenshot QA is manual-only and excluded from standard PlayMode validation." />
+                </properties>
+                <reason>
+                  <message><![CDATA[Screenshot QA is manual-only and excluded from standard PlayMode validation.]]></message>
+                </reason>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1010" name="PrototypeRoomSmokeTests" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" testcasecount="14" result="Failed" site="Child" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:16Z" duration="6.995463" total="14" passed="8" failed="6" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              <test-case id="1024" name="BakedEncounterRuntime_CombatHandoffStartsCombatFlow" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.BakedEncounterRuntime_CombatHandoffStartsCombatFlow" methodname="BakedEncounterRuntime_CombatHandoffStartsCombatFlow" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="417050513" result="Passed" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:09Z" duration="0.056817" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1023" name="BakedEncounterRuntime_ShowsChoicesAndAppliesShopPurchase" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.BakedEncounterRuntime_ShowsChoicesAndAppliesShopPurchase" methodname="BakedEncounterRuntime_ShowsChoicesAndAppliesShopPurchase" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="361680755" result="Passed" start-time="2026-09-01 14:11:09Z" end-time="2026-09-01 14:11:10Z" duration="0.043545" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1014" name="PrototypeRoom_AttachesEncounterRuntimeCatalogToRunState" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_AttachesEncounterRuntimeCatalogToRunState" methodname="PrototypeRoom_AttachesEncounterRuntimeCatalogToRunState" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="194629253" result="Passed" start-time="2026-09-01 14:11:10Z" end-time="2026-09-01 14:11:10Z" duration="0.571954" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene
+]]></output>
+              </test-case>
+              <test-case id="1019" name="PrototypeRoom_BossGateShowsFightOnlyAfterMapCommit" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_BossGateShowsFightOnlyAfterMapCommit" methodname="PrototypeRoom_BossGateShowsFightOnlyAfterMapCommit" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="403569239" result="Failed" start-time="2026-09-01 14:11:10Z" end-time="2026-09-01 14:11:10Z" duration="0.228089" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Map Node Button floor.1.layer.1.0.EVT_F01_JAR_ROOM:이벤트 | Map Node Button floor.1.layer.1.1.ENC_MEMORY_FRAGMENT_01:이벤트 | Map Node Button floor.1.layer.1.2.ENC_COMBAT_GATE_01:전투 | Map Node Button floor.1.layer.2.0.ENC_REST_01:휴식 | Map Node Button floor.1.layer.2.1.ENC_COMBAT_GATE_01:전투 | Map Node Button floor.1.layer.2.2.ENC_COMBAT_GATE_01:전투 | Map Node Button floor.1.layer.3.0.ENC_MORAL_CHOICE_01:이벤트 | Map Node Button floor.1.layer.3.1.ENC_COMBAT_GATE_01:전투 | Map Node Button floor.1.layer.3.2.ENC_COMBAT_GATE_01:전투 | Map Node Button floor.1.layer.4.0.ENC_SHOP_01:상점 | Map Node Button floor.1.layer.5.0.ENC_COMBAT_GATE_01:보스
+  Expected: 1
+  But was:  11
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests+<PrototypeRoom_BossGateShowsFightOnlyAfterMapCommit>d__10.MoveNext () [0x000cd] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/PrototypeRoomSmokeTests.cs:340
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1016" name="PrototypeRoom_BranchingMapOpensInteractiveCombatNode" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_BranchingMapOpensInteractiveCombatNode" methodname="PrototypeRoom_BranchingMapOpensInteractiveCombatNode" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="683070408" result="Passed" start-time="2026-09-01 14:11:10Z" end-time="2026-09-01 14:11:14Z" duration="3.587281" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="PrototypeRoom_BranchingMapOpensJarEventWithProbabilityHints" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_BranchingMapOpensJarEventWithProbabilityHints" methodname="PrototypeRoom_BranchingMapOpensJarEventWithProbabilityHints" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="625030889" result="Failed" start-time="2026-09-01 14:11:14Z" end-time="2026-09-01 14:11:14Z" duration="0.391615" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests+<PrototypeRoom_BranchingMapOpensJarEventWithProbabilityHints>d__6.MoveNext () [0x0008a] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/PrototypeRoomSmokeTests.cs:122
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1021" name="PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap" methodname="PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="1708943700" result="Failed" start-time="2026-09-01 14:11:14Z" end-time="2026-09-01 14:11:15Z" duration="0.270740" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests+<PrototypeRoom_FinalBossRestEndingReachableThroughBranchingMap>d__12.MoveNext () [0x000f9] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/PrototypeRoomSmokeTests.cs:384
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1020" name="PrototypeRoom_FloorFiveEliteAndFinalBossPoolsResolve" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_FloorFiveEliteAndFinalBossPoolsResolve" methodname="PrototypeRoom_FloorFiveEliteAndFinalBossPoolsResolve" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="888444513" result="Passed" start-time="2026-09-01 14:11:15Z" end-time="2026-09-01 14:11:15Z" duration="0.311913" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1013" name="PrototypeRoom_HidesDebugNodeLabelsByDefaultAndRestoresWithToggle" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_HidesDebugNodeLabelsByDefaultAndRestoresWithToggle" methodname="PrototypeRoom_HidesDebugNodeLabelsByDefaultAndRestoresWithToggle" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="733285497" result="Passed" start-time="2026-09-01 14:11:15Z" end-time="2026-09-01 14:11:15Z" duration="0.250493" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1011" name="PrototypeRoom_LoadsRuntimeAndPlayer" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_LoadsRuntimeAndPlayer" methodname="PrototypeRoom_LoadsRuntimeAndPlayer" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="743393080" result="Passed" start-time="2026-09-01 14:11:15Z" end-time="2026-09-01 14:11:15Z" duration="0.239657" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="PrototypeRoom_NewRunShowsPreRunPlaceholderBeforeMap" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_NewRunShowsPreRunPlaceholderBeforeMap" methodname="PrototypeRoom_NewRunShowsPreRunPlaceholderBeforeMap" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="621924284" result="Passed" start-time="2026-09-01 14:11:15Z" end-time="2026-09-01 14:11:16Z" duration="0.257660" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1017" name="PrototypeRoom_RestNodeResolvesHpRecoveryAndHidesGlitch" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_RestNodeResolvesHpRecoveryAndHidesGlitch" methodname="PrototypeRoom_RestNodeResolvesHpRecoveryAndHidesGlitch" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="178905582" result="Failed" start-time="2026-09-01 14:11:16Z" end-time="2026-09-01 14:11:16Z" duration="0.268004" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Missing selectable map node while advancing toward ENC_REST_01 among 
+  Expected: not null
+  But was:  null
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests+<AdvanceMapUntilEncounterSelectable>d__27.MoveNext () [0x0011b] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/PrototypeRoomSmokeTests.cs:747
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1022" name="PrototypeRoom_RouteActionButtonCompletesFullRun" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_RouteActionButtonCompletesFullRun" methodname="PrototypeRoom_RouteActionButtonCompletesFullRun" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="671125371" result="Failed" start-time="2026-09-01 14:11:16Z" end-time="2026-09-01 14:11:16Z" duration="0.250414" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Missing CHOICE_COMBAT_01_ENGAGE among 
+  Expected: not null
+  But was:  null
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests+<SelectMapEncounterChoice>d__21.MoveNext () [0x0007f] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/PrototypeRoomSmokeTests.cs:575
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1018" name="PrototypeRoom_ShopAppearsBeforeBossAndBossClearsFloor" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_ShopAppearsBeforeBossAndBossClearsFloor" methodname="PrototypeRoom_ShopAppearsBeforeBossAndBossClearsFloor" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="272475118" result="Failed" start-time="2026-09-01 14:11:16Z" end-time="2026-09-01 14:11:16Z" duration="0.249373" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Missing CHOICE_SHOP_01_BUY_ITEM among 
+  Expected: not null
+  But was:  null
+]]></message>
+                  <stack-trace><![CDATA[at HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests+<SelectMapEncounterChoice>d__21.MoveNext () [0x0007f] in /private/tmp/hwigi-runtime-baseline-e9d5454/Assets/_Project/Tests/PlayMode/PrototypeRoomSmokeTests.cs:575
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@76560ee600cb/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/godju/회귀자는 탑을 오른다/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

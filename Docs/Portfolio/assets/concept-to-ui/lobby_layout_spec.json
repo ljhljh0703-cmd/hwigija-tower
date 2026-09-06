@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 2,
+  "screen": "lobby",
+  "tokens": "ui_tokens.json",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "sourceCapture": "Builds/PortfolioScreenshots/hwigi-tower-0739f53-20260702/01_lobby.png",
+  "layoutIntent": "처음 켰을 때 5초 안에 「새 게임」을 누르게 한다. 배경 탑을 가리지 않으면서 버튼 위계를 하나로 좁힌다.",
+  "dataBinding": {
+    "_note": "2026-09-02 소급 작성. `LobbyController.cs` 가 실제로 읽는 경로를 역으로 확인해 채웠다",
+    "runStatus": {
+      "source": "PrototypeRunSaveStore.TryLoadSummary → PrototypeRunSaveSummary",
+      "fields": "RunId · CurrentFloor · PlayerHp · PlayerMaxHp · MemoryFragmentCount · RunStatus · IsValid · DisplayText",
+      "present": true,
+      "note": "로비는 스냅샷이 아니라 저장 요약을 읽는다. 런이 시작되기 전이라 RunState 가 없다"
+    },
+    "secondaryAction": {
+      "source": "PrototypeRunSaveStore.HasSave",
+      "type": "bool",
+      "present": true,
+      "note": "false 면 이어하기 비활성. 이 단언이 R2 런타임 실패의 자리였다(legacy Canvas 바인딩)"
+    },
+    "_absent": {
+      "runCount": "회차 누적 필드 없음(2026-09-01 R2 확인). 저장 유무·최고 도달 층·기억 조각으로 대체",
+      "towerDeepArt": "`tower_deep` 아트 미입고 — assetFallbacks 참조"
+    }
+  },
+  "constraints": [
+    {
+      "id": "L-01",
+      "text": "누를 수 있는 요소는 y >= 0.66 안에만 둔다",
+      "check": "모든 interactive 슬롯의 y >= 0.66",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.66,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "L-02",
+      "text": "primary 버튼은 정확히 1개다",
+      "check": "role=primary 슬롯 수 == 1",
+      "machineCheck": {
+        "type": "count",
+        "applyTo": {
+          "role": [
+            "primary"
+          ]
+        },
+        "eq": 1
+      }
+    },
+    {
+      "id": "L-03",
+      "text": "불투명 패널과 누를 수 있는 요소는 탑 중심축(x 0.35~0.65, y 0.10~0.55)을 덮지 않는다",
+      "check": "layer in [ui, actions] 또는 frameStyle=true 인 슬롯 중 해당 영역과 겹치는 것 0개",
+      "exempt": "layer=title (titleMark·tagline). 타이틀이 탑 위에 얹히는 것은 타이틀 화면의 의도다",
+      "revision": "v1.1 2026-09-01 — 구 문구 「어떤 UI도 덮지 않는다」가 titleMark 와 충돌(교집합 x .35~.65, y .46~.55). Codex STOP 보고로 발견. 보호영역이 아니라 제약 문구를 고친다",
+      "machineCheck": {
+        "type": "noOverlap",
+        "region": {
+          "x0": 0.35,
+          "y0": 0.1,
+          "x1": 0.65,
+          "y1": 0.55
+        },
+        "applyToAnyOf": [
+          {
+            "interactive": true
+          },
+          {
+            "hasField": "frameStyle"
+          }
+        ],
+        "exemptLayers": [
+          "title"
+        ]
+      }
+    },
+    {
+      "id": "L-04",
+      "text": "화면에 「Prototype」 문자열이 없다",
+      "check": "텍스트 슬롯에 해당 문자열 부재",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "Prototype"
+      }
+    },
+    {
+      "id": "L-05",
+      "text": "버튼 배경은 배경 이미지 위에 얹지 않고 프레임을 가진다",
+      "check": "role=primary/secondary 슬롯은 frameStyle 보유",
+      "machineCheck": {
+        "type": "fieldRequired",
+        "applyTo": {
+          "role": [
+            "primary",
+            "secondary"
+          ]
+        },
+        "field": "frameStyle"
+      }
+    },
+    {
+      "id": "L-06",
+      "text": "터치 타깃 최소 96px",
+      "check": "interactive 슬롯 h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "L-07",
+      "text": "층 순서는 resource → subject → action",
+      "check": "bands 순서 일치",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "resource",
+          "judgement",
+          "subject",
+          "party",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "L-08",
+      "text": "layer=title 요소는 배경 위에 불투명 패널 없이 놓는다. 텍스트 그림자·외곽선만 허용",
+      "check": "titleMark·tagline 슬롯에 frameStyle 부재 AND 배경 박스 부재",
+      "rationale": "L-03 의 면제를 열어주는 대신 타이틀이 탑을 박스로 가리는 것을 여기서 막는다",
+      "machineCheck": {
+        "type": "fieldAbsent",
+        "applyTo": {
+          "layer": [
+            "title"
+          ]
+        },
+        "field": "frameStyle"
+      }
+    }
+  ],
+  "bands": {
+    "resource": {
+      "y": 0.0,
+      "h": 0.07
+    },
+    "judgement": {
+      "y": 0.07,
+      "h": 0.0
+    },
+    "subject": {
+      "y": 0.07,
+      "h": 0.56
+    },
+    "party": {
+      "y": 0.63,
+      "h": 0.0
+    },
+    "action": {
+      "y": 0.66,
+      "h": 0.34
+    }
+  },
+  "slots": {
+    "runStatus": {
+      "band": "resource",
+      "x": 0.06,
+      "y": 0.022,
+      "w": 0.88,
+      "h": 0.036,
+      "order": 1,
+      "layer": "hud",
+      "type": "text",
+      "style": "label",
+      "content": "저장 유무 · 최고 도달 층 · 기억 조각",
+      "notes": "구 화면의 좌상단 P Player 칩과 중앙 Floor/HP/Memory 줄을 여기로 통합. HP는 로비에서 뺀다 (런 밖이라 의미 없음). 수정 2026-09-01 — 구 「회차 · 최고 도달 층 · 기억 조각」은 현재 save 스키마에 회차 누적이 없어 실현 불가. 새 저장 스키마를 만들지 않는다는 판단이 맞다. 회차 누적은 별건으로 분리"
+    },
+    "towerArt": {
+      "band": "subject",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 0.7,
+      "order": 5,
+      "layer": "background",
+      "type": "image",
+      "notes": "기존 배경 유지. 프레임 없음 — 이 화면에서는 배경 자체가 subject다"
+    },
+    "titleMark": {
+      "band": "subject",
+      "x": 0.1,
+      "y": 0.46,
+      "w": 0.8,
+      "h": 0.12,
+      "order": 10,
+      "layer": "title",
+      "type": "text",
+      "style": "title",
+      "content": "회귀자는 탑을 오른다",
+      "notes": "명조 계열 TMP. 자간 +0.04. 아래로 내려 탑 상단 실루엣을 비운다. L-03 면제 대상 — 탑 위에 얹히되 불투명 배경 금지(L-08)"
+    },
+    "tagline": {
+      "band": "subject",
+      "x": 0.15,
+      "y": 0.585,
+      "w": 0.7,
+      "h": 0.035,
+      "order": 11,
+      "layer": "title",
+      "type": "text",
+      "style": "label",
+      "content": "되찾는 것은 잃기 위해서다",
+      "notes": "구 「Prototype」 자리. 게임 메시지(P1)로 교체"
+    },
+    "primaryAction": {
+      "band": "action",
+      "x": 0.1,
+      "y": 0.69,
+      "w": 0.8,
+      "h": 0.078,
+      "order": 20,
+      "layer": "ui",
+      "type": "button",
+      "role": "primary",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "탑에 오른다",
+      "notes": "구 「새 게임」. 유일한 primary. 금색 프레임 + 코너 장식"
+    },
+    "secondaryAction": {
+      "band": "action",
+      "x": 0.14,
+      "y": 0.784,
+      "w": 0.72,
+      "h": 0.062,
+      "order": 21,
+      "layer": "ui",
+      "type": "button",
+      "role": "secondary",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "이어서 오른다",
+      "variantsRef": [
+        "noSave"
+      ],
+      "notes": "구 「이어 하기」. 저장 없으면 비활성 — 사라지지 않는다"
+    },
+    "utilityRow": {
+      "band": "action",
+      "x": 0.2,
+      "y": 0.878,
+      "w": 0.6,
+      "h": 0.052,
+      "order": 22,
+      "layer": "ui",
+      "type": "iconRow",
+      "role": "tertiary",
+      "interactive": true,
+      "items": [
+        "기록",
+        "설정",
+        "종료"
+      ],
+      "notes": "구 프로필·설정·종료 3버튼을 한 줄 아이콘 행으로 강등. 같은 무게로 세로 나열하던 것을 여기서 끊는다"
+    },
+    "buildStamp": {
+      "band": "action",
+      "x": 0.35,
+      "y": 0.955,
+      "w": 0.3,
+      "h": 0.022,
+      "order": 30,
+      "layer": "hud",
+      "type": "text",
+      "style": "micro",
+      "content": "버전 · 커밋 해시",
+      "notes": "구 Prototype 워터마크의 정직한 대체물"
+    }
+  },
+  "variants": {
+    "noSave": {
+      "trigger": "저장된 진행이 없다",
+      "slots": {
+        "secondaryAction": {
+          "state": "disabled",
+          "content": "이어서 오른다 · 저장 없음"
+        }
+      },
+      "tone": "inkMute",
+      "notes": "구 화면은 여기서 버튼 자체를 없애 규칙이 깨져 보였다. 자리를 비우지 않는다"
+    },
+    "deepRun": {
+      "trigger": "최고 도달 층 >= 4",
+      "slots": {
+        "towerArt": {
+          "art": "tower_deep"
+        },
+        "tagline": {
+          "content": "그는 아직 당신을 기억한다"
+        }
+      },
+      "tone": "채도 -10%",
+      "notes": "P1 3악장의 첫 신호. 로비가 회차 누적을 반영한다",
+      "status": "blocked",
+      "blockedBy": "assetFallbacks.tower_deep"
+    }
+  },
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "titleMark",
+      "primaryAction",
+      "secondaryAction",
+      "utilityRow"
+    ]
+  },
+  "revisions": [
+    "v1.1 2026-09-01 · L-03 범위를 불투명 패널·interactive 로 한정, L-08 신설. 사유 = Codex STOP 보고(사양 자체 모순)",
+    "v1.2 2026-09-01 · assetFallbacks 신설(명조 TMP·tower_deep 부재 명시) · deepRun status=blocked · runStatus content 를 save 스키마 현실에 맞춤(1단 오류 정정)",
+    "v1.3 2026-09-02 · `dataBinding` 소급 작성(B-01). `LobbyController.cs` 실참조 대조 기반"
+  ],
+  "checker": "Tools/check_layout.py",
+  "assetFallbacks": {
+    "displayFont": {
+      "required": "명조 계열 TMP 에셋",
+      "present": false,
+      "fallback": "LegacyRuntime.ttf",
+      "status": "미검증",
+      "note": "라이선스 확인된 명조 에셋 지정 후 visual QA 에서 확정. 코드 문제 아님"
+    },
+    "tower_deep": {
+      "required": "deepRun 배경 아트",
+      "present": false,
+      "fallback": null,
+      "status": "미구현",
+      "note": "임의 대체 금지. 아트 입고 전까지 deepRun variant 는 비활성"
+    }
+  }
+}

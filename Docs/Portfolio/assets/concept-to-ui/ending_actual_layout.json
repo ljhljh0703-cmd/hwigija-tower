@@ -1,0 +1,91 @@
+{
+  "screen": "ending",
+  "capturedAt": "origin/Proto@5adc2e1 static-contract (Unity \uBBF8\uC2E4\uD589)",
+  "source": "contract",
+  "slots": {
+    "endingTitle": {
+      "x": 0.08,
+      "y": 0.052,
+      "w": 0.84,
+      "h": 0.07,
+      "fontSize": 54,
+      "visible": true,
+      "layer": "title",
+      "type": "text",
+      "label": "",
+      "color": "",
+      "interactive": false,
+      "frameStyle": false
+    },
+    "endingScene": {
+      "x": 0,
+      "y": 0.16,
+      "w": 1,
+      "h": 0.26,
+      "fontSize": 0,
+      "visible": true,
+      "layer": "background",
+      "type": "image",
+      "label": "",
+      "color": "",
+      "interactive": false,
+      "frameStyle": false
+    },
+    "runSummary": {
+      "x": 0.06,
+      "y": 0.436,
+      "w": 0.88,
+      "h": 0.146,
+      "fontSize": 34,
+      "visible": true,
+      "layer": "content",
+      "type": "card",
+      "label": "",
+      "color": "",
+      "interactive": false,
+      "frameStyle": true
+    },
+    "choiceRest": {
+      "x": 0.06,
+      "y": 0.626,
+      "w": 0.88,
+      "h": 0.13,
+      "fontSize": 42,
+      "visible": true,
+      "layer": "actions",
+      "type": "card",
+      "label": "",
+      "color": "",
+      "interactive": true,
+      "frameStyle": true
+    },
+    "choiceContinue": {
+      "x": 0.06,
+      "y": 0.774,
+      "w": 0.88,
+      "h": 0.13,
+      "fontSize": 42,
+      "visible": true,
+      "layer": "actions",
+      "type": "card",
+      "label": "",
+      "color": "",
+      "interactive": true,
+      "frameStyle": true
+    },
+    "irreversibleNote": {
+      "x": 0.08,
+      "y": 0.922,
+      "w": 0.84,
+      "h": 0.032,
+      "fontSize": 26,
+      "visible": true,
+      "layer": "hud",
+      "type": "text",
+      "label": "",
+      "color": "",
+      "interactive": false,
+      "frameStyle": false
+    }
+  }
+}

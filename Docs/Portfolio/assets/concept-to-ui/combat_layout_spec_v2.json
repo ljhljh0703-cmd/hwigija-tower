@@ -1,0 +1,555 @@
+{
+  "schemaVersion": 2,
+  "screen": "combat",
+  "supersedes": "combat_layout_spec.json (v1, 2026-07-03)",
+  "tokens": "ui_tokens.json",
+  "referenceResolution": {
+    "width": 1080,
+    "height": 1920
+  },
+  "sourceCapture": "Builds/PortfolioScreenshots/hwigi-tower-0739f53-20260702/06_normal_combat.png",
+  "layoutIntent": "판단에 필요한 것을 먼저 읽히게 한다. 적 아트를 줄여 확보한 자리를 판단 줄 신설과 행동 버튼 확대에 쓴다.",
+  "changeFromV1": [
+    "적 아트 영역 60% → 38%",
+    "판단 줄(threatReadout) 신설 — v1에서는 combatLog 안에 문장으로 묻혀 있었다",
+    "행동 영역 7% → 26%. 엄지 도달 범위 확보",
+    "topHud 를 텍스트 한 줄에서 자원 칩 4개로 분해. 이성이 끝에서 앞으로 나온다",
+    "combatLog 를 판단용에서 기록용으로 강등. 접힌 상태가 기본",
+    "파티 카드의 두 색 바에 의미 라벨 부여"
+  ],
+  "constraints": [
+    {
+      "id": "C-01",
+      "text": "누를 수 있는 요소는 y >= 0.66 안에만 둔다",
+      "check": "interactive 슬롯 전부 y >= 0.66",
+      "exception": "itemInspectButton 은 read-only 라 제외",
+      "machineCheck": {
+        "type": "minY",
+        "value": 0.66,
+        "applyTo": {
+          "interactive": true
+        },
+        "exemptSlots": [
+          "itemInspectButton"
+        ]
+      }
+    },
+    {
+      "id": "C-02",
+      "text": "판단 줄은 적 아트보다 위에 있고 로그보다 크다",
+      "check": "threatReadout.y < enemyImage.y AND threatReadout 폰트 > combatLog 폰트",
+      "machineCheck": {
+        "type": "relative",
+        "a": "threatReadout",
+        "b": "enemyImage",
+        "field": "y",
+        "op": "lt"
+      }
+    },
+    {
+      "id": "C-03",
+      "text": "이성 칩은 자원 스트립의 첫 두 칸 안에 있다",
+      "check": "sanityChip.x < 0.5",
+      "machineCheck": {
+        "type": "fieldBound",
+        "slot": "sanityChip",
+        "field": "x",
+        "lt": 0.5
+      }
+    },
+    {
+      "id": "C-04",
+      "text": "적의 다음 행동은 문장이 아니라 기호+숫자로 표시한다",
+      "check": "threatReadout.type == 'glyphValue'",
+      "machineCheck": {
+        "type": "fieldEquals",
+        "slot": "threatReadout",
+        "field": "type",
+        "value": "glyphValue"
+      }
+    },
+    {
+      "id": "C-05",
+      "text": "행동 버튼 터치 타깃 최소 96px",
+      "check": "행동 슬롯 h * 1920 >= 96",
+      "machineCheck": {
+        "type": "minTouchPx",
+        "value": 96,
+        "applyTo": {
+          "interactive": true
+        }
+      }
+    },
+    {
+      "id": "C-06",
+      "text": "파티 카드의 각 바에 무엇을 나타내는지 라벨이 있다",
+      "check": "hpBar·sanityBar 슬롯에 label 필드 존재",
+      "machineCheck": {
+        "type": "fieldRequired",
+        "applyTo": {
+          "hasField": "color"
+        },
+        "field": "label"
+      }
+    },
+    {
+      "id": "C-07",
+      "text": "층 순서는 resource → judgement → subject → party → action",
+      "check": "bands 순서 일치",
+      "machineCheck": {
+        "type": "bandOrder",
+        "value": [
+          "resource",
+          "judgement",
+          "subject",
+          "party",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "C-08",
+      "text": "어떤 variants 에서도 threatReadout 과 행동 버튼의 대비가 4.5:1 이상",
+      "check": "붕괴 상태 캡처에서 대비 측정",
+      "manualCheck": "런타임 캡처에서 대비 측정 필요 — 자동 채점 대상 아님"
+    },
+    {
+      "id": "C-09",
+      "text": "「붕괴도」 용어가 어떤 슬롯 문구에도 나오지 않는다",
+      "check": "slots[*].content 에 「붕괴도」 0건",
+      "machineCheck": {
+        "type": "textAbsent",
+        "value": "붕괴도"
+      },
+      "rationale": "GDD D-012 P2. rest 사양 R-09 와 같은 규칙"
+    }
+  ],
+  "bands": {
+    "resource": {
+      "y": 0.0,
+      "h": 0.1
+    },
+    "judgement": {
+      "y": 0.1,
+      "h": 0.08
+    },
+    "subject": {
+      "y": 0.18,
+      "h": 0.38
+    },
+    "party": {
+      "y": 0.56,
+      "h": 0.18
+    },
+    "action": {
+      "y": 0.74,
+      "h": 0.26
+    }
+  },
+  "slots": {
+    "floorChip": {
+      "band": "resource",
+      "x": 0.04,
+      "y": 0.03,
+      "w": 0.18,
+      "h": 0.044,
+      "order": 1,
+      "layer": "hud",
+      "type": "chip",
+      "label": "층",
+      "style": "numeric"
+    },
+    "sanityChip": {
+      "band": "resource",
+      "x": 0.24,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 2,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "이성",
+      "color": "sanity",
+      "notes": "v1에서 텍스트 줄 맨 끝 '이성 0' 이던 것. 게이지로 승격하고 앞으로 당긴다. 이 게임의 핵심 자원이다"
+    },
+    "hpChip": {
+      "band": "resource",
+      "x": 0.5,
+      "y": 0.03,
+      "w": 0.24,
+      "h": 0.044,
+      "order": 3,
+      "layer": "hud",
+      "type": "gauge",
+      "label": "체력",
+      "color": "hp"
+    },
+    "goldChip": {
+      "band": "resource",
+      "x": 0.76,
+      "y": 0.03,
+      "w": 0.2,
+      "h": 0.044,
+      "order": 4,
+      "layer": "hud",
+      "type": "chip",
+      "label": "골드",
+      "color": "gold_coin"
+    },
+    "threatReadout": {
+      "band": "judgement",
+      "x": 0.06,
+      "y": 0.108,
+      "w": 0.88,
+      "h": 0.062,
+      "order": 10,
+      "layer": "judgement",
+      "type": "glyphValue",
+      "style": "primary",
+      "frameStyle": true,
+      "content": "적의 다음 행동 · 예상 피해 · 내가 버틸 수 있는 턴",
+      "notes": "완전정보 장치. Slay the Spire 의 적 의도 표시에 해당. v1에서는 combatLog 안 '판단: 적 ATK 3 - 피해 관리 필요' 문장이었다. 기호와 숫자로만 표기한다"
+    },
+    "enemyPanel": {
+      "band": "subject",
+      "x": 0.063,
+      "y": 0.186,
+      "w": 0.874,
+      "h": 0.368,
+      "order": 20,
+      "layer": "background",
+      "frameStyle": true
+    },
+    "enemyTitle": {
+      "band": "subject",
+      "x": 0.1,
+      "y": 0.196,
+      "w": 0.8,
+      "h": 0.038,
+      "order": 21,
+      "layer": "enemy",
+      "style": "body"
+    },
+    "enemyHpBar": {
+      "band": "subject",
+      "x": 0.148,
+      "y": 0.238,
+      "w": 0.704,
+      "h": 0.022,
+      "order": 22,
+      "layer": "enemy",
+      "label": "적 체력",
+      "color": "hp"
+    },
+    "enemyStatusChips": {
+      "band": "subject",
+      "x": 0.22,
+      "y": 0.266,
+      "w": 0.56,
+      "h": 0.028,
+      "order": 23,
+      "layer": "enemy"
+    },
+    "enemyImage": {
+      "band": "subject",
+      "x": 0.2,
+      "y": 0.3,
+      "w": 0.6,
+      "h": 0.246,
+      "order": 24,
+      "layer": "enemy",
+      "notes": "v1 대비 축소. 프레임 안에 가둔다"
+    },
+    "damageEffectOverlay": {
+      "band": "subject",
+      "x": 0.4,
+      "y": 0.32,
+      "w": 0.2,
+      "h": 0.1,
+      "order": 25,
+      "layer": "overlay"
+    },
+    "playerCard": {
+      "band": "party",
+      "x": 0.055,
+      "y": 0.572,
+      "w": 0.42,
+      "h": 0.152,
+      "order": 30,
+      "layer": "party",
+      "frameStyle": true
+    },
+    "playerHpBar": {
+      "band": "party",
+      "x": 0.075,
+      "y": 0.678,
+      "w": 0.38,
+      "h": 0.016,
+      "order": 31,
+      "layer": "party",
+      "label": "체력",
+      "color": "hp"
+    },
+    "playerSanityBar": {
+      "band": "party",
+      "x": 0.075,
+      "y": 0.7,
+      "w": 0.38,
+      "h": 0.016,
+      "order": 32,
+      "layer": "party",
+      "label": "이성",
+      "color": "sanity"
+    },
+    "mataiosCard": {
+      "band": "party",
+      "x": 0.525,
+      "y": 0.572,
+      "w": 0.42,
+      "h": 0.152,
+      "order": 33,
+      "layer": "party",
+      "frameStyle": true,
+      "variantsRef": [
+        "strained",
+        "broken"
+      ]
+    },
+    "mataiosHpBar": {
+      "band": "party",
+      "x": 0.545,
+      "y": 0.678,
+      "w": 0.38,
+      "h": 0.016,
+      "order": 34,
+      "layer": "party",
+      "label": "체력",
+      "color": "hp"
+    },
+    "mataiosStateLabel": {
+      "band": "party",
+      "x": 0.545,
+      "y": 0.7,
+      "w": 0.38,
+      "h": 0.016,
+      "order": 35,
+      "layer": "party",
+      "label": "상태",
+      "notes": "v2.1 · 마타이오스 전용 이성 값은 코드에 없다(Sanity 전수 0건). 그의 축은 붕괴도이고 숫자·게이지 노출은 D-012 P2 금지 → 비수치 authored 라벨로 바꾼다",
+      "type": "text",
+      "style": "label"
+    },
+    "attackButton": {
+      "band": "action",
+      "x": 0.06,
+      "y": 0.76,
+      "w": 0.27,
+      "h": 0.11,
+      "order": 40,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "공격"
+    },
+    "defendButton": {
+      "band": "action",
+      "x": 0.365,
+      "y": 0.76,
+      "w": 0.27,
+      "h": 0.11,
+      "order": 41,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "방어"
+    },
+    "skillButton": {
+      "band": "action",
+      "x": 0.67,
+      "y": 0.76,
+      "w": 0.27,
+      "h": 0.11,
+      "order": 42,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "frameStyle": true,
+      "content": "정찰"
+    },
+    "combatLog": {
+      "band": "action",
+      "x": 0.06,
+      "y": 0.888,
+      "w": 0.7,
+      "h": 0.056,
+      "order": 50,
+      "layer": "log",
+      "type": "collapsible",
+      "defaultState": "collapsed",
+      "style": "micro",
+      "notes": "판단용에서 기록용으로 강등. 최근 1줄만 보이고 탭하면 펼친다. 판단은 threatReadout 이 맡는다"
+    },
+    "itemInspectButton": {
+      "band": "action",
+      "x": 0.79,
+      "y": 0.888,
+      "w": 0.15,
+      "h": 0.056,
+      "order": 51,
+      "layer": "actions",
+      "type": "button",
+      "interactive": true,
+      "readOnly": true,
+      "content": "소지품"
+    }
+  },
+  "variants": {
+    "strained": {
+      "trigger": "붕괴도(GlitchLevel) 중간대 — 임계값 undecided",
+      "slots": {
+        "mataiosCard": {
+          "art": "mataios_strained",
+          "frameColor": "sanityWarn"
+        }
+      },
+      "tone": "채도 -15%, 비네트 0.5",
+      "notes": "붕괴 전조. 카드 표정만 바뀐다. 수치는 안 건드린다",
+      "status": "blocked",
+      "blockedBy": [
+        "thresholds.undecided"
+      ]
+    },
+    "broken": {
+      "trigger": "붕괴도(GlitchLevel) 상단대 — 임계값 undecided",
+      "slots": {
+        "mataiosCard": {
+          "art": "mataios_broken",
+          "frameColor": "sanityBroken"
+        },
+        "recoveryPrompt": {
+          "band": "party",
+          "x": 0.525,
+          "y": 0.726,
+          "w": 0.42,
+          "h": 0.03,
+          "type": "text",
+          "style": "label",
+          "color": "sanityBroken"
+        }
+      },
+      "tone": "채도 -35%, 비네트 0.7",
+      "recovery": "회복 조건을 recoveryPrompt 에 표시한다. 예 — 「이번 턴 방어를 선택」 · 「적 처치」",
+      "reward": "조건 충족 시 붕괴도 완화. ⚠ 「1턴 강화 효과」 절은 삭제됨 — D-029 는 붕괴도를 전투 타이머·능력 발동 조건·공격력 modifier·시너지 배율의 입력으로 쓰지 않는다. 붕괴 회복의 보상은 관계·회복 축 안에서 닫는다",
+      "notes": "카제나 방식. 붕괴가 막다른 길이 아니라 선택지가 된다. recoveryPrompt 가 안 보이면 이 variants 는 실패다",
+      "status": "blocked",
+      "blockedBy": [
+        "thresholds.undecided"
+      ]
+    }
+  },
+  "invariantUnderVariants": [
+    "threatReadout 은 어떤 variants 에서도 좌표·대비가 안 바뀐다",
+    "행동 버튼 3개는 어떤 variants 에서도 좌표·대비가 안 바뀐다",
+    "broken 상태에서 recoveryPrompt 는 반드시 보인다"
+  ],
+  "tolerance": {
+    "slotOffsetPx": 8,
+    "fontScalePct": 5,
+    "bandRatioPct": 3,
+    "requiredVisible": [
+      "sanityChip",
+      "threatReadout",
+      "attackButton",
+      "defendButton",
+      "skillButton"
+    ],
+    "requiredVisibleInVariant": {
+      "broken": [
+        "threatReadout",
+        "attackButton",
+        "recoveryPrompt"
+      ]
+    }
+  },
+  "checker": "Tools/check_layout.py",
+  "thresholds": {
+    "_note": "붕괴도 → 표시 단계 임계값. 작가 결정 대기. rest 사양과 같은 값을 쓴다",
+    "strainedFrom": "undecided",
+    "brokenFrom": "undecided"
+  },
+  "revisions": [
+    "v2.1 2026-09-01 · D-029 충돌 제거(broken.reward 전투 강화 절 삭제) · mataiosSanityBar → mataiosStateLabel(비수치) · C-09 신설 · 임계값 미정 → variants blocked. 구현된 적 없는 절이라 되돌릴 코드 없음",
+    "v2.2 2026-09-02 · `dataBinding` 소급 작성(B-01). `CombatUiController.cs` 실참조 대조 기반"
+  ],
+  "dataBinding": {
+    "_note": "2026-09-02 소급 작성. 이 사양은 dataBinding 규칙(2026-09-01 승격) 이전에 쓰였다. `CombatUiController.cs` 가 실제로 읽는 멤버를 역으로 확인해 채웠다 — 추론이 아니라 코드 대조다",
+    "floorChip": {
+      "source": "PrototypeRunSnapshot.CurrentFloor",
+      "type": "int",
+      "present": true
+    },
+    "sanityChip": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "normalize": "(Mental + 100) / 200",
+      "present": true,
+      "note": "0~1 이 아니다"
+    },
+    "hpChip": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "goldChip": {
+      "source": "PrototypeRunSnapshot.Gold",
+      "type": "int",
+      "present": true
+    },
+    "playerHpBar": {
+      "source": "PrototypeRunSnapshot.PlayerHp / PlayerMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "playerSanityBar": {
+      "source": "PrototypeRunSnapshot.Mental",
+      "type": "int",
+      "range": [
+        -100,
+        100
+      ],
+      "present": true
+    },
+    "enemyHpBar": {
+      "source": "PrototypeRunSnapshot.EnemyHp / EnemyMaxHp",
+      "type": "int",
+      "present": true
+    },
+    "threatReadout": {
+      "source": "PrototypeRunSnapshot.EnemyAttack",
+      "type": "int",
+      "present": true,
+      "note": "예상 피해의 근거. 버틸 턴은 PlayerHp ÷ EnemyAttack 파생 — 화면에서 계산한다"
+    },
+    "mataiosStateLabel": {
+      "source": "PrototypeRunSnapshot.GlitchLevel",
+      "type": "int",
+      "range": [
+        0,
+        100
+      ],
+      "present": true,
+      "display": "non_numeric",
+      "note": "숫자·게이지·「붕괴도」 용어 금지(C-09·D-012 P2)"
+    },
+    "_absent": {
+      "mataiosSanity": "없음. 마타이오스 전용 이성 값은 코드에 없다(2026-09-01 확인)",
+      "enemyIntent": "적의 다음 행동 종류를 담는 필드가 없다. threatReadout 은 EnemyAttack 수치 기반"
+    }
+  }
+}

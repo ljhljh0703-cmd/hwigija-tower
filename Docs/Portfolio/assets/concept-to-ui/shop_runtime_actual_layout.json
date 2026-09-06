@@ -1,0 +1,20 @@
+{
+  "screen": "shop",
+  "capturedAt": "2026-09-02T03:27:24.1427550Z runtime RectTransform capture",
+  "source": "runtime",
+  "slots": {
+    "floorChip": {"x": 0.04, "y": 0.03, "w": 0.18, "h": 0.044, "fontSize": 26, "visible": true},
+    "sanityChip": {"x": 0.24, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "hpChip": {"x": 0.5, "y": 0.03, "w": 0.2, "h": 0.044, "fontSize": 26, "visible": true},
+    "goldChip": {"x": 0.72, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "screenTitle": {"x": 0.1, "y": 0.106, "w": 0.8, "h": 0.048, "fontSize": 54, "visible": true},
+    "shopScene": {"x": 0, "y": 0.16, "w": 1, "h": 0.26, "visible": true},
+    "ownedStrip": {"x": 0.04, "y": 0.442, "w": 0.92, "h": 0.038, "fontSize": 26, "visible": true},
+    "offerRow1": {"x": 0.04, "y": 0.53, "w": 0.92, "h": 0.062, "fontSize": 26, "visible": true},
+    "offerRow2": {"x": 0.04, "y": 0.598, "w": 0.92, "h": 0.062, "fontSize": 26, "visible": true},
+    "offerRow3": {"x": 0.04, "y": 0.666, "w": 0.92, "h": 0.062, "fontSize": 26, "visible": true},
+    "offerRow4": {"x": 0.04, "y": 0.734, "w": 0.92, "h": 0.062, "fontSize": 26, "visible": true},
+    "offerRow5": {"x": 0.04, "y": 0.802, "w": 0.92, "h": 0.062, "fontSize": 26, "visible": true},
+    "leaveButton": {"x": 0.3, "y": 0.9, "w": 0.4, "h": 0.056, "fontSize": 42, "visible": true}
+  }
+}

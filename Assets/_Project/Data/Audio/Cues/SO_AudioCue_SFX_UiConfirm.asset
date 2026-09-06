@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efad53f834919416c99c8b6b68201498, type: 3}
+  m_Name: SO_AudioCue_SFX_UiConfirm
+  m_EditorClassIdentifier: HwigiTower.Runtime::HwigiTower.Audio.AudioCueData
+  cueId: ui.confirm
+  context: 212
+  channel: 2
+  clip: {fileID: 8300000, guid: 794f43ec286e04c359ec3c159fb825c9, type: 3}
+  loop: 0
+  volume: 0.66

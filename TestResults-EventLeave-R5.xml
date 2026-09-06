@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.2566862">
+  <test-suite type="TestSuite" id="1033" name="회귀자는 탑을 오른다" fullname="회귀자는 탑을 오른다" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.256686" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1026" name="HwigiTower.PlayModeTests.dll" fullname="/Users/godju/Downloads/AI Game/hwigi-rest-ui-20260901/Library/ScriptAssemblies/HwigiTower.PlayModeTests.dll" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.252614" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="77257" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1027" name="HwigiTower" fullname="HwigiTower" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.252119" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1028" name="Tests" fullname="HwigiTower.Tests" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.251720" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1029" name="PlayMode" fullname="HwigiTower.Tests.PlayMode" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.251290" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1010" name="PrototypeRoomSmokeTests" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.250587" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1013" name="PrototypeRoom_EventLeaveReturnsToUncommittedMap" fullname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests.PrototypeRoom_EventLeaveReturnsToUncommittedMap" methodname="PrototypeRoom_EventLeaveReturnsToUncommittedMap" classname="HwigiTower.Tests.PlayMode.PrototypeRoomSmokeTests" runstate="Runnable" seed="2093953452" result="Passed" start-time="2026-09-02 00:49:13Z" end-time="2026-09-02 00:49:14Z" duration="1.243792" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: /Users/godju/Library/Application Support/godju/회귀자는 탑을 오른다/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

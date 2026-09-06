@@ -1,0 +1,17 @@
+{
+  "screen": "bossgate",
+  "capturedAt": "2026-09-02T03:27:27.7614540Z runtime RectTransform capture",
+  "source": "runtime",
+  "slots": {
+    "floorChip": {"x": 0.04, "y": 0.03, "w": 0.18, "h": 0.044, "fontSize": 26, "visible": true},
+    "sanityChip": {"x": 0.24, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "hpChip": {"x": 0.5, "y": 0.03, "w": 0.24, "h": 0.044, "fontSize": 26, "visible": true},
+    "goldChip": {"x": 0.76, "y": 0.03, "w": 0.2, "h": 0.044, "fontSize": 26, "visible": true},
+    "gateTitle": {"x": 0.08, "y": 0.108, "w": 0.84, "h": 0.058, "fontSize": 54, "visible": true},
+    "gateScene": {"x": 0, "y": 0.18, "w": 1, "h": 0.24, "visible": true},
+    "readinessPanel": {"x": 0.02, "y": 0.432, "w": 0.96, "h": 0.284, "fontSize": 34, "visible": true},
+    "engageButton": {"x": 0.14, "y": 0.76, "w": 0.72, "h": 0.072, "fontSize": 42, "visible": true},
+    "warningLine": {"x": 0.08, "y": 0.848, "w": 0.84, "h": 0.034, "fontSize": 26, "visible": true},
+    "retreatButton": {"x": 0.3, "y": 0.9, "w": 0.4, "h": 0.056, "fontSize": 26, "visible": true}
+  }
+}

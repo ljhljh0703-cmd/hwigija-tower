@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "specVersion": "1.2",
+  "subject": "map-flow",
+  "authority": "wiki/projects/hwiglija-tower-gdd.md §D-034 Map Flow / Route Reveal / Commitment 🔒 LOCKED 2026-05-27",
+  "checker": "Tools/check_mapflow.py",
+  "_why": "맵 진행 테스트 14건이 기준선부터 실패한다. M1 격리 실행으로 **테스트 오염 가설은 기각**됐다 — 진짜 회귀다. 고치려면 「무엇이 맞는 상태인가」가 기계로 판정돼야 한다. D-034 는 잠겨 있지만 산문이라 대조가 안 된다. 이 파일이 그 산문을 **덤프 대조 가능한 계약**으로 옮긴 것이다. UI 레인이 화면에 한 것을 맵에 한다.",
+  "_boundary": "🔴 **여기 적힌 값은 전부 D-034 원문에서 옮긴 것이다. 내가 정한 수치는 하나도 없다.** D-034 에 없는 것은 `undecided` 로 두고 검사하지 않는다. 코드가 계약과 다르면 **코드가 틀린 것**이다(D-034 는 LOCKED).",
+  "dumpContract": {
+    "_note": "런타임이 뱉을 덤프. UI 레인의 `<screen>_runtime_actual_layout.json` 과 같은 자리다",
+    "path": "Docs/Portfolio/assets/concept-to-ui/mapflow_runtime_dump.json",
+    "source": "PrototypeRunSnapshot.FloorMapNodes (PrototypeFloorMapNodeView[]) + CurrentFloor + SelectedMapNodeId",
+    "fields": "MapNodeId · Type · Floor · Layer · Index · Selectable · Completed · Locked · NormalizedX · NormalizedY · Current · NextMapNodeIds · PreviousMapNodeIds",
+    "shape": "{ \"source\": \"runtime\", \"runId\": <string>, \"floors\": [ { \"floor\": N, \"selectedMapNodeId\": <string>, \"nodes\": [ ...위 13필드... ] } ] }",
+    "when": "🩸 **v1.0 은 2단계만 요구했고 그게 결함이었다.** 실패는 층 진입 직후가 아니라 **노드를 해결한 뒤 다음 노드가 열리는 구간**에서 난다(`Missing selectable map node **while advancing toward** ENC_REST_01`). v1.0 계약으로는 그 구간을 볼 수 없다.\n**3단계로 고친다** — 층마다 ① `beforeSelect`(진입 직후·선택 전) ② `afterSelect`(노드 선택 직후) ③ **`afterResolve`(인카운터 해결 직후)**.\n그리고 **층마다 노드를 다 소진할 때까지 ②③을 반복**한다. 한 번만 재면 첫 노드까지만 본 것이다.",
+    "path_note": "🔴 **`OpenQaFloor` 로 열고 재면 안 된다.** 그 메서드는 `_resolvedDemoSteps.Clear()` · `_selectedMapNodeId=\"\"` · `AttachDemoRunPath` 재부착으로 **층을 초기화**한다. 실패하는 테스트는 그 경로가 아니라 **정상 순회**(BeginRun → 선택 → 해결 → 다음)를 탄다. M2 가 QA 경로로 재서 MF-07·MF-08 이 초록불이 나왔지만 **실패 구간은 재지 않았다.**",
+    "traversal": "BeginRun() 부터 정상 순회로 진행한다. 층을 QA 로 열지 않는다. 진행이 막히면 **막힌 그 지점의 스냅샷이 이 라운드의 산출**이다",
+    "requiredFields_v12": "🩸 **v1.1 계약으로는 「완주」와 「막힘」이 구분되지 않는다.** 3-lane sparse route 에서 한 경로를 타면 **안 지나간 레인의 노드는 끝까지 미완료로 남는 것이 정상**이다(D-034 sparse route 의 당연한 귀결). 그런데 v1.1 의 `onlyIfIncompleteRemain` 은 그 정상 상태를 「진행 불가」로 읽는다.\n→ 덤프에 **셋을 더 싣는다**: 노드별 `Skipped` · 그 시점 **활성 레이어** · **런 종료 상태**(층 종료/보스 클리어/런 종료 여부). Codex 가 M3 착수 시 이 셋이 필요하다고 먼저 지적했고 그 판단이 맞았다."
+  },
+  "constraints": [
+    {
+      "id": "MF-01",
+      "text": "지도는 3개 logical sparse lane 으로 생성한다",
+      "source": "D-034 「지도는 5컬럼 visual grid 를 유지하되, 3개 logical sparse lane 으로 생성한다」",
+      "check": "층별 고유 lane 수 == 3",
+      "machineCheck": {
+        "type": "laneCount",
+        "eq": 3
+      }
+    },
+    {
+      "id": "MF-02",
+      "text": "대부분의 non-Shop/non-Boss 노드는 outgoing edge 가 1개다",
+      "source": "D-034 「대부분의 non-Shop/non-Boss node outgoing edge 는 1개다. 2갈래 branch 는 이벤트/휴식 등 의미 있는 선택 차이가 있을 때만 가끔 허용」",
+      "check": "outgoing==1 인 노드 비율이 다수",
+      "machineCheck": {
+        "type": "outgoingEdges",
+        "applyTo": {
+          "typeNot": [
+            "Shop",
+            "Boss"
+          ]
+        },
+        "mostlyEq": 1
+      },
+      "note": "「대부분」·「가끔」은 D-034 원문 표현이다. 정확한 임계는 D-034 에 없다 → 검사기는 **비율을 출력만 하고 FAIL 은 outgoing==0 일 때만 낸다.** 0 은 진행 불가라 어떤 해석으로도 위반이다"
+    },
+    {
+      "id": "MF-03",
+      "text": "all-to-all layer 연결 금지 · adjacent-lane cross edge 는 floor 당 0-2개 이하",
+      "source": "D-034 「all-to-all layer 연결은 금지한다. adjacent-lane cross edge 는 첫 구현에서 floor 당 0-2개 이하로 제한」",
+      "check": "cross-lane edge 수 <= 2 (층당)",
+      "machineCheck": {
+        "type": "crossLaneEdges",
+        "maxPerFloor": 2
+      }
+    },
+    {
+      "id": "MF-04",
+      "text": "Rest 는 Floor 시작 직후/Layer 1 에 나오지 않는다",
+      "source": "D-034 「Rest 는 Floor 시작 직후/Layer 1 에 나오지 않는다」",
+      "check": "Layer==1 에 Type==Rest 인 노드 0개",
+      "machineCheck": {
+        "type": "nodeTypeAbsentInLayer",
+        "nodeType": "Rest",
+        "layer": 1
+      }
+    },
+    {
+      "id": "MF-05",
+      "text": "Rest 는 Layer 2/3 에서 floor 당 0-1개",
+      "source": "D-034 「첫 구현은 Layer 2/3 에서 floor 당 0-1개 후보를 기준으로 둔다」",
+      "check": "층당 Rest 노드 수 <= 1",
+      "machineCheck": {
+        "type": "nodeTypeCountPerFloor",
+        "nodeType": "Rest",
+        "max": 1
+      }
+    },
+    {
+      "id": "MF-06",
+      "text": "미래 노드는 type 을 보여주되 선택 불가면 disabled 다",
+      "source": "D-034 「미래 node 는 type 을 face-up 으로 보여주되, 아직 선택 불가하면 dark/disabled 상태로 둔다」",
+      "check": "Selectable==false && Completed==false 인 노드는 Locked==true 이고 Type 이 비어 있지 않다",
+      "machineCheck": {
+        "type": "futureNodesLockedWithType"
+      }
+    },
+    {
+      "id": "MF-07",
+      "text": "선택 가능한 노드가 1개 이상 있다 — **층이 아직 안 끝났을 때만**",
+      "source": "D-034 「선택 가능 node 는 lit/active 상태이며, click 시 즉시 encounter 로 진입한다」의 성립 전제",
+      "check": "beforeSelect 스냅샷에서, 층 종료 전이면 Selectable >= 1",
+      "machineCheck": {
+        "type": "minSelectable",
+        "phase": "beforeSelect",
+        "min": 1,
+        "onlyIfFloorActive": true
+      },
+      "note": "🩸 **v1.0~v1.1 은 조건 없이 요구해서 오탐을 냈다.** 층을 다 지난 뒤 스냅샷에서도 «선택 가능 0»을 위반으로 읽었다. sparse route 는 한 레인만 지나므로 **다른 레인 노드는 미완료로 남는 것이 정상**이다"
+    },
+    {
+      "id": "MF-08",
+      "text": "노드를 고른 뒤에는 다른 노드를 고를 수 없다 (commitment)",
+      "source": "D-034 「active encounter 중 route 선택 취소, map 복귀 후 다른 노드 선택, utility map 을 통한 commitment 회피는 금지」",
+      "check": "선택 후 스냅샷에서 Selectable==true 인 노드 == 0",
+      "machineCheck": {
+        "type": "maxSelectable",
+        "phase": "afterSelect",
+        "max": 0
+      },
+      "note": "🔴 **MF-07 과 짝이다.** 코드가 `_selectedMapNodeId` 가 차 있으면 전부 선택 불가로 만든다 — 그 규칙 자체는 D-034 대로다. **문제는 그 값이 언제 지워지는가**이고, 지우는 지점이 6곳이다. 둘을 같이 재야 「commitment 인가 stuck 인가」가 갈린다"
+    },
+    {
+      "id": "MF-09",
+      "text": "Boss clear 후 다음 층 지도가 생성·표시된다",
+      "source": "D-034 「Boss clear 후 다음 층 선택 시 이전 result UI 를 clear 하고 새 floor map generated/visible 상태를 보장」",
+      "check": "다음 층 스냅샷에 노드 >= 1 이고 Selectable >= 1",
+      "machineCheck": {
+        "type": "nextFloorMapPresent",
+        "onlyIfFloorActive": true
+      },
+      "note": "v1.2 · 같은 오탐. 층 종료 후 스냅샷을 「새 지도가 비었다」로 읽었다"
+    },
+    {
+      "id": "MF-10",
+      "text": "맵 생성은 run id + floor seed 로 결정적이다",
+      "source": "D-034 Pillar 점검 P4 「route generation 과 reveal/commitment state 는 run id + floor seed 및 run state 로 결정 가능」",
+      "check": "같은 runId 로 두 번 생성한 덤프가 바이트 동일",
+      "machineCheck": {
+        "type": "deterministicByRunId"
+      },
+      "note": "M1 에서 `DeterministicSeed.Combine(RunId, floor)` 경로가 확인됐다. 이 검사는 그 확인을 자동화한 것이다"
+    },
+    {
+      "id": "MF-11",
+      "text": "🔴 노드를 해결하면 다음 노드가 선택 가능해진다",
+      "source": "D-034 「선택 가능 node 는 lit/active 상태이며, click 시 즉시 encounter 로 진입한다」 + sparse route 진행의 성립 전제",
+      "check": "afterResolve 스냅샷에서, **층이 아직 안 끝났으면** Selectable >= 1",
+      "machineCheck": {
+        "type": "minSelectable",
+        "phase": "afterResolve",
+        "min": 1,
+        "onlyIfFloorActive": true
+      },
+      "note": "🩸 v1.1 은 `onlyIfIncompleteRemain`(미완료가 남았는가)을 조건으로 썼는데 **그게 틀린 조건**이다. 안 지나간 레인 노드가 항상 남기 때문이다. 옳은 조건은 **「층이 아직 진행 중인가」**다. `floorActive` 는 덤프가 실어야 한다 — 검사기가 추론하지 않는다"
+    },
+    {
+      "id": "MF-12",
+      "text": "안 지나간 레인의 노드는 층 종료 시 Skipped 로 표시된다",
+      "source": "D-034 「지나온/cleared node 만 back/cleared-back 시각 상태를 사용한다」의 짝 — 안 지난 노드의 종료 상태가 정의돼야 화면이 그릴 수 있다",
+      "check": "층 종료 스냅샷에서 미완료 노드는 Skipped==true",
+      "machineCheck": {
+        "type": "unvisitedSkippedAtFloorEnd"
+      },
+      "note": "이게 없으면 「완주」와 「막힘」이 데이터로 구분되지 않는다. **M3 가 못 잰 진짜 이유**"
+    }
+  ],
+  "undecided": {
+    "_note": "D-034 에 값이 없는 것. **검사하지 않고, 지어내지도 않는다**",
+    "branchFrequency": "「2갈래는 가끔」의 정확한 빈도. D-034 는 「가끔」이라고만 쓴다",
+    "restWeightedProbability": "D-034 §범위 = 「Rest exact weighted probability 는 이후 balance tuning 이며 route-system blocker 가 아니다」",
+    "laneColumnMapping": "3 logical lane 이 5 visual column 에 어떻게 앉는지. D-034 는 컬럼 수만 정한다"
+  },
+  "outOfScope": {
+    "_note": "맵과 다른 뿌리로 보이는 실패 3건. M2 범위 밖이고 별건으로 센다",
+    "RoomController_ExplorationContextResetsToNormalBgm": "오디오 NullReference",
+    "GenericCounterplay_HeavyPressureAndSkillOpeningChangeChoices": "전투 문구 「빈틈 +2」 불일치 — D-037/D-038 영역",
+    "ItemAndAbilityEffects_ApplyToCombatLoop": "아이템·능력 효과가 전투에 0 — D-031/OQ-020 영역"
+  },
+  "revisions": [
+    "v1.0 2026-09-02 · 최초. D-034 원문을 덤프 대조 가능한 10개 제약으로 옮김. M1 결과(오염 가설 기각·진짜 회귀)를 받아 M2 의 기준으로 발행. 내가 정한 수치 0",
+    "v1.1 2026-09-02 · 🩸 **내 계약 결함 정정** — 2단계(before/afterSelect) → **3단계(+afterResolve)** 및 층당 반복 순회 요구. M2 가 QA 초기화 경로로 재는 바람에 실패 구간을 못 봤다. `MF-11` 신설(해결 후 다음 노드가 열리는가). M2 실측 = MF-03 만 위반(cross-lane 4>2) — 진짜 위반이나 14건의 원인은 아님",
+    "v1.2 2026-09-02 · 🩸 **내 제약 오류 2회째 정정** — MF-07·09·11 의 조건을 「미완료가 남았는가」에서 **「층이 아직 진행 중인가」**로 교체. sparse route 는 안 지나간 레인 노드가 항상 미완료로 남으므로 전자는 상시 오탐이다. `MF-12` 신설(안 지난 노드는 Skipped). 덤프 계약에 `Skipped`·활성레이어·런종료 상태 추가 — **Codex 가 M3 착수 시 먼저 지적한 것**"
+  ],
+  "_m2_result": {
+    "date": "2026-09-02",
+    "판정": "MF-01·02·04~10 PASS · **MF-03 FAIL**(cross-lane edge 4 > 2, 전 층)",
+    "한계": "덤프가 `OpenQaFloor` 경로에서 나왔다. 층 초기 상태만 잰 것이고 **실패가 나는 전이 구간은 안 쟀다**. Codex 가 이 한계를 정확히 지적했다",
+    "MF-03": "**진짜 D-034 위반이다.** 다만 실패 14건의 원인은 아니다 — 선택 가능 노드가 있는 상태에서도 났다. **별도 항목으로 남긴다**"
+  },
+  "_m3_partial": {
+    "date": "2026-09-02",
+    "덤프": "3단계 31스냅샷 생성됨(1/1 PASS). `Skipped`·활성레이어·런종료 상태는 없다",
+    "실측": "floor1 = L1→L2→L3→L4→L5 순차 진행 후 미완료 6개가 Layer 1·2·3 에 남음 = **안 지나간 레인**. floor2 도 동일 형태. **막힌 것이 아니라 sparse route 를 한 줄로 지난 정상 모습으로 보인다**",
+    "미확정": "floor2 마지막 `afterResolve` 에서 `selectedMapNodeId` 가 차 있고 selectable 0 이다. 런이 거기서 끝난 것인지 실제로 막힌 것인지 **런 종료 상태 없이는 판정 불가**",
+    "blocker": "Unity Licensing Client 프로토콜 불일치(`Unsupported protocol version '1.18.1'`)로 재실행 불가. **환경 문제 · 작가 몫**. Codex 가 우회하지 않은 것이 맞다"
+  }
+}
