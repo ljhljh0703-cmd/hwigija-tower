@@ -76,3 +76,7 @@ Desktop.ini
 
 # Generated Rider plugin
 **/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# 개인 작업 환경 (공개 제외)
+.obsidian/
+.DS_Store
