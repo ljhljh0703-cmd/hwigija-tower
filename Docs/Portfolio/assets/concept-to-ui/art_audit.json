@@ -1,0 +1,2364 @@
+[
+  {
+    "path": "Art/Characters/Merchants/merchant_human.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 29.491,
+      "opaqueRatio": 0.25623625,
+      "hue": 28.068845013985385,
+      "sat": 48.39808009580368,
+      "edgeAtDisplay": 7.96053466796875,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.3304251968503937
+    }
+  },
+  {
+    "path": "Art/Characters/Merchants/merchant_otherworld.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 24.626,
+      "opaqueRatio": 0.25419075,
+      "hue": 27.317289010561744,
+      "sat": 52.92622072798711,
+      "edgeAtDisplay": 8.36611572265625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.177196850393701
+    }
+  },
+  {
+    "path": "Art/Characters/char_mataios_bust_s0_s2.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 41.419999999999995,
+      "opaqueRatio": 0.32216644287109375,
+      "hue": 13.197494865282685,
+      "sat": 32.18533425719143,
+      "edgeAtDisplay": 9.866836211943793,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.7061417322834644
+    }
+  },
+  {
+    "path": "Art/Characters/char_mataios_bust_s3_s4.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 31.267,
+      "opaqueRatio": 0.38232676188151044,
+      "hue": 5.079479343959892,
+      "sat": 27.47784475487475,
+      "edgeAtDisplay": 11.892531469555035,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.3863622047244093
+    }
+  },
+  {
+    "path": "Art/Characters/char_mataios_portrait_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 36.352,
+      "opaqueRatio": 0.6971845626831055,
+      "hue": 16.606628509632568,
+      "sat": 22.450777960890054,
+      "edgeAtDisplay": 24.1969775390625,
+      "size": [
+        1024,
+        1024
+      ],
+      "contrastVsGround": 1.5465196850393699
+    }
+  },
+  {
+    "path": "Art/Characters/char_player_bust_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 82.291,
+      "opaqueRatio": 0.4893978821201183,
+      "hue": 26.633846109365752,
+      "sat": 24.899205465895676,
+      "edgeAtDisplay": 17.3788232421875,
+      "size": [
+        1254,
+        1254
+      ],
+      "contrastVsGround": 2.9934173228346457
+    }
+  },
+  {
+    "path": "Art/Characters/char_player_portrait_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 54.96799999999999,
+      "opaqueRatio": 0.6971845626831055,
+      "hue": 28.981125895750292,
+      "sat": 16.529897936937633,
+      "edgeAtDisplay": 32.5428955078125,
+      "size": [
+        1024,
+        1024
+      ],
+      "contrastVsGround": 2.132850393700787
+    }
+  },
+  {
+    "path": "Art/Characters/char_player_standing_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 47.522999999999996,
+      "opaqueRatio": 0.08337225,
+      "hue": 23.21526589204782,
+      "sat": 21.34599709919096,
+      "edgeAtDisplay": 6.44065185546875,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.8983622047244093
+    }
+  },
+  {
+    "path": "Art/Characters/마타이오스 전신.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 218.046,
+      "opaqueRatio": 1.0,
+      "hue": 21.322627434800303,
+      "sat": 10.659082612217006,
+      "edgeAtDisplay": 11.237454427083334,
+      "size": [
+        1086,
+        1448
+      ],
+      "contrastVsGround": 7.269165354330708
+    }
+  },
+  {
+    "path": "Art/Encounters/demo_complete_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 21.174,
+      "opaqueRatio": 1.0,
+      "hue": 56.36801654640752,
+      "sat": 10.804768105793409,
+      "edgeAtDisplay": 10.869368173775094,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 1.0684724409448818
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_combat_gate_01_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 21.555,
+      "opaqueRatio": 1.0,
+      "hue": 160.74705311660753,
+      "sat": 17.466798152680692,
+      "edgeAtDisplay": 9.514364817865642,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 1.0804724409448818
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_combat_gate_03_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 33.253,
+      "opaqueRatio": 1.0,
+      "hue": 320.62511635022656,
+      "sat": 6.971847658293578,
+      "edgeAtDisplay": 15.97446610531454,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 1.4489133858267718
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_complete_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 21.174,
+      "opaqueRatio": 1.0,
+      "hue": 56.36801654640752,
+      "sat": 10.804768105793409,
+      "edgeAtDisplay": 10.869368173775094,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 1.0684724409448818
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_memory_fragment_01_art.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 46.297999999999995,
+      "opaqueRatio": 0.25479793548583984,
+      "hue": 66.85825994461109,
+      "sat": 8.602903138712144,
+      "edgeAtDisplay": 16.564148902893066,
+      "size": [
+        1024,
+        1024
+      ],
+      "contrastVsGround": 1.859779527559055
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_memory_fragment_01_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 21.804,
+      "opaqueRatio": 1.0,
+      "hue": 61.42415255384827,
+      "sat": 11.637811620295677,
+      "edgeAtDisplay": 10.122631352282514,
+      "size": [
+        1070,
+        1920
+      ],
+      "contrastVsGround": 1.0883149606299214
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_memory_fragment_03_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 20.255999999999997,
+      "opaqueRatio": 1.0,
+      "hue": 135.8656759495592,
+      "sat": 8.038770074597569,
+      "edgeAtDisplay": 11.336468057843677,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 1.0395590551181102
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_memory_fragment_05_art.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 103.24949999999998,
+      "opaqueRatio": 0.14601643880208334,
+      "hue": 17.784078256993613,
+      "sat": 17.707229122513034,
+      "edgeAtDisplay": 11.236373456790124,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 3.6535275590551177
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_moral_choice_01_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 18.071,
+      "opaqueRatio": 1.0,
+      "hue": 81.12860909603704,
+      "sat": 5.980269214490997,
+      "edgeAtDisplay": 5.910456708768076,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 1.0301417864443074
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_rest_01_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 9.554999999999998,
+      "opaqueRatio": 1.0,
+      "hue": 27.56997162506134,
+      "sat": 41.79367925164706,
+      "edgeAtDisplay": 13.618169018750415,
+      "size": [
+        902,
+        1744
+      ],
+      "contrastVsGround": 1.4234476574759023
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_shop_01_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 17.11,
+      "opaqueRatio": 1.0,
+      "hue": 26.94428995894418,
+      "sat": 49.01480056715,
+      "edgeAtDisplay": 15.680745403677058,
+      "size": [
+        900,
+        1748
+      ],
+      "contrastVsGround": 1.063295378432686
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_shop_02_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 14.071,
+      "opaqueRatio": 1.0,
+      "hue": 31.269667999839342,
+      "sat": 33.18136619485675,
+      "edgeAtDisplay": 17.170921950573113,
+      "size": [
+        902,
+        1744
+      ],
+      "contrastVsGround": 1.18377390850453
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_shop_03_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 10.565999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 24.699396854696406,
+      "sat": 24.900929653997387,
+      "edgeAtDisplay": 18.61012579191033,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.361725853491165
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_shop_04_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 11.402,
+      "opaqueRatio": 1.0,
+      "hue": 15.248117031751494,
+      "sat": 24.06645127958331,
+      "edgeAtDisplay": 18.371140960038986,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.3145909241470686
+    }
+  },
+  {
+    "path": "Art/Encounters/enc_shop_05_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 14.157,
+      "opaqueRatio": 1.0,
+      "hue": 24.474761413090665,
+      "sat": 25.03218597868962,
+      "edgeAtDisplay": 21.15528752436647,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.1799903370870033
+    }
+  },
+  {
+    "path": "Art/Encounters/ending_choice_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 56.474,
+      "opaqueRatio": 1.0,
+      "hue": 6.316789731452703,
+      "sat": 12.80803265815603,
+      "edgeAtDisplay": 15.590383794008176,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 2.1802834645669287
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_gatekeeper_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 6.484,
+      "opaqueRatio": 1.0,
+      "hue": 27.038291569115426,
+      "sat": 43.458102234372774,
+      "edgeAtDisplay": 12.171489705165692,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.6507226785899967
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_jar_room_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 43.507999999999996,
+      "opaqueRatio": 1.0,
+      "hue": 32.73643997943631,
+      "sat": 35.42491655097555,
+      "edgeAtDisplay": 25.9286951303155,
+      "size": [
+        1122,
+        1402
+      ],
+      "contrastVsGround": 1.7719055118110234
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_last_words_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 6.37,
+      "opaqueRatio": 1.0,
+      "hue": 19.72337328104671,
+      "sat": 45.73956337116698,
+      "edgeAtDisplay": 15.079337231968811,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.6605648535564852
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_merchant_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 17.11,
+      "opaqueRatio": 1.0,
+      "hue": 26.94428995894418,
+      "sat": 49.01480056715,
+      "edgeAtDisplay": 15.680745403677058,
+      "size": [
+        900,
+        1748
+      ],
+      "contrastVsGround": 1.063295378432686
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_priest_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 16.483999999999998,
+      "opaqueRatio": 1.0,
+      "hue": 25.480310623082396,
+      "sat": 39.348071087081976,
+      "edgeAtDisplay": 15.590909783138402,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.0860641718546897
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_resistance_line_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 8.794,
+      "opaqueRatio": 1.0,
+      "hue": 15.176036481593387,
+      "sat": 36.67222462635016,
+      "edgeAtDisplay": 15.27862603557505,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.4737281841812104
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_rest_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 9.554999999999998,
+      "opaqueRatio": 1.0,
+      "hue": 27.56997162506134,
+      "sat": 41.79367925164706,
+      "edgeAtDisplay": 13.618169018750415,
+      "size": [
+        902,
+        1744
+      ],
+      "contrastVsGround": 1.4234476574759023
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f01_treasure_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 10.238999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 27.849851901793535,
+      "sat": 11.580432085818176,
+      "edgeAtDisplay": 15.967341313352826,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.3810953064509115
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f02_bandit_den_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 13.995999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 19.539075178220607,
+      "sat": 40.467679443901226,
+      "edgeAtDisplay": 18.01162889863548,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.1870933971434983
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f02_court_painter_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 7.071,
+      "opaqueRatio": 1.0,
+      "hue": 22.957301953939663,
+      "sat": 54.86562173314228,
+      "edgeAtDisplay": 21.64442007797271,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.6018364361031232
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f02_garden_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 12.299,
+      "opaqueRatio": 1.0,
+      "hue": 36.93854838039656,
+      "sat": 25.52581873106815,
+      "edgeAtDisplay": 19.791537219785575,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.2675156692881953
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f02_magic_anvil_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 12.598,
+      "opaqueRatio": 1.0,
+      "hue": 337.96519644283774,
+      "sat": 13.962434109166482,
+      "edgeAtDisplay": 12.542300194931775,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.2525643048761244
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f02_mercenary_outpost_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 13.995999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 19.539075178220607,
+      "sat": 40.467679443901226,
+      "edgeAtDisplay": 18.01162889863548,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.1870933971434983
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f02_merchant_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 14.071,
+      "opaqueRatio": 1.0,
+      "hue": 31.269667999839342,
+      "sat": 33.18136619485675,
+      "edgeAtDisplay": 17.170921950573113,
+      "size": [
+        902,
+        1744
+      ],
+      "contrastVsGround": 1.18377390850453
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f03_abandoned_tombstone_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 11.822,
+      "opaqueRatio": 1.0,
+      "hue": 25.124501127830737,
+      "sat": 46.94873411032655,
+      "edgeAtDisplay": 16.048215155945417,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.2921211134624777
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f03_balcony_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 26.885999999999996,
+      "opaqueRatio": 1.0,
+      "hue": 26.84677791612685,
+      "sat": 21.560476062289734,
+      "edgeAtDisplay": 20.29581353557505,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.2483779527559054
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f03_high_and_low_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 7.7059999999999995,
+      "opaqueRatio": 1.0,
+      "hue": 279.91761702106504,
+      "sat": 34.33738399818392,
+      "edgeAtDisplay": 9.80707541423002,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.5521118498240125
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f03_library_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 9.440999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 25.989858090461126,
+      "sat": 47.01125776877843,
+      "edgeAtDisplay": 12.678682383040936,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.4307602181064396
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f03_merchant_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 10.565999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 24.699396854696406,
+      "sat": 24.900929653997387,
+      "edgeAtDisplay": 18.61012579191033,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.361725853491165
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f03_poltergeist_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 11.081999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 342.2411356357347,
+      "sat": 4.706821529669084,
+      "edgeAtDisplay": 11.283371405945418,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.3322423632091305
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f04_cult_leader_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 15.142,
+      "opaqueRatio": 1.0,
+      "hue": 21.407201675243925,
+      "sat": 32.9428732021078,
+      "edgeAtDisplay": 17.96443561159844,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.1383192313208088
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f04_forbidden_book_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 12.341999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 267.8011010831479,
+      "sat": 8.781260551625973,
+      "edgeAtDisplay": 18.660853740253412,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.2653435357882992
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f04_haunted_armory_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 40.718,
+      "opaqueRatio": 1.0,
+      "hue": 215.97072820021708,
+      "sat": 41.53911488292593,
+      "edgeAtDisplay": 31.384703947368422,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.6840314960629923
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f04_life_creation_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 18.625999999999998,
+      "opaqueRatio": 1.0,
+      "hue": 35.91774464071618,
+      "sat": 22.33397833558012,
+      "edgeAtDisplay": 27.56159996345029,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.0119199388067313
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f04_merchant_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 11.402,
+      "opaqueRatio": 1.0,
+      "hue": 15.248117031751494,
+      "sat": 24.06645127958331,
+      "edgeAtDisplay": 18.371140960038986,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.3145909241470686
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f04_ritual_altar_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 15.566,
+      "opaqueRatio": 1.0,
+      "hue": 13.056979759775963,
+      "sat": 40.556620651039594,
+      "edgeAtDisplay": 22.703161549707602,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.1212741912699533
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f04_sacrifice_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 13.113999999999999,
+      "opaqueRatio": 1.0,
+      "hue": 21.597394458857163,
+      "sat": 34.813094617357784,
+      "edgeAtDisplay": 15.732609953703705,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.227575007732756
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f05_ancient_seed_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 10.886,
+      "opaqueRatio": 1.0,
+      "hue": 21.72212875803478,
+      "sat": 24.625624643961785,
+      "edgeAtDisplay": 17.36677479288499,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.3432898967676425
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f05_cradle_of_outer_gods_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 42.009,
+      "opaqueRatio": 1.0,
+      "hue": 26.09222183130625,
+      "sat": 36.2618044197391,
+      "edgeAtDisplay": 31.967263645224172,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.7246929133858269
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f05_full_preparation_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 13.762,
+      "opaqueRatio": 1.0,
+      "hue": 14.222830846965305,
+      "sat": 47.462917403766994,
+      "edgeAtDisplay": 12.102928545321637,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.1975709112854556
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f05_inquisition_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 7.6690000000000005,
+      "opaqueRatio": 1.0,
+      "hue": 13.055454417273557,
+      "sat": 62.41336258086344,
+      "edgeAtDisplay": 14.033124695419103,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.5549243351780204
+    }
+  },
+  {
+    "path": "Art/Encounters/evt_f05_oath_of_loyalty_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 30.241,
+      "opaqueRatio": 1.0,
+      "hue": 36.3684854158075,
+      "sat": 32.057963853003834,
+      "edgeAtDisplay": 20.23624360380117,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.3540472440944882
+    }
+  },
+  {
+    "path": "Art/Enemies/boss_mercenary_captain_sagan_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 49.86899999999999,
+      "opaqueRatio": 0.313239,
+      "hue": 7.990739224111303,
+      "sat": 25.622125125966654,
+      "edgeAtDisplay": 9.98092041015625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.9722519685039368
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_bandit_melee_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 49.294999999999995,
+      "opaqueRatio": 0.1262595,
+      "hue": 26.92857458929275,
+      "sat": 32.73533001442415,
+      "edgeAtDisplay": 6.85454833984375,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.9541732283464566
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_bandit_ranged_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 42.345,
+      "opaqueRatio": 0.10749375,
+      "hue": 27.495813422622454,
+      "sat": 44.59298972729054,
+      "edgeAtDisplay": 7.78664306640625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.735275590551181
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_boss_apex_02.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 50.908,
+      "opaqueRatio": 0.23183822631835938,
+      "hue": 8.675314241162383,
+      "sat": 9.072766783106777,
+      "edgeAtDisplay": 15.49001756440281,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 2.004976377952756
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_branded_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 72.081,
+      "opaqueRatio": 0.12260375,
+      "hue": 25.967748417131205,
+      "sat": 71.16677504490104,
+      "edgeAtDisplay": 7.70524658203125,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 2.6718425196850393
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_collapse_echo.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 36.396,
+      "opaqueRatio": 0.16744486490885416,
+      "hue": 240.84130297287996,
+      "sat": 12.621897907222628,
+      "edgeAtDisplay": 8.195155152224824,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.5479055118110236
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_crystalized_human_a_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 52.163999999999994,
+      "opaqueRatio": 0.10048925,
+      "hue": 32.25322925837865,
+      "sat": 32.00441159957158,
+      "edgeAtDisplay": 6.0509521484375,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 2.0445354330708656
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_crystalized_human_b_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 61.879999999999995,
+      "opaqueRatio": 0.087883,
+      "hue": 24.837158748914135,
+      "sat": 27.190769527190973,
+      "edgeAtDisplay": 5.97244384765625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 2.3505511811023623
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_cultist_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 139.052,
+      "opaqueRatio": 0.1310655,
+      "hue": 30.13580204242569,
+      "sat": 19.82258844659515,
+      "edgeAtDisplay": 10.56657470703125,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 4.781165354330708
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_empty_armor.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 21.885999999999996,
+      "opaqueRatio": 0.3534018198649089,
+      "hue": 18.227534010630848,
+      "sat": 7.845605856230138,
+      "edgeAtDisplay": 8.131246340749415,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.0908976377952755
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_execution_judge_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 44.69899999999999,
+      "opaqueRatio": 0.30769825,
+      "hue": 25.117725008486346,
+      "sat": 44.93281467059455,
+      "edgeAtDisplay": 16.52251220703125,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.8094173228346453
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_fracture_hound.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 36.43,
+      "opaqueRatio": 0.22515869140625,
+      "hue": 41.512683747989634,
+      "sat": 11.469851602740167,
+      "edgeAtDisplay": 8.486007025761124,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.548976377952756
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_homunculus_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 44.882999999999996,
+      "opaqueRatio": 0.3150278727213542,
+      "hue": 24.330543376414823,
+      "sat": 33.24893165300416,
+      "edgeAtDisplay": 12.118504830210773,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.8152125984251968
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_iron_maiden_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 18.751,
+      "opaqueRatio": 0.3953412373860677,
+      "hue": 27.275265354522944,
+      "sat": 32.09956211882598,
+      "edgeAtDisplay": 9.921439549180327,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.0079045109679057
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_isolated_inquisitor_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 39.071,
+      "opaqueRatio": 0.2571045,
+      "hue": 16.844154674044976,
+      "sat": 36.78733157672064,
+      "edgeAtDisplay": 11.0490087890625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.6321574803149606
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_lamplighter_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 50.908,
+      "opaqueRatio": 0.23183822631835938,
+      "hue": 8.675314241162383,
+      "sat": 9.072766783106777,
+      "edgeAtDisplay": 15.49001756440281,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 2.004976377952756
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_living_armor_light_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 30.035,
+      "opaqueRatio": 0.288455327351888,
+      "hue": 32.95555298970259,
+      "sat": 40.7443281840597,
+      "edgeAtDisplay": 11.19366949648712,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.34755905511811
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_living_tombstone_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 28.191999999999997,
+      "opaqueRatio": 0.45939890543619794,
+      "hue": 29.243773306842158,
+      "sat": 35.01737752251971,
+      "edgeAtDisplay": 15.158101580796252,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.289511811023622
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_maneater_jungle_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 40.440999999999995,
+      "opaqueRatio": 0.436553463579795,
+      "hue": 31.179762896481417,
+      "sat": 35.92956657409865,
+      "edgeAtDisplay": 20.841378805620607,
+      "size": [
+        1024,
+        683
+      ],
+      "contrastVsGround": 1.675307086614173
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_maneater_plant_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 26.795999999999996,
+      "opaqueRatio": 0.43880144755045575,
+      "hue": 34.00659443769331,
+      "sat": 43.26814576517653,
+      "edgeAtDisplay": 16.289311329039812,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.245543307086614
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_mercenary_assassin_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 43.534000000000006,
+      "opaqueRatio": 0.104342,
+      "hue": 19.04365297211859,
+      "sat": 40.09142739228357,
+      "edgeAtDisplay": 7.6794287109375,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.772724409448819
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_mercenary_captain_sagan_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 49.86899999999999,
+      "opaqueRatio": 0.313239,
+      "hue": 7.990739224111303,
+      "sat": 25.622125125966654,
+      "edgeAtDisplay": 9.98092041015625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.9722519685039368
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_mercenary_mage_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 47.836999999999996,
+      "opaqueRatio": 0.08934025,
+      "hue": 26.275135486427146,
+      "sat": 34.563413571506814,
+      "edgeAtDisplay": 5.9912109375,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.908251968503937
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_mercenary_melee_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 45.138,
+      "opaqueRatio": 0.13274525,
+      "hue": 31.554384543079223,
+      "sat": 55.087841582713594,
+      "edgeAtDisplay": 10.59635986328125,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.823244094488189
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_mercenary_ranged_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 52.892999999999994,
+      "opaqueRatio": 0.13996225,
+      "hue": 29.030370611917334,
+      "sat": 53.198068899048856,
+      "edgeAtDisplay": 9.122119140625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 2.067496062992126
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_offering_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 67.203,
+      "opaqueRatio": 0.0805185,
+      "hue": 26.735425240535307,
+      "sat": 26.07550752966882,
+      "edgeAtDisplay": 6.6517333984375,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 2.5182047244094488
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_old_receiver_body_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 51.193,
+      "opaqueRatio": 0.09910625,
+      "hue": 23.169691308177836,
+      "sat": 35.905856077466325,
+      "edgeAtDisplay": 8.35113525390625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 2.0139527559055117
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_outer_receiver_body_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 60.913999999999994,
+      "opaqueRatio": 0.132281,
+      "hue": 40.182033082828724,
+      "sat": 43.774538569277865,
+      "edgeAtDisplay": 8.85151611328125,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 2.320125984251968
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_prepared_offering_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 93.253,
+      "opaqueRatio": 0.455131,
+      "hue": 28.007587139169114,
+      "sat": 27.961324968011404,
+      "edgeAtDisplay": 24.5765478515625,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 3.338677165354331
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_receiver_body_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 38.99999999999999,
+      "opaqueRatio": 0.153848,
+      "hue": 21.24605132522656,
+      "sat": 26.470936753363215,
+      "edgeAtDisplay": 7.73359375,
+      "size": [
+        2000,
+        2000
+      ],
+      "contrastVsGround": 1.6299212598425195
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_shade_03.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 47.174,
+      "opaqueRatio": 0.19662348429361978,
+      "hue": 228.55675076664411,
+      "sat": 5.721971348872593,
+      "edgeAtDisplay": 11.98724019320843,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.8873700787401575
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_skeleton_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 26.006999999999998,
+      "opaqueRatio": 0.19738133748372397,
+      "hue": 28.176906359468745,
+      "sat": 38.17010767664705,
+      "edgeAtDisplay": 6.8241656908665105,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.2206929133858266
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_skeleton_horde_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 37.409,
+      "opaqueRatio": 0.5036546028550513,
+      "hue": 31.94153589963823,
+      "sat": 34.6359875426044,
+      "edgeAtDisplay": 15.885286153395784,
+      "size": [
+        1024,
+        683
+      ],
+      "contrastVsGround": 1.5798110236220473
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_slime_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 26.718,
+      "opaqueRatio": 0.18224525451660156,
+      "hue": 59.162357191520286,
+      "sat": 24.556895540313636,
+      "edgeAtDisplay": 3.2670850409836065,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.2430866141732284
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_slime_pool_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 26.404,
+      "opaqueRatio": 0.3257586589494876,
+      "hue": 55.175773674337556,
+      "sat": 44.90800877840718,
+      "edgeAtDisplay": 8.265412763466042,
+      "size": [
+        1024,
+        683
+      ],
+      "contrastVsGround": 1.2331968503937007
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_statue_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 32.626,
+      "opaqueRatio": 0.4455312093098958,
+      "hue": 34.545662973848046,
+      "sat": 25.17011138928366,
+      "edgeAtDisplay": 14.02914593091335,
+      "size": [
+        1024,
+        1536
+      ],
+      "contrastVsGround": 1.4291653543307086
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_wild_beast_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 19.839,
+      "opaqueRatio": 0.24775233345534406,
+      "hue": 32.86179670305225,
+      "sat": 55.78994151350061,
+      "edgeAtDisplay": 8.954643588992974,
+      "size": [
+        1024,
+        683
+      ],
+      "contrastVsGround": 1.0264251968503937
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_wild_beast_pack_01.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 30.843,
+      "opaqueRatio": 0.42327335743045386,
+      "hue": 33.700609664816405,
+      "sat": 19.52409590005247,
+      "edgeAtDisplay": 10.741210480093677,
+      "size": [
+        1024,
+        683
+      ],
+      "contrastVsGround": 1.373007874015748
+    }
+  },
+  {
+    "path": "Art/Enemies/enemy_wraith_04.png",
+    "class": "character",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 105.2015,
+      "opaqueRatio": 0.18805313110351562,
+      "hue": 289.5986111003706,
+      "sat": 3.772331366772974,
+      "edgeAtDisplay": 14.077587090163934,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 3.7150078740157477
+    }
+  },
+  {
+    "path": "Art/Icons/icon_ability_recall_anchor.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 111.59899999999999,
+      "opaqueRatio": 0.5154457092285156,
+      "hue": 30.5774381525733,
+      "sat": 27.986586153433414,
+      "edgeAtDisplay": 27.10101996527778,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 3.9165039370078736
+    }
+  },
+  {
+    "path": "Art/Icons/icon_ability_scout.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 32.85,
+      "opaqueRatio": 0.5401649475097656,
+      "hue": 30.70559923881346,
+      "sat": 30.581004626498316,
+      "edgeAtDisplay": 24.80023871527778,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.4362204724409449
+    }
+  },
+  {
+    "path": "Art/Icons/icon_affinity.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 72.973,
+      "opaqueRatio": 0.34935760498046875,
+      "hue": 41.62202275295104,
+      "sat": 63.823771044596775,
+      "edgeAtDisplay": 22.60470920138889,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 2.699937007874016
+    }
+  },
+  {
+    "path": "Art/Icons/icon_gold.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 61.239999999999995,
+      "opaqueRatio": 0.4245414733886719,
+      "hue": 37.03623875227374,
+      "sat": 65.73918613778028,
+      "edgeAtDisplay": 26.7373046875,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 2.3303937007874014
+    }
+  },
+  {
+    "path": "Art/Icons/icon_item_field_bandage.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 88.543,
+      "opaqueRatio": 0.2920799255371094,
+      "hue": 35.310799334500686,
+      "sat": 41.73512261368117,
+      "edgeAtDisplay": 17.474717881944443,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 3.1903307086614174
+    }
+  },
+  {
+    "path": "Art/Icons/icon_item_lantern_oil.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 34.888999999999996,
+      "opaqueRatio": 0.3098030090332031,
+      "hue": 32.612767461021136,
+      "sat": 72.09786707892347,
+      "edgeAtDisplay": 10.296766493055555,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.5004409448818896
+    }
+  },
+  {
+    "path": "Art/Icons/icon_item_torn_charm.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 100.812,
+      "opaqueRatio": 0.18337631225585938,
+      "hue": 36.68565818169179,
+      "sat": 57.854376213548306,
+      "edgeAtDisplay": 13.65407986111111,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 3.5767559055118108
+    }
+  },
+  {
+    "path": "Art/Icons/icon_memory.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 126.056,
+      "opaqueRatio": 0.22291183471679688,
+      "hue": 47.04363232130674,
+      "sat": 23.07915072087728,
+      "edgeAtDisplay": 13.302408854166666,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 4.371842519685039
+    }
+  },
+  {
+    "path": "Art/Icons/icon_status_bandage.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 120.513,
+      "opaqueRatio": 0.52349853515625,
+      "hue": 37.0821350359162,
+      "sat": 42.62359000008662,
+      "edgeAtDisplay": 31.75857204861111,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 4.197259842519685
+    }
+  },
+  {
+    "path": "Art/Icons/icon_status_recall_anchor.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 31.708000000000002,
+      "opaqueRatio": 0.6675643920898438,
+      "hue": 31.657363313411768,
+      "sat": 28.084278271129854,
+      "edgeAtDisplay": 30.96875,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.400251968503937
+    }
+  },
+  {
+    "path": "Art/Icons/icon_status_training.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 68.295,
+      "opaqueRatio": 0.7409706115722656,
+      "hue": 36.257536637736656,
+      "sat": 41.223617328180126,
+      "edgeAtDisplay": 36.178059895833336,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 2.5525984251968503
+    }
+  },
+  {
+    "path": "Art/Lobby/lobby_bg_tower_temp.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 38.504999999999995,
+      "opaqueRatio": 1.0,
+      "hue": 68.6369974741381,
+      "sat": 10.0255952753636,
+      "edgeAtDisplay": 7.121526633717737,
+      "size": [
+        1080,
+        1920
+      ],
+      "contrastVsGround": 1.6143307086614171
+    }
+  },
+  {
+    "path": "Art/Lobby/lobby_logo_temp.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 20.516,
+      "opaqueRatio": 1.0,
+      "hue": 42.8205057907043,
+      "sat": 16.245357814244972,
+      "edgeAtDisplay": 30.20724166666667,
+      "size": [
+        600,
+        600
+      ],
+      "contrastVsGround": 1.047748031496063
+    }
+  },
+  {
+    "path": "Art/Map/map_current_position_marker.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 75.084,
+      "opaqueRatio": 0.30887603759765625,
+      "hue": 41.15749745010539,
+      "sat": 44.514644541031,
+      "edgeAtDisplay": 5.896125793457031,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 2.7664251968503937
+    }
+  },
+  {
+    "path": "Art/Map/map_floor01_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 48.405,
+      "opaqueRatio": 1.0,
+      "hue": 35.43217697208942,
+      "sat": 29.845205053000086,
+      "edgeAtDisplay": 6.4503015350877195,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.9261417322834646
+    }
+  },
+  {
+    "path": "Art/Map/map_floor02_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 39.17,
+      "opaqueRatio": 1.0,
+      "hue": 49.6206988371053,
+      "sat": 26.644162715730463,
+      "edgeAtDisplay": 11.243370796783626,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.635275590551181
+    }
+  },
+  {
+    "path": "Art/Map/map_floor03_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 48.553000000000004,
+      "opaqueRatio": 1.0,
+      "hue": 233.06793438326224,
+      "sat": 16.96290193534227,
+      "edgeAtDisplay": 15.044902838693957,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.9308031496062994
+    }
+  },
+  {
+    "path": "Art/Map/map_floor04_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 39.484,
+      "opaqueRatio": 1.0,
+      "hue": 40.2211623372336,
+      "sat": 15.237312762651852,
+      "edgeAtDisplay": 17.699806591130603,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.6451653543307088
+    }
+  },
+  {
+    "path": "Art/Map/map_floor05_bg.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 33.303,
+      "opaqueRatio": 1.0,
+      "hue": 82.7567990152067,
+      "sat": 2.7837570228829245,
+      "edgeAtDisplay": 18.635367933723195,
+      "size": [
+        941,
+        1672
+      ],
+      "contrastVsGround": 1.4504881889763779
+    }
+  },
+  {
+    "path": "Art/Map/map_node_locked_overlay.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 126.377,
+      "opaqueRatio": 0.4044189453125,
+      "hue": 37.776672407875324,
+      "sat": 27.836221515821858,
+      "edgeAtDisplay": 14.668876647949219,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 4.3819527559055125
+    }
+  },
+  {
+    "path": "Art/Map/map_node_selected_ring.png",
+    "class": "background",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 151.049,
+      "opaqueRatio": 0.19976806640625,
+      "hue": 39.24574569250615,
+      "sat": 44.730757773461946,
+      "edgeAtDisplay": 8.408958435058594,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 5.159023622047244
+    }
+  },
+  {
+    "path": "Art/Nodes/node_back_cleared.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 35.153,
+      "opaqueRatio": 0.4851036071777344,
+      "hue": 35.9436317444201,
+      "sat": 21.4903598975921,
+      "edgeAtDisplay": 11.625422222222221,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.508755905511811
+    }
+  },
+  {
+    "path": "Art/Nodes/node_boss.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 23.153000000000002,
+      "opaqueRatio": 0.5673446655273438,
+      "hue": 21.30311144524643,
+      "sat": 13.6528681434021,
+      "edgeAtDisplay": 18.35697777777778,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.1308031496062994
+    }
+  },
+  {
+    "path": "Art/Nodes/node_combat.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 31.441,
+      "opaqueRatio": 0.330047607421875,
+      "hue": 32.9406694514378,
+      "sat": 18.046465778663485,
+      "edgeAtDisplay": 10.560622222222221,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.3918425196850395
+    }
+  },
+  {
+    "path": "Art/Nodes/node_event.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 42.961999999999996,
+      "opaqueRatio": 0.2637672424316406,
+      "hue": 326.6191517585057,
+      "sat": 12.735148585484454,
+      "edgeAtDisplay": 10.597111111111111,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.7547086614173226
+    }
+  },
+  {
+    "path": "Art/Nodes/node_rest.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 31.180999999999997,
+      "opaqueRatio": 0.4547080993652344,
+      "hue": 32.609814757121995,
+      "sat": 44.47125952506063,
+      "edgeAtDisplay": 15.192633333333333,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.3836535433070865
+    }
+  },
+  {
+    "path": "Art/Nodes/node_shop.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 30.141999999999996,
+      "opaqueRatio": 0.5204124450683594,
+      "hue": 31.396967286849158,
+      "sat": 32.19714979906295,
+      "edgeAtDisplay": 17.148777777777777,
+      "size": [
+        512,
+        512
+      ],
+      "contrastVsGround": 1.3509291338582676
+    }
+  },
+  {
+    "path": "Art/UI/CombatActions/icon_action_attack.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 41.0,
+      "opaqueRatio": 0.22271352639296188,
+      "hue": 21.133018087745732,
+      "sat": 10.030338375833441,
+      "edgeAtDisplay": 16.991861979166668,
+      "size": [
+        512,
+        341
+      ],
+      "contrastVsGround": 1.6929133858267718
+    }
+  },
+  {
+    "path": "Art/UI/CombatActions/icon_action_defend.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 34.854,
+      "opaqueRatio": 0.33827437683284456,
+      "hue": 33.39328695110707,
+      "sat": 15.281352446079566,
+      "edgeAtDisplay": 19.365071614583332,
+      "size": [
+        512,
+        341
+      ],
+      "contrastVsGround": 1.4993385826771652
+    }
+  },
+  {
+    "path": "Art/UI/CombatActions/icon_action_skill_scout.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 18.782999999999998,
+      "opaqueRatio": 0.20398414589442815,
+      "hue": 30.17932946374425,
+      "sat": 21.83325994422428,
+      "edgeAtDisplay": 10.164713541666666,
+      "size": [
+        512,
+        341
+      ],
+      "contrastVsGround": 1.0068816795103543
+    }
+  },
+  {
+    "path": "Art/UI/RestActions/icon_rest_recover.png",
+    "class": "icon",
+    "verdict": "FAIL",
+    "violations": [
+      "명도 중앙 11.6 < 12"
+    ],
+    "metrics": {
+      "medianLuma": 11.555000000000001,
+      "opaqueRatio": 0.4790108998616536,
+      "hue": 33.42362747840193,
+      "sat": 51.495162929207716,
+      "edgeAtDisplay": 23.62548828125,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.3063155729273812
+    }
+  },
+  {
+    "path": "Art/UI/RestActions/icon_rest_talk.png",
+    "class": "icon",
+    "verdict": "FAIL",
+    "violations": [
+      "명도 중앙 9.5 < 12"
+    ],
+    "metrics": {
+      "medianLuma": 9.512,
+      "opaqueRatio": 0.48391087849934894,
+      "hue": 29.506689727378422,
+      "sat": 69.68421251581383,
+      "edgeAtDisplay": 14.524088541666666,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.4261971071781512
+    }
+  },
+  {
+    "path": "Art/UI/RestActions/icon_rest_train.png",
+    "class": "icon",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 13.479999999999999,
+      "opaqueRatio": 0.48112742106119794,
+      "hue": 28.789173177318812,
+      "sat": 62.14743337326202,
+      "edgeAtDisplay": 44.357747395833336,
+      "size": [
+        1536,
+        1024
+      ],
+      "contrastVsGround": 1.210446054136485
+    }
+  },
+  {
+    "path": "Art/UI/ui_shop_locked_card.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 39.256,
+      "opaqueRatio": 0.5492677688598633,
+      "hue": 54.65548672201696,
+      "sat": 6.9205527663918245,
+      "edgeAtDisplay": 7.392488888888889,
+      "size": [
+        1024,
+        1024
+      ],
+      "contrastVsGround": 1.637984251968504
+    }
+  },
+  {
+    "path": "Art/UI/ui_shop_product_card.png",
+    "class": "card",
+    "verdict": "PASS",
+    "violations": [],
+    "metrics": {
+      "medianLuma": 33.914,
+      "opaqueRatio": 0.66247,
+      "hue": 50.978024554367735,
+      "sat": 21.82650740368598,
+      "edgeAtDisplay": 7.814804964539007,
+      "size": [
+        800,
+        500
+      ],
+      "contrastVsGround": 1.469732283464567
+    }
+  }
+]

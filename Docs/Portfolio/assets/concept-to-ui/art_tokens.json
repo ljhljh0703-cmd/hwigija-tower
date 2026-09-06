@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "kind": "art-gates",
+  "checker": "Tools/check_art.py (약한 게이트) + Tools/make_art_sheet.py (사람 판정)",
+  "revisions": [
+    "v1 2026-09-01 · 명도·대비·엣지로 판독성을 자동 판정하려 함 → 실패. 정답지 4건에서 좋고 나쁨이 안 갈렸다",
+    "v2 2026-09-01 · 자동 게이트를 잴 수 있는 것으로만 축소. 판독성은 대조 시트 + 사람 판정으로 이관"
+  ],
+
+  "measurable": {
+    "note": "이건 자동으로 판정한다. 위반이면 FAIL.",
+    "ground": { "panelBg": "#17120D", "luma": 19.0 },
+    "classes": {
+      "icon":       { "match": ["Art/UI/**Actions/**", "Art/Icons/**"], "displayPx": 96,   "minMedianLuma": 12 },
+      "card":       { "match": ["Art/UI/ui_*card*", "Art/Nodes/**"],    "displayPx": 300,  "minMedianLuma": 12 },
+      "character":  { "match": ["Art/Characters/**", "Art/Enemies/**"], "displayPx": 640,  "minMedianLuma": 10 },
+      "background": { "match": ["Art/Encounters/**", "Art/Map/**", "Art/Environments/**", "Art/Lobby/**"], "displayPx": 1080, "minMedianLuma": 6 }
+    },
+    "palette": {
+      "primaryHueRange": [0, 60],
+      "primaryShareMin": 0.70,
+      "measured": "97개 중 71개 = 73% 일치 (2026-09-01). 톤은 흩어져 있지 않다",
+      "declaredExceptions": {
+        "sanity": { "hueRange": [200, 240], "reason": "이성 자원 전용" },
+        "vfx":    { "hueRange": [0, 360],   "reason": "순간 노출" }
+      }
+    }
+  },
+
+  "notMeasurable": {
+    "note": "자동으로 못 잰다. 세 가지 지표(명도·대비·고주파)로 시도했고 전부 좋고 나쁨을 못 갈랐다. 대조 시트를 보고 사람이 판정한다.",
+    "criteria": [
+      "96px 로 줄였을 때 형태가 읽히는가",
+      "아이콘끼리 같은 종류로 보이는가 (형·굵기·색 계열)",
+      "아트 안에 글자가 박혀 있지 않은가"
+    ],
+    "tool": "python3 Tools/make_art_sheet.py — 실제 표시 크기로 줄여 실제 배경색 위에 깐다"
+  },
+
+  "findings_2026_09_01": {
+    "verdict": "명도 문제가 아니다. 아이콘이 세 종류로 섞여 있는 것이 문제다.",
+    "groups": {
+      "A_금색_원형_아이콘": { "count": 12, "path": "Art/Icons/**", "판정": "좋음",
+        "note": "96px 에서 형태가 읽히고 금색 하이라이트가 바닥에서 뜬다. 이게 기준이다" },
+      "B_회색_선형_아이콘": { "count": 3, "path": "Art/UI/CombatActions/**", "판정": "교체",
+        "note": "전투 공격·방어·정찰. 이 셋만 회색이라 톤이 다르고 선이 가늘어 96px 에서 흐려진다. A 계열로 다시 그린다" },
+      "C_가로_삽화_배너": { "count": 3, "path": "Art/UI/RestActions/**", "판정": "교체",
+        "note": "아이콘이 아니라 미니 배너다. **아트 안에 「휴식」「대화」「훈련」 글자가 박혀 있다** — UI 라벨과 중복되고 지역화도 막는다. 휴식 화면의 라벨 이중 표기(R-04)의 진짜 원인" }
+    },
+    "excluded": { "icon_app_launcher": "로고. 아이콘 그리드 대상 아님" }
+  },
+
+  "stop": [
+    "일괄 밝기 보정으로 게이트를 통과시키지 않는다. 톤이 죽는다",
+    "아트 안에 글자를 넣지 않는다. 글자는 UI 층이 담당한다",
+    "A 계열과 다른 톤의 아이콘을 새로 만들지 않는다"
+  ]
+}
