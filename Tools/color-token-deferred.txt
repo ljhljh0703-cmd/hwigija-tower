@@ -4,4 +4,22 @@
 #       이 색들은 12화면이 쓰지 않는 코드에도 걸쳐 있어 「팔레트 결정」이 아니라 「모놀리스 부채」다.
 # 해제 조건: 모놀리스 감축 레인이 열릴 때 이 목록을 비운다.
 PrototypeHud.cs
+# 2026-09-24 모놀리스 partial 분해 — 같은 클래스의 조각이라 이월 상태를 그대로 승계한다(건수 합 불변).
+PrototypeHud.BossGate.cs
+PrototypeHud.Choices.cs
+PrototypeHud.Combat.cs
+PrototypeHud.Ending.cs
+PrototypeHud.Event.cs
+PrototypeHud.FloorMap.cs
+PrototypeHud.Header.cs
+PrototypeHud.Navigation.cs
+PrototypeHud.PreRun.cs
+PrototypeHud.Presentation.cs
+PrototypeHud.PublicText.cs
+PrototypeHud.Rest.cs
+PrototypeHud.Result.cs
+PrototypeHud.Rewards.cs
+PrototypeHud.Shop.cs
+PrototypeHud.Utility.cs
+PrototypeHud.Widgets.cs
 PrototypeCutscenePlayer.cs
