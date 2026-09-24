@@ -14,365 +14,186 @@ namespace HwigiTower.UI
     public sealed partial class PrototypeHud : MonoBehaviour
     {
         [SerializeField] private Text focusText;
-
         [SerializeField] private Text interactionText;
-
         [SerializeField] private Text runStateText;
-
         [SerializeField] private Text resultText;
-
         [SerializeField] private Text routeText;
-
         [SerializeField] private Text memoryText;
-
         [SerializeField] private Text demoCompleteText;
-
         [SerializeField] private RectTransform choiceContainer;
-
         [SerializeField] private Sprite mataiosPortrait;
-
         [SerializeField] private DemoPresentationData presentationData;
-
         [SerializeField] private PrototypeCutscenePlayer cutscenePlayer;
-
         [SerializeField] private bool showRawDebugText;
-
         [SerializeField] private Image encounterBackgroundImage;
-
         [SerializeField] private Image npcPortraitImage;
-
         [SerializeField] private RectTransform combatPanel;
-
         [SerializeField] private Text combatText;
-
         [SerializeField] private Image combatEnemyImage;
-
         [SerializeField] private RectTransform combatEnemyStage;
-
         [SerializeField] private RectTransform combatLogPanel;
-
         [SerializeField] private RectTransform combatPartyDock;
-
         [SerializeField] private RectTransform combatPlayerCard;
-
         [SerializeField] private RectTransform combatMataiosCard;
-
         [SerializeField] private RectTransform eventCutscenePanel;
-
         [SerializeField] private Image eventCutsceneImage;
-
         [SerializeField] private Text eventHeaderText;
-
         [SerializeField] private Text eventBodyText;
-
         [SerializeField] private Text eventUtilityText;
-
         [SerializeField] private Text combatEnemyTitleText;
-
         [SerializeField] private Text combatEnemyStatusText;
-
         [SerializeField] private Text combatPlayerCardText;
-
         [SerializeField] private Text combatMataiosCardText;
-
         [SerializeField] private Image combatPlayerPortraitImage;
-
         [SerializeField] private Image combatMataiosPortraitImage;
-
         [SerializeField] private Image combatPlayerPortraitFrameImage;
-
         [SerializeField] private Image combatMataiosPortraitFrameImage;
-
         [SerializeField] private Text combatPlayerPortraitFallbackText;
-
         [SerializeField] private Image attackActionIconImage;
-
         [SerializeField] private Image defendActionIconImage;
-
         [SerializeField] private Image skillActionIconImage;
-
         [SerializeField] private Image combatTrainingStatusIconImage;
-
         [SerializeField] private Image combatBandageStatusIconImage;
-
         [SerializeField] private Image combatRecallStatusIconImage;
-
         [SerializeField] private RectTransform skillPickerPanel;
-
         [SerializeField] private Image merchantVisualImage;
-
         [SerializeField] private RectTransform npcSpotlightLayer;
-
         [SerializeField] private Image npcSpotlightBackdropImage;
-
         [SerializeField] private Image npcSpotlightGlowImage;
-
         [SerializeField] private Image npcSpotlightShadowImage;
-
         [SerializeField] private Image npcDialoguePlateImage;
-
         [SerializeField] private Text npcSpotlightNameText;
-
         [SerializeField] private Text npcSpotlightDialogueText;
-
         [SerializeField] private Image topGoldIconImage;
-
         [SerializeField] private Image topMemoryIconImage;
-
         [SerializeField] private Image topAffinityIconImage;
-
         [SerializeField] private Image topPlayerProfileImage;
-
         [SerializeField] private Image topMataiosProfileImage;
-
         [SerializeField] private Image enemyHpFill;
-
         [SerializeField] private Image playerHpFill;
-
         [SerializeField] private Image mataiosHpFill;
-
         [SerializeField] private Button attackButton;
-
         [SerializeField] private Button defendButton;
-
         [SerializeField] private Button skillButton;
-
         [SerializeField] private Button combatItemInspectButton;
-
         [SerializeField] private Button combatItemInspectCloseButton;
-
         [SerializeField] private Button routeActionButton;
-
         [SerializeField] private Button nextFloorButton;
-
         [SerializeField] private Button restartButton;
-
         [SerializeField] private Button endingRestButton;
-
         [SerializeField] private Button endingContinueButton;
-
         [SerializeField] private CombatUiController combatUiController;
-
         [SerializeField] private RestUiController restUiController;
-
         [SerializeField] private FloorMapUiController floorMapUiController;
-
         [SerializeField] private ShopUiController shopUiController;
-
         [SerializeField] private EventUiController eventUiController;
-
         [SerializeField] private BossGateUiController bossGateUiController;
-
         [SerializeField] private EndingUiController endingUiController;
-
         [SerializeField] private RectTransform restInteractionPanel;
-
         [SerializeField] private Text restResponseText;
-
         [SerializeField] private InputField restInputField;
-
         [SerializeField] private Button restAskMoodButton;
-
         [SerializeField] private Button restTrainButton;
-
         [SerializeField] private Button restRecoverButton;
-
         [SerializeField] private Image restAskMoodIconImage;
-
         [SerializeField] private Image restTrainIconImage;
-
         [SerializeField] private Image restRecoverIconImage;
-
         [SerializeField] private Button restSubmitButton;
-
         [SerializeField] private Button restContinueButton;
-
         [SerializeField] private RectTransform restResponsePanel;
-
         [SerializeField] private RectTransform topStatusLayer;
-
         [SerializeField] private RectTransform objectiveLayer;
-
         [SerializeField] private RectTransform visualLayer;
-
         [SerializeField] private RectTransform nodeMapLayer;
-
         [SerializeField] private RectTransform npcReactionLayer;
-
         [SerializeField] private RectTransform actionLayer;
-
         [SerializeField] private RectTransform resultLayer;
-
         [SerializeField] private RectTransform resultIconStrip;
-
         [SerializeField] private RectTransform endingLayer;
-
         [SerializeField] private RectTransform portraitRoot;
-
         [SerializeField] private Image floorMapBackgroundImage;
-
         [SerializeField] private RectTransform utilityPanel;
-
         [SerializeField] private RectTransform preRunPlaceholderLayer;
-
         [SerializeField] private RectTransform combatItemInspectPanel;
-
         [SerializeField] private Text combatItemInspectText;
-
         [SerializeField] private Image lowHpWarningImage;
-
         [SerializeField] private RectTransform levelRewardPanel;
-
         [SerializeField] private Text levelRewardTitleText;
-
         [SerializeField] private Text levelRewardBodyText;
-
         [SerializeField] private Button levelRewardAttackButton;
-
         [SerializeField] private Button levelRewardMaxHpButton;
-
         [SerializeField] private Button levelRewardSkillButton;
-
         [SerializeField] private Text combatEnemyDamageNumberText;
-
         [SerializeField] private Text combatMataiosDamageNumberText;
-
         [SerializeField] private Text combatPlayerDamageNumberText;
-
         [SerializeField] private Text combatDefeatFeedbackText;
-
         [SerializeField] private RectTransform combatIntroOverlay;
-
         [SerializeField] private RectTransform bossRewardPanel;
-
         [SerializeField] private Text bossRewardTitleText;
-
         [SerializeField] private Text bossRewardGoldText;
-
         [SerializeField] private Text bossRewardAffinityText;
-
         [SerializeField] private Image bossRewardGoldIconImage;
-
         [SerializeField] private Image bossRewardAffinityIconImage;
-
         [SerializeField] private Button bossRewardNextFloorButton;
-
         [SerializeField] private Image utilityPortraitImage;
-
         [SerializeField] private Text utilityText;
-
         [SerializeField] private Button utilityStatusButton;
-
         [SerializeField] private Button utilityMapButton;
-
         [SerializeField] private Button utilityLoadoutButton;
-
         [SerializeField] private Button utilityPlayerTabButton;
-
         [SerializeField] private Button utilityMataiosTabButton;
-
         [SerializeField, Range(0.05f, 0.75f)] private float lowHpWarningRatio = 0.30f;
 
         private readonly List<Button> _choiceButtons = new List<Button>();
-
         private readonly List<Image> _mapNodeIconImages = new List<Image>();
-
         private readonly List<Image> _shopChoiceCardImages = new List<Image>();
-
         private readonly List<Image> _shopChoiceIconImages = new List<Image>();
-
         private readonly List<GameObject> _resultSummaryChips = new List<GameObject>();
-
         private readonly List<Image> _resultSummaryIconImages = new List<Image>();
-
         private readonly List<Text> _resultSummaryValueTexts = new List<Text>();
-
         private readonly List<Text> _resultSummaryFallbackTexts = new List<Text>();
-
         private readonly List<string> _activeResultSummaryLabels = new List<string>();
-
         private readonly List<string> _activeResultSummaryValues = new List<string>();
-
         private readonly List<GameObject> _mapDecorations = new List<GameObject>();
-
         private readonly List<string> _demoRouteLabels = new List<string>();
-
         private readonly List<string> _demoRouteEncounterIds = new List<string>();
-
         private PrototypeRoomController _roomController;
-
         private EncounterSelection _pendingRestSelection;
-
         private string _pendingRestActionId = string.Empty;
-
         private string _lastMemoryCutsceneKey = string.Empty;
-
         private string _lastCombatCutsceneKey = string.Empty;
-
         private string _lastDemoCompleteCutsceneKey = string.Empty;
-
         private string _npcSpotlightModeLabel = string.Empty;
-
         private string _activePresentationEncounterId = string.Empty;
-
         private bool _cutsceneFinishedSubscribed;
-
         private bool _shopPresentationActive;
-
         private bool _eventPresentationActive;
-
         private bool _bossGatePresentationActive;
-
         private string _utilityMode = string.Empty;
-
         private string _utilityCharacterMode = "player";
-
         private string _lastResultMessage = string.Empty;
-
         private PrototypeRunSnapshot _lastSnapshot;
-
         private string _lastCombatVisualKey = string.Empty;
-
         private int _lastCombatVisualRound = -1;
-
         private int _lastCombatVisualEnemyHp = -1;
-
         private int _lastCombatVisualPlayerHp = -1;
-
         private bool _combatEnemyFeedbackBaseCaptured;
-
         private Vector2 _combatEnemyImageBasePosition;
-
         private Vector3 _combatEnemyImageBaseScale = Vector3.one;
-
         private bool _combatPlayerFeedbackBaseCaptured;
-
         private Vector2 _combatPlayerCardBasePosition;
-
         private Vector3 _combatPlayerCardBaseScale = Vector3.one;
-
         private Color _combatPlayerCardBaseColor = Color.white;
-
         private float _combatEnemyHitShakeTimer;
-
         private float _combatEnemyAttackPulseTimer;
-
         private float _combatEnemyDamageNumberTimer;
-
         private float _combatMataiosDamageNumberTimer;
-
         private float _combatPlayerDamageNumberTimer;
-
         private float _combatPlayerHitShakeTimer;
-
         private float _combatPlayerHpPulseTimer;
-
         private float _combatIntroTimer;
-
         private float _combatDefeatFeedbackTimer;
-
         private string _combatIntroKey = string.Empty;
-
         private string _combatDefeatFeedbackKey = string.Empty;
 
         private enum NpcSpotlightMode
@@ -399,323 +220,194 @@ namespace HwigiTower.UI
         }
 
         private const float ChoiceButtonHeight = 118f;
-
         private const float ChoiceButtonSpacing = 130f;
-
         private const float EventChoiceButtonHeight = 104f;
-
         private const float EventChoiceButtonSpacing = 116f;
-
         private const float MapNodeButtonHeight = 124f;
-
         private const float MapNodeButtonSpacing = 132f;
-
         private const float MapNodeIconSize = 84f;
-
         private const int TitleFontSize = 34;
-
         private const int SubtitleFontSize = 30;
-
         private const int BodyFontSize = 28;
-
         private const int ButtonFontSize = 30;
-
         private const int ResultFontSize = 28;
-
         private const int StatFontSize = 26;
-
         private const int CaptionFontSize = 23;
-
         private const int CombatBodyFontSize = 24;
-
         private const float CombatActionButtonSize = 118f;
-
         private const int ChoiceFontSize = ButtonFontSize;
-
         private const int MapNodeFontSize = 29;
-
         private const int ResultLineLimit = 3;
-
         private const int ResultIconChipCount = 6;
-
         private const float DenseLineSpacing = 0.92f;
-
         private const float CombatEnemyHitShakeDuration = 0.18f;
-
         private const float CombatEnemyAttackPulseDuration = 0.16f;
-
         private const float CombatPlayerHitShakeDuration = 0.20f;
-
         private const float CombatPlayerHpPulseDuration = 0.22f;
-
         private const float CombatDamageNumberDuration = 0.70f;
-
         private const float CombatIntroDuration = 0.45f;
-
         private const float CombatDefeatFeedbackDuration = 2.0f;
-
         private const float CombatEnemyHitShakePixels = 11f;
-
         private const float CombatPlayerHitShakePixels = 9f;
-
         private const float CombatEnemyAttackPulseScale = 1.045f;
-
         private const float CombatPlayerHpPulseScale = 1.06f;
-
         private static readonly Color PrimaryTextColor = new Color(0.90f, 0.95f, 0.96f, 1f);
-
         private static readonly Color ResultTextColor = new Color(0.88f, 0.93f, 0.95f, 1f);
-
         private static readonly Color PanelColor = new Color(0.035f, 0.045f, 0.055f, 0.88f);
 
         public int ChoiceButtonCount => _choiceButtons.Count;
-
         public string ResultMessage => resultText == null ? string.Empty : resultText.text;
-
         public string RunStateMessage => runStateText == null ? string.Empty : runStateText.text;
-
         public string RouteMessage => routeText == null ? string.Empty : routeText.text;
-
         public string MemoryMessage => memoryText == null ? string.Empty : memoryText.text;
-
         public string CombatMessage => combatText == null ? string.Empty : combatText.text;
-
         public string CombatThreatReadoutMessage => combatUiController == null || combatUiController.ThreatReadoutText == null
             ? string.Empty
             : combatUiController.ThreatReadoutText.text;
-
         public string CombatEnemyTitleMessage => combatEnemyTitleText == null ? string.Empty : combatEnemyTitleText.text;
-
         public bool CombatPanelVisible => combatPanel != null && combatPanel.gameObject.activeSelf;
-
         public bool CombatEnemyVisible => combatEnemyImage != null && combatEnemyImage.gameObject.activeInHierarchy;
-
         public bool PortraitVisible => npcPortraitImage != null && npcPortraitImage.gameObject.activeSelf;
-
         public bool NodeMapVisible => (floorMapUiController != null && floorMapUiController.Visible) ||
             (nodeMapLayer != null && nodeMapLayer.gameObject.activeInHierarchy);
-
         public bool ResultPanelVisible => resultLayer != null && resultLayer.gameObject.activeInHierarchy;
-
         public bool RouteHeaderVisible => routeText != null && routeText.gameObject.activeInHierarchy;
-
         public bool MemoryPanelVisible => memoryText != null && memoryText.gameObject.activeInHierarchy;
-
         public bool RouteActionButtonVisible => routeActionButton != null && routeActionButton.gameObject.activeSelf;
-
         public bool EndingRestButtonVisible => endingUiController != null && endingUiController.Visible
             ? endingUiController.RestButton != null && endingUiController.RestButton.gameObject.activeSelf
             : endingRestButton != null && endingRestButton.gameObject.activeSelf;
-
         public bool EndingContinueButtonVisible => endingUiController != null && endingUiController.Visible
             ? endingUiController.ContinueButton != null && endingUiController.ContinueButton.gameObject.activeSelf
             : endingContinueButton != null && endingContinueButton.gameObject.activeSelf;
-
         public Button EndingRestButton => endingUiController != null && endingUiController.Visible ? endingUiController.RestButton : endingRestButton;
-
         public Button EndingContinueButton => endingUiController != null && endingUiController.Visible ? endingUiController.ContinueButton : endingContinueButton;
-
         public bool RestInteractionPanelVisible => restInteractionPanel != null && restInteractionPanel.gameObject.activeSelf;
-
         public string RestResponseMessage => restResponseText == null ? string.Empty : restResponseText.text;
-
         public bool RawDebugTextVisible => showRawDebugText;
-
         public bool HasPresentationData => presentationData != null;
-
         public bool HasPortraitRoot => portraitRoot != null && portraitRoot.gameObject.activeInHierarchy;
-
         public Vector2 PortraitRootSize => portraitRoot == null ? Vector2.zero : portraitRoot.sizeDelta;
-
         public string CurrentBackgroundSpriteName => encounterBackgroundImage != null && encounterBackgroundImage.gameObject.activeInHierarchy && encounterBackgroundImage.sprite != null ? encounterBackgroundImage.sprite.name : string.Empty;
-
         public string CurrentCombatEnemySpriteName => combatEnemyImage != null && combatEnemyImage.sprite != null ? combatEnemyImage.sprite.name : string.Empty;
-
         public string CurrentCombatPlayerPortraitSpriteName => combatPlayerPortraitImage != null && combatPlayerPortraitImage.sprite != null ? combatPlayerPortraitImage.sprite.name : string.Empty;
-
         public string CurrentCombatMataiosPortraitSpriteName => combatMataiosPortraitImage != null && combatMataiosPortraitImage.sprite != null ? combatMataiosPortraitImage.sprite.name : string.Empty;
-
         public string CurrentCombatPortraitFrameSpriteName => combatPlayerPortraitFrameImage != null && combatPlayerPortraitFrameImage.sprite != null ? combatPlayerPortraitFrameImage.sprite.name : string.Empty;
-
         public bool CombatPlayerPortraitVisible => combatPlayerPortraitImage != null && combatPlayerPortraitImage.gameObject.activeInHierarchy;
-
         public bool CombatMataiosPortraitVisible => combatMataiosPortraitImage != null && combatMataiosPortraitImage.gameObject.activeInHierarchy;
-
         public bool CombatPortraitFrameVisible => combatPlayerPortraitFrameImage != null && combatPlayerPortraitFrameImage.gameObject.activeInHierarchy;
-
         public bool CombatPartyDockVisible => combatPartyDock != null && combatPartyDock.gameObject.activeInHierarchy;
-
         public string CombatPartyMessage => ((combatPlayerCardText == null ? string.Empty : combatPlayerCardText.text) + "\n" + (combatMataiosCardText == null ? string.Empty : combatMataiosCardText.text)).Trim();
-
         public string CombatEnemyStatusMessage => combatEnemyStatusText == null ? string.Empty : combatEnemyStatusText.text;
-
         public bool CombatItemInspectButtonVisible => combatItemInspectButton != null && combatItemInspectButton.gameObject.activeInHierarchy;
-
         public bool CombatItemInspectVisible => combatItemInspectPanel != null && combatItemInspectPanel.gameObject.activeInHierarchy;
-
         public string CombatItemInspectMessage => combatItemInspectText == null ? string.Empty : combatItemInspectText.text;
-
         public bool PreRunPlaceholderVisible => preRunPlaceholderLayer != null && preRunPlaceholderLayer.gameObject.activeInHierarchy;
-
         public bool LowHpWarningVisible => lowHpWarningImage != null && lowHpWarningImage.gameObject.activeInHierarchy;
-
         public bool LevelRewardPopupVisible => levelRewardPanel != null && levelRewardPanel.gameObject.activeInHierarchy;
-
         public string LevelRewardPopupMessage => ((levelRewardTitleText == null ? string.Empty : levelRewardTitleText.text) + "\n" +
             (levelRewardBodyText == null ? string.Empty : levelRewardBodyText.text) + "\n" +
             ResolveButtonLabel(levelRewardAttackButton) + "\n" +
             ResolveButtonLabel(levelRewardMaxHpButton) + "\n" +
             ResolveButtonLabel(levelRewardSkillButton)).Trim();
-
         public string CombatDamageNumberMessage => ((combatEnemyDamageNumberText == null || !combatEnemyDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatEnemyDamageNumberText.text) + "|" +
             (combatMataiosDamageNumberText == null || !combatMataiosDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatMataiosDamageNumberText.text) + "|" +
             (combatPlayerDamageNumberText == null || !combatPlayerDamageNumberText.gameObject.activeInHierarchy ? string.Empty : combatPlayerDamageNumberText.text)).Trim('|');
-
         public bool CombatIntroOverlayVisible => combatIntroOverlay != null && combatIntroOverlay.gameObject.activeInHierarchy;
-
         public bool CombatPlayerHitFeedbackActive => _combatPlayerHitShakeTimer > 0f || _combatPlayerHpPulseTimer > 0f;
-
         public bool CombatDefeatFeedbackVisible => combatDefeatFeedbackText != null && combatDefeatFeedbackText.gameObject.activeInHierarchy;
-
         public string CombatDefeatFeedbackMessage => combatDefeatFeedbackText == null ? string.Empty : combatDefeatFeedbackText.text;
-
         public bool BossRewardPopupVisible => bossRewardPanel != null && bossRewardPanel.gameObject.activeInHierarchy;
-
         public string BossRewardPopupMessage => ((bossRewardTitleText == null ? string.Empty : bossRewardTitleText.text) + "\n" +
             (bossRewardGoldText == null ? string.Empty : bossRewardGoldText.text) + "\n" +
             (bossRewardAffinityText == null ? string.Empty : bossRewardAffinityText.text)).Trim();
-
         public bool BossRewardNextFloorButtonVisible => bossRewardNextFloorButton != null && bossRewardNextFloorButton.gameObject.activeInHierarchy;
-
         public string CurrentCombatActionIconNames => string.Join("|", new[]
         {
             attackActionIconImage != null && attackActionIconImage.sprite != null ? attackActionIconImage.sprite.name : string.Empty,
             defendActionIconImage != null && defendActionIconImage.sprite != null ? defendActionIconImage.sprite.name : string.Empty,
             skillActionIconImage != null && skillActionIconImage.sprite != null ? skillActionIconImage.sprite.name : string.Empty
         });
-
         public string CurrentCombatStatusIconNames => string.Join("|", new[]
         {
             combatTrainingStatusIconImage != null && combatTrainingStatusIconImage.sprite != null ? combatTrainingStatusIconImage.sprite.name : string.Empty,
             combatBandageStatusIconImage != null && combatBandageStatusIconImage.sprite != null ? combatBandageStatusIconImage.sprite.name : string.Empty,
             combatRecallStatusIconImage != null && combatRecallStatusIconImage.sprite != null ? combatRecallStatusIconImage.sprite.name : string.Empty
         });
-
         public string CombatActionButtonLabels => string.Join("|", new[]
         {
             ResolveButtonLabel(attackButton),
             ResolveButtonLabel(defendButton),
             ResolveButtonLabel(skillButton)
         });
-
         public string CurrentTopHudIconNames => string.Join("|", new[]
         {
             topGoldIconImage != null && topGoldIconImage.gameObject.activeInHierarchy && topGoldIconImage.sprite != null ? topGoldIconImage.sprite.name : string.Empty,
             topMemoryIconImage != null && topMemoryIconImage.gameObject.activeInHierarchy && topMemoryIconImage.sprite != null ? topMemoryIconImage.sprite.name : string.Empty,
             topAffinityIconImage != null && topAffinityIconImage.gameObject.activeInHierarchy && topAffinityIconImage.sprite != null ? topAffinityIconImage.sprite.name : string.Empty
         });
-
         public Vector2 RouteHeaderAnchorMin => routeText == null ? Vector2.zero : routeText.GetComponent<RectTransform>().anchorMin;
-
         public Vector2 RouteHeaderAnchorMax => routeText == null ? Vector2.zero : routeText.GetComponent<RectTransform>().anchorMax;
-
         public Vector2 NodeMapLayerAnchorMax => nodeMapLayer == null ? Vector2.zero : nodeMapLayer.anchorMax;
-
         public Vector2 RestInteractionAnchorMin => restInteractionPanel == null ? Vector2.zero : restInteractionPanel.anchorMin;
-
         public string CurrentShopChoiceCardSpriteNames => JoinImageSpriteNames(_shopChoiceCardImages);
-
         public string CurrentShopChoiceIconNames => JoinImageSpriteNames(_shopChoiceIconImages);
-
         public bool ShopUiVisible => shopUiController != null && shopUiController.Visible;
-
         public string ShopSceneSpriteName => shopUiController == null ? string.Empty : shopUiController.SceneSpriteName;
-
         public string ShopGoldText => shopUiController == null ? string.Empty : shopUiController.GoldText;
-
         public string ShopOfferText => shopUiController == null ? string.Empty : shopUiController.OfferText;
-
         public string ShopOfferDetailText => shopUiController == null ? string.Empty : shopUiController.OfferDetailText;
-
         public string ShopUnavailableReasonText => shopUiController == null ? string.Empty : shopUiController.UnavailableReasonText;
-
         public string CurrentResultSummaryIconNames => JoinImageSpriteNames(_resultSummaryIconImages);
-
         public string CurrentResultSummaryLabels => string.Join("|", _activeResultSummaryLabels);
-
         public string CurrentResultSummaryValues => string.Join("|", _activeResultSummaryValues);
-
         public string CurrentRestActionIconNames => string.Join("|", new[]
         {
             restAskMoodIconImage != null && restAskMoodIconImage.sprite != null ? restAskMoodIconImage.sprite.name : string.Empty,
             restTrainIconImage != null && restTrainIconImage.sprite != null ? restTrainIconImage.sprite.name : string.Empty,
             restRecoverIconImage != null && restRecoverIconImage.sprite != null ? restRecoverIconImage.sprite.name : string.Empty
         });
-
         public string CurrentRestActionCardLabels => string.Join("|", new[]
         {
             ResolveButtonLabel(restAskMoodButton),
             ResolveButtonLabel(restTrainButton),
             ResolveButtonLabel(restRecoverButton)
         });
-
         public float CurrentEnemyHpFillAmount => enemyHpFill == null ? -1f : enemyHpFill.fillAmount;
-
         public float CurrentPlayerHpFillAmount => playerHpFill == null ? -1f : playerHpFill.fillAmount;
-
         public float CurrentMataiosHpFillAmount => mataiosHpFill == null ? -1f : mataiosHpFill.fillAmount;
-
         public bool EventCutsceneVisible => (eventUiController != null && eventUiController.Visible) ||
             (eventCutscenePanel != null && eventCutscenePanel.gameObject.activeInHierarchy);
-
         public string EventCutsceneMessage => eventUiController != null && eventUiController.Visible
             ? (eventUiController.TitleText + "\n" + eventUiController.BodyText).Trim()
             : ((eventHeaderText == null ? string.Empty : eventHeaderText.text) + "\n" + (eventBodyText == null ? string.Empty : eventBodyText.text)).Trim();
-
         public bool EventUiVisible => eventUiController != null && eventUiController.Visible;
-
         public int EventChoiceCount => eventUiController == null ? 0 : eventUiController.ChoiceCount;
-
         public string EventScrollHint => eventUiController == null ? string.Empty : eventUiController.ScrollHint;
-
         public bool BossGateUiVisible => bossGateUiController != null && bossGateUiController.Visible;
-
         public string BossGateReadinessText => bossGateUiController == null ? string.Empty : bossGateUiController.ReadinessText;
-
         public bool EndingUiVisible => endingUiController != null && endingUiController.Visible;
-
         public string EndingRunSummaryText => endingUiController == null ? string.Empty : endingUiController.RunSummaryText;
-
         public bool UtilityPanelVisible => utilityPanel != null && utilityPanel.gameObject.activeInHierarchy;
-
         public string UtilityPanelMessage => utilityText == null ? string.Empty : utilityText.text;
-
         public string UtilityButtonLabels => string.Join("|", new[]
         {
             ResolveButtonLabel(utilityStatusButton),
             ResolveButtonLabel(utilityMapButton),
             ResolveButtonLabel(utilityLoadoutButton)
         });
-
         public string CurrentPortraitSpriteName => npcPortraitImage != null && npcPortraitImage.sprite != null ? npcPortraitImage.sprite.name : string.Empty;
-
         public bool NpcSpotlightVisible => npcSpotlightLayer != null && npcSpotlightLayer.gameObject.activeInHierarchy;
-
         public string CurrentNpcSpotlightSpriteName => merchantVisualImage != null && merchantVisualImage.sprite != null ? merchantVisualImage.sprite.name : string.Empty;
-
         public string CurrentNpcSupportSpriteNames => string.Join("|", new[]
         {
             npcSpotlightGlowImage != null && npcSpotlightGlowImage.sprite != null ? npcSpotlightGlowImage.sprite.name : string.Empty,
             npcSpotlightShadowImage != null && npcSpotlightShadowImage.sprite != null ? npcSpotlightShadowImage.sprite.name : string.Empty,
             npcDialoguePlateImage != null && npcDialoguePlateImage.sprite != null ? npcDialoguePlateImage.sprite.name : string.Empty
         });
-
         public string NpcSpotlightMessage => ((npcSpotlightNameText == null ? string.Empty : npcSpotlightNameText.text) + "\n" + (npcSpotlightDialogueText == null ? string.Empty : npcSpotlightDialogueText.text)).Trim();
-
         public string CurrentNpcSpotlightModeLabel => _npcSpotlightModeLabel;
-
         public bool HasScreenLayerPanels => topStatusLayer != null && objectiveLayer != null && visualLayer != null && nodeMapLayer != null && npcReactionLayer != null && actionLayer != null && resultLayer != null && endingLayer != null;
-
         public string CurrentMapNodeIconNames
         {
             get
